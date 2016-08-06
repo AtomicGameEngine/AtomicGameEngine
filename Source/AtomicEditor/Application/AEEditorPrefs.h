@@ -31,7 +31,7 @@ namespace AtomicEditor
 
     class AEEditorPrefs : public Object
     {
-        OBJECT(AEEditorPrefs)
+        ATOMIC_OBJECT(AEEditorPrefs, Object)
 
     public:
         /// Construct.

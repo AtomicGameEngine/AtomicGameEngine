@@ -41,7 +41,7 @@ class JSBPackage : public Object
     friend class JSPackageWriter;
     friend class CSPackageWriter;
 
-    OBJECT(JSBPackage)
+    ATOMIC_OBJECT(JSBPackage, Object)
 
 public:
 

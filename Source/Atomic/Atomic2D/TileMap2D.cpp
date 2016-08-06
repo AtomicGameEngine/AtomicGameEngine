@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,10 @@
 namespace Atomic
 {
 
-extern const float PIXEL_SIZE;
+// ATOMIC BEGIN
+// extern const float PIXEL_SIZE;
+// ATOMIC END
+
 extern const char* ATOMIC2D_CATEGORY;
 
 TileMap2D::TileMap2D(Context* context) :
@@ -52,8 +55,8 @@ void TileMap2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<TileMap2D>(ATOMIC2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
         AM_DEFAULT);
 }
 
@@ -80,6 +83,13 @@ void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         break;
 
     case O_STAGGERED:
+        debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
+        debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
+        debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
+        debug->AddLine(Vector2(0.0f, mapH), Vector2(0.0f, 0.0f), color);
+        break;
+
+    case O_HEXAGONAL:
         debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
         debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
         debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
@@ -157,17 +167,6 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
-TileMapLayer2D* TileMap2D::GetLayerByName(const String& name) const
-{
-    for (unsigned i = 0; i < layers_.Size(); i++)
-    {
-        if (layers_[i]->GetName() == name)
-            return layers_[i];
-    }
-
-    return 0;
-}
-
 Vector2 TileMap2D::TileIndexToPosition(int x, int y) const
 {
     return info_.TileIndexToPosition(x, y);
@@ -188,5 +187,20 @@ ResourceRef TileMap2D::GetTmxFileAttr() const
 {
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
 }
+
+// ATOMIC BEGIN
+
+TileMapLayer2D* TileMap2D::GetLayerByName(const String& name) const
+{
+    for (unsigned i = 0; i < layers_.Size(); i++)
+    {
+        if (layers_[i]->GetName() == name)
+            return layers_[i];
+    }
+
+    return 0;
+}
+
+// ATOMIC END
 
 }

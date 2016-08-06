@@ -30,7 +30,7 @@ namespace Atomic
 
 class ATOMIC_API NETEventDispatcher : public Object, public GlobalEventListener
 {
-    OBJECT(NETEventDispatcher);
+    ATOMIC_OBJECT(NETEventDispatcher, Object);
 
 public:
     /// Construct.

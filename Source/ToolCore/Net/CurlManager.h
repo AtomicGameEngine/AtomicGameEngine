@@ -34,16 +34,16 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-EVENT(E_CURLCOMPLETE, CurlComplete)
+ATOMIC_EVENT(E_CURLCOMPLETE, CurlComplete)
 {
-    PARAM(P_CURLREQUEST, Request);      // CurlRequest*
+    ATOMIC_PARAM(P_CURLREQUEST, Request);      // CurlRequest*
 }
 
 class CurlRequest : public Object, public Thread
 {
     friend class CurlManager;
 
-    OBJECT(CurlRequest);
+    ATOMIC_OBJECT(CurlRequest, Object);
 
 public:
 
@@ -70,7 +70,7 @@ private:
 
 class CurlManager : public Object
 {
-    OBJECT(CurlManager);
+    ATOMIC_OBJECT(CurlManager, Object);
 
 public:
     /// Construct.

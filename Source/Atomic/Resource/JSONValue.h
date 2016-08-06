@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,15 @@
 
 #pragma once
 
+// ATOMIC BEGIN
+
+#include <Atomic/Core/Context.h>
 #include <Atomic/Core/Variant.h>
+
+// ATOMIC END
 
 namespace Atomic
 {
-
-class Context;
 
 /// JSON value type.
 enum JSONValueType
@@ -75,7 +78,7 @@ class ATOMIC_API JSONValue
 {
 public:
     /// Construct null value.
-    JSONValue() :
+    JSONValue() : 
         type_(0)
     {
     }
@@ -132,7 +135,7 @@ public:
         type_(0)
     {
         *this = value;
-    }
+    }    
     /// Copy-construct from another JSON value.
     JSONValue(const JSONValue& value) :
         type_(0)
@@ -245,16 +248,25 @@ public:
     /// Clear array or object.
     void Clear();
 
-    /// Internal functions.
+    /// Set value type and number type, internal function.
     void SetType(JSONValueType valueType, JSONNumberType numberType = JSONNT_NAN);
+
+    /// Set variant, context must provide for resource ref.
     void SetVariant(const Variant& variant, Context* context = 0);
-    void GetVariant(Variant& variant) const;
+    /// Return a variant.
+    Variant GetVariant() const;
+    /// Set variant value, context must provide for resource ref.
     void SetVariantValue(const Variant& variant, Context* context = 0);
-    void GetVariantValue(Variant& variant, VariantType type) const;
+    /// Return a variant with type.
+    Variant GetVariantValue(VariantType type) const;
+    /// Set variant map, context must provide for resource ref.
     void SetVariantMap(const VariantMap& variantMap, Context* context = 0);
-    void GetVariantMap(VariantMap& variantMap) const;
+    /// Return a variant map.
+    VariantMap GetVariantMap() const;
+    /// Set variant vector, context must provide for resource ref.
     void SetVariantVector(const VariantVector& variantVector, Context* context = 0);
-    void GetVariantVector(VariantVector& variantVector) const;
+    /// Return a variant vector.
+    VariantVector GetVariantVector() const;
 
     /// Empty JSON value.
     static const JSONValue EMPTY;

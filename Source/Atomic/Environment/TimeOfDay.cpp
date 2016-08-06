@@ -52,7 +52,7 @@ void TimeOfDay::OnNodeSet(Node* node)
 
     if (node && node->GetScene())
     {
-        SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, HANDLER(TimeOfDay, HandleSceneUpdate));
+        SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, ATOMIC_HANDLER(TimeOfDay, HandleSceneUpdate));
     }
 
 }
@@ -103,8 +103,8 @@ void TimeOfDay::RegisterObject(Context* context)
 {
     context->RegisterFactory<TimeOfDay>();
 
-    ACCESSOR_ATTRIBUTE("TimeOn", GetTimeOn, SetTimeOn, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("TimeOff", GetTimeOff, SetTimeOff, float, 0.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("TimeOn", GetTimeOn, SetTimeOn, float, 0.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("TimeOff", GetTimeOff, SetTimeOff, float, 0.0f, AM_DEFAULT);
 }
 
 

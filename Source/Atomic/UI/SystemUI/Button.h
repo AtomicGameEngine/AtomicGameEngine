@@ -33,7 +33,7 @@ namespace SystemUI
 /// Push button %UI element.
 class ATOMIC_API Button : public BorderImage
 {
-    OBJECT(Button);
+    ATOMIC_OBJECT(Button, BorderImage);
 
 public:
     /// Construct.

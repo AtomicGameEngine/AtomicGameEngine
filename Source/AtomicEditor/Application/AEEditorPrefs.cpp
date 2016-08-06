@@ -50,7 +50,7 @@ namespace AtomicEditor
         // It could be better to split this all out to a native, scriptable
         // preferences object
 
-        LOGINFOF("Creating default Atomic Editor preferences: %s", path.CString());
+        ATOMIC_LOGINFOF("Creating default Atomic Editor preferences: %s", path.CString());
 
         SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
@@ -128,8 +128,12 @@ namespace AtomicEditor
 
             prefs[editor ? "editorWindow" : "playerWindow"] = window;
 
+
+            // TODO: add highDPI support
+            bool highDPI = false;
+
             //Setting the mode to 0 width/height will use engine defaults for window size and layout
-            graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample(), editor);
+            graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), highDPI, graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample());
 
             SavePreferences(prefs);
         }
@@ -197,7 +201,7 @@ namespace AtomicEditor
 
         if (!file->IsOpen())
         {
-            LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
+            ATOMIC_LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
             return false;
         }
 

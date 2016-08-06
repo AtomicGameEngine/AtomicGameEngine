@@ -38,8 +38,7 @@ namespace Atomic
     /// NET Assembly resource.
     class ATOMIC_API CSComponentAssembly : public ScriptComponentFile
     {
-        OBJECT(CSComponentAssembly)
-        BASEOBJECT(CSComponentAssembly)
+        ATOMIC_OBJECT(CSComponentAssembly, ScriptComponentFile)
 
     public:
 

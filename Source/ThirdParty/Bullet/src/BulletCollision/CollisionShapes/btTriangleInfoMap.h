@@ -16,10 +16,10 @@ subject to the following restrictions:
 #ifndef _BT_TRIANGLE_INFO_MAP_H
 #define _BT_TRIANGLE_INFO_MAP_H
 
-
+// ATOMIC BEGIN
 #include "../../LinearMath/btHashMap.h"
 #include "../../LinearMath/btSerializer.h"
-
+// ATOMIC END
 
 ///for btTriangleInfo m_flags
 #define TRI_INFO_V0V1_CONVEX 1

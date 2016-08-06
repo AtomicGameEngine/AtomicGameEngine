@@ -145,14 +145,14 @@ void NETCmd::HandleNETBuildResult(StringHash eventType, VariantMap& eventData)
 
     if (eventData[P_SUCCESS].GetBool())
     {
-        LOGINFOF("NETBuild Success for solution: %s", solutionPath_.CString());
+        ATOMIC_LOGINFOF("NETBuild Success for solution: %s", solutionPath_.CString());
         Finished();
     }
     else
     {
         const String& errorText = eventData[P_ERRORTEXT].GetString();
 
-        LOGERRORF("\n%s\n", errorText.CString());
+        ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
         Error(ToString("NETBuild Error for solution: %s", solutionPath_.CString()));
         Finished();
     }
@@ -206,7 +206,7 @@ void NETCmd::Run()
             return;
         }
 
-        build->SubscribeToEvent(E_NETBUILDRESULT, HANDLER(NETCmd, HandleNETBuildResult));        
+        build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETCmd, HandleNETBuildResult));
 
     }
     else if (command_ == "genproject")

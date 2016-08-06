@@ -46,7 +46,7 @@ class SceneEditor3D;
 
 class SceneView3D: public UISceneView
 {
-    OBJECT(SceneView3D);
+    ATOMIC_OBJECT(SceneView3D, UISceneView);
 
 public:
 

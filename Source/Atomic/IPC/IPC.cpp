@@ -46,14 +46,14 @@ namespace Atomic
 IPC::IPC(Context* context) : Object(context),
     workerChannelID_(0)
 {
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(IPC, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, ATOMIC_HANDLER(IPC, HandleBeginFrame));
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
     jobHandle_ = CreateJobObject(NULL, NULL);
     if (!jobHandle_)
     {
-        LOGERROR("IPC::IPC - Unable to create IPC job");
+        ATOMIC_LOGERROR("IPC::IPC - Unable to create IPC job");
     }
     else
     {
@@ -63,7 +63,7 @@ IPC::IPC(Context* context) : Object(context),
         jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
         if (0 == SetInformationJobObject(jobHandle_, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
         {
-            LOGERROR("IPC::IPC - Unable set job information");
+            ATOMIC_LOGERROR("IPC::IPC - Unable set job information");
             jobHandle_ = 0;
         }
     }
@@ -125,7 +125,7 @@ bool IPC::ProcessArguments(const Vector<String>& arguments, int& id, IPCHandle& 
 
             else if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
             {
-                LOGINFOF("Starting IPCWorker %s", argument.CString());
+                ATOMIC_LOGINFOF("Starting IPCWorker %s", argument.CString());
 
                 Vector<String> ipc = argument.Split(argument.CString(), '=');
 

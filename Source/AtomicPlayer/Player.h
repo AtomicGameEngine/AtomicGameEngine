@@ -34,7 +34,7 @@ namespace AtomicPlayer
 /// Player subsystem
 class Player : public Object
 {
-    OBJECT(Player);
+    ATOMIC_OBJECT(Player, Object);
 
 public:
     /// Construct.

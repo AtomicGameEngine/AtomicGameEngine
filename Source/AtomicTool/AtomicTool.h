@@ -35,7 +35,7 @@ namespace AtomicTool
 
 class AtomicTool : public Application
 {
-    OBJECT(AtomicTool);
+    ATOMIC_OBJECT(AtomicTool, Application);
 
 public:
 

@@ -58,7 +58,7 @@ class WebRequest : public Object
 {
     friend class Web;
 
-    OBJECT(WebRequest)
+    ATOMIC_OBJECT(WebRequest, Object)
 
 public:
     /// Construct with parameters.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,10 @@
 #include "../Math/Rect.h"
 #include "../Math/Vector3.h"
 
+#ifdef ATOMIC_SSE
+#include <xmmintrin.h>
+#endif
+
 namespace Atomic
 {
 
@@ -41,85 +45,75 @@ class ATOMIC_API BoundingBox
 public:
     /// Construct with zero size.
     BoundingBox() :
-        min_(Vector3::ZERO),
-        max_(Vector3::ZERO),
-        defined_(false)
+        min_(M_INFINITY, M_INFINITY, M_INFINITY),
+        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
     }
 
     /// Copy-construct from another bounding box.
     BoundingBox(const BoundingBox& box) :
         min_(box.min_),
-        max_(box.max_),
-        defined_(box.defined_)
+        max_(box.max_)
     {
     }
 
     /// Construct from a rect, with the Z dimension left zero.
     BoundingBox(const Rect& rect) :
         min_(Vector3(rect.min_, 0.0f)),
-        max_(Vector3(rect.max_, 0.0f)),
-        defined_(true)
+        max_(Vector3(rect.max_, 0.0f))
     {
     }
 
     /// Construct from minimum and maximum vectors.
     BoundingBox(const Vector3& min, const Vector3& max) :
         min_(min),
-        max_(max),
-        defined_(true)
+        max_(max)
     {
     }
 
     /// Construct from minimum and maximum floats (all dimensions same.)
     BoundingBox(float min, float max) :
         min_(Vector3(min, min, min)),
-        max_(Vector3(max, max, max)),
-        defined_(true)
+        max_(Vector3(max, max, max))
     {
     }
 
-    /// Construct from minimum and maximum floats (all dimensions defined.)
-    BoundingBox(float minx, float miny, float minz, float maxx, float maxy, float maxz) :
-        min_(Vector3(minx, miny, minz)),
-        max_(Vector3(maxx, maxy, maxz)),
-        defined_(true)
+#ifdef ATOMIC_SSE
+    BoundingBox(__m128 min, __m128 max)
     {
+        _mm_storeu_ps(&min_.x_, min);
+        _mm_storeu_ps(&max_.x_, max);
     }
+#endif
 
-    BoundingBox(float* data) :
-        min_(Vector3(data[0], data[1], data[2])),
-        max_(Vector3(data[3], data[4], data[5])),
-        defined_(true)
-    {
-    }
-
-
-    
     /// Construct from an array of vertices.
     BoundingBox(const Vector3* vertices, unsigned count) :
-        defined_(false)
+        min_(M_INFINITY, M_INFINITY, M_INFINITY),
+        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
         Define(vertices, count);
     }
 
     /// Construct from a frustum.
     BoundingBox(const Frustum& frustum) :
-        defined_(false)
+        min_(M_INFINITY, M_INFINITY, M_INFINITY),
+        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
         Define(frustum);
     }
 
     /// Construct from a polyhedron.
     BoundingBox(const Polyhedron& poly) :
-        defined_(false)
+        min_(M_INFINITY, M_INFINITY, M_INFINITY),
+        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
         Define(poly);
     }
 
     /// Construct from a sphere.
     BoundingBox(const Sphere& sphere) :
-        defined_(false)
+        min_(M_INFINITY, M_INFINITY, M_INFINITY),
+        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
     {
         Define(sphere);
     }
@@ -129,7 +123,6 @@ public:
     {
         min_ = rhs.min_;
         max_ = rhs.max_;
-        defined_ = rhs.defined_;
         return *this;
     }
 
@@ -138,7 +131,6 @@ public:
     {
         min_ = Vector3(rhs.min_, 0.0f);
         max_ = Vector3(rhs.max_, 0.0f);
-        defined_ = true;
         return *this;
     }
 
@@ -165,7 +157,6 @@ public:
     {
         min_ = min;
         max_ = max;
-        defined_ = true;
     }
 
     /// Define from minimum and maximum floats (all dimensions same.)
@@ -173,26 +164,22 @@ public:
     {
         min_ = Vector3(min, min, min);
         max_ = Vector3(max, max, max);
-        defined_ = true;
     }
 
     /// Define from a point.
     void Define(const Vector3& point)
     {
         min_ = max_ = point;
-        defined_ = true;
     }
 
     /// Merge a point.
     void Merge(const Vector3& point)
     {
-        if (!defined_)
-        {
-            min_ = max_ = point;
-            defined_ = true;
-            return;
-        }
-
+#ifdef ATOMIC_SSE
+        __m128 vec = _mm_set_ps(1.f, point.z_, point.y_, point.x_);
+        _mm_storeu_ps(&min_.x_, _mm_min_ps(_mm_loadu_ps(&min_.x_), vec));
+        _mm_storeu_ps(&max_.x_, _mm_max_ps(_mm_loadu_ps(&max_.x_), vec));
+#else
         if (point.x_ < min_.x_)
             min_.x_ = point.x_;
         if (point.y_ < min_.y_)
@@ -205,19 +192,16 @@ public:
             max_.y_ = point.y_;
         if (point.z_ > max_.z_)
             max_.z_ = point.z_;
+#endif
     }
 
     /// Merge another bounding box.
     void Merge(const BoundingBox& box)
     {
-        if (!defined_)
-        {
-            min_ = box.min_;
-            max_ = box.max_;
-            defined_ = true;
-            return;
-        }
-
+#ifdef ATOMIC_SSE
+        _mm_storeu_ps(&min_.x_, _mm_min_ps(_mm_loadu_ps(&min_.x_), _mm_loadu_ps(&box.min_.x_)));
+        _mm_storeu_ps(&max_.x_, _mm_max_ps(_mm_loadu_ps(&max_.x_), _mm_loadu_ps(&box.max_.x_)));
+#else
         if (box.min_.x_ < min_.x_)
             min_.x_ = box.min_.x_;
         if (box.min_.y_ < min_.y_)
@@ -230,6 +214,7 @@ public:
             max_.y_ = box.max_.y_;
         if (box.max_.z_ > max_.z_)
             max_.z_ = box.max_.z_;
+#endif
     }
 
     /// Define from an array of vertices.
@@ -248,7 +233,7 @@ public:
     void Merge(const Polyhedron& poly);
     /// Merge a sphere.
     void Merge(const Sphere& sphere);
-    /// Clip with another bounding box.
+    /// Clip with another bounding box. The box can become degenerate (undefined) as a result.
     void Clip(const BoundingBox& box);
     /// Transform with a 3x3 matrix.
     void Transform(const Matrix3& transform);
@@ -258,9 +243,19 @@ public:
     /// Clear to undefined state.
     void Clear()
     {
-        min_ = Vector3::ZERO;
-        max_ = Vector3::ZERO;
-        defined_ = false;
+#ifdef ATOMIC_SSE
+        _mm_storeu_ps(&min_.x_, _mm_set1_ps(M_INFINITY));
+        _mm_storeu_ps(&max_.x_, _mm_set1_ps(-M_INFINITY));
+#else
+        min_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
+        max_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
+#endif
+    }
+
+    /// Return true if this bounding box is defined via a previous call to Define() or Merge().
+    bool Defined() const
+    {
+        return min_.x_ != M_INFINITY;
     }
 
     /// Return center.
@@ -320,6 +315,22 @@ public:
     /// Return as string.
     String ToString() const;
 
+    /// Minimum vector.
+    Vector3 min_;
+    float dummyMin_; // This is never used, but exists to pad the min_ value to four floats.
+    /// Maximum vector.
+    Vector3 max_;
+    float dummyMax_; // This is never used, but exists to pad the max_ value to four floats.
+
+    // ATOMIC BEGIN
+    float data_[6];
+
+    BoundingBox(float* data) :
+        min_(Vector3(data[0], data[1], data[2])),
+        max_(Vector3(data[3], data[4], data[5]))
+    {
+    }
+
     float* Data() const
     {
         float* data = const_cast<BoundingBox*>(this)->data_;
@@ -332,15 +343,8 @@ public:
         data[5] = max_.z_;
         return data;
     }
-    
-    /// Minimum vector.
-    Vector3 min_;
-    /// Maximum vector.
-    Vector3 max_;
-    /// Defined flag.
-    bool defined_;
+    // ATOMIC END
 
-    float data_[6];
 };
 
 }

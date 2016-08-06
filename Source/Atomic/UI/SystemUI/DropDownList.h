@@ -35,7 +35,7 @@ class ListView;
 /// %Menu %UI element that displays a popup list view.
 class ATOMIC_API DropDownList : public Menu
 {
-    OBJECT(DropDownList)
+    ATOMIC_OBJECT(DropDownList, Menu)
 
 public:
     /// Construct.

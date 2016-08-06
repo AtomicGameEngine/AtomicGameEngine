@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,8 @@ public:
     virtual const String& GetName() const;
     /// Return a checksum if applicable.
     virtual unsigned GetChecksum();
+    /// Return whether the end of stream has been reached.
+    virtual bool IsEof() const { return position_ >= size_; }
 
     /// Return current position.
     unsigned GetPosition() const { return position_; }
@@ -55,15 +57,16 @@ public:
     /// Return size.
     unsigned GetSize() const { return size_; }
 
-    /// Return whether the end of stream has been reached.
-    bool IsEof() const { return position_ >= size_; }
-
+    /// Read a 64-bit integer.
+    long long ReadInt64();
     /// Read a 32-bit integer.
     int ReadInt();
     /// Read a 16-bit integer.
     short ReadShort();
     /// Read an 8-bit integer.
     signed char ReadByte();
+    /// Read a 64-bit unsigned integer.
+    unsigned long long ReadUInt64();
     /// Read a 32-bit unsigned integer.
     unsigned ReadUInt();
     /// Read a 16-bit unsigned integer.

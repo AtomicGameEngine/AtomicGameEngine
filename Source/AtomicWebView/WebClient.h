@@ -40,7 +40,7 @@ class ATOMIC_API WebClient : public Object
     friend class WebBrowserHost;
     friend class WebClientPrivate;
 
-    OBJECT(WebClient)
+    ATOMIC_OBJECT(WebClient, Object)
 
 public:
 

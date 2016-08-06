@@ -170,6 +170,22 @@ void JSModuleWriter::WriteIncludes(String& source)
 
 }
 
+void JSModuleWriter::WritePreamble(String& source)
+{
+    if (!module_->jsmodulePreamble_.Size())
+        return;
+
+    source += "\n// Begin Module Preamble\n\n";
+
+    for (unsigned i = 0; i < module_->jsmodulePreamble_.Size(); i++)
+    {
+        source += module_->jsmodulePreamble_[i] + "\n";
+    }
+
+    source += "\n// End Module Preamble\n\n";
+
+}
+
 void JSModuleWriter::WriteClassDefine(String& source)
 {
     Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
@@ -263,6 +279,8 @@ void JSModuleWriter::GenerateSource()
     source += "#include <AtomicJS/Javascript/JSAPI.h>\n";
 
     WriteIncludes(source);
+
+    WritePreamble(source);
 
     String ns = module_->GetPackage()->GetNamespace();
 

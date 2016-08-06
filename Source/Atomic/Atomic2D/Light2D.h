@@ -50,7 +50,7 @@ struct Light2DRay
 
 class ATOMIC_API Light2D : public Component
 {
-    OBJECT(Light2D);
+    ATOMIC_OBJECT(Light2D, Component);
 
 public:
     /// Construct.
@@ -112,7 +112,7 @@ protected:
 
 class ATOMIC_API DirectionalLight2D : public Light2D
 {
-    OBJECT(DirectionalLight2D);
+    ATOMIC_OBJECT(DirectionalLight2D, Light2D);
 
 public:
     /// Construct.
@@ -137,7 +137,7 @@ protected:
 
 class ATOMIC_API PositionalLight2D : public Light2D
 {
-    OBJECT(PositionalLight2D);
+    ATOMIC_OBJECT(PositionalLight2D, Light2D);
 
 public:
     /// Construct.
@@ -156,7 +156,7 @@ protected:
 
 class ATOMIC_API PointLight2D : public PositionalLight2D
 {
-    OBJECT(PointLight2D);
+    ATOMIC_OBJECT(PointLight2D, PositionalLight2D);
 
 public:
     /// Construct.
@@ -181,7 +181,7 @@ protected:
 
 class ATOMIC_API Light2DGroup : public Drawable2D
 {
-    OBJECT(Light2DGroup);
+    ATOMIC_OBJECT(Light2DGroup, Drawable2D);
 
 public:
     /// Construct.

@@ -9,7 +9,7 @@ namespace Atomic
 
 class PrefabComponent : public Component
 {
-    OBJECT(PrefabComponent);
+    ATOMIC_OBJECT(PrefabComponent, Component);
 
 public:
 

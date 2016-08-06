@@ -95,7 +95,7 @@ struct ATOMIC_API CursorShapeInfo
 /// Mouse cursor %UI element.
 class ATOMIC_API Cursor : public BorderImage
 {
-    OBJECT(Cursor);
+    ATOMIC_OBJECT(Cursor, BorderImage);
 
 public:
     /// Construct.

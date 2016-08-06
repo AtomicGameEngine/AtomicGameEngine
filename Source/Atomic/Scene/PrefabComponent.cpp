@@ -6,7 +6,6 @@
 #include <Atomic/Resource/ResourceEvents.h>
 
 #include <Atomic/Physics/RigidBody.h>
-#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 
 #include "PrefabEvents.h"
 #include "PrefabComponent.h"
@@ -18,7 +17,7 @@ namespace Atomic
 PrefabComponent::PrefabComponent(Context* context) :
     Component(context)
 {
-    SubscribeToEvent(E_PREFABCHANGED, HANDLER(PrefabComponent, HandlePrefabChanged));
+    SubscribeToEvent(E_PREFABCHANGED, ATOMIC_HANDLER(PrefabComponent, HandlePrefabChanged));
 }
 
 PrefabComponent::~PrefabComponent()
@@ -44,7 +43,7 @@ void PrefabComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<PrefabComponent>();
 
-    ACCESSOR_ATTRIBUTE("PrefabGUID", GetPrefabGUID, SetPrefabGUID, String, String::EMPTY, AM_FILE | AM_NOEDIT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("PrefabGUID", GetPrefabGUID, SetPrefabGUID, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
 
 void PrefabComponent::LoadPrefabNode()
@@ -130,18 +129,6 @@ void PrefabComponent::BreakPrefab()
         if (rootComponents[i]->IsTemporary())
         {
             rootComponents[i]->SetTemporary(false);
-
-            // Animated sprites contain a temporary node we don't want to save in the prefab
-            // it would be nice if this was general purpose because have to test this when
-            // saving a prefab as well
-
-            if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
-            {
-                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
-                if (asprite->GetRootNode())
-                    filterNodes.Push(asprite->GetRootNode());
-            }
-
         }
     }
 

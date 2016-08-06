@@ -38,8 +38,7 @@ class ATOMIC_API JSComponent : public ScriptComponent
     friend class JSComponentFactory;
     friend class JSComponentFile;
 
-    OBJECT(JSComponent);
-    BASEOBJECT(ScriptComponent);
+    ATOMIC_OBJECT(JSComponent, ScriptComponent);
 
     enum EventFlags
     {

@@ -34,7 +34,7 @@ namespace ToolCore
 
     class NETAssemblyImporterResultHandler : public IPCResultHandler
     {
-        OBJECT(NETAssemblyImporterResultHandler)
+        ATOMIC_OBJECT(NETAssemblyImporterResultHandler, IPCResultHandler)
 
     public:
         /// Construct.
@@ -54,7 +54,7 @@ namespace ToolCore
     {
         friend class NETAssemblyImporterResultHandler;
 
-        OBJECT(NETAssemblyImporter)
+        ATOMIC_OBJECT(NETAssemblyImporter, AssetImporter)
 
     public:
         /// Construct.

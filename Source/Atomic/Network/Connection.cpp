@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,9 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
+// ATOMIC BEGIN
 #include <kNet/include/kNet.h>
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -60,7 +62,12 @@ PackageUpload::PackageUpload() :
 {
 }
 
-Connection::Connection(Context* context) : Object(context)
+Connection::Connection(Context* context) : Object(context),
+    timeStamp_(0),
+    sendMode_(OPSM_NONE),
+    connectPending_(false),
+    sceneLoaded_(false),
+    logStatistics_(false)
 {
 
 }
@@ -102,20 +109,20 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
     {
-        LOGERROR("Can not send message with reserved ID");
+        ATOMIC_LOGERROR("Can not send message with reserved ID");
         return;
     }
 
     if (numBytes && !data)
     {
-        LOGERROR("Null pointer supplied for network message data");
+        ATOMIC_LOGERROR("Null pointer supplied for network message data");
         return;
     }
 
     kNet::NetworkMessage* msg = connection_->StartNewMessage((unsigned long)msgID, numBytes);
     if (!msg)
     {
-        LOGERROR("Can not start new network message");
+        ATOMIC_LOGERROR("Can not start new network message");
         return;
     }
 
@@ -143,17 +150,17 @@ void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder,
 {
     if (!node)
     {
-        LOGERROR("Null sender node for remote node event");
+        ATOMIC_LOGERROR("Null sender node for remote node event");
         return;
     }
     if (node->GetScene() != scene_)
     {
-        LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
+        ATOMIC_LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
     if (node->GetID() >= FIRST_LOCAL_ID)
     {
-        LOGERROR("Sender node has a local ID, can not send remote node event");
+        ATOMIC_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
     }
 
@@ -203,10 +210,8 @@ void Connection::SetScene(Scene* newScene)
     {
         // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
-        SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, HANDLER(Connection, HandleAsyncLoadFinished));
+        SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, ATOMIC_HANDLER(Connection, HandleAsyncLoadFinished));
     }
-
-    SubscribeToEvent(scene_, E_COMPONENTREMOVED, HANDLER(Connection, HandleComponentRemoved));
 }
 
 void Connection::SetIdentity(const VariantMap& identity)
@@ -300,14 +305,14 @@ void Connection::SendRemoteEvents()
         sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", connection_->RoundTripTime(),
             (int)connection_->PacketsInPerSec(),
             (int)connection_->PacketsOutPerSec(), connection_->BytesInPerSec() / 1000.0f, connection_->BytesOutPerSec() / 1000.0f);
-        LOGINFO(statsBuffer);
+        ATOMIC_LOGINFO(statsBuffer);
     }
 #endif
 
     if (remoteEvents_.Empty())
         return;
 
-    PROFILE(SendRemoteEvents);
+    ATOMIC_PROFILE(SendRemoteEvents);
 
     for (Vector<RemoteEvent>::ConstIterator i = remoteEvents_.Begin(); i != remoteEvents_.End(); ++i)
     {
@@ -341,7 +346,7 @@ void Connection::SendPackages()
             HashMap<StringHash, PackageUpload>::Iterator current = i++;
             PackageUpload& upload = current->second_;
             unsigned fragmentSize =
-                (unsigned)Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
+                Min((upload.file_->GetSize() - upload.file_->GetPosition()), PACKAGE_FRAGMENT_SIZE);
             upload.file_->Read(buffer, fragmentSize);
 
             msg_.Clear();
@@ -444,9 +449,6 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
     case MSG_PACKAGEINFO:
         ProcessPackageInfo(msgID, msg);
         break;
-    case MSG_STRING:
-        ProcessStringMessage(msgID, msg);
-        break;
 
     default:
         processed = false;
@@ -460,13 +462,13 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 {
     if (IsClient())
     {
-        LOGWARNING("Received unexpected LoadScene message from client " + ToString());
+        ATOMIC_LOGWARNING("Received unexpected LoadScene message from client " + ToString());
         return;
     }
 
     if (!scene_)
     {
-        LOGERROR("Can not handle LoadScene message without an assigned scene");
+        ATOMIC_LOGERROR("Can not handle LoadScene message without an assigned scene");
         return;
     }
 
@@ -508,11 +510,11 @@ void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
 {
     if (IsClient())
     {
-        LOGWARNING("Received unexpected SceneChecksumError message from client " + ToString());
+        ATOMIC_LOGWARNING("Received unexpected SceneChecksumError message from client " + ToString());
         return;
     }
 
-    LOGERROR("Scene checksum error");
+    ATOMIC_LOGERROR("Scene checksum error");
     OnSceneLoadFailed();
 }
 
@@ -522,7 +524,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     /// while the application is minimized
     if (IsClient())
     {
-        LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
+        ATOMIC_LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
         return;
     }
 
@@ -580,7 +582,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // If was unable to create the component, would desync the message and therefore have to abort
                 if (!component)
                 {
-                    LOGERROR("CreateNode message parsing aborted due to unknown component");
+                    ATOMIC_LOGERROR("CreateNode message parsing aborted due to unknown component");
                     return;
                 }
 
@@ -609,7 +611,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 }
             }
             else
-                LOGWARNING("NodeDeltaUpdate message received for missing node " + String(nodeID));
+                ATOMIC_LOGWARNING("NodeDeltaUpdate message received for missing node " + String(nodeID));
         }
         break;
 
@@ -664,7 +666,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // If was unable to create the component, would desync the message and therefore have to abort
                 if (!component)
                 {
-                    LOGERROR("CreateComponent message parsing aborted due to unknown component");
+                    ATOMIC_LOGERROR("CreateComponent message parsing aborted due to unknown component");
                     return;
                 }
 
@@ -673,7 +675,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 component->ApplyAttributes();
             }
             else
-                LOGWARNING("CreateComponent message received for missing node " + String(nodeID));
+                ATOMIC_LOGWARNING("CreateComponent message received for missing node " + String(nodeID));
         }
         break;
 
@@ -687,7 +689,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 component->ApplyAttributes();
             }
             else
-                LOGWARNING("ComponentDeltaUpdate message received for missing component " + String(componentID));
+                ATOMIC_LOGWARNING("ComponentDeltaUpdate message received for missing component " + String(componentID));
         }
         break;
 
@@ -731,7 +733,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
     case MSG_REQUESTPACKAGE:
         if (!IsClient())
         {
-            LOGWARNING("Received unexpected RequestPackage message from server");
+            ATOMIC_LOGWARNING("Received unexpected RequestPackage message from server");
             return;
         }
         else
@@ -740,7 +742,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
 
             if (!scene_)
             {
-                LOGWARNING("Received a RequestPackage message without an assigned scene from client " + ToString());
+                ATOMIC_LOGWARNING("Received a RequestPackage message without an assigned scene from client " + ToString());
                 return;
             }
 
@@ -757,7 +759,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     // Do not restart upload if already exists
                     if (uploads_.Contains(nameHash))
                     {
-                        LOGWARNING("Received a request for package " + name + " already in transfer");
+                        ATOMIC_LOGWARNING("Received a request for package " + name + " already in transfer");
                         return;
                     }
 
@@ -765,12 +767,12 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     SharedPtr<File> file(new File(context_, packageFullName));
                     if (!file->IsOpen())
                     {
-                        LOGERROR("Failed to transmit package file " + name);
+                        ATOMIC_LOGERROR("Failed to transmit package file " + name);
                         SendPackageError(name);
                         return;
                     }
 
-                    LOGINFO("Transmitting package file " + name + " to client " + ToString());
+                    ATOMIC_LOGINFO("Transmitting package file " + name + " to client " + ToString());
 
                     uploads_[nameHash].file_ = file;
                     uploads_[nameHash].fragment_ = 0;
@@ -779,7 +781,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 }
             }
 
-            LOGERROR("Client requested an unexpected package file " + name);
+            ATOMIC_LOGERROR("Client requested an unexpected package file " + name);
             // Send the name hash only to indicate a failed download
             SendPackageError(name);
             return;
@@ -789,7 +791,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
     case MSG_PACKAGEDATA:
         if (IsClient())
         {
-            LOGWARNING("Received unexpected PackageData message from client");
+            ATOMIC_LOGWARNING("Received unexpected PackageData message from client");
             return;
         }
         else
@@ -837,7 +839,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             // Check if all fragments received
             if (download.receivedFragments_.Size() == download.totalFragments_)
             {
-                LOGINFO("Package " + download.name_ + " downloaded successfully");
+                ATOMIC_LOGINFO("Package " + download.name_ + " downloaded successfully");
 
                 // Instantiate the package and add to the resource system, as we will need it to load the scene
                 download.file_->Close();
@@ -851,7 +853,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 {
                     PackageDownload& nextDownload = downloads_.Begin()->second_;
 
-                    LOGINFO("Requesting package " + nextDownload.name_ + " from server");
+                    ATOMIC_LOGINFO("Requesting package " + nextDownload.name_ + " from server");
                     msg_.Clear();
                     msg_.WriteString(nextDownload.name_);
                     SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
@@ -869,7 +871,7 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        LOGWARNING("Received unexpected Identity message from server");
+        ATOMIC_LOGWARNING("Received unexpected Identity message from server");
         return;
     }
 
@@ -891,7 +893,7 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        LOGWARNING("Received unexpected Controls message from server");
+        ATOMIC_LOGWARNING("Received unexpected Controls message from server");
         return;
     }
 
@@ -915,13 +917,13 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        LOGWARNING("Received unexpected SceneLoaded message from server");
+        ATOMIC_LOGWARNING("Received unexpected SceneLoaded message from server");
         return;
     }
 
     if (!scene_)
     {
-        LOGWARNING("Received a SceneLoaded message without an assigned scene from client " + ToString());
+        ATOMIC_LOGWARNING("Received a SceneLoaded message without an assigned scene from client " + ToString());
         return;
     }
 
@@ -929,7 +931,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
 
     if (checksum != scene_->GetChecksum())
     {
-        LOGINFO("Scene checksum error from client " + ToString());
+        ATOMIC_LOGINFO("Scene checksum error from client " + ToString());
         msg_.Clear();
         SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_);
         OnSceneLoadFailed();
@@ -955,7 +957,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         StringHash eventType = msg.ReadStringHash();
         if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
         {
-            LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+            ATOMIC_LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
             return;
         }
 
@@ -967,7 +969,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
     {
         if (!scene_)
         {
-            LOGERROR("Can not receive remote node event without an assigned scene");
+            ATOMIC_LOGERROR("Can not receive remote node event without an assigned scene");
             return;
         }
 
@@ -975,7 +977,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         StringHash eventType = msg.ReadStringHash();
         if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
         {
-            LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+            ATOMIC_LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
             return;
         }
 
@@ -983,7 +985,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         Node* sender = scene_->GetNode(nodeID);
         if (!sender)
         {
-            LOGWARNING("Missing sender for remote node event, discarding");
+            ATOMIC_LOGWARNING("Missing sender for remote node event, discarding");
             return;
         }
         eventData[P_CONNECTION] = this;
@@ -1073,12 +1075,12 @@ void Connection::SendPackageToClient(PackageFile* package)
 
     if (!IsClient())
     {
-        LOGERROR("SendPackageToClient can be called on the server only");
+        ATOMIC_LOGERROR("SendPackageToClient can be called on the server only");
         return;
     }
     if (!package)
     {
-        LOGERROR("Null package specified for SendPackageToClient");
+        ATOMIC_LOGERROR("Null package specified for SendPackageToClient");
         return;
     }
 
@@ -1110,28 +1112,6 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     msg_.WriteUInt(scene_->GetChecksum());
     SendMessage(MSG_SCENELOADED, true, true, msg_);
 }
-
-void Connection::HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
-{
-    using namespace ComponentRemoved;
-
-    Component* comp = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
-    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-
-    unsigned nodeId = node->GetID();
-    unsigned compId = comp->GetID();
-
-    if (sceneState_.nodeStates_.Contains(node->GetID()))
-    {
-        NodeReplicationState& nodeState = sceneState_.nodeStates_[node->GetID()];
-        if (nodeState.componentStates_.Contains(comp->GetID()))
-        {
-            ComponentReplicationState& compState = nodeState.componentStates_[comp->GetID()];
-            compState.component_ = NULL;
-        }
-    }
-}
-
 
 void Connection::ProcessNode(unsigned nodeID)
 {
@@ -1300,7 +1280,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 else
                 {
                     // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
-                    LOGWARNING("Sending dummy user variable as original value was removed");
+                    ATOMIC_LOGWARNING("Sending dummy user variable as original value was removed");
                     msg_.WriteStringHash(StringHash());
                     msg_.WriteVariant(Variant::EMPTY);
                 }
@@ -1444,7 +1424,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         {
             if (packageCacheDir.Empty())
             {
-                LOGERROR("Can not check/download required packages, as package cache directory is not set");
+                ATOMIC_LOGERROR("Can not check/download required packages, as package cache directory is not set");
                 return false;
             }
 
@@ -1493,7 +1473,7 @@ void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned 
     // Start download now only if no existing downloads, else wait for the existing ones to finish
     if (downloads_.Size() == 1)
     {
-        LOGINFO("Requesting package " + name + " from server");
+        ATOMIC_LOGINFO("Requesting package " + name + " from server");
         msg_.Clear();
         msg_.WriteString(name);
         SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
@@ -1521,7 +1501,7 @@ void Connection::OnSceneLoadFailed()
 
 void Connection::OnPackageDownloadFailed(const String& name)
 {
-    LOGERROR("Download of package " + name + " failed");
+    ATOMIC_LOGERROR("Download of package " + name + " failed");
     // As one package failed, we can not join the scene in any case. Clear the downloads
     downloads_.Clear();
     OnSceneLoadFailed();
@@ -1571,49 +1551,11 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
 
     if (IsClient())
     {
-        LOGWARNING("Received unexpected packages info message from client");
+        ATOMIC_LOGWARNING("Received unexpected packages info message from client");
         return;
     }
 
     RequestNeededPackages(1, msg);
-}
-
-// Expose control methods for current controls
-void Connection::SetControlButtons(unsigned buttons, bool down)
-{
-    controls_.Set(buttons,down);
-}
-
-/// Check if a button is held down.
-bool Connection::IsControlButtonDown(unsigned button) const
-{
-    return (controls_.IsDown(button));
-}
-
-void Connection::SetControlDataInt(const String &key, int value) {
-    controls_.extraData_[key] = value;
-}
-
-int Connection::GetControlDataInt(const String &key) {
-    return controls_.extraData_[key].GetInt();
-}
-
-void Connection::SendStringMessage(const String& message)
-{
-    // Send the identity map now
-    VectorBuffer msg;
-    msg.WriteString(message);
-    SendMessage(MSG_STRING, true, true, msg);
-}
-
-void Connection::ProcessStringMessage(int msgID, MemoryBuffer &msg) {
-    using namespace NetworkMessage;
-
-    VariantMap &eventData = GetEventDataMap();
-    eventData[P_MESSAGEID] = (int) msgID;
-    eventData[P_CONNECTION] = this;
-    eventData[P_DATA] = msg.ReadString();
-    SendEvent(E_NETWORKSTRINGMESSAGE, eventData);
 }
 
 }

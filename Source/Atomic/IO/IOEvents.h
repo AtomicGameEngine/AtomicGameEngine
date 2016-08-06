@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,17 +28,17 @@ namespace Atomic
 {
 
 /// Log message event.
-EVENT(E_LOGMESSAGE, LogMessage)
+ATOMIC_EVENT(E_LOGMESSAGE, LogMessage)
 {
-    PARAM(P_MESSAGE, Message);              // String
-    PARAM(P_LEVEL, Level);                  // int
+    ATOMIC_PARAM(P_MESSAGE, Message);              // String
+    ATOMIC_PARAM(P_LEVEL, Level);                  // int
 }
 
 /// Async system command execution finished.
-EVENT(E_ASYNCEXECFINISHED, AsyncExecFinished)
+ATOMIC_EVENT(E_ASYNCEXECFINISHED, AsyncExecFinished)
 {
-    PARAM(P_REQUESTID, RequestID);          // unsigned
-    PARAM(P_EXITCODE, ExitCode);            // int
+    ATOMIC_PARAM(P_REQUESTID, RequestID);          // unsigned
+    ATOMIC_PARAM(P_EXITCODE, ExitCode);            // int
 }
 
 }

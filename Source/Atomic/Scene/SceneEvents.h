@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,156 +28,188 @@ namespace Atomic
 {
 
 /// Variable timestep scene update.
-EVENT(E_SCENEUPDATE, SceneUpdate)
+ATOMIC_EVENT(E_SCENEUPDATE, SceneUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Scene subsystem update.
-EVENT(E_SCENESUBSYSTEMUPDATE, SceneSubsystemUpdate)
+ATOMIC_EVENT(E_SCENESUBSYSTEMUPDATE, SceneSubsystemUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Scene transform smoothing update.
-EVENT(E_UPDATESMOOTHING, UpdateSmoothing)
+ATOMIC_EVENT(E_UPDATESMOOTHING, UpdateSmoothing)
 {
-    PARAM(P_CONSTANT, Constant);            // float
-    PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
+    ATOMIC_PARAM(P_CONSTANT, Constant);            // float
+    ATOMIC_PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
 }
 
 /// Scene drawable update finished. Custom animation (eg. IK) can be done at this point.
-EVENT(E_SCENEDRAWABLEUPDATEFINISHED, SceneDrawableUpdateFinished)
+ATOMIC_EVENT(E_SCENEDRAWABLEUPDATEFINISHED, SceneDrawableUpdateFinished)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// SmoothedTransform target position changed.
-EVENT(E_TARGETPOSITION, TargetPositionChanged)
+ATOMIC_EVENT(E_TARGETPOSITION, TargetPositionChanged)
 {
 }
 
 /// SmoothedTransform target position changed.
-EVENT(E_TARGETROTATION, TargetRotationChanged)
+ATOMIC_EVENT(E_TARGETROTATION, TargetRotationChanged)
 {
 }
 
 /// Scene attribute animation update.
-EVENT(E_ATTRIBUTEANIMATIONUPDATE, AttributeAnimationUpdate)
+ATOMIC_EVENT(E_ATTRIBUTEANIMATIONUPDATE, AttributeAnimationUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Attribute animation added to object animation.
-EVENT(E_ATTRIBUTEANIMATIONADDED, AttributeAnimationAdded)
+ATOMIC_EVENT(E_ATTRIBUTEANIMATIONADDED, AttributeAnimationAdded)
 {
-    PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
-    PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
+    ATOMIC_PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
+    ATOMIC_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
 }
 
 /// Attribute animation removed from object animation.
-EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
+ATOMIC_EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
 {
-    PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
-    PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
+    ATOMIC_PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
+    ATOMIC_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
 }
 
 /// Variable timestep scene post-update.
-EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
+ATOMIC_EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Asynchronous scene loading progress.
-EVENT(E_ASYNCLOADPROGRESS, AsyncLoadProgress)
+ATOMIC_EVENT(E_ASYNCLOADPROGRESS, AsyncLoadProgress)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PROGRESS, Progress);            // float
-    PARAM(P_LOADEDNODES, LoadedNodes);      // int
-    PARAM(P_TOTALNODES, TotalNodes);        // int
-    PARAM(P_LOADEDRESOURCES, LoadedResources); // int
-    PARAM(P_TOTALRESOURCES, TotalResources);   // int
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_PROGRESS, Progress);            // float
+    ATOMIC_PARAM(P_LOADEDNODES, LoadedNodes);      // int
+    ATOMIC_PARAM(P_TOTALNODES, TotalNodes);        // int
+    ATOMIC_PARAM(P_LOADEDRESOURCES, LoadedResources); // int
+    ATOMIC_PARAM(P_TOTALRESOURCES, TotalResources);   // int
 };
 
 /// Asynchronous scene loading finished.
-EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
+ATOMIC_EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
 };
 
 /// A child node has been added to a parent node.
-EVENT(E_NODEADDED, NodeAdded)
+ATOMIC_EVENT(E_NODEADDED, NodeAdded)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PARENT, Parent);                // Node pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_PARENT, Parent);                // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A child node is about to be removed from a parent node.
-EVENT(E_NODEREMOVED, NodeRemoved)
+ATOMIC_EVENT(E_NODEREMOVED, NodeRemoved)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PARENT, Parent);                // Node pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_PARENT, Parent);                // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A component has been created to a node.
-EVENT(E_COMPONENTADDED, ComponentAdded)
+ATOMIC_EVENT(E_COMPONENTADDED, ComponentAdded)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 /// A component is about to be removed from a node.
-EVENT(E_COMPONENTREMOVED, ComponentRemoved)
+ATOMIC_EVENT(E_COMPONENTREMOVED, ComponentRemoved)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 /// A node's name has changed.
-EVENT(E_NODENAMECHANGED, NodeNameChanged)
+ATOMIC_EVENT(E_NODENAMECHANGED, NodeNameChanged)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A node's enabled state has changed.
-EVENT(E_NODEENABLEDCHANGED, NodeEnabledChanged)
+ATOMIC_EVENT(E_NODEENABLEDCHANGED, NodeEnabledChanged)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+}
+
+/// A node's tag has been added.
+ATOMIC_EVENT(E_NODETAGADDED, NodeTagAdded)
+{
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_TAG, Tag);                      // String tag
+}
+
+/// A node's tag has been removed.
+ATOMIC_EVENT(E_NODETAGREMOVED, NodeTagRemoved)
+{
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_TAG, Tag);                      // String tag
 }
 
 /// A component's enabled state has changed.
-EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
+ATOMIC_EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 /// A serializable's temporary state has changed.
-EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
+ATOMIC_EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
 {
-    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+    ATOMIC_PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+}
+
+/// A node (and its children and components) has been cloned.
+ATOMIC_EVENT(E_NODECLONED, NodeCloned)
+{
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_CLONENODE, CloneNode);          // Node pointer
+}
+
+/// A component has been cloned.
+ATOMIC_EVENT(E_COMPONENTCLONED, ComponentCloned)
+{
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_CLONECOMPONENT, CloneComponent); // Component pointer
 }
 
 /// A network attribute update from the server has been intercepted.
-EVENT(E_INTERCEPTNETWORKUPDATE, InterceptNetworkUpdate)
+ATOMIC_EVENT(E_INTERCEPTNETWORKUPDATE, InterceptNetworkUpdate)
 {
-    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
-    PARAM(P_TIMESTAMP, TimeStamp);          // unsigned (0-255)
-    PARAM(P_INDEX, Index);                  // unsigned
-    PARAM(P_NAME, Name);                    // String
-    PARAM(P_VALUE, Value);                  // Variant
+    ATOMIC_PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+    ATOMIC_PARAM(P_TIMESTAMP, TimeStamp);          // unsigned (0-255)
+    ATOMIC_PARAM(P_INDEX, Index);                  // unsigned
+    ATOMIC_PARAM(P_NAME, Name);                    // String
+    ATOMIC_PARAM(P_VALUE, Value);                  // Variant
 }
 
 }

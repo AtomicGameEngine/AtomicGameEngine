@@ -74,7 +74,7 @@ class WebSocket : public Object
 {
     friend class Web;
 
-    OBJECT(WebSocket)
+    ATOMIC_OBJECT(WebSocket, Object)
 
 public:
     /// Construct with parameters.

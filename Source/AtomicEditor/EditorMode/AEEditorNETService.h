@@ -38,7 +38,7 @@ namespace AtomicEditor
 
     class EditorNETService : public Object
     {
-        OBJECT(EditorNETService)
+        ATOMIC_OBJECT(EditorNETService, Object)
 
     public:
 

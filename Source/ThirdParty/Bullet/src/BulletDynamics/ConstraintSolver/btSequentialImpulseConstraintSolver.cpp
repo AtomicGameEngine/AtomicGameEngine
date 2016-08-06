@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 //#define COMPUTE_IMPULSE_DENOM 1
 //#define BT_ADDITIONAL_DEBUG
 
@@ -606,8 +608,9 @@ void btSequentialImpulseConstraintSolver::setupFrictionConstraint(btSolverConstr
 
 //		btScalar positionalError = 0.f;
 
+        // Urho3D: possible friction fix from https://github.com/bulletphysics/bullet3/commit/907ac49892ede3f4a3295f7cbd96759107e5fc0e
 		btScalar velocityError =  desiredVelocity - rel_vel;
-		btScalar velocityImpulse = velocityError * solverConstraint.m_jacDiagABInv;
+		btScalar velocityImpulse = velocityError * btScalar(solverConstraint.m_jacDiagABInv);
 		solverConstraint.m_rhs = velocityImpulse;
 		solverConstraint.m_rhsPenetration = 0.f;
 		solverConstraint.m_cfm = cfmSlip;
@@ -687,8 +690,9 @@ void btSequentialImpulseConstraintSolver::setupRollingFrictionConstraint(	btSolv
 
 //		btScalar positionalError = 0.f;
 
-		btSimdScalar velocityError =  desiredVelocity - rel_vel;
-		btSimdScalar	velocityImpulse = velocityError * btSimdScalar(solverConstraint.m_jacDiagABInv);
+        // Urho3D: possible friction fix from https://github.com/bulletphysics/bullet3/commit/907ac49892ede3f4a3295f7cbd96759107e5fc0e
+		btScalar velocityError =  desiredVelocity - rel_vel;
+		btScalar velocityImpulse = velocityError * btScalar(solverConstraint.m_jacDiagABInv);
 		solverConstraint.m_rhs = velocityImpulse;
 		solverConstraint.m_cfm = cfmSlip;
 		solverConstraint.m_lowerLimit = -solverConstraint.m_friction;
@@ -1259,6 +1263,7 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 
 	//convert all bodies
 
+
 	for (int i=0;i<numBodies;i++)
 	{
 		int bodyId = getOrInitSolverBody(*bodies[i],infoGlobal.m_timeStep);
@@ -1268,11 +1273,24 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 		{
 			btSolverBody& solverBody = m_tmpSolverBodyPool[bodyId];
 			btVector3 gyroForce (0,0,0);
-			if (body->getFlags()&BT_ENABLE_GYROPSCOPIC_FORCE)
+			if (body->getFlags()&BT_ENABLE_GYROSCOPIC_FORCE_EXPLICIT)
 			{
-				gyroForce = body->computeGyroscopicForce(infoGlobal.m_maxGyroscopicForce);
+				gyroForce = body->computeGyroscopicForceExplicit(infoGlobal.m_maxGyroscopicForce);
 				solverBody.m_externalTorqueImpulse -= gyroForce*body->getInvInertiaTensorWorld()*infoGlobal.m_timeStep;
 			}
+			if (body->getFlags()&BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_WORLD)
+			{
+				gyroForce = body->computeGyroscopicImpulseImplicit_World(infoGlobal.m_timeStep);
+				solverBody.m_externalTorqueImpulse += gyroForce;
+			}
+			if (body->getFlags()&BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_BODY)
+			{
+				gyroForce = body->computeGyroscopicImpulseImplicit_Body(infoGlobal.m_timeStep);
+				solverBody.m_externalTorqueImpulse += gyroForce;
+
+			}
+			
+
 		}
 	}
 
@@ -1849,7 +1867,9 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlyFinish(btCo
 		}
 
 		constr->internalSetAppliedImpulse(solverConstr.m_appliedImpulse);
-		if (btFabs(solverConstr.m_appliedImpulse)>=constr->getBreakingImpulseThreshold())
+		// Urho3D: if constraint has infinity breaking threshold, do not break no matter what
+        btScalar breakingThreshold = constr->getBreakingImpulseThreshold();
+		if (breakingThreshold < SIMD_INFINITY && btFabs(solverConstr.m_appliedImpulse)>=breakingThreshold)
 		{
 			constr->setEnabled(false);
 		}

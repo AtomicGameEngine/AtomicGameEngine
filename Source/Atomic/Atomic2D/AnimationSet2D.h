@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,30 @@
 
 #pragma once
 
+#include "../Container/ArrayPtr.h"
 #include "../Resource/Resource.h"
+
+#ifdef ATOMIC_SPINE
+struct spAtlas;
+struct spSkeletonData;
+struct spAnimationStateData;
+#endif
 
 namespace Atomic
 {
 
-class Animation2D;
-class Sprite2D;
-class XMLElement;
-class XMLFile;
+namespace Spriter
+{
+    struct SpriterData;
+}
 
-/// Spriter animation set, it includes one or more animations, for more information please refer to http://www.brashmonkey.com/spriter.htm.
+class Sprite2D;
+class SpriteSheet2D;
+
+/// Spriter animation set, it includes one or more animations, for more information please refer to http://www.esotericsoftware.com and http://www.brashmonkey.com/spriter.htm.
 class ATOMIC_API AnimationSet2D : public Resource
 {
-    OBJECT(AnimationSet2D);
+    ATOMIC_OBJECT(AnimationSet2D, Resource);
 
 public:
     /// Construct.
@@ -52,29 +62,62 @@ public:
 
     /// Get number of animations.
     unsigned GetNumAnimations() const;
-    /// Return animation by index.
-    Animation2D* GetAnimation(unsigned index) const;
-    /// Return animation by name.
-    Animation2D* GetAnimation(const String& name) const;
+    /// Return animation name.
+    String GetAnimation(unsigned index) const;
+    /// Check has animation.
+    bool HasAnimation(const String& animation) const;
+    
+    /// Return sprite.
+    Sprite2D* GetSprite() const;
+
+#ifdef ATOMIC_SPINE
+    /// Return spine skeleton data.
+    spSkeletonData* GetSkeletonData() const { return skeletonData_; }
+#endif
+
+    /// Return spriter data.
+    Spriter::SpriterData* GetSpriterData() const { return spriterData_; }
+    /// Return spriter file sprite.
+    Sprite2D* GetSpriterFileSprite(int folderId, int fileId) const;
 
 private:
     /// Return sprite by hash.
-    Sprite2D* GetSprite(const StringHash& hash) const;
+    Sprite2D* GetSpriterFileSprite(const StringHash& hash) const;
+#ifdef ATOMIC_SPINE
+    /// Begin load spine.
+    bool BeginLoadSpine(Deserializer& source);
+    /// Finish load spine.
+    bool EndLoadSpine();
+#endif
     /// Begin load scml.
     bool BeginLoadSpriter(Deserializer& source);
     /// Finish load scml.
     bool EndLoadSpriter();
-    /// Load spriter folders.
-    bool LoadSpriterFolders(const XMLElement& rootElem);
-    /// Load spriter animation.
-    bool LoadSpriterAnimation(const XMLElement& animationElem);
-
-    /// Sprites.
-    HashMap<StringHash, SharedPtr<Sprite2D> > sprites_;
-    /// Animations.
-    Vector<SharedPtr<Animation2D> > animations_;
-    /// Spriter file.
-    SharedPtr<XMLFile> spriterFile_;
+    /// Dispose all data.
+    void Dispose();
+    
+    /// Spine sprite.
+    SharedPtr<Sprite2D> sprite_;
+    
+#ifdef ATOMIC_SPINE
+    /// Spine json data.
+    SharedArrayPtr<char> jsonData_;
+    /// Spine skeleton data.
+    spSkeletonData* skeletonData_;
+    /// Spine atlas.
+    spAtlas* atlas_;
+#endif
+    
+    /// Spriter data.
+    Spriter::SpriterData* spriterData_;
+    /// Has sprite sheet.
+    bool hasSpriteSheet_;
+    /// Sprite sheet file path.
+    String spriteSheetFilePath_;
+    /// Sprite sheet.
+    SharedPtr<SpriteSheet2D> spriteSheet_;
+    /// Spriter sprites.
+    HashMap<int, SharedPtr<Sprite2D> > spriterFileSprites_;
 };
 
 }

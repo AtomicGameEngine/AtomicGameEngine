@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,9 @@
 
 #pragma once
 
+#include "../Container/HashSet.h"
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
-#include "../Container/HashSet.h"
-#include "../Resource/XMLElement.h"
 
 namespace Atomic
 {
@@ -41,12 +40,12 @@ public:
 
 // ATOMIC END
 
-/// Atomic execution context. Provides access to subsystems, object factories and attributes, and event receivers.
+/// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class ATOMIC_API Context : public RefCounted
 {
     friend class Object;
 
-    REFCOUNTED(Context)
+    ATOMIC_REFCOUNTED(Context)
 
 public:
     /// Construct.
@@ -54,8 +53,18 @@ public:
     /// Destruct.
     ~Context();
 
+    /// Create an object by type. Return pointer to it or null if no factory found.
+    template <class T> inline SharedPtr<T> CreateObject()
+    {
+        return StaticCast<T>(CreateObject(T::GetTypeStatic()));
+    }
+
+    // ATOMIC BEGIN
     /// Create an object by type hash. Return pointer to it or null if no factory found.
     SharedPtr<Object> CreateObject(StringHash objectType, const XMLElement &source = XMLElement::EMPTY);
+    // ATOMIC END
+
+
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
     /// Register a factory for an object type and specify the object category.
@@ -93,6 +102,15 @@ public:
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
 
+    /// Return global variable based on key
+    const Variant& GetGlobalVar(StringHash key) const ;
+
+    /// Return all global variables.
+    const VariantMap& GetGlobalVars() const { return globalVars_; }
+
+    /// Set global variable with the respective key and value
+    void SetGlobalVar(StringHash key, const Variant& value);
+
     /// Return all subsystems.
     const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
 
@@ -116,8 +134,6 @@ public:
     template <class T> T* GetSubsystem() const;
     /// Template version of returning a specific attribute description.
     template <class T> AttributeInfo* GetAttribute(const char* name);
-    /// Get whether an Editor Context
-    bool GetEditorContext() { return editorContext_; }
 
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(StringHash type) const
@@ -158,12 +174,16 @@ public:
 
     // ATOMIC BEGIN
 
+    /// Get whether an Editor Context
+    bool GetEditorContext() { return editorContext_; }
+
+    /// Get whether an Editor Context
+    void SetEditorContext(bool editor) { editorContext_ = editor; }
+
     // hook for listening into events
     void AddGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Push(listener); }
     void RemoveGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Erase(globalEventListeners_.Find(listener)); }
 
-    /// Get whether an Editor Context
-    void SetEditorContext(bool editor) { editorContext_ = editor; }
     // ATOMIC END
 
 private:
@@ -177,23 +197,13 @@ private:
     void RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType);
     /// Remove event receiver from non-specific events.
     void RemoveEventReceiver(Object* receiver, StringHash eventType);
+    /// Begin event send.
+    void BeginSendEvent(Object* sender, StringHash eventType);
+    /// End event send. Clean up event receivers removed in the meanwhile.
+    void EndSendEvent();
 
     /// Set current event handler. Called by Object.
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
-
-    /// Begin event send.
-    void BeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
-        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
-            globalEventListeners_[i]->BeginSendEvent(this, sender, eventType, eventData);
-        eventSenders_.Push(sender);
-    }
-
-    /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
-        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
-            globalEventListeners_[i]->EndSendEvent(this, sender, eventType, eventData);
-        eventSenders_.Pop();
-    }
 
     /// Object factories.
     HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;
@@ -215,11 +225,29 @@ private:
     EventHandler* eventHandler_;
     /// Object categories.
     HashMap<String, Vector<StringHash> > objectCategories_;
+    /// Variant map for global variables that can persist throughout application execution.
+    VariantMap globalVars_;
 
     // ATOMIC BEGIN
+
+    /// Begin event send.
+    void GlobalBeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
+        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
+            globalEventListeners_[i]->BeginSendEvent(this, sender, eventType, eventData);
+        eventSenders_.Push(sender);
+    }
+
+    /// End event send. Clean up event receivers removed in the meanwhile.
+    void GlobalEndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
+        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
+            globalEventListeners_[i]->EndSendEvent(this, sender, eventType, eventData);
+        eventSenders_.Pop();
+    }
+
     PODVector<GlobalEventListener*> globalEventListeners_;
     bool editorContext_;
     // ATOMIC END
+
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -258,6 +258,66 @@ public:
         return ret;
     }
 
+    /// Add an integer.
+    String operator +(int rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a short integer.
+    String operator +(short rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long integer.
+    String operator +(long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long long integer.
+    String operator +(long long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add an unsigned integer.
+    String operator +(unsigned rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a short unsigned integer.
+    String operator +(unsigned short rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long unsigned integer.
+    String operator +(unsigned long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long long unsigned integer.
+    String operator +(unsigned long long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a float.
+    String operator +(float rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a bool.
+    String operator +(bool rhs) const
+    {
+        return *this + String(rhs);
+    }
+
     /// Test for equality with another string.
     bool operator ==(const String& rhs) const { return strcmp(CString(), rhs.CString()) == 0; }
 
@@ -387,8 +447,8 @@ public:
     String ToUpper() const;
     /// Return string in lowercase.
     String ToLower() const;
-    /// Return substrings split by a separator char.
-    Vector<String> Split(char separator) const;
+    /// Return substrings split by a separator char. By default don't return empty strings.
+    Vector<String> Split(char separator, bool keepEmptyStrings = false) const;
     /// Join substrings with a 'glue' string.
     void Join(const Vector<String>& subStrings, const String& glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
@@ -462,35 +522,23 @@ public:
         return hash;
     }
 
-    /// Return substrings split by a separator char.
-    static Vector<String> Split(const char* str, char separator);
+    /// Return substrings split by a separator char. By default don't return empty strings.
+    static Vector<String> Split(const char* str, char separator, bool keepEmptyStrings = false);
     /// Return a string by joining substrings with a 'glue' string.
     static String Joined(const Vector<String>& subStrings, const String& glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
     static void EncodeUTF8(char*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF8. Pointer will be incremented.
     static unsigned DecodeUTF8(const char*& src);
-#ifdef WIN32
+#ifdef _WIN32
     /// Encode Unicode character to UTF16. Pointer will be incremented.
     static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF16. Pointer will be incremented.
     static unsigned DecodeUTF16(const wchar_t*& src);
-    #endif
+#endif
 
     /// Return length of a C string.
-    static unsigned CStringLength(const char* str)
-    {
-        if (!str)
-            return 0;
-#ifdef _MSC_VER
-        return (unsigned)strlen(str);
-#else
-        const char* ptr = str;
-        while (*ptr)
-            ++ptr;
-        return (unsigned)(ptr - str);
-#endif
-    }
+    static unsigned CStringLength(const char* str) { return str ? (unsigned)strlen(str) : 0; }
 
     /// Append to string using formatting.
     String& AppendWithFormat(const char* formatString, ...);

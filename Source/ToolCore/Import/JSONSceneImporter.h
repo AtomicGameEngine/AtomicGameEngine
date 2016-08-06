@@ -802,7 +802,7 @@ private:
 
 class Importer: public Object
 {
-    OBJECT(Importer);
+    ATOMIC_OBJECT(Importer, Object);
 
 public:
 
@@ -815,7 +815,7 @@ private:
 
 class JSONSceneImporter: public Importer
 {
-    OBJECT(JSONSceneImporter);
+    ATOMIC_OBJECT(JSONSceneImporter, Importer);
 
 public:
 

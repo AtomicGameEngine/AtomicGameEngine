@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,11 @@
 #include "../Atomic2D/TileMapLayer2D.h"
 #include "../Atomic2D/TmxFile2D.h"
 
+// ATOMIC BEGIN
+
 #include "../Atomic2D/Light2D.h"
+
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -105,12 +109,15 @@ void RegisterAtomic2DLibrary(Context* context)
     ConstraintWeld2D::RegisterObject(context);
     ConstraintWheel2D::RegisterObject(context);
 
+// ATOMIC BEGIN
+
     Light2DGroup::RegisterObject(context);
     Light2D::RegisterObject(context);
     DirectionalLight2D::RegisterObject(context);
     PositionalLight2D::RegisterObject(context);
     PointLight2D::RegisterObject(context);
 
+// ATOMIC END
 }
 
 }

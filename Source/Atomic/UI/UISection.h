@@ -30,7 +30,7 @@ namespace Atomic
 
 class UISection : public UIWidget
 {
-    OBJECT(UISection)
+    ATOMIC_OBJECT(UISection, UIWidget)
 
 public:
 

@@ -28,75 +28,75 @@ namespace Atomic
 {
 
 /// WebView load state change
-EVENT(E_WEBVIEWLOADSTATECHANGE, WebViewLoadStateChange)
+ATOMIC_EVENT(E_WEBVIEWLOADSTATECHANGE, WebViewLoadStateChange)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_LOADING, Loading);   // Boolean
-    PARAM(P_CANGOBACK, CanGoBack);   // Boolean
-    PARAM(P_CANGOFORWARD, CanGoForward);   // Boolean
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_LOADING, Loading);   // Boolean
+    ATOMIC_PARAM(P_CANGOBACK, CanGoBack);   // Boolean
+    ATOMIC_PARAM(P_CANGOFORWARD, CanGoForward);   // Boolean
 }
 
 /// WebView load start
-EVENT(E_WEBVIEWLOADSTART, WebViewLoadStart)
+ATOMIC_EVENT(E_WEBVIEWLOADSTART, WebViewLoadStart)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_URL, Url);   // String
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_URL, Url);   // String
 }
 
 /// WebView load end
-EVENT(E_WEBVIEWLOADEND, WebViewLoadEnd)
+ATOMIC_EVENT(E_WEBVIEWLOADEND, WebViewLoadEnd)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_URL, Url);   // String
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_URL, Url);   // String
 }
 
 /// WebView address change
-EVENT(E_WEBVIEWADDRESSCHANGE, WebViewAddressChange)
+ATOMIC_EVENT(E_WEBVIEWADDRESSCHANGE, WebViewAddressChange)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_URL, Url);   // String
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_URL, Url);   // String
 }
 
 /// WebView title change
-EVENT(E_WEBVIEWTITLECHANGE, WebViewTitleChange)
+ATOMIC_EVENT(E_WEBVIEWTITLECHANGE, WebViewTitleChange)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_TITLE, Title);   // String
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_TITLE, Title);   // String
 }
 
 /// WebView title change
-EVENT(E_WEBVIEWJSEVALRESULT, WebViewJSEvalResult)
+ATOMIC_EVENT(E_WEBVIEWJSEVALRESULT, WebViewJSEvalResult)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_EVALID, EvalID);   // unsigned
-    PARAM(P_RESULT, Result);   // boolean (true: success, false: error)
-    PARAM(P_VALUE, Value);   // String (sucess: eval's value, error: exception message)
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_EVALID, EvalID);   // unsigned
+    ATOMIC_PARAM(P_RESULT, Result);   // boolean (true: success, false: error)
+    ATOMIC_PARAM(P_VALUE, Value);   // String (sucess: eval's value, error: exception message)
 }
 
 /// WebView popup request
-EVENT(E_WEBVIEWPOPUPREQUEST, WebViewPopupRequest)
+ATOMIC_EVENT(E_WEBVIEWPOPUPREQUEST, WebViewPopupRequest)
 {
-    PARAM(P_CLIENT, Client);   // WebClient*
-    PARAM(P_URL, Url);   // String
+    ATOMIC_PARAM(P_CLIENT, Client);   // WebClient*
+    ATOMIC_PARAM(P_URL, Url);   // String
 }
 
 /// WebView load state change
-EVENT(E_WEBVIEWGLOBALPROPERTIESCHANGED, WebViewGlobalPropertiesChanged)
+ATOMIC_EVENT(E_WEBVIEWGLOBALPROPERTIESCHANGED, WebViewGlobalPropertiesChanged)
 {
 }
 
 /// WebView title change
-EVENT(E_WEBMESSAGE, WebMessage)
+ATOMIC_EVENT(E_WEBMESSAGE, WebMessage)
 {
-    PARAM(P_HANDLER, Handler);          // WebMessageHandler*
-    PARAM(P_QUERYID, QueryID);          // Double (Int64 CEF Side)
-    PARAM(P_REQUEST, Request);          // String
-    PARAM(P_PERSISTENT, Persistent);    // Bool
+    ATOMIC_PARAM(P_HANDLER, Handler);          // WebMessageHandler*
+    ATOMIC_PARAM(P_QUERYID, QueryID);          // Double (Int64 CEF Side)
+    ATOMIC_PARAM(P_REQUEST, Request);          // String
+    ATOMIC_PARAM(P_PERSISTENT, Persistent);    // Bool
 
-    PARAM(P_CEFBROWSER, Browser);       // CefBrowser*
-    PARAM(P_CEFFRAME, Frame);           // CefFrame*
+    ATOMIC_PARAM(P_CEFBROWSER, Browser);       // CefBrowser*
+    ATOMIC_PARAM(P_CEFFRAME, Frame);           // CefFrame*
 
-    PARAM(P_DEFERRED, Deferred);        // Return Value: Bool
+    ATOMIC_PARAM(P_DEFERRED, Deferred);        // Return Value: Bool
 }
 
 

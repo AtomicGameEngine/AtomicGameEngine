@@ -39,9 +39,9 @@ class AnimationImportInfo : public Object
 {
     friend class ModelImporter;
 
-public:
+    ATOMIC_OBJECT(AnimationImportInfo, Object);
 
-    OBJECT(AnimationImportInfo);
+public:    
 
     AnimationImportInfo(Context* context) : Object(context), startTime_(-1.0f), endTime_(-1.0f)
     {
@@ -66,7 +66,7 @@ private:
 
 class ModelImporter : public AssetImporter
 {
-    OBJECT(ModelImporter);
+    ATOMIC_OBJECT(ModelImporter, AssetImporter)
 
 public:
 

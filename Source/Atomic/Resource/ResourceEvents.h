@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,65 +28,69 @@ namespace Atomic
 {
 
 /// Resource reloading started.
-EVENT(E_RELOADSTARTED, ReloadStarted)
+ATOMIC_EVENT(E_RELOADSTARTED, ReloadStarted)
 {
 }
 
 /// Resource reloading finished successfully.
-EVENT(E_RELOADFINISHED, ReloadFinished)
+ATOMIC_EVENT(E_RELOADFINISHED, ReloadFinished)
 {
 }
 
 /// Resource reloading failed.
-EVENT(E_RELOADFAILED, ReloadFailed)
+ATOMIC_EVENT(E_RELOADFAILED, ReloadFailed)
 {
 }
 
 /// Tracked file changed in the resource directories.
-EVENT(E_FILECHANGED, FileChanged)
+ATOMIC_EVENT(E_FILECHANGED, FileChanged)
 {
-    PARAM(P_FILENAME, FileName);                    // String
-    PARAM(P_RESOURCENAME, ResourceName);            // String
+    ATOMIC_PARAM(P_FILENAME, FileName);                    // String
+    ATOMIC_PARAM(P_RESOURCENAME, ResourceName);            // String
 }
 
 /// Resource loading failed.
-EVENT(E_LOADFAILED, LoadFailed)
+ATOMIC_EVENT(E_LOADFAILED, LoadFailed)
 {
-    PARAM(P_RESOURCENAME, ResourceName);            // String
+    ATOMIC_PARAM(P_RESOURCENAME, ResourceName);            // String
 }
 
 /// Resource not found.
-EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
+ATOMIC_EVENT(E_RESOURCENOTFOUND, ResourceNotFound)
 {
-    PARAM(P_RESOURCENAME, ResourceName);            // String
+    ATOMIC_PARAM(P_RESOURCENAME, ResourceName);            // String
 }
 
 /// Unknown resource type.
-EVENT(E_UNKNOWNRESOURCETYPE, UnknownResourceType)
+ATOMIC_EVENT(E_UNKNOWNRESOURCETYPE, UnknownResourceType)
 {
-    PARAM(P_RESOURCETYPE, ResourceType);            // StringHash
+    ATOMIC_PARAM(P_RESOURCETYPE, ResourceType);            // StringHash
 }
 
 /// Resource background loading finished.
-EVENT(E_RESOURCEBACKGROUNDLOADED, ResourceBackgroundLoaded)
+ATOMIC_EVENT(E_RESOURCEBACKGROUNDLOADED, ResourceBackgroundLoaded)
 {
-    PARAM(P_RESOURCENAME, ResourceName);            // String
-    PARAM(P_SUCCESS, Success);                      // bool
-    PARAM(P_RESOURCE, Resource);                    // Resource pointer
-}
-
-/// Resource was renamed
-EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
-{
-    PARAM(P_RESOURCEPATH, Path);                    // String
-    PARAM(P_NEWRESOURCEPATH, NewPath);              // String
-    PARAM(P_NEWNAME, NewName);                      // String
-    PARAM(P_RESOURCE, Asset);                       // Resource pointer
+    ATOMIC_PARAM(P_RESOURCENAME, ResourceName);            // String
+    ATOMIC_PARAM(P_SUCCESS, Success);                      // bool
+    ATOMIC_PARAM(P_RESOURCE, Resource);                    // Resource pointer
 }
 
 /// Language changed.
-EVENT(E_CHANGELANGUAGE, ChangeLanguage)
+ATOMIC_EVENT(E_CHANGELANGUAGE, ChangeLanguage)
 {
 }
+
+// ATOMIC BEGIN
+
+/// Resource was renamed
+ATOMIC_EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
+{
+    ATOMIC_PARAM(P_RESOURCEPATH, Path);                    // String
+    ATOMIC_PARAM(P_NEWRESOURCEPATH, NewPath);              // String
+    ATOMIC_PARAM(P_NEWNAME, NewName);                      // String
+    ATOMIC_PARAM(P_RESOURCE, Asset);                       // Resource pointer
+}
+
+// ATOMIC END
 
 }

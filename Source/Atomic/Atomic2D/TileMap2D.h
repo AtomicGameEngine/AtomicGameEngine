@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class TmxFile2D;
 /// Tile map component.
 class ATOMIC_API TileMap2D : public Component
 {
-    OBJECT(TileMap2D);
+    ATOMIC_OBJECT(TileMap2D, Component);
 
 public:
     /// Construct.
@@ -63,9 +63,6 @@ public:
 
     /// Return tile map layer at index.
     TileMapLayer2D* GetLayer(unsigned index) const;
-
-    TileMapLayer2D* GetLayerByName(const String& name) const;
-
     /// Convert tile index to position.
     Vector2 TileIndexToPosition(int x, int y) const;
     /// Convert position to tile index, if out of map return false.
@@ -75,6 +72,12 @@ public:
     void SetTmxFileAttr(const ResourceRef& value);
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
+
+    // ATOMIC BEGIN
+
+    TileMapLayer2D* GetLayerByName(const String& name) const;
+
+    // ATOMIC END
 
 private:
     /// Tmx file.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,11 +54,11 @@ void CollisionBox2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionBox2D>(ATOMIC2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, Vector2, DEFAULT_BOX_SIZE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Angle", GetAngle, SetAngle, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, Vector2, DEFAULT_BOX_SIZE, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Angle", GetAngle, SetAngle, float, 0.0f, AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionBox2D::SetSize(const Vector2& size)
@@ -113,11 +113,11 @@ void CollisionBox2D::RecreateFixture()
 {
     ReleaseFixture();
 
-    float worlsScaleX = cachedWorldScale_.x_;
+    float worldScaleX = cachedWorldScale_.x_;
     float worldScaleY = cachedWorldScale_.y_;
-    float halfWidth = size_.x_ * 0.5f * worlsScaleX;
+    float halfWidth = size_.x_ * 0.5f * worldScaleX;
     float halfHeight = size_.y_ * 0.5f * worldScaleY;
-    Vector2 scaledCenter = center_ * Vector2(worlsScaleX, worldScaleY);
+    Vector2 scaledCenter = center_ * Vector2(worldScaleX, worldScaleY);
 
     if (scaledCenter == Vector2::ZERO && angle_ == 0.0f)
         boxShape_.SetAsBox(halfWidth, halfHeight);

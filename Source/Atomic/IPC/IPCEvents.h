@@ -28,36 +28,36 @@ namespace Atomic
 {
 
 /// Worker start
-EVENT(E_IPCWORKERSTART, IPCWorkerStart)
+ATOMIC_EVENT(E_IPCWORKERSTART, IPCWorkerStart)
 {
 
 }
 
 /// Worker exited
-EVENT(E_IPCWORKEREXIT, IPCWorkerExit)
+ATOMIC_EVENT(E_IPCWORKEREXIT, IPCWorkerExit)
 {
-    PARAM(P_BROKER, Broker);   // Broker*
-    PARAM(P_EXITCODE, ExitCode);   // int
+    ATOMIC_PARAM(P_BROKER, Broker);   // Broker*
+    ATOMIC_PARAM(P_EXITCODE, ExitCode);   // int
 }
 
 /// broker -> worker start
-EVENT(E_IPCINITIALIZE, IPCInitialize)
+ATOMIC_EVENT(E_IPCINITIALIZE, IPCInitialize)
 {
 
 }
 
 /// Worker Log
-EVENT(E_IPCWORKERLOG, IPCWorkerLog)
+ATOMIC_EVENT(E_IPCWORKERLOG, IPCWorkerLog)
 {
-    PARAM(P_LEVEL, Level);      // int log level
-    PARAM(P_MESSAGE, Message);  // string
+    ATOMIC_PARAM(P_LEVEL, Level);      // int log level
+    ATOMIC_PARAM(P_MESSAGE, Message);  // string
 }
 
 /// Worker Log
-EVENT(E_IPCMESSAGE, IPCMessage)
+ATOMIC_EVENT(E_IPCMESSAGE, IPCMessage)
 {
-    PARAM(P_MESSAGE, Message);  // string
-    PARAM(P_VALUE, Value);  // int
+    ATOMIC_PARAM(P_MESSAGE, Message);  // string
+    ATOMIC_PARAM(P_VALUE, Value);  // int
 }
 
 

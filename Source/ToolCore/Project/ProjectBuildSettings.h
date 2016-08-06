@@ -32,7 +32,7 @@ namespace ToolCore
 
 class MacBuildSettings : public RefCounted
 {
-    REFCOUNTED(MacBuildSettings)
+    ATOMIC_REFCOUNTED(MacBuildSettings)
 
 public:
 
@@ -61,7 +61,7 @@ private:
 
 class WebBuildSettings : public RefCounted
 {
-    REFCOUNTED(WebBuildSettings)
+    ATOMIC_REFCOUNTED(WebBuildSettings)
 
 public:
 
@@ -90,7 +90,7 @@ private:
 
 class WindowsBuildSettings : public RefCounted
 {
-    REFCOUNTED(WindowsBuildSettings)
+    ATOMIC_REFCOUNTED(WindowsBuildSettings)
 
 public:
 
@@ -119,7 +119,7 @@ private:
 
 class AndroidBuildSettings : public RefCounted
 {
-    REFCOUNTED(AndroidBuildSettings)
+    ATOMIC_REFCOUNTED(AndroidBuildSettings)
 
 public:
 
@@ -163,7 +163,7 @@ private:
 
 class IOSBuildSettings : public RefCounted
 {
-    REFCOUNTED(IOSBuildSettings)
+    ATOMIC_REFCOUNTED(IOSBuildSettings)
 
 public:
 
@@ -201,7 +201,7 @@ private:
 
 class ProjectBuildSettings : public Object
 {
-    OBJECT(ProjectBuildSettings);
+    ATOMIC_OBJECT(ProjectBuildSettings, Object);
 
 public:
     /// Construct.

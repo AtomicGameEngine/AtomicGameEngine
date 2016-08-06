@@ -52,13 +52,13 @@ void CSComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<CSComponent>(LOGIC_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 
-    ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
+    ATOMIC_ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
 
-    MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(CSComponentAssembly::GetTypeStatic()), AM_DEFAULT);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(CSComponentAssembly::GetTypeStatic()), AM_DEFAULT);
 
-    ACCESSOR_ATTRIBUTE("Class", GetComponentClassName, SetComponentClassName, String, String::EMPTY, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Class", GetComponentClassName, SetComponentClassName, String, String::EMPTY, AM_DEFAULT);
 
 }
 

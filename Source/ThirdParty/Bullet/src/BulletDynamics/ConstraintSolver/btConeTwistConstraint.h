@@ -36,7 +36,10 @@ and swing 1 and 2 are along the z and y axes respectively.
 #ifndef BT_CONETWISTCONSTRAINT_H
 #define BT_CONETWISTCONSTRAINT_H
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btVector3.h"
+// ATOMIC END
+
 #include "btJacobianEntry.h"
 #include "btTypedConstraint.h"
 

@@ -64,7 +64,7 @@ class UISceneView : public UIWidget
 
     friend class SceneViewWidget;
 
-    OBJECT(UISceneView)
+    ATOMIC_OBJECT(UISceneView, UIWidget)
 
 public:
 

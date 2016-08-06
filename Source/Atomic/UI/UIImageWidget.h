@@ -30,7 +30,7 @@ namespace Atomic
 
 class UIImageWidget : public UIWidget
 {
-    OBJECT(UIImageWidget)
+    ATOMIC_OBJECT(UIImageWidget, UIWidget)
 
 public:
 

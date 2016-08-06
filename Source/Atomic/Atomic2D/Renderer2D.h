@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Graphics/Drawable.h"
+#include "../Math/Frustum.h"
 
 namespace Atomic
 {
@@ -55,6 +56,8 @@ struct ViewBatchInfo2D
     PODVector<const SourceBatch2D*> sourceBatches_;
     /// Batch count;
     unsigned batchCount_;
+    /// Distances.
+    PODVector<float> distances_;
     /// Materials.
     Vector<SharedPtr<Material> > materials_;
     /// Geometries.
@@ -64,7 +67,7 @@ struct ViewBatchInfo2D
 /// 2D renderer component.
 class ATOMIC_API Renderer2D : public Drawable
 {
-    OBJECT(Renderer2D);
+    ATOMIC_OBJECT(Renderer2D, Drawable);
 
     friend void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex);
 
@@ -95,9 +98,13 @@ public:
     /// Check visibility.
     bool CheckVisibility(Drawable2D* drawable) const;
 
+    // ATOMIC BEGIN
+
     /// Whether this renderer uses triangles (instead of quads)
     void SetUseTris(bool useTris) { useTris_ = useTris; }
     bool GetUseTris() const { return useTris_; }
+
+    // ATOMIC END
 
 private:
     /// Recalculate the world-space bounding box.
@@ -111,9 +118,8 @@ private:
     /// Update view batch info.
     void UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera);
     /// Add view batch.
-    void AddViewBatch
-        (ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart,
-            unsigned vertexCount);
+    void AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, 
+        unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, float distance);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
@@ -126,15 +132,20 @@ private:
     /// View batch info.
     HashMap<Camera*, ViewBatchInfo2D> viewBatchInfos_;
     /// Frustum for current frame.
-    const Frustum* frustum_;
-    /// Frustum bounding box for current frame.
-    BoundingBox frustumBoundingBox_;
+    Frustum frustum_;
+    /// View mask of current camera for visibility checking.
+    unsigned viewMask_;
     /// Cached materials.
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
     /// Cached techniques per blend mode.
     HashMap<int, SharedPtr<Technique> > cachedTechniques_;
+
+    // ATOMIC BEGIN
+
     /// Whether or not the renderer containts tris (default is quads)
     bool useTris_;
+
+    // ATOMIC END
 };
 
 }

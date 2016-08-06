@@ -177,9 +177,9 @@ UIWebView::UIWebView(Context* context, const String &initialURL) : UIWidget(cont
 
     initialURL_ = initialURL;
 
-    SubscribeToEvent(E_KEYDOWN, HANDLER(UIWebView, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(UIWebView, HandleKeyUp));
-    SubscribeToEvent(E_TEXTINPUT, HANDLER(UIWebView, HandleTextInput));
+    SubscribeToEvent(E_KEYDOWN, ATOMIC_HANDLER(UIWebView, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, ATOMIC_HANDLER(UIWebView, HandleKeyUp));
+    SubscribeToEvent(E_TEXTINPUT, ATOMIC_HANDLER(UIWebView, HandleTextInput));
 }
 
 UIWebView::~UIWebView()

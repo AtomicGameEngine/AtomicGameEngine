@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,8 @@
 namespace Atomic
 {
 
+extern const char* ATOMIC2D_CATEGORY;
+
 ConstraintGear2D::ConstraintGear2D(Context* context) :
     Constraint2D(context)
 {
@@ -43,11 +45,11 @@ ConstraintGear2D::~ConstraintGear2D()
 
 void ConstraintGear2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintGear2D>();
+    context->RegisterFactory<ConstraintGear2D>(ATOMIC2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint)

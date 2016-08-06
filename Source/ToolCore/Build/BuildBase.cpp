@@ -73,7 +73,7 @@ bool BuildBase::BuildClean(const String& path)
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::BuildClean - Attempt to clean directory of failed build, %s", path.CString());
+        ATOMIC_LOGERRORF("BuildBase::BuildClean - Attempt to clean directory of failed build, %s", path.CString());
         return false;
     }
 
@@ -107,7 +107,7 @@ bool BuildBase::BuildClean(const String& path)
         }
         else
         {
-            LOGWARNINGF("BuildBase::BuildClean - temp build folder exists, removing: %s", newPath.CString());
+            ATOMIC_LOGWARNINGF("BuildBase::BuildClean - temp build folder exists, removing: %s", newPath.CString());
             fileSystem->RemoveDir(newPath, true);
         }
 
@@ -134,7 +134,7 @@ bool BuildBase::BuildCreateDirectory(const String& path)
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::BuildCreateDirectory - Attempt to create directory of failed build, %s", path.CString());
+        ATOMIC_LOGERRORF("BuildBase::BuildCreateDirectory - Attempt to create directory of failed build, %s", path.CString());
         return false;
     }
 
@@ -159,7 +159,7 @@ bool BuildBase::BuildCopyFile(const String& srcFileName, const String& destFileN
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::BuildCopyFile - Attempt to copy file of failed build, %s", srcFileName.CString());
+        ATOMIC_LOGERRORF("BuildBase::BuildCopyFile - Attempt to copy file of failed build, %s", srcFileName.CString());
         return false;
     }
 
@@ -180,7 +180,7 @@ bool BuildBase::BuildCopyDir(const String& srcDir, const String& destDir)
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::BuildCopyDir - Attempt to copy directory of failed build, %s", srcDir.CString());
+        ATOMIC_LOGERRORF("BuildBase::BuildCopyDir - Attempt to copy directory of failed build, %s", srcDir.CString());
         return false;
     }
 
@@ -206,7 +206,7 @@ bool BuildBase::BuildRemoveDirectory(const String& path)
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::BuildRemoveDirectory - Attempt to remove directory of failed build, %s", path.CString());
+        ATOMIC_LOGERRORF("BuildBase::BuildRemoveDirectory - Attempt to remove directory of failed build, %s", path.CString());
         return false;
     }
 
@@ -278,7 +278,7 @@ void BuildBase::FailBuild(const String& message)
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::FailBuild - Attempt to fail already failed build: %s", message.CString());
+        ATOMIC_LOGERRORF("BuildBase::FailBuild - Attempt to fail already failed build: %s", message.CString());
         return;
     }
 
@@ -405,7 +405,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         itr++;
         if (itr == resourceTags.End())
         {
-            LOGERRORF("BuildBase::BuildFilteredProjectResourceEntries - Asset build-tag \"%s\" not defined in ./Settings/AssetBuildConfig.json", assetBuildTag_.CString());
+            ATOMIC_LOGERRORF("BuildBase::BuildFilteredProjectResourceEntries - Asset build-tag \"%s\" not defined in ./Settings/AssetBuildConfig.json", assetBuildTag_.CString());
         }
     }
 

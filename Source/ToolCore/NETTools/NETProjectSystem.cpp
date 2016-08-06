@@ -133,14 +133,14 @@ namespace ToolCore
 
         if (eventData[P_SUCCESS].GetBool())
         {
-            LOGINFOF("NETBuild Success for project");
+            ATOMIC_LOGINFOF("NETBuild Success for project");
         }
         else
         {
             const String& errorText = eventData[P_ERRORTEXT].GetString();
 
-            LOGERRORF("\n%s\n", errorText.CString());
-            LOGERRORF("NETBuild Error for project");
+            ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
+            ATOMIC_LOGERRORF("NETBuild Error for project");
         }
 
     }
@@ -153,7 +153,7 @@ namespace ToolCore
         {
             if (!GenerateSolution())
             {
-                LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
+                ATOMIC_LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
                 return;
             }
         }
@@ -169,7 +169,7 @@ namespace ToolCore
 
             if (build)
             {
-                build->SubscribeToEvent(E_NETBUILDRESULT, HANDLER(NETProjectSystem, HandleNETBuildResult));
+                build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildResult));
             }
 
         }
@@ -184,7 +184,7 @@ namespace ToolCore
 
         if (!project)
         {
-            LOGERRORF("NETProjectSystem::GenerateSolution - No Project Loaded");
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - No Project Loaded");
             return false;
         }
 
@@ -194,13 +194,13 @@ namespace ToolCore
 
         if (!gen->LoadProject(project))
         {
-            LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Load Project");
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Load Project");
             return false;
         }
 
         if (!gen->Generate())
         {
-            LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Generate Project");
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Generate Project");
             return false;
         }
 
@@ -297,18 +297,18 @@ namespace ToolCore
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
-        SubscribeToEvent(E_UPDATE, HANDLER(NETProjectSystem, HandleUpdate));
+        SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(NETProjectSystem, HandleUpdate));
 
-        SubscribeToEvent(E_PROJECTLOADED, HANDLER(NETProjectSystem, HandleProjectLoaded));
-        SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(NETProjectSystem, HandleProjectUnloaded));
+        SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectLoaded));
+        SubscribeToEvent(E_PROJECTUNLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectUnloaded));
 
-        SubscribeToEvent(E_FILECHANGED, HANDLER(NETProjectSystem, HandleFileChanged));
+        SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(NETProjectSystem, HandleFileChanged));
 
-        SubscribeToEvent(E_RESOURCEADDED, HANDLER(NETProjectSystem, HandleResourceAdded));
-        SubscribeToEvent(E_RESOURCEREMOVED, HANDLER(NETProjectSystem, HandleResourceRemoved));
+        SubscribeToEvent(E_RESOURCEADDED, ATOMIC_HANDLER(NETProjectSystem, HandleResourceAdded));
+        SubscribeToEvent(E_RESOURCEREMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleResourceRemoved));
 
-        SubscribeToEvent(E_ASSETRENAMED, HANDLER(NETProjectSystem, HandleAssetRenamed));
-        SubscribeToEvent(E_ASSETMOVED, HANDLER(NETProjectSystem, HandleAssetMoved));
+        SubscribeToEvent(E_ASSETRENAMED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetRenamed));
+        SubscribeToEvent(E_ASSETMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetMoved));
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 

@@ -83,7 +83,7 @@ Cursor::Cursor(Context* context) :
         shapeInfos_[shapeNames[i]] = CursorShapeInfo(i);
 
     // Subscribe to OS mouse cursor visibility changes to be able to reapply the cursor shape
-    SubscribeToEvent(E_MOUSEVISIBLECHANGED, HANDLER(Cursor, HandleMouseVisibleChanged));
+    SubscribeToEvent(E_MOUSEVISIBLECHANGED, ATOMIC_HANDLER(Cursor, HandleMouseVisibleChanged));
 }
 
 Cursor::~Cursor()
@@ -102,10 +102,10 @@ void Cursor::RegisterObject(Context* context)
 {
     context->RegisterFactory<Cursor>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Priority", M_MAX_INT);
-    ACCESSOR_ATTRIBUTE("Use System Shapes", GetUseSystemShapes, SetUseSystemShapes, bool, false, AM_FILE);
-    MIXED_ACCESSOR_ATTRIBUTE("Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
+    ATOMIC_COPY_BASE_ATTRIBUTES(BorderImage);
+    ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Priority", M_MAX_INT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Use System Shapes", GetUseSystemShapes, SetUseSystemShapes, bool, false, AM_FILE);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
 }
 
 void Cursor::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
@@ -126,7 +126,7 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
 {
     if (shape < CS_NORMAL || shape >= CS_MAX_SHAPES)
     {
-        LOGERROR("Shape index out of bounds, can not define cursor shape");
+        ATOMIC_LOGERROR("Shape index out of bounds, can not define cursor shape");
         return;
     }
 
@@ -277,7 +277,7 @@ void Cursor::ApplyOSCursorShape()
             info.osCursor_ = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[info.systemCursor_]);
             info.systemDefined_ = true;
             if (!info.osCursor_)
-                LOGERROR("Could not create system cursor");
+                ATOMIC_LOGERROR("Could not create system cursor");
         }
         // Create from image
         else if (info.image_)
@@ -289,7 +289,7 @@ void Cursor::ApplyOSCursorShape()
                 info.osCursor_ = SDL_CreateColorCursor(surface, info.hotSpot_.x_, info.hotSpot_.y_);
                 info.systemDefined_ = false;
                 if (!info.osCursor_)
-                    LOGERROR("Could not create cursor from image " + info.image_->GetName());
+                    ATOMIC_LOGERROR("Could not create cursor from image " + info.image_->GetName());
                 SDL_FreeSurface(surface);
             }
         }

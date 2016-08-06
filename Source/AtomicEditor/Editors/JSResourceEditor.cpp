@@ -74,9 +74,9 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     webView_->GetWebTexture2D()->SetClearColor(Color(.23f, .23f, .23f, 1));
 
-    SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
+    SubscribeToEvent(messageHandler_, E_WEBMESSAGE, ATOMIC_HANDLER(JSResourceEditor, HandleWebMessage));
 
-    SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleRenameResourceNotification));
+    SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, ATOMIC_HANDLER(JSResourceEditor, HandleRenameResourceNotification));
 
     c->AddChild(webView_->GetInternalWidget());
 
@@ -156,7 +156,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
                     file.Write((void*) code.CString(), code.Length());
                     file.Close();
             } else {
-                LOGWARNING("Ignoring attempt to write file: " + fn);
+                ATOMIC_LOGWARNING("Ignoring attempt to write file: " + fn);
             }
         }
     }

@@ -30,7 +30,7 @@ namespace Atomic
 
     class NETAtomicPlayer : public PlayerApp
     {
-        OBJECT(NETAtomicPlayer)
+        ATOMIC_OBJECT(NETAtomicPlayer, PlayerApp)
 
     public:
 

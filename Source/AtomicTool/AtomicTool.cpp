@@ -36,7 +36,7 @@
 
 #include "AtomicTool.h"
 
-DEFINE_APPLICATION_MAIN(AtomicTool::AtomicTool);
+ATOMIC_DEFINE_APPLICATION_MAIN(AtomicTool::AtomicTool);
 
 using namespace ToolCore;
 
@@ -146,7 +146,7 @@ void AtomicTool::HandleLicenseActivationError(StringHash eventType, VariantMap& 
 
 void AtomicTool::HandleLicenseActivationSuccess(StringHash eventType, VariantMap& eventData)
 {
-    LOGRAW("\nActivation successful, thank you!\n\n");
+    ATOMIC_LOGRAW("\nActivation successful, thank you!\n\n");
     GetSubsystem<Engine>()->Exit();
 }
 
@@ -162,8 +162,8 @@ void AtomicTool::DoActivation()
 
     licenseSystem->LicenseAgreementConfirmed();
 
-    SubscribeToEvent(E_LICENSE_ACTIVATIONERROR, HANDLER(AtomicTool, HandleLicenseActivationError));
-    SubscribeToEvent(E_LICENSE_ACTIVATIONSUCCESS, HANDLER(AtomicTool, HandleLicenseActivationSuccess));
+    SubscribeToEvent(E_LICENSE_ACTIVATIONERROR, ATOMIC_HANDLER(AtomicTool, HandleLicenseActivationError));
+    SubscribeToEvent(E_LICENSE_ACTIVATIONSUCCESS, ATOMIC_HANDLER(AtomicTool, HandleLicenseActivationSuccess));
 
     licenseSystem->RequestServerActivation(activationKey_);
 
@@ -177,7 +177,7 @@ void AtomicTool::HandleLicenseDeactivationError(StringHash eventType, VariantMap
 
 void AtomicTool::HandleLicenseDeactivationSuccess(StringHash eventType, VariantMap& eventData)
 {
-    LOGRAW("\nDeactivation successful\n\n");
+    ATOMIC_LOGRAW("\nDeactivation successful\n\n");
     GetSubsystem<Engine>()->Exit();
 }
 
@@ -197,20 +197,20 @@ void AtomicTool::DoDeactivation()
         return;
     }
 
-    SubscribeToEvent(E_LICENSE_DEACTIVATIONERROR, HANDLER(AtomicTool, HandleLicenseDeactivationError));
-    SubscribeToEvent(E_LICENSE_DEACTIVATIONSUCCESS, HANDLER(AtomicTool, HandleLicenseDeactivationSuccess));
+    SubscribeToEvent(E_LICENSE_DEACTIVATIONERROR, ATOMIC_HANDLER(AtomicTool, HandleLicenseDeactivationError));
+    SubscribeToEvent(E_LICENSE_DEACTIVATIONSUCCESS, ATOMIC_HANDLER(AtomicTool, HandleLicenseDeactivationSuccess));
 }
 
 void AtomicTool::Start()
 {
     // Subscribe to events
-    SubscribeToEvent(E_COMMANDERROR, HANDLER(AtomicTool, HandleCommandError));
-    SubscribeToEvent(E_COMMANDFINISHED, HANDLER(AtomicTool, HandleCommandFinished));
+    SubscribeToEvent(E_COMMANDERROR, ATOMIC_HANDLER(AtomicTool, HandleCommandError));
+    SubscribeToEvent(E_COMMANDFINISHED, ATOMIC_HANDLER(AtomicTool, HandleCommandFinished));
 
-    SubscribeToEvent(E_LICENSE_EULAREQUIRED, HANDLER(AtomicTool, HandleLicenseEulaRequired));
-    SubscribeToEvent(E_LICENSE_ACTIVATIONREQUIRED, HANDLER(AtomicTool, HandleLicenseActivationRequired));
-    SubscribeToEvent(E_LICENSE_ERROR, HANDLER(AtomicTool, HandleLicenseError));
-    SubscribeToEvent(E_LICENSE_SUCCESS, HANDLER(AtomicTool, HandleLicenseSuccess));
+    SubscribeToEvent(E_LICENSE_EULAREQUIRED, ATOMIC_HANDLER(AtomicTool, HandleLicenseEulaRequired));
+    SubscribeToEvent(E_LICENSE_ACTIVATIONREQUIRED, ATOMIC_HANDLER(AtomicTool, HandleLicenseActivationRequired));
+    SubscribeToEvent(E_LICENSE_ERROR, ATOMIC_HANDLER(AtomicTool, HandleLicenseError));
+    SubscribeToEvent(E_LICENSE_SUCCESS, ATOMIC_HANDLER(AtomicTool, HandleLicenseSuccess));
 
     const Vector<String>& arguments = GetArguments();
 

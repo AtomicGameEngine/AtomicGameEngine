@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,9 @@ namespace Atomic
 {
 
 /// Work item completed event.
-EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+ATOMIC_EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
 {
-    PARAM(P_ITEM, Item);                        // WorkItem ptr
+    ATOMIC_PARAM(P_ITEM, Item);                        // WorkItem ptr
 }
 
 class WorkerThread;
@@ -40,9 +40,9 @@ class WorkerThread;
 /// Work queue item.
 struct WorkItem : public RefCounted
 {
-    REFCOUNTED(WorkItem)
-
     friend class WorkQueue;
+
+    ATOMIC_REFCOUNTED(WorkItem)
 
 public:
     // Construct
@@ -76,7 +76,7 @@ private:
 /// Work queue subsystem for multithreading.
 class ATOMIC_API WorkQueue : public Object
 {
-    OBJECT(WorkQueue);
+    ATOMIC_OBJECT(WorkQueue, Object);
 
     friend class WorkerThread;
 

@@ -24,12 +24,18 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ WEB",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ WEB",
       "cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=" + bcommon.atomicRoot + "Build/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../../",
-      "make -j4",
-      "cd ./Source/AtomicPlayer/Application && mv ./AtomicPlayer ./AtomicPlayer.bc && " +
-      // -s ERROR_ON_UNDEFINED_SYMBOLS=1 (disabled for pthread errors currently on incoming)
-      "emcc -O3 -s USE_PTHREADS=0 -s ASM_JS=1 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
-
+      "make -j4"
     ]
+
+    // TODO: Verify the follow settings for CI Build
+
+    /*
+
+    "cd ./Source/AtomicPlayer/Application && mv ./AtomicPlayer ./AtomicPlayer.bc && " +
+    // -s ERROR_ON_UNDEFINED_SYMBOLS=1 (disabled for pthread errors currently on incoming)
+    "emcc -O3 -s USE_PTHREADS=0 -s ASM_JS=1 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
+
+    */
 
     jake.exec(cmds, function() {
 

@@ -114,7 +114,7 @@ class JSBClass : public Object
     friend class JSClassWriter;
     friend class CSClassWriter;
 
-    OBJECT(JSBClass)
+    ATOMIC_OBJECT(JSBClass, Object)
 
 public:
 

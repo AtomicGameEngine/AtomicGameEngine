@@ -35,7 +35,7 @@ class UISelectItemSource;
 
 class UISelectItem : public Object
 {
-    OBJECT(UISelectItem)
+    ATOMIC_OBJECT(UISelectItem, Object)
 
 public:
 
@@ -66,7 +66,7 @@ protected:
 
 class UISelectItemSource : public Object
 {
-    OBJECT(UISelectItemSource)
+    ATOMIC_OBJECT(UISelectItemSource, Object)
 
 public:
 

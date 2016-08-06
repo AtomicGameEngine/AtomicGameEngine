@@ -69,7 +69,7 @@ void JSMetrics::Dump()
     while (vitr != sorted.End())
     {
         const String& classname = (*vitr).classname;
-        LOGINFOF("%s %i", classname.CString(), objectMetrics_[classname].count);
+        ATOMIC_LOGINFOF("%s %i", classname.CString(), objectMetrics_[classname].count);
         vitr++;
     }
 
@@ -93,7 +93,7 @@ void JSMetrics::DumpNodes()
     while (vitr != sorted.End())
     {
         const String& nodename = (*vitr).name;
-        LOGINFOF("%s %i", nodename.CString(), nodeMetrics_[nodename].count);
+        ATOMIC_LOGINFOF("%s %i", nodename.CString(), nodeMetrics_[nodename].count);
         vitr++;
     }
 
@@ -142,7 +142,7 @@ void JSMetrics::DumpJSComponents()
     for (unsigned i = 0; i < jsnames.Size(); i++)
     {
         const String& classname = jsnames[i];
-        LOGINFOF("%s %i", classname.CString(), jscomponents[classname]);
+        ATOMIC_LOGINFOF("%s %i", classname.CString(), jscomponents[classname]);
     }
 
 }

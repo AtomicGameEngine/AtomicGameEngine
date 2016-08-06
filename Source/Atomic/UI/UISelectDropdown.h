@@ -30,7 +30,7 @@ namespace Atomic
 
 class UISelectDropdown : public UIButton
 {
-    OBJECT(UISelectDropdown)
+    ATOMIC_OBJECT(UISelectDropdown, UIButton)
 
 public:
 

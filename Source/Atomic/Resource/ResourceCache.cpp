@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,8 +40,15 @@
 
 #include "../DebugNew.h"
 
+#include <cstdio>
+
 namespace Atomic
 {
+
+// ATOMIC BEGIN
+const char* PAK_EXTENSION = ".pak";
+// ATOMIC END
+
 
 static const char* checkDirs[] =
 {
@@ -64,8 +71,6 @@ static const char* checkDirs[] =
 };
 
 static const SharedPtr<Resource> noResource;
-const char* PAK_EXTENSION = ".pak";
-const char* PAK_FILTER = "*.pak";
 
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
@@ -78,17 +83,21 @@ ResourceCache::ResourceCache(Context* context) :
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
 
+#ifdef ATOMIC_THREADING
     // Create resource background loader. Its thread will start on the first background request
     backgroundLoader_ = new BackgroundLoader(this);
+#endif
 
     // Subscribe BeginFrame for handling directory watchers and background loaded resource finalization
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, ATOMIC_HANDLER(ResourceCache, HandleBeginFrame));
 }
 
 ResourceCache::~ResourceCache()
 {
+#ifdef ATOMIC_THREADING
     // Shut down the background loader first
     backgroundLoader_.Reset();
+#endif
 }
 
 bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
@@ -98,7 +107,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem || !fileSystem->DirExists(pathName))
     {
-        LOGERROR("Could not open directory " + pathName);
+        ATOMIC_LOGERROR("Could not open directory " + pathName);
         return false;
     }
 
@@ -125,7 +134,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
         fileWatchers_.Push(watcher);
     }
 
-    LOGINFO("Added resource path " + fixedPath);
+    ATOMIC_LOGINFO("Added resource path " + fixedPath);
     return true;
 }
 
@@ -135,14 +144,17 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 
     // Do not add packages that failed to load
     if (!package || !package->GetNumFiles())
+    {
+        ATOMIC_LOGERRORF("Could not add package file %s due to load failure", package->GetName().CString());
         return false;
+    }
 
     if (priority < packages_.Size())
         packages_.Insert(priority, SharedPtr<PackageFile>(package));
     else
         packages_.Push(SharedPtr<PackageFile>(package));
 
-    LOGINFO("Added resource package " + package->GetName());
+    ATOMIC_LOGINFO("Added resource package " + package->GetName());
     return true;
 }
 
@@ -156,14 +168,14 @@ bool ResourceCache::AddManualResource(Resource* resource)
 {
     if (!resource)
     {
-        LOGERROR("Null manual resource");
+        ATOMIC_LOGERROR("Null manual resource");
         return false;
     }
 
     const String& name = resource->GetName();
     if (name.Empty())
     {
-        LOGERROR("Manual resource with empty name, can not add");
+        ATOMIC_LOGERROR("Manual resource with empty name, can not add");
         return false;
     }
 
@@ -193,7 +205,7 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
                     break;
                 }
             }
-            LOGINFO("Removed resource path " + fixedPath);
+            ATOMIC_LOGINFO("Removed resource path " + fixedPath);
             return;
         }
     }
@@ -209,7 +221,7 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
         {
             if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
-            LOGINFO("Removed resource package " + (*i)->GetName());
+            ATOMIC_LOGINFO("Removed resource package " + (*i)->GetName());
             packages_.Erase(i);
             return;
         }
@@ -229,7 +241,7 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
         {
             if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
-            LOGINFO("Removed resource package " + (*i)->GetName());
+            ATOMIC_LOGINFO("Removed resource package " + (*i)->GetName());
             packages_.Erase(i);
             return;
         }
@@ -371,33 +383,32 @@ bool ResourceCache::ReloadResource(Resource* resource)
 
     bool success = false;
     SharedPtr<File> file = GetFile(resource->GetName());
-	
 
-	if (file) 
-	{
+// ATOMIC BEGIN
+
+    if (file)
+    {
 #ifdef ATOMIC_PLATFORM_DESKTOP
-		String ext = GetExtension(resource->GetName());
-		if (ext == ".jpg" || ext == ".png" || ext == ".tga")
-		{
-			String ddsName = "DDS/" + resource->GetName() + ".dds";
-			file = GetFile(ddsName, false);
-			if (file != NULL)
-				success = resource->Load(*(file.Get()));
-			else
-			{
-				file = GetFile(resource->GetName());
-				success = resource->Load(*(file.Get()));
-			}
-		}
-		else
-		{
-			success = resource->Load(*(file.Get()));
-		}
+        String ext = GetExtension(resource->GetName());
+        if (ext == ".jpg" || ext == ".png" || ext == ".tga")
+        {
+            String ddsName = "DDS/" + resource->GetName() + ".dds";
+            SharedPtr<File> ddsFile = GetFile(ddsName, false);
+            if (ddsFile != NULL)
+                success = resource->Load(*(ddsFile.Get()));
+            else
+                success = resource->Load(*(file.Get()));
+        }
+        else
+        {
+            success = resource->Load(*(file.Get()));
+        }
 #else
-		success = resource->Load(*(file.Get()));
+        success = resource->Load(*(file.Get()));
 #endif
-	}
+    }
 
+// ATOMIC END
 
     if (success)
     {
@@ -420,7 +431,7 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
     const SharedPtr<Resource>& resource = FindResource(fileNameHash);
     if (resource)
     {
-        LOGDEBUG("Reloading changed resource " + fileName);
+        ATOMIC_LOGDEBUG("Reloading changed resource " + fileName);
         ReloadResource(resource);
     }
     // Always perform dependency resource check for resource loaded from XML file as it could be used in inheritance
@@ -444,14 +455,14 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
 
             for (unsigned k = 0; k < dependents.Size(); ++k)
             {
-                LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
+                ATOMIC_LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
                 ReloadResource(dependents[k]);
             }
         }
     }
 }
 
-void ResourceCache::SetMemoryBudget(StringHash type, unsigned budget)
+void ResourceCache::SetMemoryBudget(StringHash type, unsigned long long budget)
 {
     resourceGroups_[type].memoryBudget_ = budget;
 }
@@ -540,9 +551,9 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     if (sendEventOnFailure)
     {
         if (resourceRouters_.Size() && name.Empty() && !nameIn.Empty())
-            LOGERROR("Resource request " + nameIn + " was blocked");
+            ATOMIC_LOGERROR("Resource request " + nameIn + " was blocked");
         else
-            LOGERROR("Could not find resource " + name);
+            ATOMIC_LOGERROR("Could not find resource " + name);
 
         if (Thread::IsMainThread())
         {
@@ -563,7 +574,7 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const String& name
 
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        ATOMIC_LOGERROR("Attempted to get resource " + name + " from outside the main thread");
         return 0;
     }
 
@@ -583,7 +594,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        ATOMIC_LOGERROR("Attempted to get resource " + name + " from outside the main thread");
         return 0;
     }
 
@@ -593,8 +604,10 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
     StringHash nameHash(name);
 
+#ifdef ATOMIC_THREADING
     // Check if the resource is being background loaded but is now needed immediately
     backgroundLoader_->WaitForResource(type, nameHash);
+#endif
 
     const SharedPtr<Resource>& existing = FindResource(type, nameHash);
     if (existing)
@@ -605,7 +618,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
     {
-        LOGERROR("Could not load unknown resource type " + String(type));
+        ATOMIC_LOGERROR("Could not load unknown resource type " + String(type));
 
         if (sendEventOnFailure)
         {
@@ -620,30 +633,11 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     }
 
     // Attempt to load the resource
-    SharedPtr<File> file;
-
-    // #623 BEGIN TODO: For now try to get DDS version of textures from /DDS cache sub directory,
-    // ultimately should have per platform compressed versions saved in cache
-#ifdef ATOMIC_PLATFORM_DESKTOP
-    String ext = Atomic::GetExtension(name);
-    if (ext == ".jpg" || ext == ".png" || ext == ".tga")
-    {
-        String ddsName = "DDS/" + name + ".dds";
-        file = GetFile(ddsName, false);
-        if (file)
-            LOGDEBUG("Loaded cached DDS " + name + ".dds");
-    }
-    if (!file)
-        file = GetFile(name, sendEventOnFailure);
-#else
-    // #623 END TODO
-    file = GetFile(name, sendEventOnFailure);
-#endif
-
+    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
     if (!file)
         return 0;   // Error is already logged
 
-    LOGDEBUG("Loading resource " + name);
+    ATOMIC_LOGDEBUG("Loading resource " + name);
     resource->SetName(name);
 
     if (!resource->Load(*(file.Get())))
@@ -672,6 +666,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
 bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn, bool sendEventOnFailure, Resource* caller)
 {
+#ifdef ATOMIC_THREADING
     // If empty name, fail immediately
     String name = SanitateResourceName(nameIn);
     if (name.Empty())
@@ -683,6 +678,10 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn
         return false;
 
     return backgroundLoader_->QueueResource(type, name, sendEventOnFailure, caller);
+#else
+    // When threading not supported, fall back to synchronous loading
+    return GetResource(type, nameIn, sendEventOnFailure);
+#endif
 }
 
 SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
@@ -698,7 +697,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
     {
-        LOGERROR("Could not load unknown resource type " + String(type));
+        ATOMIC_LOGERROR("Could not load unknown resource type " + String(type));
 
         if (sendEventOnFailure)
         {
@@ -717,7 +716,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     if (!file)
         return SharedPtr<Resource>();  // Error is already logged
 
-    LOGDEBUG("Loading temporary resource " + name);
+    ATOMIC_LOGDEBUG("Loading temporary resource " + name);
     resource->SetName(file->GetName());
 
     if (!resource->Load(*(file.Get())))
@@ -740,7 +739,11 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
 
 unsigned ResourceCache::GetNumBackgroundLoadResources() const
 {
+#ifdef ATOMIC_THREADING
     return backgroundLoader_->GetNumQueuedResources();
+#else
+    return 0;
+#endif
 }
 
 void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
@@ -788,21 +791,21 @@ bool ResourceCache::Exists(const String& nameIn) const
     return fileSystem->FileExists(name);
 }
 
-unsigned ResourceCache::GetMemoryBudget(StringHash type) const
+unsigned long long ResourceCache::GetMemoryBudget(StringHash type) const
 {
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     return i != resourceGroups_.End() ? i->second_.memoryBudget_ : 0;
 }
 
-unsigned ResourceCache::GetMemoryUse(StringHash type) const
+unsigned long long ResourceCache::GetMemoryUse(StringHash type) const
 {
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     return i != resourceGroups_.End() ? i->second_.memoryUse_ : 0;
 }
 
-unsigned ResourceCache::GetTotalMemoryUse() const
+unsigned long long ResourceCache::GetTotalMemoryUse() const
 {
-    unsigned total = 0;
+    unsigned long long total = 0;
     for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         total += i->second_.memoryUse_;
     return total;
@@ -908,8 +911,7 @@ String ResourceCache::SanitateResourceDirName(const String& nameIn) const
 
 void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)
 {
-    // If resource reloading is not on, do not create the dependency data structure (saves memory)
-    if (!resource || !autoReloadResources_)
+    if (!resource)
         return;
 
     MutexLock lock(resourceMutex_);
@@ -921,7 +923,7 @@ void ResourceCache::StoreResourceDependency(Resource* resource, const String& de
 
 void ResourceCache::ResetDependencies(Resource* resource)
 {
-    if (!resource || !autoReloadResources_)
+    if (!resource)
         return;
 
     MutexLock lock(resourceMutex_);
@@ -937,6 +939,65 @@ void ResourceCache::ResetDependencies(Resource* resource)
         else
             ++i;
     }
+}
+
+String ResourceCache::PrintMemoryUsage() const
+{
+    String output = "Resource Type                 Cnt       Avg       Max    Budget     Total\n\n";
+    char outputLine[256];
+
+    unsigned totalResourceCt = 0;
+    unsigned long long totalLargest = 0;
+    unsigned long long totalAverage = 0;
+    unsigned long long totalUse = GetTotalMemoryUse();
+
+    for (HashMap<StringHash, ResourceGroup>::ConstIterator cit = resourceGroups_.Begin(); cit != resourceGroups_.End(); ++cit)
+    {
+        const unsigned resourceCt = cit->second_.resources_.Size();
+        unsigned long long average = 0;
+        if (resourceCt > 0)
+            average = cit->second_.memoryUse_ / resourceCt;
+        else
+            average = 0;
+        unsigned long long largest = 0;
+        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
+        {
+            if (resIt->second_->GetMemoryUse() > largest)
+                largest = resIt->second_->GetMemoryUse();
+            if (largest > totalLargest)
+                totalLargest = largest;
+        }
+
+        totalResourceCt += resourceCt;
+
+        const String countString(cit->second_.resources_.Size());
+        const String memUseString = GetFileSizeString(average);
+        const String memMaxString = GetFileSizeString(largest);
+        const String memBudgetString = GetFileSizeString(cit->second_.memoryBudget_);
+        const String memTotalString = GetFileSizeString(cit->second_.memoryUse_);
+        const String resTypeName = context_->GetTypeName(cit->first_);
+
+        memset(outputLine, ' ', 256);
+        outputLine[255] = 0;
+        sprintf(outputLine, "%-28s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(), memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
+
+        output += ((const char*)outputLine);
+    }
+
+    if (totalResourceCt > 0)
+        totalAverage = totalUse / totalResourceCt;
+
+    const String countString(totalResourceCt);
+    const String memUseString = GetFileSizeString(totalAverage);
+    const String memMaxString = GetFileSizeString(totalLargest);
+    const String memTotalString = GetFileSizeString(totalUse);
+
+    memset(outputLine, ' ', 256);
+    outputLine[255] = 0;
+    sprintf(outputLine, "%-28s %4s %9s %9s %9s %9s\n", "All", countString.CString(), memUseString.CString(), memMaxString.CString(), "-", memTotalString.CString());
+    output += ((const char*)outputLine);
+
+    return output;
 }
 
 const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHash nameHash)
@@ -1028,7 +1089,7 @@ void ResourceCache::UpdateResourceGroup(StringHash type)
         if (i->second_.memoryBudget_ && i->second_.memoryUse_ > i->second_.memoryBudget_ &&
             oldestResource != i->second_.resources_.End())
         {
-            LOGDEBUG("Resource group " + oldestResource->second_->GetTypeName() + " over memory budget, releasing resource " +
+            ATOMIC_LOGDEBUG("Resource group " + oldestResource->second_->GetTypeName() + " over memory budget, releasing resource " +
                      oldestResource->second_->GetName());
             i->second_.resources_.Erase(oldestResource);
         }
@@ -1057,10 +1118,12 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
     }
 
     // Check for background loaded resources that can be finished
+#ifdef ATOMIC_THREADING
     {
-        PROFILE(FinishBackgroundResources);
+        ATOMIC_PROFILE(FinishBackgroundResources);
         backgroundLoader_->FinishResources(finishBackgroundResourcesMs_);
     }
+#endif
 }
 
 File* ResourceCache::SearchResourceDirs(const String& nameIn)

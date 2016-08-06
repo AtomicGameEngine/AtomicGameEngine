@@ -33,7 +33,7 @@ class Command;
 
 class CommandParser : public Object
 {
-    OBJECT(CommandParser);
+    ATOMIC_OBJECT(CommandParser, Object);
 
 public:
 

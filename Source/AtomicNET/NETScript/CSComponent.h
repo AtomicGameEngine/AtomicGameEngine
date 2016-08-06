@@ -34,8 +34,7 @@ class ATOMIC_API CSComponent : public ScriptComponent
 {
     friend class CSComponentFactory;
 
-    OBJECT(CSComponent)
-    BASEOBJECT(ScriptComponent)
+    ATOMIC_OBJECT(CSComponent, ScriptComponent)
 
 public:
 

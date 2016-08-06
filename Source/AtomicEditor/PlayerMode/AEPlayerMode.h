@@ -38,7 +38,7 @@ class PlayerMode : public Object
 {
     friend class AEPlayerApplication;
 
-    OBJECT(PlayerMode);
+    ATOMIC_OBJECT(PlayerMode, Object);
 
 public:
     /// Construct.

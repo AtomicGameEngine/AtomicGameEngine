@@ -30,7 +30,7 @@ namespace Atomic
 
 class UICheckBox : public UIWidget
 {
-    OBJECT(UICheckBox)
+    ATOMIC_OBJECT(UICheckBox, UIWidget)
 
 public:
 

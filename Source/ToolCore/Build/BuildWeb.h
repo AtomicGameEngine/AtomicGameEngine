@@ -31,7 +31,7 @@ class Project;
 
 class BuildWeb : public BuildBase
 {
-    OBJECT(BuildWeb);
+    ATOMIC_OBJECT(BuildWeb, BuildBase);
 
 public:
 

@@ -31,7 +31,7 @@ namespace AtomicEditor
 
 class FileUtils : public Object
 {
-    OBJECT(FileUtils);
+    ATOMIC_OBJECT(FileUtils, Object);
 
 public:
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,21 +53,21 @@ typedef Vector<PListValue> PListValueVector;
 class ATOMIC_API PListValue
 {
 public:
-    // Construct.
+    /// Construct.
     PListValue();
-    // Construct from int.
+    /// Construct from int.
     PListValue(int value);
-    // Construct from boolean.
+    /// Construct from boolean.
     PListValue(bool value);
-    // Construct from float.
+    /// Construct from float.
     PListValue(float value);
-    // Construct from string.
+    /// Construct from string.
     PListValue(const String& value);
-    // Construct from value map.
+    /// Construct from value map.
     PListValue(PListValueMap& valueMap);
-    // Construct from value vector.
+    /// Construct from value vector.
     PListValue(PListValueVector& valueVector);
-    // Construct from another value.
+    /// Construct from another value.
     PListValue(const PListValue& value);
     /// Destruct.
     ~PListValue();
@@ -137,7 +137,7 @@ private:
 /// Property list (plist).
 class ATOMIC_API PListFile : public Resource
 {
-    OBJECT(PListFile);
+    ATOMIC_OBJECT(PListFile, Resource);
 
 public:
     /// Construct.

@@ -50,6 +50,13 @@
 #include "WebString.h"
 
 #include <SDL/include/SDL.h>
+
+#ifdef ATOMIC_PLATFORM_LINUX
+  #ifndef SDL_VIDEO_DRIVER_X11
+  #define SDL_VIDEO_DRIVER_X11
+  #endif
+#endif
+
 #include <ThirdParty/SDL/include/SDL_syswm.h>
 
 namespace Atomic
@@ -320,7 +327,7 @@ public:
         String _source;
         ConvertCEFString(source, _source);
 
-        LOGINFOF("WebViewJS: %s (%s:%i)", _message.CString(), _source.CString(), line);
+        ATOMIC_LOGINFOF("WebViewJS: %s (%s:%i)", _message.CString(), _source.CString(), line);
 
         return false;
     }
@@ -329,13 +336,13 @@ public:
     {
         if (browser_.get())
         {
-            LOGERROR("WebClient::CreateBrowser - Browser already created");
+            ATOMIC_LOGERROR("WebClient::CreateBrowser - Browser already created");
             return false;
         }
 
         if (webClient_->renderHandler_.Null())
         {
-            LOGERROR("WebClient::CreateBrowser - No render handler specified");
+            ATOMIC_LOGERROR("WebClient::CreateBrowser - No render handler specified");
             return false;
         }
 
@@ -519,7 +526,7 @@ WebClient::WebClient(Context* context) : Object(context)
     d_ = new WebClientPrivate(this);
     d_->AddRef();
 
-    SubscribeToEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED, HANDLER(WebClient, HandleWebViewGlobalPropertiesChanged));
+    SubscribeToEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED, ATOMIC_HANDLER(WebClient, HandleWebViewGlobalPropertiesChanged));
 }
 
 WebClient::~WebClient()
@@ -771,13 +778,13 @@ void WebClient::AddMessageHandler(WebMessageHandler* handler, bool first)
 
     if (handler->GetWebClient())
     {
-        LOGWARNING("WebClient::AddMessageHandler - message handler already added to another client");
+        ATOMIC_LOGWARNING("WebClient::AddMessageHandler - message handler already added to another client");
         return;
     }
 
     if (messageHandlers_.Contains(_handler))
     {
-        LOGWARNING("WebClient::AddMessageHandler - message handler already added to this client");
+        ATOMIC_LOGWARNING("WebClient::AddMessageHandler - message handler already added to this client");
         return;
     }
 
@@ -796,7 +803,7 @@ void WebClient::RemoveMessageHandler(WebMessageHandler* handler)
 
     if (itr == messageHandlers_.End())
     {
-        LOGWARNING("WebClient::RemoveMessageHandler - message handler not found");
+        ATOMIC_LOGWARNING("WebClient::RemoveMessageHandler - message handler not found");
         return;
     }
 
@@ -968,7 +975,7 @@ void WebClient::UpdateGlobalProperties()
     // Send the process message to the render process.
     if (!d_->browser_->SendProcessMessage(PID_RENDERER, msg))
     {
-        LOGERROR("WebClient::UpdateGlobalProperties - Failed to send message");
+        ATOMIC_LOGERROR("WebClient::UpdateGlobalProperties - Failed to send message");
     }
 
 }

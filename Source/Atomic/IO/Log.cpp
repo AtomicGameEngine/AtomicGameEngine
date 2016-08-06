@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@
 
 #include <cstdio>
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 #include <android/log.h>
 #endif
 #ifdef IOS
@@ -70,7 +70,7 @@ Log::Log(Context* context) :
 {
     logInstance = this;
 
-    SubscribeToEvent(E_ENDFRAME, HANDLER(Log, HandleEndFrame));
+    SubscribeToEvent(E_ENDFRAME, ATOMIC_HANDLER(Log, HandleEndFrame));
 }
 
 Log::~Log()
@@ -80,7 +80,7 @@ Log::~Log()
 
 void Log::Open(const String& fileName)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     if (fileName.Empty())
         return;
     if (logFile_ && logFile_->IsOpen())
@@ -104,7 +104,7 @@ void Log::Open(const String& fileName)
 
 void Log::Close()
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     if (logFile_ && logFile_->IsOpen())
     {
         logFile_->Close();
@@ -115,7 +115,11 @@ void Log::Close()
 
 void Log::SetLevel(int level)
 {
-    assert(level >= LOG_DEBUG && level < LOG_NONE);
+    if (level < LOG_DEBUG || level > LOG_NONE)
+    {
+        ATOMIC_LOGERRORF("Attempted to set erroneous log level %d", level);
+        return;
+    }
 
     level_ = level;
 }
@@ -132,7 +136,16 @@ void Log::SetQuiet(bool quiet)
 
 void Log::Write(int level, const String& message)
 {
-    assert(level >= LOG_DEBUG && level < LOG_NONE);
+    // Special case for LOG_RAW level
+    if (level == LOG_RAW)
+    {
+        WriteRaw(message, false);
+        return;
+    }
+
+    // No-op if illegal level
+    if (level < LOG_DEBUG || level >= LOG_NONE)
+        return;
 
     // If not in the main thread, store message for later processing
     if (!Thread::IsMainThread())
@@ -157,9 +170,9 @@ void Log::Write(int level, const String& message)
     if (logInstance->timeStamp_)
         formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
 
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     int androidLevel = ANDROID_LOG_DEBUG + level;
-    __android_log_print(androidLevel, "Atomic", "%s", message.CString());
+    __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
 #elif defined(IOS)
     SDL_IOS_LogMessage(message.CString());
 #else
@@ -211,14 +224,14 @@ void Log::WriteRaw(const String& message, bool error)
 
     logInstance->lastMessage_ = message;
 
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     if (logInstance->quiet_)
     {
         if (error)
-            __android_log_print(ANDROID_LOG_ERROR, "Atomic", message.CString());
+            __android_log_print(ANDROID_LOG_ERROR, "Urho3D", message.CString());
     }
     else
-        __android_log_print(error ? ANDROID_LOG_ERROR : ANDROID_LOG_INFO, "Atomic", message.CString());
+        __android_log_print(error ? ANDROID_LOG_ERROR : ANDROID_LOG_INFO, "Urho3D", message.CString());
 #elif defined(IOS)
     SDL_IOS_LogMessage(message.CString());
 #else

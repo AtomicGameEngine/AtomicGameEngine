@@ -1,7 +1,6 @@
-/* stb_image_write - v0.98 - public domain - http://nothings.org/stb/stb_image_write.h
-   writes out PNG/BMP/TGA images to C stdio - Sean Barrett 2010
-                            no warranty implied; use at your own risk
-
+/* stb_image_write - v1.02 - public domain - http://nothings.org/stb/stb_image_write.h
+   writes out PNG/BMP/TGA images to C stdio - Sean Barrett 2010-2015
+                                     no warranty implied; use at your own risk
 
    Before #including,
 
@@ -18,7 +17,7 @@ ABOUT:
 
    The PNG output is not optimal; it is 20-50% larger than the file
    written by a decent optimizing implementation. This library is designed
-   for source code compactness and simplicitly, not optimal image file size
+   for source code compactness and simplicity, not optimal image file size
    or run-time performance.
 
 BUILDING:
@@ -35,7 +34,22 @@ USAGE:
      int stbi_write_png(char const *filename, int w, int h, int comp, const void *data, int stride_in_bytes);
      int stbi_write_bmp(char const *filename, int w, int h, int comp, const void *data);
      int stbi_write_tga(char const *filename, int w, int h, int comp, const void *data);
-     int stbi_write_hdr(char const *filename, int w, int h, int comp, const void *data);
+     int stbi_write_hdr(char const *filename, int w, int h, int comp, const float *data);
+
+   There are also four equivalent functions that use an arbitrary write function. You are
+   expected to open/close your file-equivalent before and after calling these:
+
+     int stbi_write_png_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data, int stride_in_bytes);
+     int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
+     int stbi_write_tga_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
+     int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const float *data);
+
+   where the callback is:
+      void stbi_write_func(void *context, void *data, int size);
+
+   You can define STBI_WRITE_NO_STDIO to disable the file variant of these
+   functions, so the library will not use stdio.h at all. However, this will
+   also disable HDR writing, because it requires stdio for formatted output.
 
    Each function returns 0 on failure and non-0 on success.
 
@@ -63,6 +77,9 @@ USAGE:
    data, alpha (if provided) is discarded, and for monochrome data it is
    replicated across all three channels.
 
+   TGA supports RLE or non-RLE compressed data. To use non-RLE-compressed
+   data, set the global variable 'stbi_write_tga_with_rle' to 0.
+
 CREDITS:
 
    PNG/BMP/TGA
@@ -73,9 +90,29 @@ CREDITS:
       Jean-Sebastien Guay
    misc enhancements:
       Tim Kelsey
+   TGA RLE
+      Alan Hickman
+   initial file IO callback implementation
+      Emmanuel Julien
    bugfixes:
       github:Chribba
+      Guillaume Chereau
+      github:jry2
+      github:romigrou
+      Sergio Gonzalez
+      Jonas Karlsson
+      Filip Wasil
+      Thatcher Ulrich
+
+LICENSE
+
+This software is dual-licensed to the public domain and under the following
+license: you are granted a perpetual, irrevocable license to copy, modify,
+publish, and distribute this file as you see fit.
+
 */
+
+// Modified by Lasse Oorni for Urho3D
 
 #ifndef INCLUDE_STB_IMAGE_WRITE_H
 #define INCLUDE_STB_IMAGE_WRITE_H
@@ -84,10 +121,30 @@ CREDITS:
 extern "C" {
 #endif
 
-extern int stbi_write_png(char const *filename, int w, int h, int comp, const void  *data, int stride_in_bytes);
-extern int stbi_write_bmp(char const *filename, int w, int h, int comp, const void  *data);
-extern int stbi_write_tga(char const *filename, int w, int h, int comp, const void  *data);
-extern int stbi_write_hdr(char const *filename, int w, int h, int comp, const float *data);
+#ifdef STB_IMAGE_WRITE_STATIC
+#define STBIWDEF static
+#else
+#define STBIWDEF extern
+extern int stbi_write_tga_with_rle;
+#endif
+
+#ifndef STBI_WRITE_NO_STDIO
+STBIWDEF int stbi_write_png(char const *filename, int w, int h, int comp, const void  *data, int stride_in_bytes);
+STBIWDEF int stbi_write_bmp(char const *filename, int w, int h, int comp, const void  *data);
+STBIWDEF int stbi_write_tga(char const *filename, int w, int h, int comp, const void  *data);
+STBIWDEF int stbi_write_hdr(char const *filename, int w, int h, int comp, const float *data);
+#endif
+
+typedef void stbi_write_func(void *context, void *data, int size);
+
+STBIWDEF int stbi_write_png_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data, int stride_in_bytes);
+STBIWDEF int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
+STBIWDEF int stbi_write_tga_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
+STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const float *data);
+
+// ATOMIC BEGIN
+unsigned char *stbi_write_png_to_mem(unsigned char *pixels, int stride_bytes, int x, int y, int n, int *out_len);
+// ATOMIC END
 
 #ifdef __cplusplus
 }
@@ -95,3 +152,33 @@ extern int stbi_write_hdr(char const *filename, int w, int h, int comp, const fl
 
 #endif//INCLUDE_STB_IMAGE_WRITE_H
 
+/* Revision history
+      1.02 (2016-04-02)
+             avoid allocating large structures on the stack
+      1.01 (2016-01-16)
+             STBIW_REALLOC_SIZED: support allocators with no realloc support
+             avoid race-condition in crc initialization
+             minor compile issues
+      1.00 (2015-09-14)
+             installable file IO function
+      0.99 (2015-09-13)
+             warning fixes; TGA rle support
+      0.98 (2015-04-08)
+             added STBIW_MALLOC, STBIW_ASSERT etc
+      0.97 (2015-01-18)
+             fixed HDR asserts, rewrote HDR rle logic
+      0.96 (2015-01-17)
+             add HDR output
+             fix monochrome BMP
+      0.95 (2014-08-17)
+		       add monochrome TGA output
+      0.94 (2014-05-31)
+             rename private functions to avoid conflicts with stb_image.h
+      0.93 (2014-05-27)
+             warning fixes
+      0.92 (2010-08-01)
+             casts to unsigned char to fix warnings
+      0.91 (2010-07-17)
+             first public release
+      0.90   first internal release
+*/

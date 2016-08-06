@@ -29,7 +29,7 @@ typedef HashMap<StringHash, VariantMap> ClassDefaultValueMap;
 /// NET Assembly resource.
 class ATOMIC_API ScriptComponentFile : public Resource
 {
-    OBJECT(ScriptComponentFile);
+    ATOMIC_OBJECT(ScriptComponentFile, Resource);
 
 public:
 

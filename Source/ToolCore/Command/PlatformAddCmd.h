@@ -31,7 +31,7 @@ namespace ToolCore
 
 class PlatformAddCmd: public Command
 {
-    OBJECT(PlatformAddCmd);
+    ATOMIC_OBJECT(PlatformAddCmd, Command);
 
 public:
 

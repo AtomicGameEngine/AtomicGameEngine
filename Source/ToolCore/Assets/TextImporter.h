@@ -29,7 +29,7 @@ namespace ToolCore
 
 class TextImporter : public AssetImporter
 {
-    OBJECT(TextImporter);
+    ATOMIC_OBJECT(TextImporter, AssetImporter);
 
 public:
     /// Construct.

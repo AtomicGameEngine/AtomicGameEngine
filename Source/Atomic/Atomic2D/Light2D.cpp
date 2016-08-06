@@ -130,16 +130,16 @@ void Light2D::AddVertices(Vector<Vertex2D>& vertices)
 void Light2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<Light2D>(ATOMIC2D_CATEGORY);
-    COPY_BASE_ATTRIBUTES(Component);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Component);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("LightGroup", GetLightGroupID, SetLightGroupID, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Num Rays", GetNumRays, SetNumRays, int, 32, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Soft Shadows", GetSoftShadows, SetSoftShadows, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Soft Shadows Length", GetSoftShadowLength, SetSoftShadowLength, float, 2.5f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Backtrace", GetBacktrace, SetBacktrace, bool, false, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("LightGroup", GetLightGroupID, SetLightGroupID, int, 0, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Num Rays", GetNumRays, SetNumRays, int, 32, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Soft Shadows", GetSoftShadows, SetSoftShadows, bool, false, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Soft Shadows Length", GetSoftShadowLength, SetSoftShadowLength, float, 2.5f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Backtrace", GetBacktrace, SetBacktrace, bool, false, AM_DEFAULT);
 
 }
 
@@ -221,9 +221,9 @@ DirectionalLight2D::~DirectionalLight2D()
 void DirectionalLight2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<DirectionalLight2D>(ATOMIC2D_CATEGORY);
-    COPY_BASE_ATTRIBUTES(Light2D);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Light2D);
 
-    ACCESSOR_ATTRIBUTE("Direction", GetDirection, SetDirection, float, -45.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Direction", GetDirection, SetDirection, float, -45.0f, AM_DEFAULT);
 }
 
 void DirectionalLight2D::UpdateVertices()
@@ -396,7 +396,7 @@ PositionalLight2D::~PositionalLight2D()
 void PositionalLight2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<PositionalLight2D>(ATOMIC2D_CATEGORY);
-    COPY_BASE_ATTRIBUTES(Light2D);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Light2D);
 }
 
 void PositionalLight2D::UpdateVertices()
@@ -508,9 +508,9 @@ PointLight2D::~PointLight2D()
 void PointLight2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<PointLight2D>(ATOMIC2D_CATEGORY);
-    COPY_BASE_ATTRIBUTES(PositionalLight2D);
+    ATOMIC_COPY_BASE_ATTRIBUTES(PositionalLight2D);
 
-    ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 4.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 4.0f, AM_DEFAULT);
 }
 
 void PointLight2D::UpdateVertices()
@@ -546,7 +546,7 @@ void PointLight2D::UpdateVertices()
 void Light2DGroup::RegisterObject(Context* context)
 {
     context->RegisterFactory<Light2DGroup>(ATOMIC2D_CATEGORY);
-    COPY_BASE_ATTRIBUTES(Drawable2D);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Drawable2D);
 }
 
 
@@ -588,8 +588,9 @@ Light2DGroup::Light2DGroup(Context* context) : Drawable2D(context),
     frustum_(0)
 {
     sourceBatches_.Resize(1);
-    SubscribeToEvent(E_BEGINRENDERING, HANDLER(Light2DGroup, HandleBeginRendering));
-    SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Light2DGroup, HandleBeginViewUpdate));
+    sourceBatches_[0].owner_ = this;
+    SubscribeToEvent(E_BEGINRENDERING, ATOMIC_HANDLER(Light2DGroup, HandleBeginRendering));
+    SubscribeToEvent(E_BEGINVIEWUPDATE, ATOMIC_HANDLER(Light2DGroup, HandleBeginViewUpdate));
 }
 
 Light2DGroup::~Light2DGroup()

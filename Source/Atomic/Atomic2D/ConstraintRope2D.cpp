@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,8 @@
 namespace Atomic
 {
 
+extern const char* ATOMIC2D_CATEGORY;
+
 ConstraintRope2D::ConstraintRope2D(Context* context) :
     Constraint2D(context),
     ownerBodyAnchor_(Vector2::ZERO),
@@ -46,13 +48,13 @@ ConstraintRope2D::~ConstraintRope2D()
 
 void ConstraintRope2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintRope2D>();
+    context->RegisterFactory<ConstraintRope2D>(ATOMIC2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, float, 0.0f, AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintRope2D::SetOwnerBodyAnchor(const Vector2& anchor)

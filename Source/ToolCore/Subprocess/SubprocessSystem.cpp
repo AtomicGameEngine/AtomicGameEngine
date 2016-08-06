@@ -33,7 +33,7 @@ SubprocessSystem::SubprocessSystem(Context* context) :
     Object(context),
     updateTimer_(0.0f)
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(SubprocessSystem, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(SubprocessSystem, HandleUpdate));
 }
 
 SubprocessSystem::~SubprocessSystem()

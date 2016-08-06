@@ -31,7 +31,7 @@ namespace ToolCore
 
 class PlayCmd: public Command
 {
-    OBJECT(PlayCmd);
+    ATOMIC_OBJECT(PlayCmd, Command);
 
 public:
 

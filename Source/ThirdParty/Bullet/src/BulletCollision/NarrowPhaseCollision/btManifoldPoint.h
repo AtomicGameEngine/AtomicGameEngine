@@ -16,8 +16,10 @@ subject to the following restrictions:
 #ifndef BT_MANIFOLD_CONTACT_POINT_H
 #define BT_MANIFOLD_CONTACT_POINT_H
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btVector3.h"
 #include "../../LinearMath/btTransformUtil.h"
+// ATOMIC END
 
 #ifdef PFX_USE_FREE_VECTORMATH
 	#include "physics_effects/base_level/solver/pfx_constraint_row.h"

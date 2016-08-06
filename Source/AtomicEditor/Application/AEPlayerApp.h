@@ -30,7 +30,7 @@ namespace AtomicEditor
 {
     class AEPlayerApplication : public IPCPlayerApp
     {
-        OBJECT(AEPlayerApplication)
+        ATOMIC_OBJECT(AEPlayerApplication, IPCPlayerApp)
 
     public:
         /// Construct.

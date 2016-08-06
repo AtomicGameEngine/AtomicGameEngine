@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,18 +37,6 @@ const Matrix3x4 Matrix3x4::ZERO(
     0.0f, 0.0f, 0.0f, 0.0f);
 
 const Matrix3x4 Matrix3x4::IDENTITY;
-
-Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
-{
-    SetRotation(rotation.RotationMatrix() * scale);
-    SetTranslation(translation);
-}
-
-Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
-{
-    SetRotation(rotation.RotationMatrix().Scaled(scale));
-    SetTranslation(translation);
-}
 
 void Matrix3x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {

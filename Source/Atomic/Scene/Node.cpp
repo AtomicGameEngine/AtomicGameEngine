@@ -1,5 +1,5 @@
 ﻿//
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Component.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/ReplicationState.h"
@@ -76,17 +77,18 @@ void Node::RegisterObject(Context* context)
 {
     context->RegisterFactory<Node>();
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
-    ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
-    ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Tags", GetTags, SetTags, StringVector, Variant::emptyStringVector, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
+    ATOMIC_ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    ATOMIC_ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    ATOMIC_ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_NET | AM_NOEDIT);
 }
 
@@ -169,6 +171,25 @@ bool Node::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
+bool Node::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    SceneResolver resolver;
+
+    // Read own ID. Will not be applied, only stored for resolving possible references
+    unsigned nodeID = source.Get("id").GetUInt();
+    resolver.AddNode(nodeID, this);
+
+    // Read attributes, components and child nodes
+    bool success = LoadJSON(source, resolver);
+    if (success)
+    {
+        resolver.Resolve();
+        ApplyAttributes();
+    }
+
+    return success;
+}
+
 bool Node::SaveXML(XMLElement& dest) const
 {
     // Write node ID
@@ -202,6 +223,50 @@ bool Node::SaveXML(XMLElement& dest) const
         if (!node->SaveXML(childElem))
             return false;
     }
+
+    return true;
+}
+
+bool Node::SaveJSON(JSONValue& dest) const
+{
+    // Write node ID
+    dest.Set("id", id_);
+
+    // Write attributes
+    if (!Animatable::SaveJSON(dest))
+        return false;
+
+    // Write components
+    JSONArray componentsArray;
+    componentsArray.Reserve(components_.Size());
+    for (unsigned i = 0; i < components_.Size(); ++i)
+    {
+        Component* component = components_[i];
+        if (component->IsTemporary())
+            continue;
+
+        JSONValue compVal;
+        if (!component->SaveJSON(compVal))
+            return false;
+        componentsArray.Push(compVal);
+    }
+    dest.Set("components", componentsArray);
+
+    // Write child nodes
+    JSONArray childrenArray;
+    childrenArray.Reserve(children_.Size());
+    for (unsigned i = 0; i < children_.Size(); ++i)
+    {
+        Node* node = children_[i];
+        if (node->IsTemporary())
+            continue;
+
+        JSONValue childVal;
+        if (!node->SaveJSON(childVal))
+            return false;
+        childrenArray.Push(childVal);
+    }
+    dest.Set("children", childrenArray);
 
     return true;
 }
@@ -242,6 +307,17 @@ bool Node::SaveXML(Serializer& dest, const String& indentation) const
     return xml->Save(dest, indentation);
 }
 
+bool Node::SaveJSON(Serializer& dest, const String& indentation) const
+{
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    JSONValue& rootElem = json->GetRoot();
+
+    if (!SaveJSON(rootElem))
+        return false;
+
+    return json->Save(dest, indentation);
+}
+
 void Node::SetName(const String& name)
 {
     if (name != name_)
@@ -263,6 +339,104 @@ void Node::SetName(const String& name)
             scene_->SendEvent(E_NODENAMECHANGED, eventData);
         }
     }
+}
+
+void Node::SetTags(const StringVector& tags)
+{
+    RemoveAllTags();
+    AddTags(tags);
+    // MarkNetworkUpdate() already called in RemoveAllTags() / AddTags()
+}
+
+void Node::AddTag(const String& tag)
+{
+    // Check if tag empty or already added
+    if (tag.Empty() || HasTag(tag))
+        return;
+    
+    // Add tag
+    tags_.Push(tag);
+
+    // Cache
+    scene_->NodeTagAdded(this, tag);
+
+    // Send event
+    using namespace NodeTagAdded;
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_SCENE] = scene_;
+    eventData[P_NODE] = this;
+    eventData[P_TAG] = tag;
+    scene_->SendEvent(E_NODETAGADDED, eventData);
+
+    // Sync
+    MarkNetworkUpdate();
+}
+
+void Node::AddTags(const String& tags, String separator)
+{
+    if (!separator.Length())
+        return;
+
+    StringVector tagVector = tags.Split(separator[0]);
+    AddTags(tagVector);
+}
+
+void Node::AddTags(const StringVector& tags)
+{
+    // This is OK, as MarkNetworkUpdate() early-outs when called multiple times
+    for (unsigned i = 0; i < tags.Size(); ++i)
+        AddTag(tags[i]);
+}
+
+bool Node::RemoveTag(const String& tag)
+{
+    bool removed = tags_.Remove(tag);
+
+    // Nothing to do
+    if (!removed)
+        return false;
+
+    // Scene cache update
+    if (scene_)
+    {
+        scene_->NodeTagRemoved(this, tag);
+        // Send event
+        using namespace NodeTagRemoved;
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_NODE] = this;
+        eventData[P_TAG] = tag;
+        scene_->SendEvent(E_NODETAGREMOVED, eventData);
+    }
+    
+    // Sync
+    MarkNetworkUpdate();
+    return true;
+}
+
+void Node::RemoveAllTags()
+{
+    // Clear old scene cache
+    if (scene_)
+    {
+        for (unsigned i = 0; i < tags_.Size(); ++i)
+        {
+            scene_->NodeTagRemoved(this, tags_[i]);
+
+            // Send event
+            using namespace NodeTagRemoved;
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_SCENE] = scene_;
+            eventData[P_NODE] = this;
+            eventData[P_TAG] = tags_[i];
+            scene_->SendEvent(E_NODETAGREMOVED, eventData);
+        }
+    }
+
+    tags_.Clear();
+
+    // Sync
+    MarkNetworkUpdate();
 }
 
 void Node::SetPosition(const Vector3& position)
@@ -558,23 +732,51 @@ void Node::SetOwner(Connection* owner)
 
 void Node::MarkDirty()
 {
-    dirty_ = true;
-
-    // Notify listener components first, then mark child nodes
-    for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End();)
+    Node *cur = this;
+    for (;;)
     {
-        if (*i)
-        {
-            (*i)->OnMarkedDirty(this);
-            ++i;
-        }
-        // If listener has expired, erase from list
-        else
-            i = listeners_.Erase(i);
-    }
+        // Precondition:
+        // a) whenever a node is marked dirty, all its children are marked dirty as well.
+        // b) whenever a node is cleared from being dirty, all its parents must have been
+        //    cleared as well.
+        // Therefore if we are recursing here to mark this node dirty, and it already was,
+        // then all children of this node must also be already dirty, and we don't need to
+        // reflag them again.
+        if (cur->dirty_)
+            return;
+        cur->dirty_ = true;
 
-    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->MarkDirty();
+        // Notify listener components first, then mark child nodes
+        for (Vector<WeakPtr<Component> >::Iterator i = cur->listeners_.Begin(); i != cur->listeners_.End();)
+        {
+            Component *c = *i;
+            if (c)
+            {
+                c->OnMarkedDirty(cur);
+                ++i;
+            }
+            // If listener has expired, erase from list (swap with the last element to avoid O(n^2) behavior)
+            else
+            {
+                *i = cur->listeners_.Back();
+                cur->listeners_.Pop();
+            }
+        }
+
+        // Tail call optimization: Don't recurse to mark the first child dirty, but
+        // instead process it in the context of the current function. If there are more
+        // than one child, then recurse to the excess children.
+        Vector<SharedPtr<Node> >::Iterator i = cur->children_.Begin();
+        if (i != cur->children_.End())
+        {
+            Node *next = *i;
+            for (++i; i != cur->children_.End(); ++i)
+                (*i)->MarkDirty();
+            cur = next;
+        }
+        else
+            return;
+    }
 }
 
 Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id)
@@ -696,11 +898,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
         MarkReplicationDirty();
 }
 
-Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
-{
-    return CreateComponentInternal(type, mode, id);
-}
-
+// ATOMIC BEGIN
 Component* Node::CreateComponentInternal(StringHash type, CreateMode mode, unsigned id, const XMLElement& source)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
@@ -712,13 +910,21 @@ Component* Node::CreateComponentInternal(StringHash type, CreateMode mode, unsig
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type, source));
     if (!newComponent)
     {
-        LOGERROR("Could not create unknown component type " + type.ToString());
+        ATOMIC_LOGERROR("Could not create unknown component type " + type.ToString());
         return 0;
     }
 
     AddComponent(newComponent, id, mode);
     return newComponent;
+
 }
+
+Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
+{
+    return CreateComponentInternal(type, mode, id);
+}
+
+// ATOMIC END
 
 Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
@@ -733,7 +939,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
 {
     if (!component)
     {
-        LOGERROR("Null source component given for CloneComponent");
+        ATOMIC_LOGERROR("Null source component given for CloneComponent");
         return 0;
     }
 
@@ -744,14 +950,14 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
 {
     if (!component)
     {
-        LOGERROR("Null source component given for CloneComponent");
+        ATOMIC_LOGERROR("Null source component given for CloneComponent");
         return 0;
     }
 
     Component* cloneComponent = SafeCreateComponent(component->GetTypeName(), component->GetType(), mode, 0);
     if (!cloneComponent)
     {
-        LOGERROR("Could not clone component " + component->GetTypeName());
+        ATOMIC_LOGERROR("Could not clone component " + component->GetTypeName());
         return 0;
     }
 
@@ -774,6 +980,17 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
             }
         }
         cloneComponent->ApplyAttributes();
+    }
+
+    {
+        using namespace ComponentCloned;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_COMPONENT] = component;
+        eventData[P_CLONECOMPONENT] = cloneComponent;
+
+        scene_->SendEvent(E_COMPONENTCLONED, eventData);
     }
 
     return cloneComponent;
@@ -858,16 +1075,34 @@ void Node::RemoveAllComponents()
     RemoveComponents(true, true);
 }
 
+void Node::ReorderComponent(Component* component, unsigned index)
+{
+    if (!component || component->GetNode() != this)
+        return;
+
+    for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if (*i == component)
+        {
+            // Need shared ptr to insert. Also, prevent destruction when removing first
+            SharedPtr<Component> componentShared(component);
+            components_.Erase(i);
+            components_.Insert(index, componentShared);
+            return;
+        }
+    }
+}
+
 Node* Node::Clone(CreateMode mode)
 {
     // The scene itself can not be cloned
     if (this == scene_ || !parent_)
     {
-        LOGERROR("Can not clone node without a parent");
+        ATOMIC_LOGERROR("Can not clone node without a parent");
         return 0;
     }
 
-    PROFILE(CloneNode);
+    ATOMIC_PROFILE(CloneNode);
 
     SceneResolver resolver;
     Node* clone = CloneRecursive(parent_, resolver, mode);
@@ -1014,6 +1249,22 @@ void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, boo
         GetChildrenWithComponentRecursive(dest, type);
 }
 
+void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive /*= true*/) const
+{
+    dest.Clear();
+
+    if (!recursive)
+    {
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            if ((*i)->HasTag(tag))
+                dest.Push(*i);
+        }
+    }
+    else
+        GetChildrenWithTagRecursive(dest, tag);
+}
+
 Node* Node::GetChild(unsigned index) const
 {
     return index < children_.Size() ? children_[index].Get() : 0;
@@ -1063,18 +1314,23 @@ void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recu
 {
     dest.Clear();
 
+// ATOMIC BEGIN
+
     bool all = type == Component::GetTypeStatic();
 
     if (!recursive)
     {
         for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
         {
-            if (all || ((*i)->GetType() == type))
+            if (all || (*i)->GetType() == type)
                 dest.Push(*i);
         }
     }
     else
         GetComponentsRecursive(dest, type);
+
+    // ATOMIC END
+
 }
 
 bool Node::HasComponent(StringHash type) const
@@ -1085,6 +1341,11 @@ bool Node::HasComponent(StringHash type) const
             return true;
     }
     return false;
+}
+
+bool Node::HasTag(const String& tag) const
+{
+    return tags_.Contains(tag);
 }
 
 const Variant& Node::GetVar(StringHash key) const
@@ -1111,6 +1372,23 @@ Component* Node::GetComponent(StringHash type, bool recursive) const
         }
     }
 
+    return 0;
+}
+
+Component* Node::GetParentComponent(StringHash type, bool fullTraversal) const
+{
+    Node* current = GetParent();
+    while (current)
+    {
+        Component* soughtComponent = current->GetComponent(type);
+        if (soughtComponent)
+            return soughtComponent;
+
+        if (fullTraversal)
+            current = current->GetParent();
+        else
+            break;
+    }
     return 0;
 }
 
@@ -1168,7 +1446,7 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
     Node* baseNode = scene->GetNode(baseNodeID);
     if (!baseNode)
     {
-        LOGWARNING("Failed to find parent node " + String(baseNodeID));
+        ATOMIC_LOGWARNING("Failed to find parent node " + String(baseNodeID));
         return;
     }
 
@@ -1181,7 +1459,7 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
         StringHash nameHash = buf.ReadStringHash();
         Node* parentNode = baseNode->GetChild(nameHash, true);
         if (!parentNode)
-            LOGWARNING("Failed to find parent node with name hash " + nameHash.ToString());
+            ATOMIC_LOGWARNING("Failed to find parent node with name hash " + nameHash.ToString());
         else
             parentNode->AddChild(this);
     }
@@ -1283,11 +1561,11 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     while (compElem)
     {
         String typeName = compElem.GetAttribute("type");
-        unsigned compID = compElem.GetInt("id");
-
+        unsigned compID = compElem.GetUInt("id");
+// ATOMIC BEGIN
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID, compElem);
-
+// ATOMIC END
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1317,6 +1595,50 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     return true;
 }
 
+bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs, CreateMode mode)
+{
+    // Remove all children and components first in case this is not a fresh load
+    RemoveAllChildren();
+    RemoveAllComponents();
+
+    if (!Animatable::LoadJSON(source))
+        return false;
+
+    const JSONArray& componentsArray = source.Get("components").GetArray();
+
+    for (unsigned i = 0; i < componentsArray.Size(); i++)
+    {
+        const JSONValue& compVal = componentsArray.At(i);
+        String typeName = compVal.Get("type").GetString();
+        unsigned compID = compVal.Get("id").GetUInt();
+        Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
+            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+        if (newComponent)
+        {
+            resolver.AddComponent(compID, newComponent);
+            if (!newComponent->LoadJSON(compVal))
+                return false;
+        }
+    }
+
+    if (!readChildren)
+        return true;
+
+    const JSONArray& childrenArray = source.Get("children").GetArray();
+    for (unsigned i = 0; i < childrenArray.Size(); i++)
+    {
+        const JSONValue& childVal = childrenArray.At(i);
+
+        unsigned nodeID = childVal.Get("id").GetUInt();
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
+            LOCAL);
+        resolver.AddNode(nodeID, newNode);
+        if (!newNode->LoadJSON(childVal, resolver, readChildren, rewriteIDs, mode))
+            return false;
+    }
+
+    return true;
+}
 
 void Node::PrepareNetworkUpdate()
 {
@@ -1474,7 +1796,7 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     components_.Push(SharedPtr<Component>(component));
 
     if (component->GetNode())
-        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
+        ATOMIC_LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
 
     component->SetNode(this);
 
@@ -1546,7 +1868,7 @@ void Node::SetTransformSilent(const Vector3& position, const Quaternion& rotatio
 void Node::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInfos_.Size() == 1)
-        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, HANDLER(Node, HandleAttributeAnimationUpdate));
+        SubscribeToEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE, ATOMIC_HANDLER(Node, HandleAttributeAnimationUpdate));
 }
 
 void Node::OnAttributeAnimationRemoved()
@@ -1555,12 +1877,15 @@ void Node::OnAttributeAnimationRemoved()
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
-void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outName)
 {
     Vector<String> names = name.Split('/');
     // Only attribute name
     if (names.Size() == 1)
-        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    {
+        outName = name;
+        return this;
+    }
     else
     {
         // Name must in following format: "#0/#1/@component#0/attribute"
@@ -1575,21 +1900,21 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             node = node->GetChild(index);
             if (!node)
             {
-                LOGERROR("Could not find node by name " + name);
-                return;
+                ATOMIC_LOGERROR("Could not find node by name " + name);
+                return 0;
             }
         }
 
         if (i == names.Size() - 1)
         {
-            node->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
-            return;
+            outName = names.Back();
+            return node;
         }
 
         if (i != names.Size() - 2 || names[i].Front() != '@')
         {
-            LOGERROR("Invalid name " + name);
-            return;
+            ATOMIC_LOGERROR("Invalid name " + name);
+            return 0;
         }
 
         String componentName = names[i].Substring(1, names[i].Length() - 1);
@@ -1599,11 +1924,12 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             Component* component = node->GetComponent(StringHash(componentNames.Front()));
             if (!component)
             {
-                LOGERROR("Could not find component by name " + name);
-                return;
+                ATOMIC_LOGERROR("Could not find component by name " + name);
+                return 0;
             }
 
-            component->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+            outName = names.Back();
+            return component;
         }
         else
         {
@@ -1612,11 +1938,12 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())
             {
-                LOGERROR("Could not find component by name " + name);
-                return;
+                ATOMIC_LOGERROR("Could not find component by name " + name);
+                return 0;
             }
 
-            components[index]->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+            outName = names.Back();
+            return components[index];
         }
     }
 }
@@ -1626,7 +1953,7 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     // The enabled state of the whole scene can not be changed. SetUpdateEnabled() is used instead to start/stop updates.
     if (GetType() == Scene::GetTypeStatic())
     {
-        LOGERROR("Can not change enabled state of the Scene");
+        ATOMIC_LOGERROR("Can not change enabled state of the Scene");
         return;
     }
 
@@ -1689,7 +2016,9 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     }
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const Atomic::XMLElement &source)
+// ATOMIC BEGIN
+
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const XMLElement& source)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -1701,7 +2030,7 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
         return CreateComponentInternal(type, mode, id, source);
     else
     {
-        LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
+        ATOMIC_LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
         // Else create as UnknownComponent
         SharedPtr<UnknownComponent> newComponent(new UnknownComponent(context_));
         if (typeName.Empty() || typeName.StartsWith("Unknown", false))
@@ -1713,6 +2042,8 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
         return newComponent;
     }
 }
+
+// ATOMIC END
 
 void Node::UpdateWorldTransform() const
 {
@@ -1784,6 +2115,8 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash 
 
 void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const
 {
+    // ATOMIC BEGIN
+
     bool all = type == Component::GetTypeStatic();
 
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
@@ -1793,43 +2126,19 @@ void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) 
     }
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->GetComponentsRecursive(dest, type);
+
+    // ATOMIC END
 }
 
-void Node::GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive) const
-{
-    GetChildrenWithName(dest, StringHash(name), recursive);
-}
-
-void Node::GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive) const
-{
-    GetChildrenWithName(dest, StringHash(name), recursive);
-}
-
-void Node::GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive) const
-{
-    dest.Clear();
-
-    if (!recursive)
-    {
-        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-        {
-            if ((*i)->GetNameHash() == nameHash)
-                dest.Push(*i);
-        }
-    }
-    else
-        GetChildrenWithNameRecursive(dest, nameHash);
-}
-
-void Node::GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const
+void Node::GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const
 {
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         Node* node = *i;
-        if (node->GetNameHash() == nameHash)
+        if (node->HasTag(tag))
             dest.Push(node);
         if (!node->children_.Empty())
-            node->GetChildrenWithNameRecursive(dest, nameHash);
+            node->GetChildrenWithTagRecursive(dest, tag);
     }
 }
 
@@ -1876,6 +2185,17 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         node->CloneRecursive(cloneNode, resolver, mode);
     }
 
+    {
+        using namespace NodeCloned;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene_;
+        eventData[P_NODE] = this;
+        eventData[P_CLONENODE] = cloneNode;
+
+        scene_->SendEvent(E_NODECLONED, eventData);
+    }
+
     return cloneNode;
 }
 
@@ -1907,5 +2227,47 @@ void Node::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& even
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
+
+// ATOMIC BEGIN
+
+void Node::GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive) const
+{
+    GetChildrenWithName(dest, StringHash(name), recursive);
+}
+
+void Node::GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive) const
+{
+    GetChildrenWithName(dest, StringHash(name), recursive);
+}
+
+void Node::GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive) const
+{
+    dest.Clear();
+
+    if (!recursive)
+    {
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            if ((*i)->GetNameHash() == nameHash)
+                dest.Push(*i);
+        }
+    }
+    else
+        GetChildrenWithNameRecursive(dest, nameHash);
+}
+
+void Node::GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const
+{
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        Node* node = *i;
+        if (node->GetNameHash() == nameHash)
+            dest.Push(node);
+        if (!node->children_.Empty())
+            node->GetChildrenWithNameRecursive(dest, nameHash);
+    }
+}
+
+// ATOMIC END
 
 }

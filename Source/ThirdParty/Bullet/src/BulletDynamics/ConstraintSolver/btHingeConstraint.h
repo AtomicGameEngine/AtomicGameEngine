@@ -20,8 +20,9 @@ subject to the following restrictions:
 
 #define _BT_USE_CENTER_LIMIT_ 1
 
-
+// ATOMIC BEGIN
 #include "../../LinearMath/btVector3.h"
+// ATOMIC END
 #include "btJacobianEntry.h"
 #include "btTypedConstraint.h"
 

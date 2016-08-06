@@ -237,23 +237,23 @@ String ToolEnvironment::GetIOSDeployBinary()
 
 void ToolEnvironment::Dump()
 {
-    LOGINFOF("Root Source Dir: %s", rootSourceDir_.CString());
-    LOGINFOF("Root Build Dir: %s", rootBuildDir_.CString());
+    ATOMIC_LOGINFOF("Root Source Dir: %s", rootSourceDir_.CString());
+    ATOMIC_LOGINFOF("Root Build Dir: %s", rootBuildDir_.CString());
 
-    LOGINFOF("Core Resource Dir: %s", resourceCoreDataDir_.CString());
-    LOGINFOF("Player Resource Dir: %s", resourcePlayerDataDir_.CString());
-    LOGINFOF("Editor Resource Dir: %s", resourceEditorDataDir_.CString());
+    ATOMIC_LOGINFOF("Core Resource Dir: %s", resourceCoreDataDir_.CString());
+    ATOMIC_LOGINFOF("Player Resource Dir: %s", resourcePlayerDataDir_.CString());
+    ATOMIC_LOGINFOF("Editor Resource Dir: %s", resourceEditorDataDir_.CString());
 
-    LOGINFOF("Editor Binary: %s", editorBinary_.CString());
-    LOGINFOF("Player Binary: %s", playerBinary_.CString());
-    LOGINFOF("Tool Binary: %s", toolBinary_.CString());
+    ATOMIC_LOGINFOF("Editor Binary: %s", editorBinary_.CString());
+    ATOMIC_LOGINFOF("Player Binary: %s", playerBinary_.CString());
+    ATOMIC_LOGINFOF("Tool Binary: %s", toolBinary_.CString());
 
 
-    LOGINFOF("Tool Data Dir: %s", toolDataDir_.CString());
+    ATOMIC_LOGINFOF("Tool Data Dir: %s", toolDataDir_.CString());
 
-    LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());
+    ATOMIC_LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());
 
-    LOGINFOF("Dev Config File: %s", devConfigFilename_.CString());
+    ATOMIC_LOGINFOF("Dev Config File: %s", devConfigFilename_.CString());
 
 }
 

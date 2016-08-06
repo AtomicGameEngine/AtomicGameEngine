@@ -27,7 +27,7 @@
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Drawable.h>
 #include <Atomic/Graphics/DebugRenderer.h>
-#include <Atomic/Atomic3D/Terrain.h>
+#include <Atomic/Graphics/Terrain.h>
 
 #include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Node.h>
@@ -47,16 +47,16 @@ SceneSelection::SceneSelection(Context* context, SceneEditor3D *sceneEditor) : O
     sceneEditor3D_ = sceneEditor;
     scene_ = sceneEditor3D_->GetScene();
 
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneSelection, HandlePostRenderUpdate));
-    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneSelection, HandleNodeRemoved));
+    SubscribeToEvent(E_POSTRENDERUPDATE, ATOMIC_HANDLER(SceneSelection, HandlePostRenderUpdate));
+    SubscribeToEvent(scene_, E_NODEREMOVED, ATOMIC_HANDLER(SceneSelection, HandleNodeRemoved));
 
-    SubscribeToEvent(scene_, E_SCENEEDITPREFABSAVE, HANDLER(SceneSelection, HandleSceneEditPrefabSave));
-    SubscribeToEvent(scene_, E_SCENEEDITPREFABREVERT, HANDLER(SceneSelection, HandleSceneEditPrefabRevert));
-    SubscribeToEvent(scene_, E_SCENEEDITPREFABBREAK, HANDLER(SceneSelection, HandleSceneEditPrefabBreak));
-    SubscribeToEvent(scene_, E_SCENEEDITPREFABCOPY, HANDLER(SceneSelection, HandleSceneEditPrefabCopy));
-    SubscribeToEvent(scene_, E_SCENEEDITPREFABPASTE, HANDLER(SceneSelection, HandleSceneEditPrefabPaste));
-    SubscribeToEvent(scene_, E_SCENEEDITCOMPONENTCOPY, HANDLER(SceneSelection, HandleSceneEditComponentCopy));
-    SubscribeToEvent(scene_, E_SCENEEDITCOMPONENTPASTE, HANDLER(SceneSelection, HandleSceneEditComponentPaste));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABSAVE, ATOMIC_HANDLER(SceneSelection, HandleSceneEditPrefabSave));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABREVERT, ATOMIC_HANDLER(SceneSelection, HandleSceneEditPrefabRevert));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABBREAK, ATOMIC_HANDLER(SceneSelection, HandleSceneEditPrefabBreak));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABCOPY, ATOMIC_HANDLER(SceneSelection, HandleSceneEditPrefabCopy));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABPASTE, ATOMIC_HANDLER(SceneSelection, HandleSceneEditPrefabPaste));
+    SubscribeToEvent(scene_, E_SCENEEDITCOMPONENTCOPY, ATOMIC_HANDLER(SceneSelection, HandleSceneEditComponentCopy));
+    SubscribeToEvent(scene_, E_SCENEEDITCOMPONENTPASTE, ATOMIC_HANDLER(SceneSelection, HandleSceneEditComponentPaste));
 }
 
 SceneSelection::~SceneSelection()
@@ -199,7 +199,7 @@ void SceneSelection::Copy()
         if (!node->GetParent())
         {
             clipBoardNodes_.Clear();
-            LOGERROR("SceneSelection::Copy - unable to copy node to clipboard (no parent)");
+            ATOMIC_LOGERROR("SceneSelection::Copy - unable to copy node to clipboard (no parent)");
             return;
         }
 
@@ -341,7 +341,7 @@ void SceneSelection::HandleSceneEditPrefabSave(StringHash eventType, VariantMap&
     PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
     if (!prefab)
     {
-        LOGERRORF("Prefab Save: Unable to get prefab component for node: %s", node->GetName().CString());
+        ATOMIC_LOGERRORF("Prefab Save: Unable to get prefab component for node: %s", node->GetName().CString());
         return;
     }
 
@@ -357,7 +357,7 @@ void SceneSelection::HandleSceneEditPrefabRevert(StringHash eventType, VariantMa
     PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
     if (!prefab)
     {
-        LOGERRORF("Prefab Revert: Unable to get prefab component for node: %s", node->GetName().CString());
+        ATOMIC_LOGERRORF("Prefab Revert: Unable to get prefab component for node: %s", node->GetName().CString());
         return;
     }
 
@@ -373,7 +373,7 @@ void SceneSelection::HandleSceneEditPrefabBreak(StringHash eventType, VariantMap
     PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
     if (!prefab)
     {
-        LOGERRORF("Prefab Break: Unable to get prefab component for node: %s", node->GetName().CString());
+        ATOMIC_LOGERRORF("Prefab Break: Unable to get prefab component for node: %s", node->GetName().CString());
         return;
     }
 
@@ -405,7 +405,7 @@ void SceneSelection::HandleSceneEditPrefabCopy(StringHash eventType, VariantMap 
     PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
     if (!prefab)
     {
-        LOGERRORF("Prefab Copy: Unable to get prefab component for node: %s", node->GetName().CString());
+        ATOMIC_LOGERRORF("Prefab Copy: Unable to get prefab component for node: %s", node->GetName().CString());
         return;
     }
 
@@ -421,7 +421,7 @@ void SceneSelection::HandleSceneEditPrefabPaste(StringHash eventType, VariantMap
     PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
     if (!prefab)
     {
-        LOGERRORF("Prefab Paste: Unable to get prefab component for node: %s", node->GetName().CString());
+        ATOMIC_LOGERRORF("Prefab Paste: Unable to get prefab component for node: %s", node->GetName().CString());
         return;
     }
 
@@ -437,14 +437,14 @@ void SceneSelection::HandleSceneEditComponentCopy(StringHash eventType, VariantM
 
     if (!component)
     {
-        LOGERRORF("Component Copy: Unable to copy component from node: %s", component->GetAttribute("type").ToString().CString());
+        ATOMIC_LOGERRORF("Component Copy: Unable to copy component from node: %s", component->GetAttribute("type").ToString().CString());
         return;
     }
 
     componentAttributeNames_.Clear();
     componentAttributeValues_.Clear();
 
-    for (int i = 0; i < component->GetAttributes()->Size(); i++)
+    for (unsigned i = 0; i < component->GetAttributes()->Size(); i++)
     {
         String attributeName = component->GetAttributes()->At(i).name_;
         Variant attributeValue = component->GetAttribute(attributeName);
@@ -462,23 +462,23 @@ void SceneSelection::HandleSceneEditComponentPaste(StringHash eventType, Variant
 
     if (!component)
     {
-        LOGERRORF("Component Paste: Unable to paste component to node: %s", component->GetAttribute("type").ToString().CString());
+        ATOMIC_LOGERRORF("Component Paste: Unable to paste component to node: %s", component->GetAttribute("type").ToString().CString());
         return;
     }
 
     if (!hasCopied_)
     {
-        LOGERROR("Component Paste: Unable to paste, no information has been copied.");
+        ATOMIC_LOGERROR("Component Paste: Unable to paste, no information has been copied.");
         return;
     }
 
     if (copiedComponent_->GetType() != component->GetType())
     {
-        LOGERROR("Component Paste: Unable to paste, component type differ.");
+        ATOMIC_LOGERROR("Component Paste: Unable to paste, component type differ.");
         return;
     }
 
-    for (int i = 0; i < componentAttributeNames_.Size(); i++)
+    for (unsigned i = 0; i < componentAttributeNames_.Size(); i++)
     {
         String attrName = componentAttributeNames_[i];
         Variant attrValue = componentAttributeValues_[i];

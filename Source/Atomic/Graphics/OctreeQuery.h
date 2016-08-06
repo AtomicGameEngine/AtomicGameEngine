@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -254,6 +254,21 @@ private:
     RayOctreeQuery(const RayOctreeQuery& rhs);
     /// Prevent assignment.
     RayOctreeQuery& operator =(const RayOctreeQuery& rhs);
+};
+
+class ATOMIC_API AllContentOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct.
+    AllContentOctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask) :
+        OctreeQuery(result, drawableFlags, viewMask)
+    {
+    }
+
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside);
+    /// Intersection test for drawables.
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
 };
 
 }

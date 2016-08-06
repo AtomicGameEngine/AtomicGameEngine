@@ -28,14 +28,14 @@
 namespace ToolCore
 {
 
-EVENT(E_ANDROIDTARGETSREFRESHED, AndroidTargetsRefreshed)
+ATOMIC_EVENT(E_ANDROIDTARGETSREFRESHED, AndroidTargetsRefreshed)
 {
 
 }
 
 class PlatformAndroid : public Platform
 {
-    OBJECT(PlatformAndroid);
+    ATOMIC_OBJECT(PlatformAndroid, Platform);
 
     struct AndroidTarget
     {

@@ -56,7 +56,7 @@ namespace AtomicEditor
         if (!netService_->Start())
         {
             netService_ = nullptr;
-            LOGERRORF("Unable to start AtomicNETService");
+            ATOMIC_LOGERRORF("Unable to start AtomicNETService");
             return false;
         }
 

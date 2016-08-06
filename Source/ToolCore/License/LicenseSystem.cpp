@@ -270,7 +270,7 @@ void LicenseSystem::RequestServerVerification(const String& key)
 {
     if (serverVerification_.NotNull())
     {
-        LOGERROR("LicenseSystem::RequestServerLicense - request already exists");
+        ATOMIC_LOGERROR("LicenseSystem::RequestServerLicense - request already exists");
         return;
     }
 
@@ -284,13 +284,13 @@ void LicenseSystem::RequestServerVerification(const String& key)
         unsigned deltaMinutes = (currentTime - fileTime)/60;
         if (deltaMinutes < 1)
         {
-            LOGINFOF("%u minutes, using cached license", deltaMinutes);
+            ATOMIC_LOGINFOF("%u minutes, using cached license", deltaMinutes);
             SendEvent(E_LICENSE_SUCCESS);
             return;
         }
     }
 
-    LOGINFO("LicenseSystem::RequestServerLicense - requesting verification");
+    ATOMIC_LOGINFO("LicenseSystem::RequestServerLicense - requesting verification");
 
     key_ = key;
     CurlManager* cm = GetSubsystem<CurlManager>();
@@ -300,13 +300,13 @@ void LicenseSystem::RequestServerVerification(const String& key)
 
     serverVerification_ = cm->MakeRequest("https://store.atomicgameengine.com/licenses/license_verify.php", post);
 
-    SubscribeToEvent(serverVerification_, E_CURLCOMPLETE, HANDLER(LicenseSystem, HandleVerification));
+    SubscribeToEvent(serverVerification_, E_CURLCOMPLETE, ATOMIC_HANDLER(LicenseSystem, HandleVerification));
 }
 
 int LicenseSystem::ParseResponse(const String& response, LicenseParse& parse)
 {
 
-    LOGINFOF("%s", response.CString());
+    ATOMIC_LOGINFOF("%s", response.CString());
 
     if (response.StartsWith("AC_ACTIVATIONSEXCEEDED"))
     {
@@ -325,7 +325,7 @@ int LicenseSystem::ParseResponse(const String& response, LicenseParse& parse)
 
     if (!response.StartsWith("WINDOWS"))
     {
-        LOGERRORF("Error Parsing Server Response %s", response.CString());
+        ATOMIC_LOGERRORF("Error Parsing Server Response %s", response.CString());
         return 3;
     }
 
@@ -399,7 +399,7 @@ bool LicenseSystem::Deactivate()
 
     deactivate_ = cm->MakeRequest("https://store.atomicgameengine.com/licenses/license_deactivate.php", post);
 
-    SubscribeToEvent(deactivate_, E_CURLCOMPLETE, HANDLER(LicenseSystem, HandleDeactivate));
+    SubscribeToEvent(deactivate_, E_CURLCOMPLETE, ATOMIC_HANDLER(LicenseSystem, HandleDeactivate));
 
     return true;
 
@@ -434,7 +434,7 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
 
         if (serverVerification_->GetError().Length())
         {
-            LOGERRORF("Unable to verify with server: %s", serverVerification_->GetError().CString());
+            ATOMIC_LOGERRORF("Unable to verify with server: %s", serverVerification_->GetError().CString());
         }
         else
         {
@@ -496,7 +496,7 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
 
                 if (mismatch)
                 {
-                    LOGERROR("License Mismatch, reseting");
+                    ATOMIC_LOGERROR("License Mismatch, reseting");
                     licenseWindows_ = parse.licenseWindows_;
                     licenseMac_ = parse.licenseMac_;
                     licenseAndroid_ = parse.licenseAndroid_;
@@ -526,7 +526,7 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
 
     if (licenseError)
     {
-        LOGINFO("There was an issue with the atomic-cli activation.  Please reactivate or contact sales@atomicgameengine.com if this problem persists");
+        ATOMIC_LOGINFO("There was an issue with the atomic-cli activation.  Please reactivate or contact sales@atomicgameengine.com if this problem persists");
         SendEvent(E_LICENSE_ERROR);
     }
 
@@ -632,7 +632,7 @@ void LicenseSystem::RequestServerActivation(const String& key)
 {
     if (serverActivation_.NotNull())
     {
-        LOGERROR("UIActivation::RequestServerActivation - request already exists");
+        ATOMIC_LOGERROR("UIActivation::RequestServerActivation - request already exists");
         return;
     }
     key_ = key;
@@ -644,7 +644,7 @@ void LicenseSystem::RequestServerActivation(const String& key)
     // todo, this should be a verify url (shouldn't auto add id)
     serverActivation_ = cm->MakeRequest("https://store.atomicgameengine.com/licenses/license_activate.php", post);
 
-    SubscribeToEvent(serverActivation_, E_CURLCOMPLETE, HANDLER(LicenseSystem, HandleActivationResult));
+    SubscribeToEvent(serverActivation_, E_CURLCOMPLETE, ATOMIC_HANDLER(LicenseSystem, HandleActivationResult));
 }
 
 bool LicenseSystem::GetSourceBuild()

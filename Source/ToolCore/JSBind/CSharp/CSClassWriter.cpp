@@ -241,7 +241,7 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     // Make sure we have at least a IntPtr version
     if (!wroteConstructor)
     {
-        LOGINFOF("WARNING: %s class didn't write a constructor, filling in generated native constructor", klass_->GetName().CString());
+        ATOMIC_LOGINFOF("WARNING: %s class didn't write a constructor, filling in generated native constructor", klass_->GetName().CString());
 
         line = ToString("public %s (IntPtr native) : base (native)\n", klass_->GetName().CString());
         source += IndentLine(line);

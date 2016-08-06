@@ -18,7 +18,9 @@ subject to the following restrictions:
 
 #include "btTriangleMeshShape.h"
 #include "btOptimizedBvh.h"
+// ATOMIC BEGIN
 #include "../../LinearMath/btAlignedAllocator.h"
+// ATOMIC END
 #include "btTriangleInfoMap.h"
 
 ///The btBvhTriangleMeshShape is a static-triangle mesh shape, it can only be used for fixed/non-moving objects.

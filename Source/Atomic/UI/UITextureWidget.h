@@ -36,7 +36,7 @@ class UITextureWidget : public UIWidget
 {
     friend class TBTextureWidget;
 
-    OBJECT(UITextureWidget)
+    ATOMIC_OBJECT(UITextureWidget, UIWidget)
 
 public:
 

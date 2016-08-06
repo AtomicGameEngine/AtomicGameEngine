@@ -405,16 +405,14 @@ void JSBModule::RegisterConstant(const String& constantName, const String& value
 }
 
 bool JSBModule::Load(const String& jsonFilename)
-{
-    JSBind* jsbind = GetSubsystem<JSBind>();
-
-    LOGINFOF("Loading Module: %s", jsonFilename.CString());
+{    
+    ATOMIC_LOGINFOF("Loading Module: %s", jsonFilename.CString());
 
     SharedPtr<File> jsonFile(new File(context_, jsonFilename));
 
     if (!jsonFile->IsOpen())
     {
-        LOGERRORF("Unable to open module json: %s", jsonFilename.CString());
+        ATOMIC_LOGERRORF("Unable to open module json: %s", jsonFilename.CString());
         return false;
     }
 
@@ -422,7 +420,7 @@ bool JSBModule::Load(const String& jsonFilename)
 
     if (!moduleJSON_->BeginLoad(*jsonFile))
     {
-        LOGERRORF("Unable to parse module json: %s", jsonFilename.CString());
+        ATOMIC_LOGERRORF("Unable to parse module json: %s", jsonFilename.CString());
         return false;
     }
 
@@ -473,6 +471,16 @@ bool JSBModule::Load(const String& jsonFilename)
         }
     }
 
+    JSONValue jsmodulepreamble = root.Get("jsmodulepreamble");
+
+    if (jsmodulepreamble.IsArray())
+    {
+        for (unsigned j = 0; j < jsmodulepreamble.GetArray().Size(); j++)
+        {
+            jsmodulePreamble_.Push(jsmodulepreamble.GetArray()[j].GetString());
+        }
+    }
+
     JSONValue sources = root.Get("sources");
 
     for (unsigned i = 0; i < sources.GetArray().Size(); i++)
@@ -483,6 +491,7 @@ bool JSBModule::Load(const String& jsonFilename)
     if (name_ == "Graphics")
     {
 #ifdef _MSC_VER
+        JSBind* jsbind = GetSubsystem<JSBind>();
         if (jsbind->GetPlatform() == "ANDROID" || jsbind->GetPlatform() == "WEB")
         {
             sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");

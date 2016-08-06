@@ -48,7 +48,7 @@ enum FONT_TYPE
 /// %Font resource.
 class ATOMIC_API Font : public Resource
 {
-    OBJECT(Font);
+    ATOMIC_OBJECT(Font, Resource);
 
 public:
     /// Construct.

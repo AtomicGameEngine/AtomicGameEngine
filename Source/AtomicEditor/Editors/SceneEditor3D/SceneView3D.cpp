@@ -35,10 +35,10 @@
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Material.h>
 
-#include <Atomic/Atomic3D/Model.h>
-#include <Atomic/Atomic3D/StaticModel.h>
-#include <Atomic/Atomic3D/AnimatedModel.h>
-#include <Atomic/Atomic3D/AnimationController.h>
+#include <Atomic/Graphics/Model.h>
+#include <Atomic/Graphics/StaticModel.h>
+#include <Atomic/Graphics/AnimatedModel.h>
+#include <Atomic/Graphics/AnimationController.h>
 
 #include <Atomic/Input/Input.h>
 
@@ -107,7 +107,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
 
     if (octree_.Null())
     {
-        LOGWARNING("Scene without an octree loaded");
+        ATOMIC_LOGWARNING("Scene without an octree loaded");
         octree_ = scene_->CreateComponent<Octree>();
     }
 
@@ -125,17 +125,17 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SetView(scene_, camera_);
     SetAutoUpdate(false);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(SceneView3D, HandleUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, ATOMIC_HANDLER(SceneView3D, HandlePostRenderUpdate));
 
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
+    SubscribeToEvent(E_MOUSEMOVE, ATOMIC_HANDLER(SceneView3D,HandleMouseMove));
 
-    SubscribeToEvent(this, E_DRAGENTERWIDGET, HANDLER(SceneView3D, HandleDragEnterWidget));
-    SubscribeToEvent(this, E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
-    SubscribeToEvent(this, E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
+    SubscribeToEvent(this, E_DRAGENTERWIDGET, ATOMIC_HANDLER(SceneView3D, HandleDragEnterWidget));
+    SubscribeToEvent(this, E_DRAGEXITWIDGET, ATOMIC_HANDLER(SceneView3D, HandleDragExitWidget));
+    SubscribeToEvent(this, E_DRAGENDED, ATOMIC_HANDLER(SceneView3D, HandleDragEnded));
 
-    SubscribeToEvent(E_UIUNHANDLEDSHORTCUT, HANDLER(SceneView3D, HandleUIUnhandledShortcut));
-    SubscribeToEvent(E_UIWIDGETFOCUSESCAPED, HANDLER(SceneView3D, HandleUIWidgetFocusEscaped));
+    SubscribeToEvent(E_UIUNHANDLEDSHORTCUT, ATOMIC_HANDLER(SceneView3D, HandleUIUnhandledShortcut));
+    SubscribeToEvent(E_UIWIDGETFOCUSESCAPED, ATOMIC_HANDLER(SceneView3D, HandleUIWidgetFocusEscaped));
 
     SetIsFocusable(true);
 
@@ -167,7 +167,7 @@ void SceneView3D::Disable()
 bool SceneView3D::GetOrbitting()
 {
     Input* input = GetSubsystem<Input>();
-    return framedBBox_.defined_ && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
+    return framedBBox_.Defined() && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
 }
 
 bool SceneView3D::GetZooming()
@@ -228,7 +228,7 @@ void SceneView3D::MoveCamera(float timeStep)
         IntVector2 mouseMove = input->GetMouseMove();
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
-        pitch_ = Clamp(pitch_, -90.0f, 90.0f);
+        pitch_ = Atomic::Clamp(pitch_, -90.0f, 90.0f);
     }
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
@@ -242,7 +242,7 @@ void SceneView3D::MoveCamera(float timeStep)
         zooming = false;
         BoundingBox bbox;
         sceneEditor_->GetSelection()->GetBounds(bbox);
-        if (bbox.defined_)
+        if (bbox.Defined())
         {
             Vector3 centerPoint = bbox.Center();
             Vector3 d = cameraNode_->GetWorldPosition() - centerPoint;
@@ -618,7 +618,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
     else
     {
         mouseLeftDown_ = true;
-        if (Abs(input->GetMouseMoveX() > 3 || input->GetMouseMoveY() >  3))
+        if (Atomic::Abs(input->GetMouseMoveX() > 3 || input->GetMouseMoveY() >  3))
         {
             mouseMoved_ = true;
         }
@@ -848,7 +848,7 @@ void SceneView3D::FrameSelection()
     BoundingBox bbox;
     sceneEditor_->GetSelection()->GetBounds(bbox);
 
-    if (!bbox.defined_)
+    if (!bbox.Defined())
         return;
 
     Sphere sphere(bbox);

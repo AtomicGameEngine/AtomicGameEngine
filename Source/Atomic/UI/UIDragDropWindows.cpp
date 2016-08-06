@@ -346,7 +346,7 @@ namespace Atomic
 
     class UIDragDropWindows : public Object
     {
-        OBJECT(UIDragDropWindows);
+        ATOMIC_OBJECT(UIDragDropWindows, Object);
 
     public:
         /// Construct.

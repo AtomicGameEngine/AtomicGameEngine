@@ -91,8 +91,8 @@ void BuildAndroid::RunADBStartActivity()
     buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Android Activity</color>\n\n";
     SendEvent(E_BUILDOUTPUT, buildOutput);
 
-    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildAndroid, HandleADBStartActivityComplete));
-    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildBase, HandleSubprocessOutputEvent));
+    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(BuildAndroid, HandleADBStartActivityComplete));
+    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(BuildBase, HandleSubprocessOutputEvent));
 
 }
 
@@ -139,8 +139,8 @@ void BuildAndroid::RunADBInstall()
     buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Installing on Android Device</color>\n\n";
     SendEvent(E_BUILDOUTPUT, buildOutput);
 
-    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildAndroid, HandleRunADBInstallComplete));
-    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildBase, HandleSubprocessOutputEvent));
+    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(BuildAndroid, HandleRunADBInstallComplete));
+    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(BuildBase, HandleSubprocessOutputEvent));
 
 }
 
@@ -223,8 +223,8 @@ void BuildAndroid::RunADBListDevices()
     buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Listing Android Devices</color>\n\n";
     SendEvent(E_BUILDOUTPUT, buildOutput);
 
-    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildAndroid, HandleADBListDevicesComplete));
-    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildAndroid, HandleADBListDevicesOutputEvent));
+    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(BuildAndroid, HandleADBListDevicesComplete));
+    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(BuildAndroid, HandleADBListDevicesOutputEvent));
 
 }
 
@@ -306,8 +306,8 @@ void BuildAndroid::RunAntDebug()
     buildOutput[BuildOutput::P_TEXT] = "<color #D4FB79>Starting Android " + buildApk + " Deployment</color>\n\n";
     SendEvent(E_BUILDOUTPUT, buildOutput);
 
-    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildAndroid, HandleAntDebugComplete));
-    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildBase, HandleSubprocessOutputEvent));
+    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(BuildAndroid, HandleAntDebugComplete));
+    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(BuildBase, HandleSubprocessOutputEvent));
 
 }
 

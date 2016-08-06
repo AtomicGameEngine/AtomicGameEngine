@@ -29,18 +29,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # ------------------------------------------------------------------------------
-#  Android CMake toolchain file, for use with the Android NDK r5-r10d
-#  Requires cmake 2.6.3 or newer (2.8.5 or newer is recommended).
+#  Android CMake toolchain file, for use with the Android NDK r5-r12b
+#  Requires cmake 2.6.3 or newer (2.8.9 or newer is recommended).
 #  See home page: https://github.com/taka-no-me/android-cmake
 #
 #  Usage Linux:
 #   $ export ANDROID_NDK=/absolute/path/to/the/android-ndk
-#   $ mkdir build && cd build
-#   $ cmake -DCMAKE_TOOLCHAIN_FILE=path/to/the/android.toolchain.cmake ..
-#   $ make -j8
-#
-#  Usage Linux (using standalone toolchain):
-#   $ export ANDROID_STANDALONE_TOOLCHAIN=/absolute/path/to/android-toolchain
 #   $ mkdir build && cd build
 #   $ cmake -DCMAKE_TOOLCHAIN_FILE=path/to/the/android.toolchain.cmake ..
 #   $ make -j8
@@ -61,11 +55,6 @@
 #
 #  Options (can be set as cmake parameters: -D<option_name>=<value>):
 #    ANDROID_NDK=/opt/android-ndk - path to the NDK root.
-#      Can be set as environment variable. Can be set only at first cmake run.
-#
-#    ANDROID_STANDALONE_TOOLCHAIN=/opt/android-toolchain - path to the
-#      standalone toolchain. This option is not used if full NDK is found
-#      (ignored if ANDROID_NDK is set).
 #      Can be set as environment variable. Can be set only at first cmake run.
 #
 #    ANDROID_ABI=armeabi-v7a - specifies the target Application Binary
@@ -95,36 +84,62 @@
 #
 #    ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-4.9 - the name of compiler
 #      toolchain to be used. The list of possible values depends on the NDK
-#      version. For NDK r10c the possible values are:
+#      version.
+#
+#      For NDK r12b the possible values are:
 #
 #        * aarch64-linux-android-4.9
-#        * aarch64-linux-android-clang3.4
-#        * aarch64-linux-android-clang3.5
-#        * arm-linux-androideabi-4.6
-#        * arm-linux-androideabi-4.8
+#        * aarch64-linux-android-clang
 #        * arm-linux-androideabi-4.9 (default)
-#        * arm-linux-androideabi-clang3.4
-#        * arm-linux-androideabi-clang3.5
+#        * arm-linux-androideabi-clang
 #        * mips64el-linux-android-4.9
-#        * mips64el-linux-android-clang3.4
-#        * mips64el-linux-android-clang3.5
-#        * mipsel-linux-android-4.6
-#        * mipsel-linux-android-4.8
+#        * mips64el-linux-android-clang
 #        * mipsel-linux-android-4.9
-#        * mipsel-linux-android-clang3.4
-#        * mipsel-linux-android-clang3.5
-#        * x86-4.6
-#        * x86-4.8
+#        * mipsel-linux-android-clang
 #        * x86-4.9
-#        * x86-clang3.4
-#        * x86-clang3.5
+#        * x86-clang
 #        * x86_64-4.9
-#        * x86_64-clang3.4
+#        * x86_64-clang
+#
+#      For NDK r11c the possible values are:
+#
+#        * aarch64-linux-android-4.9
+#        * aarch64-linux-android-clang3.6 (it is actually Clang 3.8)
+#        * arm-linux-androideabi-4.9 (default)
+#        * arm-linux-androideabi-clang3.6 (it is actually Clang 3.8)
+#        * mips64el-linux-android-4.9
+#        * mips64el-linux-android-clang3.6 (it is actually Clang 3.8)
+#        * mipsel-linux-android-4.9
+#        * mipsel-linux-android-clang3.6 (it is actually Clang 3.8)
+#        * x86-4.9
+#        * x86-clang3.6 (it is actually Clang 3.8)
+#        * x86_64-4.9
+#        * x86_64-clang3.6 (it is actually Clang 3.8)
+#
+#      For NDK r10e the possible values are:
+#
+#        * aarch64-linux-android-4.9
+#        * aarch64-linux-android-clang3.5
+#        * aarch64-linux-android-clang3.6
+#        * arm-linux-androideabi-4.9 (default)
+#        * arm-linux-androideabi-clang3.5
+#        * arm-linux-androideabi-clang3.6
+#        * mips64el-linux-android-4.9
+#        * mips64el-linux-android-clang3.5
+#        * mips64el-linux-android-clang3.6
+#        * mipsel-linux-android-4.9
+#        * mipsel-linux-android-clang3.5
+#        * mipsel-linux-android-clang3.6
+#        * x86-4.9
+#        * x86-clang3.5
+#        * x86-clang3.6
+#        * x86_64-4.9
 #        * x86_64-clang3.5
+#        * x86_64-clang3.6
 #
 #    ANDROID_FORCE_ARM_BUILD=OFF - set ON to generate 32-bit ARM instructions
-#      instead of Thumb. Is not available for "x86" (inapplicable) and
-#      "armeabi-v6 with VFP" (is forced to be ON) ABIs.
+#      instead of Thumb. Is not available for "armeabi-v6 with VFP"
+#      (is forced to be ON) ABI.
 #
 #    ANDROID_NO_UNDEFINED=ON - set ON to show all undefined symbols as linker
 #      errors even if they are not used.
@@ -132,13 +147,6 @@
 #    ANDROID_SO_UNDEFINED=OFF - set ON to allow undefined symbols in shared
 #      libraries. Automatically turned for NDK r5x and r6x due to GLESv2
 #      problems.
-#
-#    LIBRARY_OUTPUT_PATH_ROOT=${CMAKE_SOURCE_DIR} - where to output binary
-#      files. See additional details below.
-#
-#    ANDROID_SET_OBSOLETE_VARIABLES=ON - if set, then toolchain defines some
-#      obsolete variables which were used by previous versions of this file for
-#      backward compatibility.
 #
 #    ANDROID_STL=gnustl_static - specify the runtime to use.
 #
@@ -172,6 +180,10 @@
 #                          Implies -frtti -fno-exceptions.
 #                          Available for NDK r7b and newer.
 #                          Silently degrades to gnustl_static if not available.
+#        c++_static     -> Use the LLVM libc++ runtime as a static library.
+#                          Implies -frtti -fexceptions.
+#        c++_shared     -> Use the LLVM libc++ runtime as a shared library.
+#                          Implies -frtti -fexceptions.
 #
 #    ANDROID_STL_FORCE_FEATURES=ON - turn rtti and exceptions support based on
 #      chosen runtime. If disabled, then the user is responsible for settings
@@ -200,27 +212,20 @@
 #    will be set true, mutually exclusive. NEON option will be set true
 #    if VFP is set to NEON.
 #
-#    LIBRARY_OUTPUT_PATH_ROOT should be set in cache to determine where Android
-#    libraries will be installed.
-#    Default is ${CMAKE_SOURCE_DIR}, and the android libs will always be
-#    under the ${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}
-#    (depending on the target ABI). This is convenient for Android packaging.
-#
 # ------------------------------------------------------------------------------
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 cmake_minimum_required( VERSION 2.6.3 )
 
+if( DEFINED CMAKE_CROSSCOMPILING )
+ return()
+endif()
+
 # Urho3D: on Windows Cygwin-based NDK tools may fail in the linking phase with too long command line. Turn on response files to avoid this
 if( CMAKE_HOST_WIN32 )
  set( CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
  set( CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
-endif()
-
-if( DEFINED CMAKE_CROSSCOMPILING )
- # subsequent toolchain loading is not really needed
- return()
 endif()
 
 if( CMAKE_TOOLCHAIN_FILE )
@@ -243,22 +248,22 @@ endif()
 # this one not so much
 set( CMAKE_SYSTEM_VERSION 1 )
 
-# rpath makes low sence for Android
+# rpath makes low sense for Android
 set( CMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG "" )
 set( CMAKE_SKIP_RPATH TRUE CACHE BOOL "If set, runtime paths are not added when using shared libraries." )
 
 # NDK search paths
-set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r10d -r10c -r10b -r10 -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
-if(NOT DEFINED ANDROID_NDK_SEARCH_PATHS)
+set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r12b -r11c -r11b -r11 -r10e -r10d -r10c -r10b -r10 -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
+if( NOT DEFINED ANDROID_NDK_SEARCH_PATHS )
  if( CMAKE_HOST_WIN32 )
   file( TO_CMAKE_PATH "$ENV{PROGRAMFILES}" ANDROID_NDK_SEARCH_PATHS )
-  set( ANDROID_NDK_SEARCH_PATHS "${ANDROID_NDK_SEARCH_PATHS}/android-ndk" "$ENV{SystemDrive}/NVPACK/android-ndk" )
+  set( ANDROID_NDK_SEARCH_PATHS "${ANDROID_NDK_SEARCH_PATHS}" "$ENV{SystemDrive}/NVPACK" )
  else()
   file( TO_CMAKE_PATH "$ENV{HOME}" ANDROID_NDK_SEARCH_PATHS )
-  set( ANDROID_NDK_SEARCH_PATHS /opt/android-ndk "${ANDROID_NDK_SEARCH_PATHS}/NVPACK/android-ndk" )
+  set( ANDROID_NDK_SEARCH_PATHS /opt "${ANDROID_NDK_SEARCH_PATHS}/NVPACK" )
  endif()
 endif()
-if(NOT DEFINED ANDROID_STANDALONE_TOOLCHAIN_SEARCH_PATH)
+if( NOT DEFINED ANDROID_STANDALONE_TOOLCHAIN_SEARCH_PATH )
  set( ANDROID_STANDALONE_TOOLCHAIN_SEARCH_PATH /opt/android-toolchain )
 endif()
 
@@ -271,116 +276,100 @@ set( ANDROID_SUPPORTED_ABIS_mips "mips" )
 set( ANDROID_SUPPORTED_ABIS_mips64 "mips64" )
 
 # API level defaults
-# Urho3D: default to API 12
-set( ANDROID_DEFAULT_NDK_API_LEVEL 12 )
+# Urho3D: default to API 9
+set( ANDROID_DEFAULT_NDK_API_LEVEL 9 )
 set( ANDROID_DEFAULT_NDK_API_LEVEL_arm64 21 )
-set( ANDROID_DEFAULT_NDK_API_LEVEL_x86 12)
+set( ANDROID_DEFAULT_NDK_API_LEVEL_x86 9 )
 set( ANDROID_DEFAULT_NDK_API_LEVEL_x86_64 21 )
-set( ANDROID_DEFAULT_NDK_API_LEVEL_mips 12 )
+set( ANDROID_DEFAULT_NDK_API_LEVEL_mips 9 )
 set( ANDROID_DEFAULT_NDK_API_LEVEL_mips64 21 )
 
 
 macro( __LIST_FILTER listvar regex )
- if( ${listvar} )
-  foreach( __val ${${listvar}} )
-   if( __val MATCHES "${regex}" )
-    list( REMOVE_ITEM ${listvar} "${__val}" )
-   endif()
-  endforeach()
- endif()
+  if( ${listvar} )
+    foreach( __val ${${listvar}} )
+      if( __val MATCHES "${regex}" )
+        list( REMOVE_ITEM ${listvar} "${__val}" )
+      endif()
+    endforeach()
+  endif()
 endmacro()
 
 macro( __INIT_VARIABLE var_name )
- set( __test_path 0 )
- foreach( __var ${ARGN} )
-  if( __var STREQUAL "PATH" )
-   set( __test_path 1 )
-   break()
-  endif()
- endforeach()
- if( __test_path AND NOT EXISTS "${${var_name}}" )
-  unset( ${var_name} CACHE )
- endif()
- if( "${${var_name}}" STREQUAL "" )
-  set( __values 0 )
+  set( __test_path 0 )
   foreach( __var ${ARGN} )
-   if( __var STREQUAL "VALUES" )
-    set( __values 1 )
-   elseif( NOT __var STREQUAL "PATH" )
-    set( __obsolete 0 )
-    if( __var MATCHES "^OBSOLETE_.*$" )
-     string( REPLACE "OBSOLETE_" "" __var "${__var}" )
-     set( __obsolete 1 )
-    endif()
-    if( __var MATCHES "^ENV_.*$" )
-     string( REPLACE "ENV_" "" __var "${__var}" )
-     set( __value "$ENV{${__var}}" )
-    elseif( DEFINED ${__var} )
-     set( __value "${${__var}}" )
-    else()
-     if( __values )
-      set( __value "${__var}" )
-     else()
-      set( __value "" )
-     endif()
-    endif()
-    if( NOT "${__value}" STREQUAL "" )
-     if( __test_path )
-      if( EXISTS "${__value}" )
-       file( TO_CMAKE_PATH "${__value}" ${var_name} )
-       if( __obsolete AND NOT _CMAKE_IN_TRY_COMPILE )
-        message( WARNING "Using value of obsolete variable ${__var} as initial value for ${var_name}. Please note, that ${__var} can be completely removed in future versions of the toolchain." )
-       endif()
-       break()
-      endif()
-     else()
-      set( ${var_name} "${__value}" )
-       if( __obsolete AND NOT _CMAKE_IN_TRY_COMPILE )
-        message( WARNING "Using value of obsolete variable ${__var} as initial value for ${var_name}. Please note, that ${__var} can be completely removed in future versions of the toolchain." )
-       endif()
+    if( __var STREQUAL PATH )   # Urho3D: avoid CMP0054 warning
+      set( __test_path 1 )
       break()
-     endif()
     endif()
-   endif()
   endforeach()
-  unset( __value )
-  unset( __values )
-  unset( __obsolete )
- elseif( __test_path )
-  file( TO_CMAKE_PATH "${${var_name}}" ${var_name} )
- endif()
- unset( __test_path )
+
+  if( __test_path AND NOT EXISTS "${${var_name}}" )
+    unset( ${var_name} CACHE )
+  endif()
+
+  if( " ${${var_name}}" STREQUAL " " )
+    set( __values 0 )
+    foreach( __var ${ARGN} )
+      if( __var STREQUAL "VALUES" )
+        set( __values 1 )
+      elseif( NOT __var STREQUAL PATH )      # Urho3D: avoid CMP0054 warning
+        if( __var MATCHES "^ENV_.*$" )
+          string( REPLACE "ENV_" "" __var "${__var}" )
+          set( __value "$ENV{${__var}}" )
+        elseif( DEFINED ${__var} )
+          set( __value "${${__var}}" )
+        elseif( __values )
+          set( __value "${__var}" )
+        else()
+          set( __value "" )
+        endif()
+
+        if( NOT " ${__value}" STREQUAL " " AND (NOT __test_path OR EXISTS "${__value}") )
+          set( ${var_name} "${__value}" )
+          break()
+        endif()
+      endif()
+    endforeach()
+    unset( __value )
+    unset( __values )
+  endif()
+
+  if( __test_path )
+    file( TO_CMAKE_PATH "${${var_name}}" ${var_name} )
+  endif()
+  unset( __test_path )
 endmacro()
 
 macro( __DETECT_NATIVE_API_LEVEL _var _path )
- SET( __ndkApiLevelRegex "^[\t ]*#define[\t ]+__ANDROID_API__[\t ]+([0-9]+)[\t ]*.*$" )
- FILE( STRINGS ${_path} __apiFileContent REGEX "${__ndkApiLevelRegex}" )
- if( NOT __apiFileContent )
-  message( SEND_ERROR "Could not get Android native API level. Probably you have specified invalid level value, or your copy of NDK/toolchain is broken." )
- endif()
- string( REGEX REPLACE "${__ndkApiLevelRegex}" "\\1" ${_var} "${__apiFileContent}" )
- unset( __apiFileContent )
- unset( __ndkApiLevelRegex )
+  set( __ndkApiLevelRegex "^[\t ]*#define[\t ]+__ANDROID_API__[\t ]+([0-9]+)[\t ]*.*$" )
+  file( STRINGS ${_path} __apiFileContent REGEX "${__ndkApiLevelRegex}" )
+  if( NOT __apiFileContent )
+    message( SEND_ERROR "Could not get Android native API level. Probably you have specified invalid level value, or your copy of NDK/toolchain is broken." )
+  endif()
+  string( REGEX REPLACE "${__ndkApiLevelRegex}" "\\1" ${_var} "${__apiFileContent}" )
+  unset( __apiFileContent )
+  unset( __ndkApiLevelRegex )
 endmacro()
 
 macro( __DETECT_TOOLCHAIN_MACHINE_NAME _var _root )
  if( EXISTS "${_root}" )
-  file( GLOB __gccExePath RELATIVE "${_root}/bin/" "${_root}/bin/*-gcc${TOOL_OS_SUFFIX}" )
-  __LIST_FILTER( __gccExePath "^[.].*" )
-  list( LENGTH __gccExePath __gccExePathsCount )
-  if( NOT __gccExePathsCount EQUAL 1  AND NOT _CMAKE_IN_TRY_COMPILE )
-   message( WARNING "Could not determine machine name for compiler from ${_root}" )
-   set( ${_var} "" )
+    file( GLOB __gccExePath RELATIVE "${_root}/bin/" "${_root}/bin/*-gcc${TOOL_OS_SUFFIX}" )
+    __LIST_FILTER( __gccExePath "^[.].*" )
+    list( LENGTH __gccExePath __gccExePathsCount )
+    if( NOT __gccExePathsCount EQUAL 1  AND NOT _CMAKE_IN_TRY_COMPILE )
+      message( WARNING "Could not determine machine name for compiler from ${_root}" )
+      set( ${_var} "" )
+    else()
+      get_filename_component( __gccExeName "${__gccExePath}" NAME_WE )
+      string( REPLACE "-gcc" "" ${_var} "${__gccExeName}" )
+    endif()
+    unset( __gccExePath )
+    unset( __gccExePathsCount )
+    unset( __gccExeName )
   else()
-   get_filename_component( __gccExeName "${__gccExePath}" NAME_WE )
-   string( REPLACE "-gcc" "" ${_var} "${__gccExeName}" )
+    set( ${_var} "" )
   endif()
-  unset( __gccExePath )
-  unset( __gccExePathsCount )
-  unset( __gccExeName )
- else()
-  set( ${_var} "" )
- endif()
 endmacro()
 
 
@@ -428,17 +417,19 @@ if( NOT ANDROID_NDK_HOST_X64 )
 endif()
 
 # see if we have path to Android NDK
-__INIT_VARIABLE( ANDROID_NDK PATH ENV_ANDROID_NDK )
+if( NOT ANDROID_NDK AND NOT ANDROID_STANDALONE_TOOLCHAIN )
+  __INIT_VARIABLE( ANDROID_NDK PATH ENV_ANDROID_NDK )
+endif()
 if( NOT ANDROID_NDK )
  # see if we have path to Android standalone toolchain
- __INIT_VARIABLE( ANDROID_STANDALONE_TOOLCHAIN PATH ENV_ANDROID_STANDALONE_TOOLCHAIN OBSOLETE_ANDROID_NDK_TOOLCHAIN_ROOT OBSOLETE_ENV_ANDROID_NDK_TOOLCHAIN_ROOT )
+ __INIT_VARIABLE( ANDROID_STANDALONE_TOOLCHAIN PATH ENV_ANDROID_STANDALONE_TOOLCHAIN )
 
  if( NOT ANDROID_STANDALONE_TOOLCHAIN )
   #try to find Android NDK in one of the the default locations
   set( __ndkSearchPaths )
   foreach( __ndkSearchPath ${ANDROID_NDK_SEARCH_PATHS} )
    foreach( suffix ${ANDROID_SUPPORTED_NDK_VERSIONS} )
-    list( APPEND __ndkSearchPaths "${__ndkSearchPath}${suffix}" )
+    list( APPEND __ndkSearchPaths "${__ndkSearchPath}/android-ndk${suffix}" )
    endforeach()
   endforeach()
   __INIT_VARIABLE( ANDROID_NDK PATH VALUES ${__ndkSearchPaths} )
@@ -464,16 +455,19 @@ if( ANDROID_NDK )
  get_filename_component( ANDROID_NDK "${ANDROID_NDK}" ABSOLUTE )
  set( ANDROID_NDK "${ANDROID_NDK}" CACHE INTERNAL "Path of the Android NDK" FORCE )
  set( BUILD_WITH_ANDROID_NDK True )
- if( EXISTS "${ANDROID_NDK}/RELEASE.TXT" )
-  file( STRINGS "${ANDROID_NDK}/RELEASE.TXT" ANDROID_NDK_RELEASE_FULL LIMIT_COUNT 1 REGEX "r[0-9]+[a-z]?" )
-  string( REGEX MATCH "r([0-9]+)([a-z]?)" ANDROID_NDK_RELEASE "${ANDROID_NDK_RELEASE_FULL}" )
+ # Urho3D - major refactoring on how the NDK release and version are being captured
+ if( EXISTS "${ANDROID_NDK}/RELEASE.TXT" )  # Prior to r11
+  file( STRINGS "${ANDROID_NDK}/RELEASE.TXT" __line LIMIT_COUNT 1 REGEX "r[0-9]+[a-z]?" )
+  string( REGEX MATCH "r([0-9]+)([a-z]?)" ANDROID_NDK_RELEASE "${__line}" )
+  string( FIND " abcdefghijklmnopqastuvwxyz" ${CMAKE_MATCH_2} __index )
+  set( ANDROID_NDK_VERSION ${CMAKE_MATCH_1}.${__index}.0 )
+ elseif( EXISTS "${ANDROID_NDK}/source.properties" )    # r11 onward
+  file( STRINGS "${ANDROID_NDK}/source.properties" __line LIMIT_COUNT 1 REGEX "[0-9]+\\.[0-9]+\\.[0-9]+" )
+  string( REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" ANDROID_NDK_VERSION "${__line}" )
+  set( ANDROID_NDK_RELEASE r${ANDROID_NDK_VERSION} )
  else()
-  set( ANDROID_NDK_RELEASE "r1x" )
-  set( ANDROID_NDK_RELEASE_FULL "unreleased" )
+  message( FATAL_ERROR "Unrecognized Android NDK release" )
  endif()
- string( REGEX REPLACE "r([0-9]+)([a-z]?)" "\\1*1000" ANDROID_NDK_RELEASE_NUM "${ANDROID_NDK_RELEASE}" )
- string( FIND " abcdefghijklmnopqastuvwxyz" "${CMAKE_MATCH_2}" __ndkReleaseLetterNum )
- math( EXPR ANDROID_NDK_RELEASE_NUM "${ANDROID_NDK_RELEASE_NUM}+${__ndkReleaseLetterNum}" )
 elseif( ANDROID_STANDALONE_TOOLCHAIN )
  get_filename_component( ANDROID_STANDALONE_TOOLCHAIN "${ANDROID_STANDALONE_TOOLCHAIN}" ABSOLUTE )
  # try to detect change
@@ -496,7 +490,7 @@ else()
     or
       export ANDROID_STANDALONE_TOOLCHAIN=~/my-android-toolchain
     or put the toolchain or NDK in the default path:
-      sudo ln -s ~/my-android-ndk ${ANDROID_NDK_SEARCH_PATH}
+      sudo ln -s ~/my-android-ndk ${ANDROID_NDK_SEARCH_PATH}/android-ndk
       sudo ln -s ~/my-android-toolchain ${ANDROID_STANDALONE_TOOLCHAIN_SEARCH_PATH}" )
 endif()
 
@@ -504,22 +498,25 @@ endif()
 if( BUILD_WITH_ANDROID_NDK )
  if( NOT DEFINED ANDROID_NDK_LAYOUT )
   # try to automatically detect the layout
-  if( EXISTS "${ANDROID_NDK}/RELEASE.TXT")
-   set( ANDROID_NDK_LAYOUT "RELEASE" )
+  if( EXISTS "${ANDROID_NDK}/RELEASE.TXT" )
+   set( ANDROID_NDK_LAYOUT RELEASE )
+  # Urho3D - new NDK layout after r11
+  elseif( EXISTS "${ANDROID_NDK}/source.properties" )
+   set( ANDROID_NDK_LAYOUT RELEASE2 )
   elseif( EXISTS "${ANDROID_NDK}/../../linux-x86/toolchain/" )
-   set( ANDROID_NDK_LAYOUT "LINARO" )
+   set( ANDROID_NDK_LAYOUT LINARO )
   elseif( EXISTS "${ANDROID_NDK}/../../gcc/" )
-   set( ANDROID_NDK_LAYOUT "ANDROID" )
+   set( ANDROID_NDK_LAYOUT ANDROID )
   endif()
  endif()
  set( ANDROID_NDK_LAYOUT "${ANDROID_NDK_LAYOUT}" CACHE STRING "The inner layout of NDK" )
  mark_as_advanced( ANDROID_NDK_LAYOUT )
- if( ANDROID_NDK_LAYOUT STREQUAL "LINARO" )
+ if( ANDROID_NDK_LAYOUT STREQUAL LINARO )
   set( ANDROID_NDK_HOST_SYSTEM_NAME ${ANDROID_NDK_HOST_SYSTEM_NAME2} ) # only 32-bit at the moment
   set( ANDROID_NDK_TOOLCHAINS_PATH "${ANDROID_NDK}/../../${ANDROID_NDK_HOST_SYSTEM_NAME}/toolchain" )
   set( ANDROID_NDK_TOOLCHAINS_SUBPATH  "" )
   set( ANDROID_NDK_TOOLCHAINS_SUBPATH2 "" )
- elseif( ANDROID_NDK_LAYOUT STREQUAL "ANDROID" )
+ elseif( ANDROID_NDK_LAYOUT STREQUAL ANDROID )      # Urho3D: avoid CMP0054 warning
   set( ANDROID_NDK_HOST_SYSTEM_NAME ${ANDROID_NDK_HOST_SYSTEM_NAME2} ) # only 32-bit at the moment
   set( ANDROID_NDK_TOOLCHAINS_PATH "${ANDROID_NDK}/../../gcc/${ANDROID_NDK_HOST_SYSTEM_NAME}/arm" )
   set( ANDROID_NDK_TOOLCHAINS_SUBPATH  "" )
@@ -528,6 +525,11 @@ if( BUILD_WITH_ANDROID_NDK )
   set( ANDROID_NDK_TOOLCHAINS_PATH "${ANDROID_NDK}/toolchains" )
   set( ANDROID_NDK_TOOLCHAINS_SUBPATH  "/prebuilt/${ANDROID_NDK_HOST_SYSTEM_NAME}" )
   set( ANDROID_NDK_TOOLCHAINS_SUBPATH2 "/prebuilt/${ANDROID_NDK_HOST_SYSTEM_NAME2}" )
+ endif()
+ if( ANDROID_NDK_LAYOUT STREQUAL RELEASE2 )
+  set( ANDROID_NDK_TOOLCHAINS_CONFIG_PATH ${ANDROID_NDK}/build/core/toolchains )
+ else()
+  set( ANDROID_NDK_TOOLCHAINS_CONFIG_PATH ${ANDROID_NDK_TOOLCHAINS_PATH} )
  endif()
  get_filename_component( ANDROID_NDK_TOOLCHAINS_PATH "${ANDROID_NDK_TOOLCHAINS_PATH}" ABSOLUTE )
 
@@ -580,14 +582,21 @@ endif()
 
 macro( __GLOB_NDK_TOOLCHAINS __availableToolchainsVar __availableToolchainsLst __toolchain_subpath )
  foreach( __toolchain ${${__availableToolchainsLst}} )
-  if( "${__toolchain}" MATCHES "-clang3[.][0-9]$" AND NOT EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}${__toolchain_subpath}" )
+  # Urho3D - add support for r12b which drops the Clang version number from the toolchain name
+  if( "${__toolchain}" MATCHES "-clang.*$" AND NOT EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}${__toolchain_subpath}" )
    SET( __toolchainVersionRegex "^TOOLCHAIN_VERSION[\t ]+:=[\t ]+(.*)$" )
-   FILE( STRINGS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}/setup.mk" __toolchainVersionStr REGEX "${__toolchainVersionRegex}" )
+   FILE( STRINGS "${ANDROID_NDK_TOOLCHAINS_CONFIG_PATH}/${__toolchain}/setup.mk" __toolchainVersionStr REGEX "${__toolchainVersionRegex}" )
    if( __toolchainVersionStr )
     string( REGEX REPLACE "${__toolchainVersionRegex}" "\\1" __toolchainVersionStr "${__toolchainVersionStr}" )
-    string( REGEX REPLACE "-clang3[.][0-9]$" "-${__toolchainVersionStr}" __gcc_toolchain "${__toolchain}" )
+    string( REGEX REPLACE "-clang.*$" "-${__toolchainVersionStr}" __gcc_toolchain "${__toolchain}" )
    else()
-    string( REGEX REPLACE "-clang3[.][0-9]$" "-4.6" __gcc_toolchain "${__toolchain}" )
+    # Urho3D - fallback to use the latest GCC toolchain available
+    foreach( __gcc_ver 4.9 4.8 4.6 )
+     string( REGEX REPLACE -clang.*$ -${__gcc_ver} __gcc_toolchain "${__toolchain}" )
+     if( EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__gcc_toolchain}" )
+      break()
+     endif()
+    endforeach()
    endif()
    unset( __toolchainVersionStr )
    unset( __toolchainVersionRegex )
@@ -632,7 +641,7 @@ if( BUILD_WITH_ANDROID_NDK )
  set( __availableToolchainMachines "" )
  set( __availableToolchainArchs "" )
  set( __availableToolchainCompilerVersions "" )
- if( ANDROID_TOOLCHAIN_NAME AND EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${ANDROID_TOOLCHAIN_NAME}/" )
+ if( ANDROID_TOOLCHAIN_NAME AND EXISTS "${ANDROID_NDK_TOOLCHAINS_CONFIG_PATH}/${ANDROID_TOOLCHAIN_NAME}/" )
   # do not go through all toolchains if we know the name
   set( __availableToolchainsLst "${ANDROID_TOOLCHAIN_NAME}" )
   __GLOB_NDK_TOOLCHAINS( __availableToolchains __availableToolchainsLst "${ANDROID_NDK_TOOLCHAINS_SUBPATH}" )
@@ -644,7 +653,7 @@ if( BUILD_WITH_ANDROID_NDK )
   endif()
  endif()
  if( NOT __availableToolchains )
-  file( GLOB __availableToolchainsLst RELATIVE "${ANDROID_NDK_TOOLCHAINS_PATH}" "${ANDROID_NDK_TOOLCHAINS_PATH}/*" )
+  file( GLOB __availableToolchainsLst RELATIVE "${ANDROID_NDK_TOOLCHAINS_CONFIG_PATH}" "${ANDROID_NDK_TOOLCHAINS_CONFIG_PATH}/*" )
   # Urho3D: bug fix - remove redundant if check which prevented the sort to take place
   list(SORT __availableToolchainsLst) # we need clang to go after gcc
   __LIST_FILTER( __availableToolchainsLst "^[.]" )
@@ -677,7 +686,7 @@ if( NOT ANDROID_SUPPORTED_ABIS )
 endif()
 
 # choose target ABI
-__INIT_VARIABLE( ANDROID_ABI OBSOLETE_ARM_TARGET OBSOLETE_ARM_TARGETS VALUES ${ANDROID_SUPPORTED_ABIS} )
+__INIT_VARIABLE( ANDROID_ABI VALUES ${ANDROID_SUPPORTED_ABIS} )
 # verify that target ABI is supported
 list( FIND ANDROID_SUPPORTED_ABIS "${ANDROID_ABI}" __androidAbiIdx )
 if( __androidAbiIdx EQUAL -1 )
@@ -768,7 +777,7 @@ if( CMAKE_BINARY_DIR AND EXISTS "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMa
 endif()
 
 if( ANDROID_ARCH_NAME STREQUAL "arm" AND NOT ARMEABI_V6 )
- __INIT_VARIABLE( ANDROID_FORCE_ARM_BUILD OBSOLETE_FORCE_ARM VALUES OFF )
+ __INIT_VARIABLE( ANDROID_FORCE_ARM_BUILD VALUES OFF )
  set( ANDROID_FORCE_ARM_BUILD ${ANDROID_FORCE_ARM_BUILD} CACHE BOOL "Use 32-bit ARM instructions instead of Thumb-1" FORCE )
  mark_as_advanced( ANDROID_FORCE_ARM_BUILD )
 else()
@@ -877,23 +886,14 @@ endif()
 
 # runtime choice (STL, rtti, exceptions)
 if( NOT ANDROID_STL )
- # honor legacy ANDROID_USE_STLPORT
- if( DEFINED ANDROID_USE_STLPORT )
-  if( ANDROID_USE_STLPORT )
-   set( ANDROID_STL stlport_static )
-  endif()
-  message( WARNING "You are using an obsolete variable ANDROID_USE_STLPORT to select the STL variant. Use -DANDROID_STL=stlport_static instead." )
- endif()
- if( NOT ANDROID_STL )
   set( ANDROID_STL gnustl_static )
- endif()
 endif()
 set( ANDROID_STL "${ANDROID_STL}" CACHE STRING "C++ runtime" )
 set( ANDROID_STL_FORCE_FEATURES ON CACHE BOOL "automatically configure rtti and exceptions support based on C++ runtime" )
 mark_as_advanced( ANDROID_STL ANDROID_STL_FORCE_FEATURES )
 
 if( BUILD_WITH_ANDROID_NDK )
- if( NOT "${ANDROID_STL}" MATCHES "^(none|system|system_re|gabi\\+\\+_static|gabi\\+\\+_shared|stlport_static|stlport_shared|gnustl_static|gnustl_shared)$")
+ if( NOT "${ANDROID_STL}" MATCHES "^(none|system|system_re|gabi\\+\\+_static|gabi\\+\\+_shared|stlport_static|stlport_shared|gnustl_static|gnustl_shared|c\\+\\+_static|c\\+\\+_shared)$")
   message( FATAL_ERROR "ANDROID_STL is set to invalid value \"${ANDROID_STL}\".
 The possible values are:
   none           -> Do not configure the runtime.
@@ -905,15 +905,19 @@ The possible values are:
   stlport_shared -> Use the STLport runtime as a shared library.
   gnustl_static  -> (default) Use the GNU STL as a static library.
   gnustl_shared  -> Use the GNU STL as a shared library.
+  c++_static     -> Use LLVM libc++ runtime as static library.
+  c++_shared     -> Use LLVM libc++ runtime as shared library.
 " )
  endif()
 elseif( BUILD_WITH_STANDALONE_TOOLCHAIN )
- if( NOT "${ANDROID_STL}" MATCHES "^(none|gnustl_static|gnustl_shared)$")
+ if( NOT "${ANDROID_STL}" MATCHES "^(none|gnustl_static|gnustl_shared|c\\+\\+_static|c\\+\\+_shared)$")
   message( FATAL_ERROR "ANDROID_STL is set to invalid value \"${ANDROID_STL}\".
 The possible values are:
   none           -> Do not configure the runtime.
   gnustl_static  -> (default) Use the GNU STL as a static library.
   gnustl_shared  -> Use the GNU STL as a shared library.
+  c++_static     -> Use LLVM libc++ runtime as static library.
+  c++_shared     -> Use LLVM libc++ runtime as shared library.
 " )
  endif()
 endif()
@@ -985,7 +989,7 @@ if( BUILD_WITH_STANDALONE_TOOLCHAIN )
    set( __libsupcxx "${__libstl}/libsupc++.a" )
    set( __libstl    "${__libstl}/libstdc++.a" )
   endif()
-  if( NOT EXISTS "${__libsupcxx}" )
+  if( NOT EXISTS "${__libsupcxx}" AND NOT ANDROID_STL MACHES "c\\+\\+_(static|shared)" )
    message( FATAL_ERROR "The required libstdsupc++.a is missing in your standalone toolchain.
  Usually it happens because of bug in make-standalone-toolchain.sh script from NDK r7, r7b and r7c.
  You need to either upgrade to newer NDK or manually copy
@@ -1011,14 +1015,20 @@ if( "${ANDROID_TOOLCHAIN_NAME}" STREQUAL "standalone-clang" )
  set( ANDROID_COMPILER_IS_CLANG 1 )
  execute_process( COMMAND "${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin/clang${TOOL_OS_SUFFIX}" --version OUTPUT_VARIABLE ANDROID_CLANG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE )
  string( REGEX MATCH "[0-9]+[.][0-9]+" ANDROID_CLANG_VERSION "${ANDROID_CLANG_VERSION}")
-elseif( "${ANDROID_TOOLCHAIN_NAME}" MATCHES "-clang3[.][0-9]?$" )
- string( REGEX MATCH "3[.][0-9]$" ANDROID_CLANG_VERSION "${ANDROID_TOOLCHAIN_NAME}")
+elseif( "${ANDROID_TOOLCHAIN_NAME}" MATCHES "-clang(.*)$" )
+ set (ANDROID_CLANG_VERSION ${CMAKE_MATCH_1})
  string( REGEX REPLACE "-clang${ANDROID_CLANG_VERSION}$" "-${ANDROID_COMPILER_VERSION}" ANDROID_GCC_TOOLCHAIN_NAME "${ANDROID_TOOLCHAIN_NAME}" )
- if( NOT EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/llvm-${ANDROID_CLANG_VERSION}${ANDROID_NDK_TOOLCHAINS_SUBPATH}/bin/clang${TOOL_OS_SUFFIX}" )
+ if( ANDROID_NDK_LAYOUT STREQUAL RELEASE2)
+  set( ANDROID_CLANG_TOOLCHAIN_ROOT "${ANDROID_NDK_TOOLCHAINS_PATH}/llvm${ANDROID_NDK_TOOLCHAINS_SUBPATH}" )
+ else()
+  set( ANDROID_CLANG_TOOLCHAIN_ROOT "${ANDROID_NDK_TOOLCHAINS_PATH}/llvm-${ANDROID_CLANG_VERSION}${ANDROID_NDK_TOOLCHAINS_SUBPATH}" )
+ endif()
+
+ if( NOT EXISTS "${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin/clang${TOOL_OS_SUFFIX}" )
+  unset( ANDROID_CLANG_TOOLCHAIN_ROOT )
   message( FATAL_ERROR "Could not find the Clang compiler driver" )
  endif()
  set( ANDROID_COMPILER_IS_CLANG 1 )
- set( ANDROID_CLANG_TOOLCHAIN_ROOT "${ANDROID_NDK_TOOLCHAINS_PATH}/llvm-${ANDROID_CLANG_VERSION}${ANDROID_NDK_TOOLCHAINS_SUBPATH}" )
 else()
  set( ANDROID_GCC_TOOLCHAIN_NAME "${ANDROID_TOOLCHAIN_NAME}" )
  unset( ANDROID_COMPILER_IS_CLANG CACHE )
@@ -1046,20 +1056,20 @@ if( BUILD_WITH_ANDROID_NDK )
   set( ANDROID_EXCEPTIONS       ON )
   set( ANDROID_STL_INCLUDE_DIRS "${ANDROID_NDK}/sources/cxx-stl/system/include" )
  elseif( ANDROID_STL MATCHES "gabi" )
-  if( ANDROID_NDK_RELEASE_NUM LESS 7000 ) # before r7
-   message( FATAL_ERROR "gabi++ is not awailable in your NDK. You have to upgrade to NDK r7 or newer to use gabi++.")
+  if( ANDROID_NDK_VERSION VERSION_LESS 7 ) # before r7
+   message( FATAL_ERROR "gabi++ is not available in your NDK. You have to upgrade to NDK r7 or newer to use gabi++.")
   endif()
   set( ANDROID_RTTI             ON )
   set( ANDROID_EXCEPTIONS       OFF )
   set( ANDROID_STL_INCLUDE_DIRS "${ANDROID_NDK}/sources/cxx-stl/gabi++/include" )
   set( __libstl                 "${ANDROID_NDK}/sources/cxx-stl/gabi++/libs/${ANDROID_NDK_ABI_NAME}/libgabi++_static.a" )
  elseif( ANDROID_STL MATCHES "stlport" )
-  if( NOT ANDROID_NDK_RELEASE_NUM LESS 8004 ) # before r8d
+  if( NOT ANDROID_NDK_VERSION VERSION_LESS 8.4 ) # before r8d
    set( ANDROID_EXCEPTIONS       ON )
   else()
    set( ANDROID_EXCEPTIONS       OFF )
   endif()
-  if( ANDROID_NDK_RELEASE_NUM LESS 7000 ) # before r7
+  if( ANDROID_NDK_VERSION VERSION_LESS 7 ) # before r7
    set( ANDROID_RTTI            OFF )
   else()
    set( ANDROID_RTTI            ON )
@@ -1086,6 +1096,22 @@ if( BUILD_WITH_ANDROID_NDK )
   else()
    set( __libstl                "${__libstl}/libs/${ANDROID_NDK_ABI_NAME}/libstdc++.a" )
   endif()
+  # Urho3D - cherry pick from jroger's PR #54
+ elseif( ANDROID_STL MATCHES "c\\+\\+_(shared|static)" )
+  set( ANDROID_EXCEPTIONS       ON )
+  set( ANDROID_RTTI             ON )
+  set( ANDROID_CXX_ROOT         "${ANDROID_NDK}/sources/cxx-stl/" )
+  set( ANDROID_LLVM_ROOT        "${ANDROID_CXX_ROOT}/llvm-libc++" )
+  set( ANDROID_ABI_INCLUDE_DIRS "${ANDROID_CXX_ROOT}/llvm-libc++abi/libcxxabi/include" )
+  set( ANDROID_STL_INCLUDE_DIRS "${ANDROID_LLVM_ROOT}/libcxx/include"
+                                "${ANDROID_ABI_INCLUDE_DIRS}" )
+  # android support sfiles
+  include_directories ( SYSTEM ${ANDROID_NDK}/sources/android/support/include )
+  if( EXISTS "${ANDROID_LLVM_ROOT}/libs/${ANDROID_NDK_ABI_NAME}/libc++_shared.so" )
+   set( __libstl               "${ANDROID_LLVM_ROOT}/libs/${ANDROID_NDK_ABI_NAME}/libc++_static.a" )
+  else()
+   message( "c++ library doesn't exist" )
+  endif()
  else()
   message( FATAL_ERROR "Unknown runtime: ${ANDROID_STL}" )
  endif()
@@ -1109,7 +1135,7 @@ if( BUILD_WITH_ANDROID_NDK )
    endif()
   endif()
   if( NOT EXISTS "${__libsupcxx}")
-   message( ERROR "Could not find libsupc++.a for a chosen platform. Either your NDK is not supported or is broken.")
+   message( FATAL_ERROR "Could not find libsupc++.a for a chosen platform. Either your NDK is not supported or is broken.")
   endif()
  endif()
 endif()
@@ -1147,6 +1173,35 @@ if( NOT CMAKE_C_COMPILER )
    set( CMAKE_C_COMPILER_ARG1   "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc${TOOL_OS_SUFFIX}" CACHE PATH "C compiler")
    set( CMAKE_CXX_COMPILER_ARG1 "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-g++${TOOL_OS_SUFFIX}" CACHE PATH "C++ compiler")
   endif()
+ # Urho3D - there are two ways to use ccache, by prefixing compiler toolchain with 'ccache' command (as done by NDK_CCACHE code branch above) or
+ #          let ccache masquerade as the compiler by creating a symbolic link named as the compiler pointing back to 'ccache' command
+ #          Urho3D has to use the second way because the first one does not handle our precompiled header build rules well
+ elseif ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32)   # Need to stringify to guard against undefined environment variable
+    execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0)
+        if (ANDROID_COMPILER_IS_CLANG)
+            set (PATH ${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${_clang_name})
+            set (CMAKE_C_COMPILER ${CMAKE_BINARY_DIR}/${_clang_name} CACHE PATH "C compiler")
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${_clang_name}++)
+            set (CMAKE_CXX_COMPILER ${CMAKE_BINARY_DIR}/${_clang_name}++ CACHE PATH "C++ compiler")
+        else ()
+            set (PATH ${ANDROID_TOOLCHAIN_ROOT}/bin)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc)
+            set (CMAKE_C_COMPILER ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc CACHE PATH "C compiler")
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-g++)
+            set (CMAKE_CXX_COMPILER ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-g++ CACHE PATH "C++ compiler")
+        endif ()
+    else ()
+        # To avoid repeating the code to instruct CMake to fallback to use the actual Android compiler toolchain below, we raise this as an error instead of warning
+        message (FATAL_ERROR "ccache may not have been installed on this host system. "
+            "This is required to enable ccache support for Android compiler toolchain. "
+            "In order to rectify this, install ccache software package first or do not set the USE_CCACHE environment variable.")
+    endif ()
+    if (NOT $ENV{PATH} MATCHES ${PATH})
+        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for Android compiler toolchain.")
+    endif ()
  else()
   if( ANDROID_COMPILER_IS_CLANG )
    set( CMAKE_C_COMPILER   "${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin/${_clang_name}${TOOL_OS_SUFFIX}"   CACHE PATH "C compiler")
@@ -1158,7 +1213,12 @@ if( NOT CMAKE_C_COMPILER )
  endif()
  set( CMAKE_ASM_COMPILER "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc${TOOL_OS_SUFFIX}"     CACHE PATH "assembler" )
  set( CMAKE_STRIP        "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-strip${TOOL_OS_SUFFIX}"   CACHE PATH "strip" )
- set( CMAKE_AR           "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-ar${TOOL_OS_SUFFIX}"      CACHE PATH "archive" )
+ if( EXISTS "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc-ar${TOOL_OS_SUFFIX}" )
+  # Use gcc-ar if we have it for better LTO support.
+  set( CMAKE_AR           "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc-ar${TOOL_OS_SUFFIX}"      CACHE PATH "archive" )
+ else()
+  set( CMAKE_AR           "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-ar${TOOL_OS_SUFFIX}"      CACHE PATH "archive" )
+ endif()
  set( CMAKE_LINKER       "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-ld${TOOL_OS_SUFFIX}"      CACHE PATH "linker" )
  set( CMAKE_NM           "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-nm${TOOL_OS_SUFFIX}"      CACHE PATH "nm" )
  set( CMAKE_OBJCOPY      "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-objcopy${TOOL_OS_SUFFIX}" CACHE PATH "objcopy" )
@@ -1211,15 +1271,21 @@ set( CMAKE_ASM_SOURCE_FILE_EXTENSIONS s S asm )
 
 foreach( lang C CXX ASM )
  if( ANDROID_COMPILER_IS_CLANG )
-  set( CMAKE_${lang}_COMPILER_VERSION ${ANDROID_CLANG_VERSION} )
+  if (ANDROID_CLANG_VERSION)
+   set( CMAKE_${lang}_COMPILER_VERSION ${ANDROID_CLANG_VERSION} )
+  else ()
+   set (CMAKE_${lang}_COMPILER_VERSION 3.8)
+  endif ()
  else()
   set( CMAKE_${lang}_COMPILER_VERSION ${ANDROID_COMPILER_VERSION} )
  endif()
 endforeach()
 
 # flags and definitions
-remove_definitions( -DANDROID )
-add_definitions( -DANDROID )
+# Urho3D: comment out redundant command which actually may interfere with compile definition cache generation when enabling PCH
+#remove_definitions( -DANDROID )
+# Urho3D: comment out redundant compiler defines as we use __ANDROID__ in our code base consistently
+#add_definitions( -DANDROID )
 
 if( ANDROID_SYSROOT MATCHES "[ ;\"]" )
  if( CMAKE_HOST_WIN32 )
@@ -1247,7 +1313,7 @@ endif()
 
 # NDK flags
 if (ARM64_V8A )
- set( ANDROID_CXX_FLAGS         "${ANDROID_CXX_FLAGS} -ffunction-sections -funwind-tables" )
+ set( ANDROID_CXX_FLAGS         "${ANDROID_CXX_FLAGS} -funwind-tables" )
  set( ANDROID_CXX_FLAGS_RELEASE "-fomit-frame-pointer -fstrict-aliasing" )
  set( ANDROID_CXX_FLAGS_DEBUG   "-fno-omit-frame-pointer -fno-strict-aliasing" )
  if( NOT ANDROID_COMPILER_IS_CLANG )
@@ -1277,7 +1343,7 @@ elseif( X86 OR X86_64 )
  set( ANDROID_CXX_FLAGS_RELEASE "-fomit-frame-pointer -fstrict-aliasing" )
  set( ANDROID_CXX_FLAGS_DEBUG   "-fno-omit-frame-pointer -fno-strict-aliasing" )
 elseif( MIPS OR MIPS64 )
- set( ANDROID_CXX_FLAGS         "${ANDROID_CXX_FLAGS} -fno-strict-aliasing -finline-functions -ffunction-sections -funwind-tables -fmessage-length=0" )
+ set( ANDROID_CXX_FLAGS         "${ANDROID_CXX_FLAGS} -fno-strict-aliasing -finline-functions -funwind-tables -fmessage-length=0" )
  set( ANDROID_CXX_FLAGS_RELEASE "-fomit-frame-pointer" )
  set( ANDROID_CXX_FLAGS_DEBUG   "-fno-omit-frame-pointer" )
  if( NOT ANDROID_COMPILER_IS_CLANG )
@@ -1358,14 +1424,14 @@ if( EXISTS "${__libstl}" OR EXISTS "${__libsupcxx}" )
 endif()
 
 # variables controlling optional build flags
-if( ANDROID_NDK_RELEASE_NUM LESS 7000 ) # before r7
+if( ANDROID_NDK_VERSION VERSION_LESS 7 ) # before r7
  # libGLESv2.so in NDK's prior to r7 refers to missing external symbols.
  # So this flag option is required for all projects using OpenGL from native.
  __INIT_VARIABLE( ANDROID_SO_UNDEFINED                      VALUES ON )
 else()
  __INIT_VARIABLE( ANDROID_SO_UNDEFINED                      VALUES OFF )
 endif()
-__INIT_VARIABLE( ANDROID_NO_UNDEFINED OBSOLETE_NO_UNDEFINED VALUES ON )
+__INIT_VARIABLE( ANDROID_NO_UNDEFINED                       VALUES ON )
 __INIT_VARIABLE( ANDROID_FUNCTION_LEVEL_LINKING             VALUES ON )
 __INIT_VARIABLE( ANDROID_GOLD_LINKER                        VALUES ON )
 __INIT_VARIABLE( ANDROID_NOEXECSTACK                        VALUES ON )
@@ -1373,7 +1439,7 @@ __INIT_VARIABLE( ANDROID_RELRO                              VALUES ON )
 
 set( ANDROID_NO_UNDEFINED           ${ANDROID_NO_UNDEFINED}           CACHE BOOL "Show all undefined symbols as linker errors" )
 set( ANDROID_SO_UNDEFINED           ${ANDROID_SO_UNDEFINED}           CACHE BOOL "Allows or disallows undefined symbols in shared libraries" )
-set( ANDROID_FUNCTION_LEVEL_LINKING ${ANDROID_FUNCTION_LEVEL_LINKING} CACHE BOOL "Allows or disallows undefined symbols in shared libraries" )
+set( ANDROID_FUNCTION_LEVEL_LINKING ${ANDROID_FUNCTION_LEVEL_LINKING} CACHE BOOL "Put each function in separate section and enable garbage collection of unused input sections at link time" )
 set( ANDROID_GOLD_LINKER            ${ANDROID_GOLD_LINKER}            CACHE BOOL "Enables gold linker" )
 set( ANDROID_NOEXECSTACK            ${ANDROID_NOEXECSTACK}            CACHE BOOL "Allows or disallows undefined symbols in shared libraries" )
 set( ANDROID_RELRO                  ${ANDROID_RELRO}                  CACHE BOOL "Enables RELRO - a memory corruption mitigation technique" )
@@ -1409,9 +1475,9 @@ if( ANDROID_FUNCTION_LEVEL_LINKING )
 endif()
 
 if( ANDROID_COMPILER_VERSION VERSION_EQUAL "4.6" )
- if( ANDROID_GOLD_LINKER AND (CMAKE_HOST_UNIX OR ANDROID_NDK_RELEASE_NUM GREATER 8002) AND (ARMEABI OR ARMEABI_V7A OR X86) )
+ if( ANDROID_GOLD_LINKER AND (CMAKE_HOST_UNIX OR ANDROID_NDK_VERSION VERSION_GREATER 8.2) AND (ARMEABI OR ARMEABI_V7A OR X86) )
   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -fuse-ld=gold" )
- elseif( ANDROID_NDK_RELEASE_NUM GREATER 8002 ) # after r8b
+ elseif( ANDROID_NDK_VERSION VERSION_GREATER 8.2 ) # after r8b
   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -fuse-ld=bfd" )
  elseif( ANDROID_NDK_RELEASE STREQUAL "r8b" AND ARMEABI AND NOT _CMAKE_IN_TRY_COMPILE )
   message( WARNING "The default bfd linker from arm GCC 4.6 toolchain can fail with 'unresolvable R_ARM_THM_CALL relocation' error message. See https://code.google.com/p/android/issues/detail?id=35342
@@ -1444,9 +1510,8 @@ endif()
 # cache flags
 set( CMAKE_CXX_FLAGS           ""                        CACHE STRING "c++ flags" )
 set( CMAKE_C_FLAGS             ""                        CACHE STRING "c flags" )
-# Urho3D: optimise for size
-set( CMAKE_CXX_FLAGS_RELEASE   "-Os -DNDEBUG"            CACHE STRING "c++ Release flags" )
-set( CMAKE_C_FLAGS_RELEASE     "-Os -DNDEBUG"            CACHE STRING "c Release flags" )
+set( CMAKE_CXX_FLAGS_RELEASE   "-O3 -DNDEBUG"            CACHE STRING "c++ Release flags" )
+set( CMAKE_C_FLAGS_RELEASE     "-O3 -DNDEBUG"            CACHE STRING "c Release flags" )
 set( CMAKE_CXX_FLAGS_DEBUG     "-O0 -g -DDEBUG -D_DEBUG" CACHE STRING "c++ Debug flags" )
 set( CMAKE_C_FLAGS_DEBUG       "-O0 -g -DDEBUG -D_DEBUG" CACHE STRING "c Debug flags" )
 set( CMAKE_SHARED_LINKER_FLAGS ""                        CACHE STRING "shared linker flags" )
@@ -1476,14 +1541,9 @@ if( MIPS AND BUILD_WITH_ANDROID_NDK AND ANDROID_NDK_RELEASE STREQUAL "r8" )
  set( CMAKE_EXE_LINKER_FLAGS    "-Wl,-T,${ANDROID_NDK_TOOLCHAINS_PATH}/${ANDROID_GCC_TOOLCHAIN_NAME}/mipself.x ${CMAKE_EXE_LINKER_FLAGS}" )
 endif()
 
-# pie/pic
-if( NOT (ANDROID_NATIVE_API_LEVEL LESS 16) AND (NOT DEFINED ANDROID_APP_PIE OR ANDROID_APP_PIE) AND (CMAKE_VERSION VERSION_GREATER 2.8.8) )
- set( CMAKE_POSITION_INDEPENDENT_CODE TRUE )
+# Urho3D: CMake is able to take care of the PIC flag by itself, so we only need to worry about the PIE flag for executable target targeting API level 16+ (Android 4.1+)
+if( NOT ANDROID_NATIVE_API_LEVEL LESS 16 )
  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIE -pie")
-else()
- set( CMAKE_POSITION_INDEPENDENT_CODE FALSE )
- set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
- set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
 endif()
 
 # configure rtti
@@ -1556,31 +1616,39 @@ endif()
 
 # setup output directories
 # Urho3D: Prefer binary dir over source dir, which is anyway equal to source dir when not using out-of-source build tree
-set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_BINARY_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
+if( NOT LIBRARY_OUTPUT_PATH_ROOT )
+ set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_BINARY_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
+endif()
 # Urho3D: Do not prepend ${ANDROID_TOOLCHAIN_ROOT} to prefix dir on user behalf, let user specify that via DESTDIR; revert CMAKE_INSTALL_PREFIX to CMake's default
 #set( CMAKE_INSTALL_PREFIX "${ANDROID_TOOLCHAIN_ROOT}/user" CACHE STRING "path for installing" )
 
-if(NOT _CMAKE_IN_TRY_COMPILE)
- if( EXISTS "${CMAKE_SOURCE_DIR}/jni/CMakeLists.txt" )
-  set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin/${ANDROID_NDK_ABI_NAME}" CACHE PATH "Output directory for applications" )
- else()
-  set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin" CACHE PATH "Output directory for applications" )
- endif()
- # Urho3D: All libraries are first generated in CMake default binary directory and only the main target library is later copied to below output path by Urho3D own build script
- set( ANDROID_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" FORCE )
- mark_as_advanced (ANDROID_LIBRARY_OUTPUT_PATH)
-endif()
+# Urho3D: Bug fix - not sure what was the original intention as it always tries to overwrite when it is user defined?
+#if( DEFINED LIBRARY_OUTPUT_PATH_ROOT
+#      OR EXISTS "${CMAKE_SOURCE_DIR}/AndroidManifest.xml"
+#      OR (EXISTS "${CMAKE_SOURCE_DIR}/../AndroidManifest.xml" AND EXISTS "${CMAKE_SOURCE_DIR}/../jni/") )
+#  set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_SOURCE_DIR} CACHE PATH "Root for binaries output, set this to change where Android libs are installed to" )
+  if( NOT _CMAKE_IN_TRY_COMPILE )
+    if( EXISTS "${CMAKE_SOURCE_DIR}/jni/CMakeLists.txt" )
+      set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin/${ANDROID_NDK_ABI_NAME}" CACHE PATH "Output directory for applications" )
+    else()
+      set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin" CACHE PATH "Output directory for applications" )
+    endif()
+    # Urho3D: All libraries are first generated in CMake default binary directory and only the main target library is later copied to below output path by Urho3D own build script
+    set( ANDROID_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" FORCE )
+    mark_as_advanced (ANDROID_LIBRARY_OUTPUT_PATH)
+  endif()
+#endif()
 
 # Urho3D: Copy shared STL library to final Android library output path pointed by ANDROID_LIBRARY_OUTPUT_PATH variable as CMake's LIBRARY_OUTPUT_PATH still points to its default
 # copy shared stl library to build directory
-if( NOT _CMAKE_IN_TRY_COMPILE AND __libstl MATCHES "[.]so$" )
- get_filename_component( __libstlname "${__libstl}" NAME )
- execute_process( COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${__libstl}" "${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}" RESULT_VARIABLE __fileCopyProcess )
- if( NOT __fileCopyProcess EQUAL 0 OR NOT EXISTS "${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}")
-   message( SEND_ERROR "Failed copying of ${__libstl} to the ${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}" )
- endif()
- unset( __fileCopyProcess )
- unset( __libstlname )
+if( NOT _CMAKE_IN_TRY_COMPILE AND __libstl MATCHES "[.]so$" AND DEFINED ANDROID_LIBRARY_OUTPUT_PATH )
+  get_filename_component( __libstlname "${__libstl}" NAME )
+  execute_process( COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${__libstl}" "${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}" RESULT_VARIABLE __fileCopyProcess )
+  if( NOT __fileCopyProcess EQUAL 0 OR NOT EXISTS "${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}")
+    message( SEND_ERROR "Failed copying of ${__libstl} to the ${ANDROID_LIBRARY_OUTPUT_PATH}/${__libstlname}" )
+  endif()
+  unset( __fileCopyProcess )
+  unset( __libstlname )
 endif()
 
 
@@ -1665,9 +1733,9 @@ endmacro()
 
 
 # export toolchain settings for the try_compile() command
-if( NOT PROJECT_NAME STREQUAL "CMAKE_TRY_COMPILE" )
+if( NOT _CMAKE_IN_TRY_COMPILE )
  set( __toolchain_config "")
- foreach( __var NDK_CCACHE  LIBRARY_OUTPUT_PATH_ROOT  ANDROID_FORBID_SYGWIN  ANDROID_SET_OBSOLETE_VARIABLES
+ foreach( __var NDK_CCACHE  LIBRARY_OUTPUT_PATH_ROOT  ANDROID_FORBID_SYGWIN
                 ANDROID_NDK_HOST_X64
                 ANDROID_NDK
                 ANDROID_NDK_LAYOUT
@@ -1689,7 +1757,7 @@ if( NOT PROJECT_NAME STREQUAL "CMAKE_TRY_COMPILE" )
                 ANDROID_APP_PIE
                 )
   if( DEFINED ${__var} )
-   if( "${__var}" MATCHES " ")
+   if( ${__var} MATCHES " ")
     set( __toolchain_config "${__toolchain_config}set( ${__var} \"${${__var}}\" CACHE INTERNAL \"\" )\n" )
    else()
     set( __toolchain_config "${__toolchain_config}set( ${__var} ${${__var}} CACHE INTERNAL \"\" )\n" )
@@ -1714,16 +1782,6 @@ if( CMAKE_GENERATOR MATCHES "Ninja" AND CMAKE_HOST_WIN32 )
 endif()
 
 
-# set some obsolete variables for backward compatibility
-set( ANDROID_SET_OBSOLETE_VARIABLES ON CACHE BOOL "Define obsolete Andrid-specific cmake variables" )
-mark_as_advanced( ANDROID_SET_OBSOLETE_VARIABLES )
-if( ANDROID_SET_OBSOLETE_VARIABLES )
- set( ANDROID_API_LEVEL ${ANDROID_NATIVE_API_LEVEL} )
- set( ARM_TARGET "${ANDROID_ABI}" )
- set( ARMEABI_NDK_NAME "${ANDROID_NDK_ABI_NAME}" )
-endif()
-
-
 # Variables controlling behavior or set by cmake toolchain:
 #   ANDROID_ABI : "armeabi-v7a" (default), "armeabi", "armeabi-v7a with NEON", "armeabi-v7a with VFPV3", "armeabi-v6 with VFP", "x86", "mips", "arm64-v8a", "x86_64", "mips64"
 #   ANDROID_NATIVE_API_LEVEL : 3,4,5,8,9,14,15,16,17,18,19,21 (depends on NDK version)
@@ -1737,22 +1795,15 @@ endif()
 #   ANDROID_RELRO : ON/OFF
 #   ANDROID_FORCE_ARM_BUILD : ON/OFF
 #   ANDROID_STL_FORCE_FEATURES : ON/OFF
-#   ANDROID_SET_OBSOLETE_VARIABLES : ON/OFF
+#   ANDROID_LIBM_PATH : path to libm.so (set to something like $(TOP)/out/target/product/<product_name>/obj/lib/libm.so) to workaround unresolved `sincos`
 # Can be set only at the first run:
-#   ANDROID_NDK
-#   ANDROID_STANDALONE_TOOLCHAIN
+#   ANDROID_NDK : path to your NDK install
+#   NDK_CCACHE : path to your ccache executable
 #   ANDROID_TOOLCHAIN_NAME : the NDK name of compiler toolchain
 #   ANDROID_NDK_HOST_X64 : try to use x86_64 toolchain (default for x64 host systems)
 #   ANDROID_NDK_LAYOUT : the inner NDK structure (RELEASE, LINARO, ANDROID)
 #   LIBRARY_OUTPUT_PATH_ROOT : <any valid path>
-#   NDK_CCACHE : <path to your ccache executable>
-# Obsolete:
-#   ANDROID_API_LEVEL : superseded by ANDROID_NATIVE_API_LEVEL
-#   ARM_TARGET : superseded by ANDROID_ABI
-#   ARM_TARGETS : superseded by ANDROID_ABI (can be set only)
-#   ANDROID_NDK_TOOLCHAIN_ROOT : superseded by ANDROID_STANDALONE_TOOLCHAIN (can be set only)
-#   ANDROID_USE_STLPORT : superseded by ANDROID_STL=stlport_static
-#   ANDROID_LEVEL : superseded by ANDROID_NATIVE_API_LEVEL (completely removed)
+#   ANDROID_STANDALONE_TOOLCHAIN
 #
 # Primary read-only variables:
 #   ANDROID : always TRUE
@@ -1766,19 +1817,16 @@ endif()
 #   X86_64 : TRUE if configured for x86_64
 #   MIPS : TRUE if configured for mips
 #   MIPS64 : TRUE if configured for mips64
-#   BUILD_ANDROID : always TRUE
 #   BUILD_WITH_ANDROID_NDK : TRUE if NDK is used
 #   BUILD_WITH_STANDALONE_TOOLCHAIN : TRUE if standalone toolchain is used
 #   ANDROID_NDK_HOST_SYSTEM_NAME : "windows", "linux-x86" or "darwin-x86" depending on host platform
 #   ANDROID_NDK_ABI_NAME : "armeabi", "armeabi-v7a", "x86", "mips", "arm64-v8a", "x86_64", "mips64" depending on ANDROID_ABI
-#   ANDROID_NDK_RELEASE : from r5 to r10d; set only for NDK
-#   ANDROID_NDK_RELEASE_NUM : numeric ANDROID_NDK_RELEASE version (1000*major+minor)
+#   ANDROID_NDK_RELEASE : from r5 to r12b; set only for NDK
+#   ANDROID_NDK_VERSION : major.minor.patch; set only for NDK; e.g. r10e = 10.5.0 but r11c = 11.2.2725575 (as defined in the source.properties)
 #   ANDROID_ARCH_NAME : "arm", "x86", "mips", "arm64", "x86_64", "mips64" depending on ANDROID_ABI
 #   ANDROID_SYSROOT : path to the compiler sysroot
 #   TOOL_OS_SUFFIX : "" or ".exe" depending on host platform
 #   ANDROID_COMPILER_IS_CLANG : TRUE if clang compiler is used
-# Obsolete:
-#   ARMEABI_NDK_NAME : superseded by ANDROID_NDK_ABI_NAME
 #
 # Secondary (less stable) read-only variables:
 #   ANDROID_COMPILER_VERSION : GCC version used (not Clang version)
@@ -1793,12 +1841,10 @@ endif()
 #   ANDROID_RTTI : if rtti is enabled by the runtime
 #   ANDROID_EXCEPTIONS : if exceptions are enabled by the runtime
 #   ANDROID_GCC_TOOLCHAIN_NAME : read-only, differs from ANDROID_TOOLCHAIN_NAME only if clang is used
-#   ANDROID_LIBM_PATH : path to libm.so (set to something like $(TOP)/out/target/product/<product_name>/obj/lib/libm.so) to workaround unresolved `sincos`
 #
 # Defaults:
 #   ANDROID_DEFAULT_NDK_API_LEVEL
 #   ANDROID_DEFAULT_NDK_API_LEVEL_${ARCH}
 #   ANDROID_NDK_SEARCH_PATHS
-#   ANDROID_STANDALONE_TOOLCHAIN_SEARCH_PATH
 #   ANDROID_SUPPORTED_ABIS_${ARCH}
 #   ANDROID_SUPPORTED_NDK_VERSIONS

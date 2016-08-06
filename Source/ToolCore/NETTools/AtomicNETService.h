@@ -33,7 +33,7 @@ namespace ToolCore
 /// NETService subsystem
 class AtomicNETService : public IPCServer
 {
-    OBJECT(AtomicNETService)
+    ATOMIC_OBJECT(AtomicNETService, IPCServer)
 
 public:
     /// Construct.

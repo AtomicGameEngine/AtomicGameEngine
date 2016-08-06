@@ -29,7 +29,7 @@ namespace ToolCore
 
 class SceneImporter : public AssetImporter
 {
-    OBJECT(SceneImporter);
+    ATOMIC_OBJECT(SceneImporter, AssetImporter);
 
 public:
     /// Construct.

@@ -37,7 +37,7 @@ class EditorTabLayout;
 
 class ResourceEditor: public Object
 {
-    OBJECT(ResourceEditor);
+    ATOMIC_OBJECT(ResourceEditor, Object);
 
 public:
 

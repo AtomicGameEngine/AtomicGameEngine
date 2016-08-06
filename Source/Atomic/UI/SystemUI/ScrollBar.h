@@ -37,7 +37,7 @@ class Slider;
 /// Scroll bar %UI element with forward and back buttons.
 class ATOMIC_API ScrollBar : public UIElement
 {
-    OBJECT(ScrollBar);
+    ATOMIC_OBJECT(ScrollBar, UIElement);
 
 public:
     /// Construct.

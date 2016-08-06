@@ -45,7 +45,7 @@ enum UI_SCROLL_MODE {
 
 class UIScrollContainer : public UIWidget
 {
-    OBJECT(UIScrollContainer)
+    ATOMIC_OBJECT(UIScrollContainer, UIWidget)
 
 public:
 

@@ -117,17 +117,17 @@ SystemUI::SystemUI(Context* context) :
     // Register UI library object factories
     RegisterSystemUILibrary(context_);
 
-    SubscribeToEvent(E_SCREENMODE, HANDLER(SystemUI, HandleScreenMode));
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(SystemUI, HandleMouseButtonDown));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(SystemUI, HandleMouseButtonUp));
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(SystemUI, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(SystemUI, HandleMouseWheel));
-    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(SystemUI, HandleTouchBegin));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(SystemUI, HandleTouchEnd));
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(SystemUI, HandleTouchMove));
-    SubscribeToEvent(E_KEYDOWN, HANDLER(SystemUI, HandleKeyDown));
-    SubscribeToEvent(E_TEXTINPUT, HANDLER(SystemUI, HandleTextInput));
-    SubscribeToEvent(E_DROPFILE, HANDLER(SystemUI, HandleDropFile));
+    SubscribeToEvent(E_SCREENMODE, ATOMIC_HANDLER(SystemUI, HandleScreenMode));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, ATOMIC_HANDLER(SystemUI, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONUP, ATOMIC_HANDLER(SystemUI, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, ATOMIC_HANDLER(SystemUI, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEWHEEL, ATOMIC_HANDLER(SystemUI, HandleMouseWheel));
+    SubscribeToEvent(E_TOUCHBEGIN, ATOMIC_HANDLER(SystemUI, HandleTouchBegin));
+    SubscribeToEvent(E_TOUCHEND, ATOMIC_HANDLER(SystemUI, HandleTouchEnd));
+    SubscribeToEvent(E_TOUCHMOVE, ATOMIC_HANDLER(SystemUI, HandleTouchMove));
+    SubscribeToEvent(E_KEYDOWN, ATOMIC_HANDLER(SystemUI, HandleKeyDown));
+    SubscribeToEvent(E_TEXTINPUT, ATOMIC_HANDLER(SystemUI, HandleTextInput));
+    SubscribeToEvent(E_DROPFILE, ATOMIC_HANDLER(SystemUI, HandleDropFile));
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -300,7 +300,7 @@ void SystemUI::Update(float timeStep)
 {
     assert(rootElement_ && rootModalElement_);
 
-    PROFILE(UpdateUI);
+    ATOMIC_PROFILE(UpdateUI);
 
     // Expire hovers
     for (HashMap<WeakPtr<UIElement>, bool>::Iterator i = hoveredElements_.Begin(); i != hoveredElements_.End(); ++i)
@@ -394,7 +394,7 @@ void SystemUI::RenderUpdate()
 {
     assert(rootElement_ && rootModalElement_ && graphics_);
 
-    PROFILE(GetUIBatches);
+    ATOMIC_PROFILE(GetUIBatches);
 
     uiRendered_ = false;
 
@@ -430,7 +430,7 @@ void SystemUI::Render(bool resetRenderTargets)
     if (resetRenderTargets && uiRendered_)
         return;
 
-    PROFILE(RenderUI);
+    ATOMIC_PROFILE(RenderUI);
 
     // If the OS cursor is visible, apply its shape now if changed
     bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
@@ -474,22 +474,22 @@ SharedPtr<UIElement> SystemUI::LoadLayout(Deserializer& source, XMLFile* styleFi
 
 SharedPtr<UIElement> SystemUI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 {
-    PROFILE(LoadUILayout);
+    ATOMIC_PROFILE(LoadUILayout);
 
     SharedPtr<UIElement> root;
 
     if (!file)
     {
-        LOGERROR("Null UI layout XML file");
+        ATOMIC_LOGERROR("Null UI layout XML file");
         return root;
     }
 
-    LOGDEBUG("Loading UI layout " + file->GetName());
+    ATOMIC_LOGDEBUG("Loading UI layout " + file->GetName());
 
     XMLElement rootElem = file->GetRoot("element");
     if (!rootElem)
     {
-        LOGERROR("No root UI element in " + file->GetName());
+        ATOMIC_LOGERROR("No root UI element in " + file->GetName());
         return root;
     }
 
@@ -500,7 +500,7 @@ SharedPtr<UIElement> SystemUI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     root = DynamicCast<UIElement>(context_->CreateObject(typeName));
     if (!root)
     {
-        LOGERROR("Could not create unknown UI element " + typeName);
+        ATOMIC_LOGERROR("Could not create unknown UI element " + typeName);
         return root;
     }
 
@@ -517,7 +517,7 @@ SharedPtr<UIElement> SystemUI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 
 bool SystemUI::SaveLayout(Serializer& dest, UIElement* element)
 {
-    PROFILE(SaveUILayout);
+    ATOMIC_PROFILE(SaveUILayout);
 
     return element && element->SaveXML(dest);
 }
@@ -694,7 +694,7 @@ void SystemUI::Initialize()
     if (!graphics || !graphics->IsInitialized())
         return;
 
-    PROFILE(InitUI);
+    ATOMIC_PROFILE(InitUI);
 
     graphics_ = graphics;
     SystemUIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
@@ -707,11 +707,11 @@ void SystemUI::Initialize()
 
     initialized_ = true;
 
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(SystemUI, HandleBeginFrame));
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(SystemUI, HandlePostUpdate));
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(SystemUI, HandleRenderUpdate));
+    SubscribeToEvent(E_BEGINFRAME, ATOMIC_HANDLER(SystemUI, HandleBeginFrame));
+    SubscribeToEvent(E_POSTUPDATE, ATOMIC_HANDLER(SystemUI, HandlePostUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, ATOMIC_HANDLER(SystemUI, HandleRenderUpdate));
 
-    LOGINFO("Initialized system user interface");
+    ATOMIC_LOGINFO("Initialized system user interface");
 }
 
 void SystemUI::Update(float timeStep, UIElement* element)
@@ -990,7 +990,7 @@ void SystemUI::SetCursorShape(CursorShape shape)
 
 void SystemUI::ReleaseFontFaces()
 {
-    LOGDEBUG("Reloading font faces");
+    ATOMIC_LOGDEBUG("Reloading font faces");
 
     PODVector<Font*> fonts;
     GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);
@@ -1569,7 +1569,7 @@ void SystemUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     int key = eventData[P_KEY].GetInt();
 
     // Cancel UI dragging
-    if (key == KEY_ESC && dragElementsCount_ > 0)
+    if (key == KEY_ESCAPE && dragElementsCount_ > 0)
     {
         ProcessDragCancel();
 
@@ -1577,7 +1577,7 @@ void SystemUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 
     // Dismiss modal element if any when ESC key is pressed
-    if (key == KEY_ESC && HasModalElement())
+    if (key == KEY_ESCAPE && HasModalElement())
     {
         UIElement* element = rootModalElement_->GetChild(rootModalElement_->GetNumChildren() - 1);
         if (element->GetVars().Contains(VAR_ORIGIN))
@@ -1627,7 +1627,7 @@ void SystemUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             }
         }
         // Defocus the element
-        else if (key == KEY_ESC && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
+        else if (key == KEY_ESCAPE && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
             element->SetFocus(false);
         // If none of the special keys, pass the key to the focused element
         else

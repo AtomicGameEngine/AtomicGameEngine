@@ -37,7 +37,7 @@ namespace AtomicPlayer
 
 class AtomicPlayerApp : public Application
 {
-    OBJECT(AtomicPlayerApp);
+    ATOMIC_OBJECT(AtomicPlayerApp, Application);
 
 public:
     /// Construct.

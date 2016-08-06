@@ -87,7 +87,7 @@ void NewProjectCmd::Run()
         return;
     }
 
-    LOGINFOF("Creating new project in: %s", projectPath_.CString());
+    ATOMIC_LOGINFOF("Creating new project in: %s", projectPath_.CString());
 
     projectDest.createDirectory();
     projectSrc.copyTo((projectPath_ + "/Resources").CString());

@@ -29,16 +29,16 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-    EVENT(E_NETBUILDRESULT, NETBuildResult)
+    ATOMIC_EVENT(E_NETBUILDRESULT, NETBuildResult)
     {
-        PARAM(P_BUILD, Build); // NETBuild*
-        PARAM(P_SUCCESS, Success); // bool = success = true;
-        PARAM(P_ERRORTEXT, ErrorText); // for failure, the compilation output        
+        ATOMIC_PARAM(P_BUILD, Build); // NETBuild*
+        ATOMIC_PARAM(P_SUCCESS, Success); // bool = success = true;
+        ATOMIC_PARAM(P_ERRORTEXT, ErrorText); // for failure, the compilation output
     }
 
-    EVENT(E_NETBUILDATOMICPROJECT, NETBuildAtomicProject)
+    ATOMIC_EVENT(E_NETBUILDATOMICPROJECT, NETBuildAtomicProject)
     {
-        PARAM(P_PROJECT, Project); // Project*
+        ATOMIC_PARAM(P_PROJECT, Project); // Project*
     }
 
     enum NETBuildStatus
@@ -54,7 +54,7 @@ namespace ToolCore
     {
         friend class NETBuildSystem;
 
-        OBJECT(NETBuild)
+        ATOMIC_OBJECT(NETBuild, Object)
     
     public:
 
@@ -77,7 +77,7 @@ namespace ToolCore
     class NETBuildSystem : public Object
     {
         
-        OBJECT(NETBuildSystem)
+        ATOMIC_OBJECT(NETBuildSystem, Object)
 
     public:
 

@@ -29,7 +29,7 @@ namespace ToolCore
 
 class ParticleEffectImporter : public AssetImporter
 {
-    OBJECT(ParticleEffectImporter);
+    ATOMIC_OBJECT(ParticleEffectImporter, AssetImporter);
 
 public:
     /// Construct.

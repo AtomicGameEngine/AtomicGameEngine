@@ -31,7 +31,7 @@ namespace ToolCore
 
 class NewProjectCmd: public Command
 {
-    OBJECT(NewProjectCmd);
+    ATOMIC_OBJECT(NewProjectCmd, Command);
 
 public:
 

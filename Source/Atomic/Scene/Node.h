@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,8 +54,7 @@ enum TransformSpace
 /// %Scene node that may contain components and child nodes.
 class ATOMIC_API Node : public Animatable
 {
-    OBJECT(Node);
-    BASEOBJECT(Node);
+    ATOMIC_OBJECT(Node, Animatable);
 
     friend class Connection;
 
@@ -71,10 +70,14 @@ public:
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Save as JSON data. Return true if successful.
+    virtual bool SaveJSON(JSONValue& dest) const;
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
     virtual void ApplyAttributes();
 
@@ -88,8 +91,24 @@ public:
 
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest, const String& indentation = "\t") const;
+    /// Save to a JSON file. Return true if successful.
+    bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Set name of the scene node. Names are not required to be unique.
     void SetName(const String& name);
+
+    /// Set tags. Old tags are overwritten.
+    void SetTags(const StringVector& tags);
+    /// Add a tag.
+    void AddTag(const String& tag);
+    /// Add tags with the specified separator, by default ;
+    void AddTags(const String& tags, String separator = ";");
+    /// Add tags.
+    void AddTags(const StringVector& tags);
+    /// Remove tag. Return true if existed.
+    bool RemoveTag(const String& tag);
+    /// Remove all tags.
+    void RemoveAllTags();
+
     /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
 
@@ -270,11 +289,13 @@ public:
     void RemoveComponents(StringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
+    /// Adjust index order of an existing component in this node.
+    void ReorderComponent(Component* component, unsigned index);
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// Set parent scene node. Retains the world transform.
+    /// Assign to a new parent scene node. Retains the world transform.
     void SetParent(Node* parent);
     /// Set a user variable.
     void SetVar(StringHash key, const Variant& value);
@@ -299,6 +320,12 @@ public:
 
     /// Return name hash.
     StringHash GetNameHash() const { return nameHash_; }
+
+    /// Return all tags.
+    const StringVector& GetTags() const { return tags_; }
+
+    /// Return whether has a specific tag.
+    bool HasTag(const String& tag) const;
 
     /// Return parent scene node.
     Node* GetParent() const { return parent_; }
@@ -454,13 +481,9 @@ public:
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
     /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
-    /// Return child scene nodes by name, optionally recursive
-    void GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive = false) const;
-    /// Return child scene nodes by name, optionally recursive
-    void GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive = false) const;
-    /// Return child scene nodes by name hash, optionally recursive
-    void GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive = false) const;
-    /// Return child scene nodes with a specific component.
+    /// Return child scene nodes with a specific tag.
+    void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
     /// Return child scene node by name.
@@ -483,9 +506,10 @@ public:
     void GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const;
     /// Return component by type. If there are several, returns the first.
     Component* GetComponent(StringHash type, bool recursive = false) const;
+    /// Return component in parent node. If there are several, returns the first. May optional traverse up to the root node.
+    Component* GetParentComponent(StringHash type, bool fullTraversal = false) const;
     /// Return whether has a specific component.
     bool HasComponent(StringHash type) const;
-
     /// Return listener components.
     const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
 
@@ -497,12 +521,16 @@ public:
 
     /// Return first component derived from class.
     template <class T> T* GetDerivedComponent(bool recursive = false) const;
+    /// Return first component derived from class in the parent node, or if fully traversing then the first node up the tree with one.
+    template <class T> T* GetParentDerivedComponent(bool fullTraversal = false) const;
     /// Return components derived from class.
     template <class T> void GetDerivedComponents(PODVector<T*>& dest, bool recursive = false, bool clearVector = true) const;
     /// Template version of returning child nodes with a specific component.
     template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type.
     template <class T> T* GetComponent(bool recursive = false) const;
+    /// Template version of returning a parent's component by type.
+    template <class T> T* GetParentComponent(bool fullTraversal = false) const;
     /// Template version of returning all components of type.
     template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
     /// Template version of checking whether has a specific component.
@@ -532,7 +560,9 @@ public:
     /// Load components from XML data and optionally load child nodes.
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
-
+    /// Load components from XML data and optionally load child nodes.
+    bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
+        CreateMode mode = REPLICATED);
     /// Return the depended on nodes to order network updates.
     const PODVector<Node*>& GetDependencyNodes() const { return dependencyNodes_; }
 
@@ -563,14 +593,24 @@ public:
     /// Set local transform silently without marking the node & child nodes dirty. Used by animation code.
     void SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
+    // ATOMIC BEGIN
+
+    /// Return child scene nodes by name, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive = false) const;
+    /// Return child scene nodes by name, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive = false) const;
+    /// Return child scene nodes by name hash, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive = false) const;
+
+    // ATOMIC END
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved();
-    /// Set object attribute animation internal.
-    virtual void
-        SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Find target of an attribute animation from object hierarchy by name.
+    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
 
     /// Network update queued flag.
     bool networkUpdate_;
@@ -580,10 +620,12 @@ protected:
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
     void SetEnabled(bool enable, bool recursive, bool storeSelf);
-    /// Internal call for creating component
-    Component* CreateComponentInternal(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0, const XMLElement& source = XMLElement::EMPTY);
+
+// ATOMIC BEGIN
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
     Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const XMLElement& source = XMLElement::EMPTY);
+// ATOMIC END
+
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.
@@ -592,8 +634,8 @@ private:
     void GetChildrenRecursive(PODVector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively.
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const;
-    /// Return child nodes by name, recursively
-    void GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const;
+    /// Return child nodes with a specific tag recursively.
+    void GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const;
     /// Return specific components recursively.
     void GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const;
     /// Clone node recursively.
@@ -637,10 +679,21 @@ private:
     Connection* owner_;
     /// Name.
     String name_;
+    /// Tag strings.
+    StringVector tags_;
     /// Name hash.
     StringHash nameHash_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
+
+    // ATOMIC BEGIN
+
+    /// Return child nodes by name, recursively
+    void GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const;
+
+    Component* CreateComponentInternal(StringHash type, CreateMode mode, unsigned id, const XMLElement& source = XMLElement::EMPTY);
+
+    // ATOMIC END
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id)
@@ -663,6 +716,8 @@ template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, b
 }
 
 template <class T> T* Node::GetComponent(bool recursive) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), recursive)); }
+
+template <class T> T* Node::GetParentComponent(bool fullTraversal) const { return static_cast<T*>(GetParentComponent(T::GetTypeStatic(), fullTraversal)); }
 
 template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const
 {
@@ -690,6 +745,23 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
         }
     }
 
+    return 0;
+}
+
+template <class T> T* Node::GetParentDerivedComponent(bool fullTraversal) const
+{
+    Node* current = GetParent();
+    while (current)
+    {
+        T* soughtComponent = current->GetDerivedComponent<T>();
+        if (soughtComponent)
+            return soughtComponent;
+
+        if (fullTraversal)
+            current = current->GetParent();
+        else
+            break;
+    }
     return 0;
 }
 

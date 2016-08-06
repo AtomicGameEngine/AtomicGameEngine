@@ -38,7 +38,7 @@ class ATOMIC_API WebTexture2D : public WebRenderHandler
 {
     friend class WebTexture2DPrivate;
 
-    OBJECT(WebTexture2D)
+    ATOMIC_OBJECT(WebTexture2D, WebRenderHandler)
 
 public:
 

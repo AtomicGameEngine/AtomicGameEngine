@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Atomic
 /// %Localization subsystem. Stores all the strings in all languages.
 class ATOMIC_API Localization : public Object
 {
-    OBJECT(Localization);
+    ATOMIC_OBJECT(Localization, Object);
 
 public:
     /// Construct.

@@ -9,7 +9,7 @@ namespace Atomic
 
 class ScriptSystem : public Object
 {
-    OBJECT(ScriptSystem);
+    ATOMIC_OBJECT(ScriptSystem, Object);
 
 public:
 

@@ -30,7 +30,7 @@ namespace Atomic
 
 class UIInlineSelect : public UIWidget
 {
-    OBJECT(UIInlineSelect)
+    ATOMIC_OBJECT(UIInlineSelect, UIWidget)
 
 public:
 

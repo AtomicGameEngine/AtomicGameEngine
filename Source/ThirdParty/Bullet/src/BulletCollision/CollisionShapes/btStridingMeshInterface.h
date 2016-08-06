@@ -16,7 +16,9 @@ subject to the following restrictions:
 #ifndef BT_STRIDING_MESHINTERFACE_H
 #define BT_STRIDING_MESHINTERFACE_H
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btVector3.h"
+// ATOMIC END
 #include "btTriangleCallback.h"
 #include "btConcaveShape.h"
 

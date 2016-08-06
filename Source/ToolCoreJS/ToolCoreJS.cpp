@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Graphics/Animation.h>
 
 #include <AtomicJS/Javascript/JSVM.h>
 #include <ToolCore/ToolEnvironment.h>

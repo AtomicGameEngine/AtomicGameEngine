@@ -44,7 +44,7 @@ enum PlatformID
 
 class Platform : public Object
 {
-    OBJECT(Platform);
+    ATOMIC_OBJECT(Platform, Object);
 
 public:
 

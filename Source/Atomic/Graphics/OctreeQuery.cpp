@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -114,6 +114,23 @@ void FrustumOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool in
             if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                 result_.Push(drawable);
         }
+    }
+}
+
+
+Intersection AllContentOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
+{
+    return INSIDE;
+}
+
+void AllContentOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside)
+{
+    while (start != end)
+    {
+        Drawable* drawable = *start++;
+
+        if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+            result_.Push(drawable);
     }
 }
 

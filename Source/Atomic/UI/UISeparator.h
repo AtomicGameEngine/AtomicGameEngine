@@ -29,7 +29,7 @@ namespace Atomic
 
 class UISeparator : public UIWidget
 {
-    OBJECT(UISeparator)
+    ATOMIC_OBJECT(UISeparator, UIWidget)
 
 public:
 

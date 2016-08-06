@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -116,7 +116,9 @@ static void CallbackFunction(ConstFSEventStreamRef streamRef, void* clientCallBa
 static void CallbackFunction(ConstFSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[])
 {
     MacFileWatcher* watcher = (MacFileWatcher*)clientCallBackInfo;
-    NSArray* paths = (NSArray*) eventPaths;
+    // ATOMIC BEGIN
+    NSArray* paths = (NSArray*)eventPaths;
+    // ATOMIC END
     int index = -1;
     for (NSString* fileName in paths)
     {

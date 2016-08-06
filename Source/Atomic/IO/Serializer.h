@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,12 +49,16 @@ public:
     /// Write bytes to the stream. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size) = 0;
 
+    /// Write a 64-bit integer.
+    bool WriteInt64(long long value);
     /// Write a 32-bit integer.
     bool WriteInt(int value);
     /// Write a 16-bit integer.
     bool WriteShort(short value);
     /// Write an 8-bit integer.
     bool WriteByte(signed char value);
+    /// Write a 64-bit unsigned integer.
+    bool WriteUInt64(unsigned long long value);
     /// Write a 32-bit unsigned integer.
     bool WriteUInt(unsigned value);
     /// Write a 16-bit unsigned integer.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#ifdef ATOMIC_THREADING
+
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
@@ -37,6 +39,13 @@ namespace Atomic
 BackgroundLoader::BackgroundLoader(ResourceCache* owner) :
     owner_(owner)
 {
+}
+
+BackgroundLoader::~BackgroundLoader()
+{
+    MutexLock lock(backgroundLoadMutex_);
+
+    backgroundLoadQueue_.Clear();
 }
 
 void BackgroundLoader::ThreadFunction()
@@ -118,7 +127,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
     item.resource_ = DynamicCast<Resource>(owner_->GetContext()->CreateObject(type));
     if (!item.resource_)
     {
-        LOGERROR("Could not load unknown resource type " + String(type));
+        ATOMIC_LOGERROR("Could not load unknown resource type " + String(type));
 
         if (sendEventOnFailure && Thread::IsMainThread())
         {
@@ -133,7 +142,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
         return false;
     }
 
-    LOGDEBUG("Background loading resource " + name);
+    ATOMIC_LOGDEBUG("Background loading resource " + name);
 
     item.resource_->SetName(name);
     item.resource_->SetAsyncLoadState(ASYNC_QUEUED);
@@ -150,7 +159,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
             callerItem.dependencies_.Insert(key);
         }
         else
-            LOGWARNING("Resource " + caller->GetName() +
+            ATOMIC_LOGWARNING("Resource " + caller->GetName() +
                        " requested for a background loaded resource but was not in the background load queue");
     }
 
@@ -191,7 +200,7 @@ void BackgroundLoader::WaitForResource(StringHash type, StringHash nameHash)
             }
 
             if (didWait)
-                LOGDEBUG("Waited " + String(waitTimer.GetUSec(false) / 1000) + " ms for background loaded resource " +
+                ATOMIC_LOGDEBUG("Waited " + String(waitTimer.GetUSec(false) / 1000) + " ms for background loaded resource " +
                          resource->GetName());
         }
 
@@ -262,7 +271,7 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif
-        LOGDEBUG("Finishing background loaded resource " + resource->GetName());
+        ATOMIC_LOGDEBUG("Finishing background loaded resource " + resource->GetName());
         success = resource->EndLoad();
 
 #ifdef ATOMIC_PROFILING
@@ -298,3 +307,5 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
 }
 
 }
+
+#endif

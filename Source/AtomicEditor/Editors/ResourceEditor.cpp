@@ -122,7 +122,7 @@ public:
 
 ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabContainer *container):
     Object(context), fullpath_(fullpath), container_(container),
-    editorTabLayout_(0), rootContentWidget_(0), button_(0), modified_(false)
+    editorTabLayout_(nullptr), rootContentWidget_(nullptr), button_(nullptr), modified_(false)
 {
 
     String filename = GetFileNameAndExtension(fullpath_);
@@ -154,8 +154,8 @@ ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabCo
     rootContentWidget_->SetGravity(UI_GRAVITY_ALL);
     container_->GetContentRoot()->AddChild(rootContentWidget_);
 
-    SubscribeToEvent(E_FILECHANGED, HANDLER(ResourceEditor, HandleFileChanged));
-    SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(ResourceEditor, HandleRenameResourceNotification));
+    SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(ResourceEditor, HandleFileChanged));
+    SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, ATOMIC_HANDLER(ResourceEditor, HandleRenameResourceNotification));
 
 }
 

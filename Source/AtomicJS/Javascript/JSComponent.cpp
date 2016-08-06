@@ -44,14 +44,14 @@ extern const char* LOGIC_CATEGORY;
 
 class JSComponentFactory : public ObjectFactory
 {
+    ATOMIC_REFCOUNTED(JSComponentFactory)
+
 public:
     /// Construct.
     JSComponentFactory(Context* context) :
         ObjectFactory(context)
     {
-        type_ = JSComponent::GetTypeStatic();
-        baseType_ = JSComponent::GetBaseTypeStatic();
-        typeName_ = JSComponent::GetTypeNameStatic();
+        typeInfo_ = JSComponent::GetTypeInfoStatic();
     }
 
     /// Create an object of the specific type.
@@ -100,7 +100,7 @@ public:
                     ptr = componentFile->CreateJSComponent();
                 else
                 {
-                    LOGERRORF("Unable to load component file %s", split[1].CString());
+                    ATOMIC_LOGERRORF("Unable to load component file %s", split[1].CString());
                 }
             }
 
@@ -138,9 +138,9 @@ JSComponent::~JSComponent()
 
 void JSComponent::RegisterObject(Context* context)
 {
-    context->RegisterFactory(new JSComponentFactory(context), LOGIC_CATEGORY);
-    MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetComponentFileAttr, SetComponentFileAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(ScriptComponent);
+    context->RegisterFactory( new JSComponentFactory(context), LOGIC_CATEGORY);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetComponentFileAttr, SetComponentFileAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(ScriptComponent);
 }
 
 void JSComponent::OnSetEnabled()
@@ -444,7 +444,7 @@ void JSComponent::UpdateEventSubscription()
     bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
     if (needUpdate && !(currentEventMask_ & USE_UPDATE))
     {
-        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(JSComponent, HandleSceneUpdate));
+        SubscribeToEvent(scene, E_SCENEUPDATE, ATOMIC_HANDLER(JSComponent, HandleSceneUpdate));
         currentEventMask_ |= USE_UPDATE;
     }
     else if (!needUpdate && (currentEventMask_ & USE_UPDATE))
@@ -456,7 +456,7 @@ void JSComponent::UpdateEventSubscription()
     bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
     if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
     {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(JSComponent, HandleScenePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, ATOMIC_HANDLER(JSComponent, HandleScenePostUpdate));
         currentEventMask_ |= USE_POSTUPDATE;
     }
     else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
@@ -473,7 +473,7 @@ void JSComponent::UpdateEventSubscription()
     bool needFixedUpdate = enabled && (updateEventMask_ & USE_FIXEDUPDATE);
     if (needFixedUpdate && !(currentEventMask_ & USE_FIXEDUPDATE))
     {
-        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(JSComponent, HandlePhysicsPreStep));
+        SubscribeToEvent(world, E_PHYSICSPRESTEP, ATOMIC_HANDLER(JSComponent, HandlePhysicsPreStep));
         currentEventMask_ |= USE_FIXEDUPDATE;
     }
     else if (!needFixedUpdate && (currentEventMask_ & USE_FIXEDUPDATE))
@@ -485,7 +485,7 @@ void JSComponent::UpdateEventSubscription()
     bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
     if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
     {
-        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(JSComponent, HandlePhysicsPostStep));
+        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, ATOMIC_HANDLER(JSComponent, HandlePhysicsPostStep));
         currentEventMask_ |= USE_FIXEDPOSTUPDATE;
     }
     else if (!needFixedPostUpdate && (currentEventMask_ & USE_FIXEDPOSTUPDATE))

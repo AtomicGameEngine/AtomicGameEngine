@@ -43,7 +43,7 @@ namespace ToolCore
 
     class NETProjectSystem : public Object
     {
-        OBJECT(NETProjectSystem)
+        ATOMIC_OBJECT(NETProjectSystem, Object)
 
     public:
 

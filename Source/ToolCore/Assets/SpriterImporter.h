@@ -29,7 +29,7 @@ namespace ToolCore
 
 class SpriterImporter : public AssetImporter
 {
-    OBJECT(SpriterImporter);
+    ATOMIC_OBJECT(SpriterImporter, AssetImporter);
 
 public:
     /// Construct.

@@ -20,8 +20,9 @@ subject to the following restrictions:
 #include "btBroadphaseInterface.h"
 #include "btBroadphaseProxy.h"
 #include "btOverlappingPairCallback.h"
-
+// ATOMIC BEGIN
 #include "../../LinearMath/btAlignedObjectArray.h"
+// ATOMIC END
 class btDispatcher;
 
 typedef btAlignedObjectArray<btBroadphasePair>	btBroadphasePairArray;

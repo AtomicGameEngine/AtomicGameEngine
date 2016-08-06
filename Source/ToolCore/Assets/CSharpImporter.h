@@ -29,7 +29,7 @@ namespace ToolCore
 
     class CSharpImporter : public AssetImporter
     {
-        OBJECT(CSharpImporter)
+        ATOMIC_OBJECT(CSharpImporter, AssetImporter)
 
     public:
         /// Construct.

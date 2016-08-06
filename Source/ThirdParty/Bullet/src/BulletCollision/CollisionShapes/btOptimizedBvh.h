@@ -18,7 +18,9 @@ subject to the following restrictions:
 #ifndef BT_OPTIMIZED_BVH_H
 #define BT_OPTIMIZED_BVH_H
 
+// ATOMIC BEGIN
 #include "../../BulletCollision/BroadphaseCollision/btQuantizedBvh.h"
+// ATOMIC END
 
 class btStridingMeshInterface;
 

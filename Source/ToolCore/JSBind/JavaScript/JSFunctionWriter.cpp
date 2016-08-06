@@ -110,8 +110,8 @@ void JSFunctionWriter::WriteParameterMarshal(String& source)
                     {
                         source.Append("}\n");
 
-                        source.AppendWithFormat("%s __arg%i(duk_get_top(ctx) >= %i ? arrayData%i : defaultArg%i);\n",
-                                                klass->GetNativeName().CString(), cparam, cparam + 1, cparam, cparam);
+                        source.AppendWithFormat("%s __arg%i(duk_get_top(ctx) >= %i ? (const %s *) arrayData%i : defaultArg%i.Data());\n",
+                                                klass->GetNativeName().CString(), cparam, cparam + 1, elementType.CString(), cparam, cparam);
                     }
                     else
                     {

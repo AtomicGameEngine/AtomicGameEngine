@@ -32,7 +32,7 @@ namespace Atomic
 class ScriptObject : public Object
 {
 
-    OBJECT(ScriptObject);
+    ATOMIC_OBJECT(ScriptObject, Object);
 
 public:
     /// Construct.

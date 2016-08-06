@@ -29,7 +29,7 @@ namespace ToolCore
 
 class FolderImporter : public AssetImporter
 {
-    OBJECT(FolderImporter);
+    ATOMIC_OBJECT(FolderImporter, AssetImporter);
 
 public:
     /// Construct.

@@ -31,7 +31,7 @@ namespace ToolCore
 
 class ImportCmd: public Command
 {
-    OBJECT(ImportCmd);
+    ATOMIC_OBJECT(ImportCmd, Command);
 
 public:
 

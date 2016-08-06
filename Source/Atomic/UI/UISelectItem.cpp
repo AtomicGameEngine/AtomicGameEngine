@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 UISelectItem::UISelectItem(Context* context, const String &str, const String &id, const String &skinImage) : Object(context)
-    , subSource_(0)
+    , subSource_(nullptr)
 {
     SetID(id);
     SetString(str);

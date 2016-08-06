@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,12 @@
 //
 
 #pragma once
+
+#include "Atomic/Atomic.h"
+
+#if ATOMIC_CXX11
+#include <initializer_list>
+#endif
 
 namespace Atomic
 {
@@ -47,7 +53,16 @@ public:
         head_(0)
     {
     }
-
+#if ATOMIC_CXX11
+    /// Aggregate initialization constructor.
+    LinkedList(const std::initializer_list<T>& list) : LinkedList()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Insert(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~LinkedList()
     {

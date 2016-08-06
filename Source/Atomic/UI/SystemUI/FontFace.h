@@ -68,7 +68,7 @@ class ATOMIC_API FontFace : public RefCounted
 {
     friend class Font;
 
-    REFCOUNTED(FontFace)
+    ATOMIC_REFCOUNTED(FontFace)
 
 public:
     /// Construct.

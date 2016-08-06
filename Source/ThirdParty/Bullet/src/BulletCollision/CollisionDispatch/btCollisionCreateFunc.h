@@ -16,7 +16,9 @@ subject to the following restrictions:
 #ifndef BT_COLLISION_CREATE_FUNC
 #define BT_COLLISION_CREATE_FUNC
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btAlignedObjectArray.h"
+// ATOMIC END
 class btCollisionAlgorithm;
 class btCollisionObject;
 struct btCollisionObjectWrapper;

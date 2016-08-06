@@ -1,6 +1,6 @@
 //
 
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,12 +26,19 @@
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
+#include "../IO/File.h"
+#include "../Graphics/Geometry.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
 #include "../Graphics/Renderer.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Zone.h"
 #include "../IO/Log.h"
 #include "../Scene/Scene.h"
+
+// ATOMIC BEGIN
+#include "../IO/Log.h"
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -49,17 +56,38 @@ SourceBatch::SourceBatch() :
     geometry_(0),
     worldTransform_(&Matrix3x4::IDENTITY),
     numWorldTransforms_(1),
+    instancingData_((void*)0),
     geometryType_(GEOM_STATIC)
 {
+}
+
+SourceBatch::SourceBatch(const SourceBatch& batch)
+{
+    *this = batch;
 }
 
 SourceBatch::~SourceBatch()
 {
 }
 
-Drawable::Drawable(Context* context, unsigned char drawableFlags) :
+SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
+{
+    distance_ = rhs.distance_;
+    geometry_ = rhs.geometry_;
+    material_ = rhs.material_;
+    worldTransform_ = rhs.worldTransform_;
+    numWorldTransforms_ = rhs.numWorldTransforms_;
+    instancingData_ = rhs.instancingData_;
+    geometryType_ = rhs.geometryType_;
+
+    return *this;
+}
+
+
+Drawable::Drawable(Context* context, unsigned drawableFlags) :
     Component(context),
-    drawableFlags_(drawableFlags),
+    boundingBox_(0.0f, 0.0f),
+    drawableFlags_((unsigned char)drawableFlags),
     worldBoundingBoxDirty_(true),
     castShadows_(false),
     occluder_(false),
@@ -85,6 +113,12 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     maxLights_(0),
     firstLight_(0)
 {
+// ATOMIC BEGIN
+    if (drawableFlags == DRAWABLE_UNDEFINED || drawableFlags > DRAWABLE_ANY)
+    {
+        ATOMIC_LOGERROR("Drawable with undefined drawableFlags");
+    }
+// ATOMIC END
 }
 
 Drawable::~Drawable()
@@ -94,11 +128,11 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
-    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Drawable::OnSetEnabled()
@@ -127,10 +161,6 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
     }
 }
 
-void Drawable::Update(const FrameInfo& frame)
-{
-}
-
 void Drawable::UpdateBatches(const FrameInfo& frame)
 {
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
@@ -148,10 +178,6 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
 
     if (newLodDistance != lodDistance_)
         lodDistance_ = newLodDistance;
-}
-
-void Drawable::UpdateGeometry(const FrameInfo& frame)
-{
 }
 
 Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
@@ -399,12 +425,12 @@ void Drawable::AddToOctree()
         if (octree)
             octree->InsertDrawable(this);
         else
-            LOGERROR("No Octree component in scene, drawable will not render");
+            ATOMIC_LOGERROR("No Octree component in scene, drawable will not render");
     }
     else
     {
         // We have a mechanism for adding detached nodes to an octree manually, so do not log this error
-        //LOGERROR("Node is detached from scene, drawable will not render");
+        //ATOMIC_LOGERROR("Node is detached from scene, drawable will not render");
     }
 }
 
@@ -421,6 +447,216 @@ void Drawable::RemoveFromOctree()
 
         octant_->RemoveDrawable(this);
     }
+}
+
+bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
+{
+    // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
+    unsigned currentPositionIndex = 1;
+    unsigned currentUVIndex = 1;
+    unsigned currentNormalIndex = 1;
+    bool anythingWritten = false;
+
+    // Write the common "I came from X" comment
+    outputFile->WriteLine("# OBJ file exported from Urho3D");
+
+    for (unsigned i = 0; i < drawables.Size(); ++i)
+    {
+        Drawable* drawable = drawables[i];
+
+        // Only write enabled drawables
+        if (!drawable->IsEnabledEffective())
+            continue;
+
+        Node* node = drawable->GetNode();
+        Matrix3x4 transMat = drawable->GetNode()->GetWorldTransform();
+        Matrix3x4 n = transMat.Inverse();
+        Matrix3 normalMat = Matrix3(n.m00_, n.m01_, n.m02_, n.m10_, n.m11_, n.m12_, n.m20_, n.m21_, n.m22_);
+        normalMat = normalMat.Transpose();
+
+        const Vector<SourceBatch>& batches = drawable->GetBatches();
+        for (unsigned geoIndex = 0; geoIndex < batches.Size(); ++geoIndex)
+        {
+            Geometry* geo = drawable->GetLodGeometry(geoIndex, 0);
+            if (geo == 0)
+                continue;
+            if (geo->GetPrimitiveType() != TRIANGLE_LIST)
+            {
+                ATOMIC_LOGERRORF("%s (%u) %s (%u) Geometry %u contains an unsupported geometry type %u", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex, (unsigned)geo->GetPrimitiveType());
+                continue;
+            }
+
+            // If we've reached here than we're going to actually write something to the OBJ file
+            anythingWritten = true;
+
+            const unsigned char* vertexData;
+            const unsigned char* indexData;
+            unsigned elementSize, indexSize;
+            const PODVector<VertexElement>* elements;
+            geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);
+            if (!vertexData || !elements)
+                continue;
+
+            bool hasPosition = VertexBuffer::HasElement(*elements, TYPE_VECTOR3, SEM_POSITION);
+            if (!hasPosition)
+            {
+                ATOMIC_LOGERRORF("%s (%u) %s (%u) Geometry %u contains does not have Vector3 type positions in vertex data", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex);
+                continue;
+            }
+
+            bool hasNormals = VertexBuffer::HasElement(*elements, TYPE_VECTOR3, SEM_NORMAL);
+            bool hasUV = VertexBuffer::HasElement(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 0);
+            bool hasLMUV = VertexBuffer::HasElement(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 1);
+
+            if (elementSize > 0 && indexSize > 0)
+            {
+                unsigned vertexStart = geo->GetVertexStart();
+                unsigned vertexCount = geo->GetVertexCount();
+                unsigned indexStart = geo->GetIndexStart();
+                unsigned indexCount = geo->GetIndexCount();
+
+                // Name NodeID DrawableType DrawableID GeometryIndex ("Geo" is included for clarity as StaticModel_32_2 could easily be misinterpreted or even quickly misread as 322)
+                // Generated object name example: Node_5_StaticModel_32_Geo_0 ... or ... Bob_5_StaticModel_32_Geo_0
+                outputFile->WriteLine(String("o ").AppendWithFormat("%s_%u_%s_%u_Geo_%u", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex));
+
+                // Write vertex position
+                unsigned positionOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION);
+                for (unsigned j = 0; j < vertexCount; ++j)
+                {
+                    Vector3 vertexPosition = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
+                    vertexPosition = transMat * vertexPosition;
+
+                    // Convert coordinates as requested
+                    if (asRightHanded)
+                        vertexPosition.x_ *= -1;
+                    if (asZUp)
+                    {
+                        float yVal = vertexPosition.y_;
+                        vertexPosition.y_ = vertexPosition.z_;
+                        vertexPosition.z_ = yVal;
+                    }
+                    outputFile->WriteLine("v " + String(vertexPosition));
+                }
+
+                if (hasNormals)
+                {
+                    unsigned normalOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_NORMAL);
+                    for (unsigned j = 0; j < vertexCount; ++j)
+                    {
+                        Vector3 vertexNormal = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + normalOffset]));
+                        vertexNormal = normalMat * vertexNormal;
+                        vertexNormal.Normalize();
+
+                        if (asRightHanded)
+                            vertexNormal.x_ *= -1;
+                        if (asZUp)
+                        {
+                            float yVal = vertexNormal.y_;
+                            vertexNormal.y_ = vertexNormal.z_;
+                            vertexNormal.z_ = yVal;
+                        }
+
+                        outputFile->WriteLine("vn " + String(vertexNormal));
+                    }
+                }
+
+                // Write TEXCOORD1 or TEXCOORD2 if it was chosen
+                if (hasUV || (hasLMUV && writeLightmapUV))
+                {
+                    // if writing Lightmap UV is chosen, only use it if TEXCOORD2 exists, otherwise use TEXCOORD1
+                    unsigned texCoordOffset = (writeLightmapUV && hasLMUV) ? VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 1) :
+                        VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 0);
+                    for (unsigned j = 0; j < vertexCount; ++j)
+                    {
+                        Vector2 uvCoords = *((const Vector2*)(&vertexData[(vertexStart + j) * elementSize + texCoordOffset]));
+                        outputFile->WriteLine("vt " + String(uvCoords));
+                    }
+                }
+
+                // If we don't have UV but have normals then must write a double-slash to indicate the absence of UV coords, otherwise use a single slash
+                const String slashCharacter = hasNormals ? "//" : "/";
+
+                // Amount by which to offset indices in the OBJ vs their values in the Urho3D geometry, basically the lowest index value
+                // Compensates for the above vertex writing which doesn't write ALL vertices, just the used ones
+                unsigned indexOffset = M_MAX_INT;
+                for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx++)
+                {
+                    if (indexSize == 2)
+                        indexOffset = Min(indexOffset, (unsigned)*((unsigned short*)(indexData + indexIdx * indexSize)));
+                    else
+                        indexOffset = Min(indexOffset, *((unsigned*)(indexData + indexIdx * indexSize)));
+                }
+
+                for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx += 3)
+                {
+                    // Deal with 16 or 32 bit indices
+                    unsigned longIndices[3];
+                    if (indexSize == 2)
+                    {
+                        //16 bit indices
+                        unsigned short indices[3];
+                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        longIndices[0] = indices[0] - indexOffset;
+                        longIndices[1] = indices[1] - indexOffset;
+                        longIndices[2] = indices[2] - indexOffset;
+                    }
+                    else
+                    {
+                        //32 bit indices
+                        unsigned indices[3];
+                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        longIndices[0] = indices[0] - indexOffset;
+                        longIndices[1] = indices[1] - indexOffset;
+                        longIndices[2] = indices[2] - indexOffset;
+                    }
+
+                    String output = "f ";
+                    if (hasNormals)
+                    {
+                        output.AppendWithFormat("%l/%l/%l %l/%l/%l %l/%l/%l",
+                            currentPositionIndex + longIndices[0],
+                            currentUVIndex + longIndices[0],
+                            currentNormalIndex + longIndices[0],
+                            currentPositionIndex + longIndices[1],
+                            currentUVIndex + longIndices[1],
+                            currentNormalIndex + longIndices[1],
+                            currentPositionIndex + longIndices[2],
+                            currentUVIndex + longIndices[2],
+                            currentNormalIndex + longIndices[2]);
+                    }
+                    else if (hasNormals || hasUV)
+                    {
+                        unsigned secondTraitIndex = hasNormals ? currentNormalIndex : currentUVIndex;
+                        output.AppendWithFormat("%l%s%l %l%s%l %l%s%l",
+                            currentPositionIndex + longIndices[0],
+                            slashCharacter.CString(),
+                            secondTraitIndex + longIndices[0],
+                            currentPositionIndex + longIndices[1],
+                            slashCharacter.CString(),
+                            secondTraitIndex + longIndices[1],
+                            currentPositionIndex + longIndices[2],
+                            slashCharacter.CString(),
+                            secondTraitIndex + longIndices[2]);
+                    }
+                    else
+                    {
+                        output.AppendWithFormat("%l %l %l",
+                            currentPositionIndex + longIndices[0],
+                            currentPositionIndex + longIndices[1],
+                            currentPositionIndex + longIndices[2]);
+                    }
+                    outputFile->WriteLine(output);
+                }
+
+                // Increment our positions based on what vertex attributes we have
+                currentPositionIndex += vertexCount;
+                currentNormalIndex += hasNormals ? vertexCount : 0;
+                // is it possible to have TEXCOORD2 but not have TEXCOORD1, assume anything
+                currentUVIndex += (hasUV || hasLMUV) ? vertexCount : 0;
+            }
+        }
+    }
+    return anythingWritten;
 }
 
 }

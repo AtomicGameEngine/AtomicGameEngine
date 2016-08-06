@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -303,7 +303,7 @@ public:
     XPathResultSet();
     /// Construct with result set from XPath query.
     XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet);
-    // Copy-construct.
+    /// Copy-construct.
     XPathResultSet(const XPathResultSet& rhs);
     /// Destruct.
     ~XPathResultSet();

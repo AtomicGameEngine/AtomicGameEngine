@@ -34,7 +34,7 @@ namespace ToolCore
 
 class BuildSystem : public Object
 {
-    OBJECT(BuildSystem);
+    ATOMIC_OBJECT(BuildSystem, Object);
 
 public:
     /// Construct.

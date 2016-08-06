@@ -6,7 +6,9 @@
 class btCollisionShape;
 class btCollisionObject;
 class btTransform;
+// ATOMIC BEGIN
 #include "../../LinearMath/btScalar.h" // for SIMD_FORCE_INLINE definition
+// ATOMIC END
 
 #define BT_DECLARE_STACK_ONLY_OBJECT \
 	private: \

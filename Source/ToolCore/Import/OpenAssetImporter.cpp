@@ -31,9 +31,9 @@
 #include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Resource/ResourceCache.h>
 
-#include <Atomic/Atomic3D/AnimatedModel.h>
-#include <Atomic/Atomic3D/Animation.h>
-#include <Atomic/Atomic3D/AnimationController.h>
+#include <Atomic/Graphics/AnimatedModel.h>
+#include <Atomic/Graphics/Animation.h>
+#include <Atomic/Graphics/AnimationController.h>
 
 #include <Atomic/Graphics/Geometry.h>
 #include <Atomic/Graphics/IndexBuffer.h>

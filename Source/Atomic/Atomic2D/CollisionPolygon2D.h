@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ namespace Atomic
 /// 2D polygon collision component.
 class ATOMIC_API CollisionPolygon2D : public CollisionShape2D
 {
-    OBJECT(CollisionPolygon2D);
+    ATOMIC_OBJECT(CollisionPolygon2D, CollisionShape2D);
 
 public:
     /// Construct.

@@ -53,8 +53,8 @@ namespace ToolCore
     NETBuildSystem::NETBuildSystem(Context* context) :
         Object(context)
     {
-        SubscribeToEvent(E_TOOLUPDATE, HANDLER(NETBuildSystem, HandleToolUpdate));
-        SubscribeToEvent(E_NETBUILDATOMICPROJECT, HANDLER(NETBuildSystem, HandleBuildAtomicProject));
+        SubscribeToEvent(E_TOOLUPDATE, ATOMIC_HANDLER(NETBuildSystem, HandleToolUpdate));
+        SubscribeToEvent(E_NETBUILDATOMICPROJECT, ATOMIC_HANDLER(NETBuildSystem, HandleBuildAtomicProject));
     }
 
     NETBuildSystem::~NETBuildSystem()
@@ -66,7 +66,7 @@ namespace ToolCore
     {
         if (curBuild_.Null())
         {
-            LOGERRORF("NETBuildSystem::HandleSubprocessOutput - output received without current build");
+            ATOMIC_LOGERRORF("NETBuildSystem::HandleSubprocessOutput - output received without current build");
             return;
         }
 
@@ -85,7 +85,7 @@ namespace ToolCore
 
         if (curBuild_.Null())
         {
-            LOGERROR("NETBuildSystem::HandleCompileProcessComplete - called with no current build");
+            ATOMIC_LOGERROR("NETBuildSystem::HandleCompileProcessComplete - called with no current build");
             return;
         }
         curBuild_->status_ = NETBUILD_COMPLETE;
@@ -148,7 +148,7 @@ namespace ToolCore
     {
         if (curBuild_.Null())
         {
-            LOGERRORF("NETBuildSystem::CurrentBuildError - Error %s with no current build", errorText.CString());
+            ATOMIC_LOGERRORF("NETBuildSystem::CurrentBuildError - Error %s with no current build", errorText.CString());
             return;
         }
 
@@ -299,8 +299,8 @@ namespace ToolCore
                 return;
             }
 
-            SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(NETBuildSystem, HandleCompileProcessComplete));
-            SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(NETBuildSystem, HandleSubprocessOutput));
+            SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(NETBuildSystem, HandleCompileProcessComplete));
+            SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(NETBuildSystem, HandleSubprocessOutput));
 
             curBuild_->status_ = NETBUILD_BUILDING;
 
@@ -355,7 +355,7 @@ namespace ToolCore
             build->project_ = project;
         }
 
-        LOGINFOF("Received build for project %s", project->GetProjectFilePath().CString());
+        ATOMIC_LOGINFOF("Received build for project %s", project->GetProjectFilePath().CString());
 
         return build;
 
@@ -370,7 +370,7 @@ namespace ToolCore
 
         if (!project)
         {
-            LOGERROR("NETBuildSystem::HandleBuildAtomicProject - null project");
+            ATOMIC_LOGERROR("NETBuildSystem::HandleBuildAtomicProject - null project");
             return;
         }
 
@@ -385,7 +385,7 @@ namespace ToolCore
 
         if (!fileSystem->FileExists(solutionPath))
         {
-            LOGERRORF("NETBuildSystem::Build - Solution does not exist (%s)", solutionPath.CString());
+            ATOMIC_LOGERRORF("NETBuildSystem::Build - Solution does not exist (%s)", solutionPath.CString());
             return 0;
         }
 

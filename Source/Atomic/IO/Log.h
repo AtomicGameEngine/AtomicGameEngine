@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ struct StoredLogMessage
 /// Logging subsystem.
 class ATOMIC_API Log : public Object
 {
-    OBJECT(Log);
+    ATOMIC_OBJECT(Log, Object);
 
 public:
     /// Construct.
@@ -137,27 +137,27 @@ private:
 };
 
 #ifdef ATOMIC_LOGGING
-#define LOGDEBUG(message) Atomic::Log::Write(Atomic::LOG_DEBUG, message)
-#define LOGINFO(message) Atomic::Log::Write(Atomic::LOG_INFO, message)
-#define LOGWARNING(message) Atomic::Log::Write(Atomic::LOG_WARNING, message)
-#define LOGERROR(message) Atomic::Log::Write(Atomic::LOG_ERROR, message)
-#define LOGRAW(message) Atomic::Log::WriteRaw(message)
-#define LOGDEBUGF(format, ...) Atomic::Log::Write(Atomic::LOG_DEBUG, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGINFOF(format, ...) Atomic::Log::Write(Atomic::LOG_INFO, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGWARNINGF(format, ...) Atomic::Log::Write(Atomic::LOG_WARNING, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGERRORF(format, ...) Atomic::Log::Write(Atomic::LOG_ERROR, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGRAWF(format, ...) Atomic::Log::WriteRaw(Atomic::ToString(format, ##__VA_ARGS__))
+#define ATOMIC_LOGDEBUG(message) Atomic::Log::Write(Atomic::LOG_DEBUG, message)
+#define ATOMIC_LOGINFO(message) Atomic::Log::Write(Atomic::LOG_INFO, message)
+#define ATOMIC_LOGWARNING(message) Atomic::Log::Write(Atomic::LOG_WARNING, message)
+#define ATOMIC_LOGERROR(message) Atomic::Log::Write(Atomic::LOG_ERROR, message)
+#define ATOMIC_LOGRAW(message) Atomic::Log::WriteRaw(message)
+#define ATOMIC_LOGDEBUGF(format, ...) Atomic::Log::Write(Atomic::LOG_DEBUG, Atomic::ToString(format, ##__VA_ARGS__))
+#define ATOMIC_LOGINFOF(format, ...) Atomic::Log::Write(Atomic::LOG_INFO, Atomic::ToString(format, ##__VA_ARGS__))
+#define ATOMIC_LOGWARNINGF(format, ...) Atomic::Log::Write(Atomic::LOG_WARNING, Atomic::ToString(format, ##__VA_ARGS__))
+#define ATOMIC_LOGERRORF(format, ...) Atomic::Log::Write(Atomic::LOG_ERROR, Atomic::ToString(format, ##__VA_ARGS__))
+#define ATOMIC_LOGRAWF(format, ...) Atomic::Log::WriteRaw(Atomic::ToString(format, ##__VA_ARGS__))
 #else
-#define LOGDEBUG(message) ((void)0)
-#define LOGINFO(message) ((void)0)
-#define LOGWARNING(message) ((void)0)
-#define LOGERROR(message) ((void)0)
-#define LOGRAW(message) ((void)0)
-#define LOGDEBUGF(...) ((void)0)
-#define LOGINFOF(...) ((void)0)
-#define LOGWARNINGF(...) ((void)0)
-#define LOGERRORF(...) ((void)0)
-#define LOGRAWF(...) ((void)0)
+#define ATOMIC_LOGDEBUG(message) ((void)0)
+#define ATOMIC_LOGINFO(message) ((void)0)
+#define ATOMIC_LOGWARNING(message) ((void)0)
+#define ATOMIC_LOGERROR(message) ((void)0)
+#define ATOMIC_LOGRAW(message) ((void)0)
+#define ATOMIC_LOGDEBUGF(...) ((void)0)
+#define ATOMIC_LOGINFOF(...) ((void)0)
+#define ATOMIC_LOGWARNINGF(...) ((void)0)
+#define ATOMIC_LOGERRORF(...) ((void)0)
+#define ATOMIC_LOGRAWF(...) ((void)0)
 #endif
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ namespace Atomic
 class CrowdAgent;
 class NavigationMesh;
 
-/// Parameter structure for obstacle avoidance params (copied from DetourObstacleAvoidance.h in order to hide Detour header from Atomic library users).
+/// Parameter structure for obstacle avoidance params (copied from DetourObstacleAvoidance.h in order to hide Detour header from Urho3D library users).
 struct CrowdObstacleAvoidanceParams
 {
     float velBias;
@@ -58,7 +58,7 @@ struct CrowdObstacleAvoidanceParams
 /// Crowd manager scene component. Should be added only to the root scene node.
 class ATOMIC_API CrowdManager : public Component
 {
-    OBJECT(CrowdManager);
+    ATOMIC_OBJECT(CrowdManager, Component);
 
     friend class CrowdAgent;
 

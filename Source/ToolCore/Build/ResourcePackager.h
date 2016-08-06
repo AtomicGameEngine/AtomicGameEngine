@@ -37,7 +37,7 @@ class BuildBase;
 
 class ResourcePackager : public Object
 {
-    OBJECT(ResourcePackager);
+    ATOMIC_OBJECT(ResourcePackager, Object);
 
 public:
 

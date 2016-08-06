@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,10 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
 
+// ATOMIC BEGIN
 #include <kNet/include/kNetFwd.h>
 #include <kNet/include/kNet/SharedPtr.h>
+// ATOMIC END
 
 #ifdef SendMessage
 #undef SendMessage
@@ -104,10 +106,12 @@ enum ObserverPositionSendMode
 /// %Connection to a remote network host.
 class ATOMIC_API Connection : public Object
 {
-    OBJECT(Connection);
+    ATOMIC_OBJECT(Connection, Object);
 
 public:
+
     Connection(Context* context);
+
     /// Construct with context and kNet message connection pointers.
     Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
     /// Destruct.
@@ -231,19 +235,6 @@ public:
     /// Identity map.
     VariantMap identity_;
 
-    // Expose control methods for current controls
-    void SetControlButtons(unsigned buttons, bool down = true);
-
-    /// Check if a button is held down.
-    bool IsControlButtonDown(unsigned button) const;
-
-    void SetControlDataInt(const String& key, int value);
-
-    int GetControlDataInt(const String& key);
-
-    /// Send a message.
-    void SendStringMessage(const String& message);
-
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
@@ -283,10 +274,6 @@ private:
     void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
-
-    void ProcessStringMessage(int msgID, MemoryBuffer& msg);
-
-    void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
 
     /// kNet message connection.
     kNet::SharedPtr<kNet::MessageConnection> connection_;
@@ -333,4 +320,3 @@ private:
 };
 
 }
-

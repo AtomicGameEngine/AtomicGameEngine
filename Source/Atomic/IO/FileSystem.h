@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ static const unsigned SCAN_HIDDEN = 0x4;
 /// Subsystem for file and directory operations and access control.
 class ATOMIC_API FileSystem : public Object
 {
-    OBJECT(FileSystem);
+    ATOMIC_OBJECT(FileSystem, Object);
 
 public:
     /// Construct.
@@ -71,7 +71,7 @@ public:
     bool Rename(const String& srcFileName, const String& destFileName);
     /// Delete a file. Return true if successful.
     bool Delete(const String& fileName);
-    /// Register a path as allowed to access. If no paths are registered, all are allowed. Registering allowed paths is considered securing the Atomic execution environment: running programs and opening files externally through the system will fail afterward.
+    /// Register a path as allowed to access. If no paths are registered, all are allowed. Registering allowed paths is considered securing the Urho3D execution environment: running programs and opening files externally through the system will fail afterward.
     void RegisterPath(const String& pathName);
     /// Set a file's last modified time as seconds since 1.1.1970. Return true on success.
     bool SetLastModifiedTime(const String& fileName, unsigned newTime);
@@ -95,26 +95,26 @@ public:
     bool DirExists(const String& pathName) const;
     /// Scan a directory for specified files.
     void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
-    /// Return the program's directory. If it does not contain the Atomic default CoreData and Data directories, and the current working directory does, return the working directory instead.
+    /// Return the program's directory. If it does not contain the Urho3D default CoreData and Data directories, and the current working directory does, return the working directory instead.
     String GetProgramDir() const;
     /// Return the user documents directory.
     String GetUserDocumentsDir() const;
     /// Return the application preferences directory.
     String GetAppPreferencesDir(const String& org, const String& app) const;
 
-    String GetAppBundleResourceFolder();
-    /// Remove a directory
-    bool RemoveDir(const String& directoryIn, bool recursive);    
-    /// Create directory and all necessary subdirectories below a given root
-    bool CreateDirs(const String& root, const String& subdirectory);
-    /// Copy a directory, directoryOut must not exist
-    bool CopyDir(const String& directoryIn, const String& directoryOut);
+// ATOMIC BEGIN
 
-	/// Check if a file or directory exists at the specified path
+    /// Check if a file or directory exists at the specified path
     bool Exists(const String& pathName) const { return FileExists(pathName) || DirExists(pathName); }
 
+    bool CopyDir(const String& directoryIn, const String& directoryOut);
+
+    bool CreateDirs(const String& root, const String& subdirectory);
     bool CreateDirsRecursive(const String& directoryIn);
-    
+
+    bool RemoveDir(const String& directoryIn, bool recursive);
+// ATOMIC END
+
 private:
     /// Scan directory, called internally.
     void ScanDirInternal
@@ -163,7 +163,9 @@ ATOMIC_API String GetNativePath(const String& pathName);
 ATOMIC_API WString GetWideNativePath(const String& pathName);
 /// Return whether a path is absolute.
 ATOMIC_API bool IsAbsolutePath(const String& pathName);
-/// Return whether a path or file is child of another path (both must be absolute)
+
+// ATOMIC BEGIN
 ATOMIC_API bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath);
+// ATOMIC END
 
 }

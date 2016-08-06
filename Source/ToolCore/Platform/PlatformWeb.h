@@ -29,7 +29,7 @@ namespace ToolCore
 
 class PlatformWeb : public Platform
 {
-    OBJECT(PlatformWeb);
+    ATOMIC_OBJECT(PlatformWeb, Platform);
 
 public:
 

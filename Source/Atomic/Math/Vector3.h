@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ public:
     {
     }
 
-    /// Construct from a two-dimensional vector (for Urho2D).
+    /// Construct from a two-dimensional vector (for Atomic2D).
     Vector3(const Vector2& vector) :
         x_(vector.x_),
         y_(vector.y_),
@@ -71,7 +71,7 @@ public:
     {
     }
 
-    /// Construct from two-dimensional coordinates (for Urho2D).
+    /// Construct from two-dimensional coordinates (for Atomic2D).
     Vector3(float x, float y) :
         x_(x),
         y_(y),
@@ -80,7 +80,7 @@ public:
     }
 
     /// Construct from a float array.
-    Vector3(const float* data) :
+    explicit Vector3(const float* data) :
         x_(data[0]),
         y_(data[1]),
         z_(data[2])

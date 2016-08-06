@@ -17,8 +17,10 @@ subject to the following restrictions:
 #define BT_TRIANGLE_INDEX_VERTEX_ARRAY_H
 
 #include "btStridingMeshInterface.h"
+// ATOMIC BEGIN
 #include "../../LinearMath/btAlignedObjectArray.h"
 #include "../../LinearMath/btScalar.h"
+// ATOMIC END
 
 
 ///The btIndexedMesh indexes a single vertex and index array. Multiple btIndexedMesh objects can be passed into a btTriangleIndexVertexArray using addIndexedMesh.

@@ -26,11 +26,11 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Scene/Node.h>
 
-#include <Atomic/Atomic3D/AnimatedModel.h>
-#include <Atomic/Atomic3D/Animation.h>
-#include <Atomic/Atomic3D/AnimationController.h>
-#include <Atomic/Atomic3D/StaticModel.h>
-#include <Atomic/Atomic3D/Model.h>
+#include <Atomic/Graphics/AnimatedModel.h>
+#include <Atomic/Graphics/Animation.h>
+#include <Atomic/Graphics/AnimationController.h>
+#include <Atomic/Graphics/StaticModel.h>
+#include <Atomic/Graphics/Model.h>
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/XMLFile.h>
@@ -70,7 +70,7 @@ void ModelImporter::SetDefaults()
 bool ModelImporter::ImportModel()
 {
 
-    LOGDEBUGF("Importing Model: %s", asset_->GetPath().CString());
+    ATOMIC_LOGDEBUGF("Importing Model: %s", asset_->GetPath().CString());
 
     SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
 
@@ -138,7 +138,7 @@ bool ModelImporter::ImportAnimation(const String& filename, const String& name, 
                     controller->AddAnimationResource(animation);
             }
 
-            LOGINFOF("Import Info: %s : %s", info.name_.CString(), fileName.CString());
+            ATOMIC_LOGINFOF("Import Info: %s : %s", info.name_.CString(), fileName.CString());
         }
 
         return true;
@@ -333,6 +333,7 @@ void ModelImporter::GetAnimations(PODVector<Animation*>& animations)
             animations.Push(animresources[i]);
         }
     }
+
 }
 
 bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)

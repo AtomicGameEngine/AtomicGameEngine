@@ -32,7 +32,7 @@ class UISelectItemSource;
 
 class UIMenuWindow : public UIWidget
 {
-    OBJECT(UIMenuWindow)
+    ATOMIC_OBJECT(UIMenuWindow, UIWidget)
 
 public:
 

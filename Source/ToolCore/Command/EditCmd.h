@@ -31,7 +31,7 @@ namespace ToolCore
 
 class EditCmd: public Command
 {
-    OBJECT(EditCmd);
+    ATOMIC_OBJECT(EditCmd, Command);
 
 public:
 

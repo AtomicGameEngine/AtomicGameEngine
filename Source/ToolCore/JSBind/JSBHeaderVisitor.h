@@ -484,13 +484,16 @@ public:
                 value = init->chars();
         }
 
-        if (type->isIntegerType() || _unsigned)
+        if (dtype.isConst())
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Int, _unsigned);
-        }
-        else
-        {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Float);
+            if (type->isIntegerType() || _unsigned)
+            {
+                module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Int, _unsigned);
+            }
+            else
+            {
+                module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Float);
+            }
         }
 
         return true;
@@ -519,7 +522,7 @@ public:
 
             if (!base)
             {
-                LOGINFOF("Warning: %s baseclass %s not in bindings", name.CString(), baseclassname.CString());
+                ATOMIC_LOGINFOF("Warning: %s baseclass %s not in bindings", name.CString(), baseclassname.CString());
             }
             else
             {

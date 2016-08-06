@@ -26,7 +26,7 @@
 #include <Atomic/IPC/IPC.h>
 
 // This can be removed once bone hack is fixed
-#include <Atomic/Atomic3D/AnimatedModel.h>
+#include <Atomic/Graphics/AnimatedModel.h>
 
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/ToolSystem.h>
@@ -118,7 +118,7 @@ namespace AtomicEditor
 #endif
 
 #ifdef ATOMIC_DEV_BUILD
-        engineParameters_["ResourcePrefixPath"] = "";
+        engineParameters_["ResourcePrefixPaths"] = "";
         String resourcePaths = env->GetCoreDataDir() + ";" + env->GetEditorDataDir();
         // for dev builds, add the compile editor scripts from artifacts
         resourcePaths += ";" + env->GetRootSourceDir() + "Artifacts/Build/Resources/EditorData/";
@@ -126,10 +126,10 @@ namespace AtomicEditor
 #else
 
 #ifdef ATOMIC_PLATFORM_OSX
-        engineParameters_["ResourcePrefixPath"] = "../Resources";
+        engineParameters_["ResourcePrefixPaths"] = "../Resources";
 
 #else
-        engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
+        engineParameters_["ResourcePrefixPaths"] = filesystem->GetProgramDir() + "Resources";
 #endif
 
         engineParameters_["ResourcePaths"] = "CoreData;EditorData";
@@ -152,10 +152,6 @@ namespace AtomicEditor
 
     void AEEditorApp::Start()
     {
-        // Do not create bone structure by default when in the editor
-        // this can be toggled temporarily, for example to setup an animation preview
-        AnimatedModel::SetBoneCreationEnabled(false);
-
         GetSubsystem<AEEditorPrefs>()->ValidateWindow();
 
         context_->RegisterSubsystem(new EditorMode(context_));

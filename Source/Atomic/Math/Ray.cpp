@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ float Ray::HitDistance(const Plane& plane) const
 float Ray::HitDistance(const BoundingBox& box) const
 {
     // If undefined, no hit (infinite distance)
-    if (!box.defined_)
+    if (!box.Defined())
         return M_INFINITY;
 
     // Check for ray origin being inside the box

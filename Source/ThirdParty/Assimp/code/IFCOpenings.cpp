@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  IFCOpenings.cpp
  *  @brief Implements a subset of Ifc CSG operations for pouring
   *    holes for windows and doors into walls.
@@ -602,12 +604,12 @@ bool IntersectingLineSegments(const IfcVector2& n0, const IfcVector2& n1,
     const IfcVector2& m0, const IfcVector2& m1,
     IfcVector2& out0, IfcVector2& out1)
 {
-    const IfcVector2& n0_to_n1 = n1 - n0;
+    const IfcVector2 n0_to_n1 = n1 - n0;
 
-    const IfcVector2& n0_to_m0 = m0 - n0;
-    const IfcVector2& n1_to_m1 = m1 - n1;
+    const IfcVector2 n0_to_m0 = m0 - n0;
+    const IfcVector2 n1_to_m1 = m1 - n1;
 
-    const IfcVector2& n0_to_m1 = m1 - n0;
+    const IfcVector2 n0_to_m1 = m1 - n0;
 
     const IfcFloat e = 1e-5f;
     const IfcFloat smalle = 1e-9f;
@@ -902,11 +904,12 @@ size_t CloseWindows(ContourVector& contours,
             curmesh.vertcnt.reserve(curmesh.vertcnt.size() + (*it).contour.size());
 
             // compare base poly normal and contour normal to detect if we need to reverse the face winding
-            IfcVector3 basePolyNormal = TempMesh::ComputePolygonNormal( curmesh.verts.data(), curmesh.vertcnt.front());
+            // Urho3D: modified to not use C++11
+            IfcVector3 basePolyNormal = TempMesh::ComputePolygonNormal( &curmesh.verts[0], curmesh.vertcnt.front());
             std::vector<IfcVector3> worldSpaceContourVtx( it->contour.size());
             for( size_t a = 0; a < it->contour.size(); ++a )
                 worldSpaceContourVtx[a] = minv * IfcVector3( it->contour[a].x, it->contour[a].y, 0.0);
-            IfcVector3 contourNormal = TempMesh::ComputePolygonNormal( worldSpaceContourVtx.data(), worldSpaceContourVtx.size());
+            IfcVector3 contourNormal = TempMesh::ComputePolygonNormal( &worldSpaceContourVtx[0], worldSpaceContourVtx.size());
             bool reverseCountourFaces = (contourNormal * basePolyNormal) > 0.0;
 
             // XXX this algorithm is really a bit inefficient - both in terms
@@ -927,7 +930,7 @@ size_t CloseWindows(ContourVector& contours,
                 IfcFloat best = static_cast<IfcFloat>(1e10);
                 IfcVector3 bestv;
 
-                const IfcVector3& world_point = minv * IfcVector3(proj_point.x,proj_point.y,0.0f);
+                const IfcVector3 world_point = minv * IfcVector3(proj_point.x,proj_point.y,0.0f);
 
                 BOOST_FOREACH(const TempOpening* opening, refs) {
                     BOOST_FOREACH(const IfcVector3& other, opening->wallPoints) {
@@ -1066,7 +1069,7 @@ IfcMatrix4 ProjectOntoPlane(std::vector<IfcVector2>& out_contour, const TempMesh
 
     // Project all points into the new coordinate system, collect min/max verts on the way
     BOOST_FOREACH(const IfcVector3& x, in_verts) {
-        const IfcVector3& vv = m * x;
+        const IfcVector3 vv = m * x;
         // keep Z offset in the plane coordinate system. Ignoring precision issues
         // (which  are present, of course), this should be the same value for
         // all polygon vertices (assuming the polygon is planar).
@@ -1144,7 +1147,7 @@ bool GenerateOpenings(std::vector<TempOpening>& openings,
     std::vector<IfcVector2> contour_flat;
 
     IfcVector3 nor;
-    const IfcMatrix4& m = ProjectOntoPlane(contour_flat, curmesh,  ok, nor);
+    const IfcMatrix4 m = ProjectOntoPlane(contour_flat, curmesh,  ok, nor);
     if(!ok) {
         return false;
     }
@@ -1227,7 +1230,7 @@ bool GenerateOpenings(std::vector<TempOpening>& openings,
 
             bool side_flag = true;
             if (!is_2d_source) {
-                const IfcVector3& face_nor = ((profile_verts[vi_total+2] - profile_verts[vi_total]) ^
+                const IfcVector3 face_nor = ((profile_verts[vi_total+2] - profile_verts[vi_total]) ^
                     (profile_verts[vi_total+1] - profile_verts[vi_total])).Normalize();
 
                 const IfcFloat abs_dot_face_nor = std::abs(nor * face_nor);
@@ -1242,7 +1245,7 @@ bool GenerateOpenings(std::vector<TempOpening>& openings,
             for (unsigned int vi = 0, vend = profile_vertcnts[f]; vi < vend; ++vi, ++vi_total) {
                 const IfcVector3& x = profile_verts[vi_total];
 
-                const IfcVector3& v = m * x;
+                const IfcVector3 v = m * x;
                 IfcVector2 vv(v.x, v.y);
 
                 //if(check_intersection) {
@@ -1322,7 +1325,7 @@ bool GenerateOpenings(std::vector<TempOpening>& openings,
                 MakeDisjunctWindowContours(other, temp_contour, poly);
                 if(poly.size() == 1) {
 
-                    const BoundingBox& newbb = GetBoundingBox(poly[0].outer);
+                    const BoundingBox newbb = GetBoundingBox(poly[0].outer);
                     if (!BoundingBoxesOverlapping(ibb, newbb )) {
                          // Good guy bounding box
                          bb = newbb ;
@@ -1438,7 +1441,7 @@ bool TryAddOpenings_Poly2Tri(const std::vector<TempOpening>& openings,const std:
     // working coordinate system.
     bool ok;
     IfcVector3 nor;
-    const IfcMatrix3& m = DerivePlaneCoordinateSpace(curmesh, ok, nor);
+    const IfcMatrix3 m = DerivePlaneCoordinateSpace(curmesh, ok, nor);
     if (!ok) {
         return false;
     }
@@ -1686,13 +1689,13 @@ bool TryAddOpenings_Poly2Tri(const std::vector<TempOpening>& openings,const std:
             continue;
         }
 
-        const std::vector<p2t::Triangle*>& tris = cdt->GetTriangles();
+        const std::vector<p2t::Triangle*> tris = cdt->GetTriangles();
 
         // Collect the triangles we just produced
         BOOST_FOREACH(p2t::Triangle* tri, tris) {
             for(int i = 0; i < 3; ++i) {
 
-                const IfcVector2& v = IfcVector2(
+                const IfcVector2 v = IfcVector2(
                     static_cast<IfcFloat>( tri->GetPoint(i)->x ),
                     static_cast<IfcFloat>( tri->GetPoint(i)->y )
                 );

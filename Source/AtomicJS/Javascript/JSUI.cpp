@@ -40,17 +40,17 @@ JSUI::JSUI(Context* context) : Object(context),
 {
     ctx_ = JSVM::GetJSVM(nullptr)->GetJSContext();
 
-    SubscribeToEvent(E_UPDATE, HANDLER(JSUI, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(JSUI, HandleUpdate));
 
-    SubscribeToEvent(E_JSOBJECTADDED, HANDLER(JSUI, HandleObjectAdded));
+    SubscribeToEvent(E_JSOBJECTADDED, ATOMIC_HANDLER(JSUI, HandleObjectAdded));
 
     // for debugging only, commented out otherwise
     //SubscribeToEvent(E_JSOBJECTREMOVED, HANDLER(JSUI, HandleObjectRemoved));
 
-    SubscribeToEvent(E_WIDGETDELETED, HANDLER(JSUI, HandleWidgetDeleted));
-    SubscribeToEvent(E_WIDGETEVENT, HANDLER(JSUI, HandleWidgetEvent));
-    SubscribeToEvent(E_WIDGETLOADED, HANDLER(JSUI, HandleWidgetLoaded));
-    SubscribeToEvent(E_POPUPMENUSELECT, HANDLER(JSUI, HandlePopupMenuSelect));
+    SubscribeToEvent(E_WIDGETDELETED, ATOMIC_HANDLER(JSUI, HandleWidgetDeleted));
+    SubscribeToEvent(E_WIDGETEVENT, ATOMIC_HANDLER(JSUI, HandleWidgetEvent));
+    SubscribeToEvent(E_WIDGETLOADED, ATOMIC_HANDLER(JSUI, HandleWidgetLoaded));
+    SubscribeToEvent(E_POPUPMENUSELECT, ATOMIC_HANDLER(JSUI, HandlePopupMenuSelect));
 
     duk_push_global_stash(ctx_);
     duk_push_object(ctx_);
@@ -137,7 +137,7 @@ void JSUI::HandleObjectRemoved(StringHash eventType, VariantMap& eventData)
 {
     Object* o = static_cast<Object*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
 
-    LOGINFOF("Removing %s", o->GetTypeName().CString());
+    ATOMIC_LOGINFOF("Removing %s", o->GetTypeName().CString());
 
 }
 

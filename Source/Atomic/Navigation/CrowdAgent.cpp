@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,10 @@
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
 
+// ATOMIC BEGIN
 #include <Detour/include/DetourCommon.h>
 #include <DetourCrowd/include/DetourCrowd.h>
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -103,19 +105,19 @@ void CrowdAgent::RegisterObject(Context* context)
 {
     context->RegisterFactory<CrowdAgent>(NAVIGATION_CATEGORY);
 
-    ATTRIBUTE("Target Position", Vector3, targetPosition_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
+    ATOMIC_ATTRIBUTE("Target Position", Vector3, targetPosition_, Vector3::ZERO, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
+    ATOMIC_ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
         DEFAULT_AGENT_REQUEST_TARGET_TYPE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
-    ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
-    ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
-    ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE("Height", float, height_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE("Query Filter Type", unsigned, queryFilterType_, DEFAULT_AGENT_QUERY_FILTER_TYPE, AM_DEFAULT);
-    ATTRIBUTE("Obstacle Avoidance Type", unsigned, obstacleAvoidanceType_, DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Navigation Pushiness", navPushiness_, crowdAgentPushinessNames, DEFAULT_AGENT_NAVIGATION_PUSHINESS, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Navigation Quality", navQuality_, crowdAgentAvoidanceQualityNames, DEFAULT_AGENT_AVOIDANCE_QUALITY, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Height", float, height_, 0.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Query Filter Type", unsigned, queryFilterType_, DEFAULT_AGENT_QUERY_FILTER_TYPE, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Obstacle Avoidance Type", unsigned, obstacleAvoidanceType_, DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE, AM_DEFAULT);
+    ATOMIC_ENUM_ATTRIBUTE("Navigation Pushiness", navPushiness_, crowdAgentPushinessNames, DEFAULT_AGENT_NAVIGATION_PUSHINESS, AM_DEFAULT);
+    ATOMIC_ENUM_ATTRIBUTE("Navigation Quality", navQuality_, crowdAgentAvoidanceQualityNames, DEFAULT_AGENT_AVOIDANCE_QUALITY, AM_DEFAULT);
 }
 
 void CrowdAgent::ApplyAttributes()
@@ -125,8 +127,8 @@ void CrowdAgent::ApplyAttributes()
     maxSpeed_ = Max(0.f, maxSpeed_);
     radius_ = Max(0.f, radius_);
     height_ = Max(0.f, height_);
-    queryFilterType_ = Min(queryFilterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
-    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
+    queryFilterType_ = Min(queryFilterType_, (unsigned)DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
+    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, (unsigned)DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
 
     UpdateParameters();
 
@@ -266,7 +268,7 @@ int CrowdAgent::AddAgentToCrowd(bool force)
 
     if (force || !IsInCrowd())
     {
-        PROFILE(AddAgentToCrowd);
+        ATOMIC_PROFILE(AddAgentToCrowd);
 
         agentCrowdId_ = crowdManager_->AddAgent(this, node_->GetPosition());
         if (agentCrowdId_ == -1)
@@ -290,6 +292,9 @@ int CrowdAgent::AddAgentToCrowd(bool force)
             map[P_POSITION] = GetPosition();
             map[P_VELOCITY] = GetActualVelocity();
             crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
+            Node* node = GetNode();
+            if (node)
+                node->SendEvent(E_CROWD_AGENT_NODE_FAILURE, map);
 
             // Reevaluate states as handling of event may have resulted in changes
             previousAgentState_ = GetAgentState();
@@ -411,7 +416,7 @@ void CrowdAgent::SetQueryFilterType(unsigned queryFilterType)
     {
         if (queryFilterType >= DT_CROWD_MAX_QUERY_FILTER_TYPE)
         {
-            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType,
+            ATOMIC_LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType,
                 DT_CROWD_MAX_QUERY_FILTER_TYPE);
             return;
         }
@@ -428,7 +433,7 @@ void CrowdAgent::SetObstacleAvoidanceType(unsigned obstacleAvoidanceType)
     {
         if (obstacleAvoidanceType >= DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)
         {
-            LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)",
+            ATOMIC_LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)",
                 obstacleAvoidanceType, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS);
             return;
         }
@@ -526,6 +531,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_ARRIVED] = HasArrived();
             map[P_TIMESTEP] = dt;
             crowdManager_->SendEvent(E_CROWD_AGENT_REPOSITION, map);
+            node_->SendEvent(E_CROWD_AGENT_NODE_REPOSITION, map);
 
             if (updateNodePosition_)
             {
@@ -550,6 +556,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_POSITION] = newPos;
             map[P_VELOCITY] = newVel;
             crowdManager_->SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
+            node_->SendEvent(E_CROWD_AGENT_NODE_STATE_CHANGED, map);
 
             // Send a failure event if either state is a failed status
             if (newAgentState == CA_STATE_INVALID || newTargetState == CA_TARGET_FAILED)
@@ -562,6 +569,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
                 map[P_POSITION] = newPos;
                 map[P_VELOCITY] = newVel;
                 crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
+                node_->SendEvent(E_CROWD_AGENT_NODE_FAILURE, map);
             }
 
             // State may have been altered during the handling of the event
@@ -582,7 +590,7 @@ void CrowdAgent::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGERROR(GetTypeName() + " should not be created to the root scene node");
+            ATOMIC_LOGERROR(GetTypeName() + " should not be created to the root scene node");
         crowdManager_ = scene->GetOrCreateComponent<CrowdManager>();
         AddAgentToCrowd();
     }

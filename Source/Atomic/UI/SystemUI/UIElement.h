@@ -115,8 +115,7 @@ class Cursor;
 /// Base class for %UI elements.
 class ATOMIC_API UIElement : public Animatable
 {
-    OBJECT(UIElement);
-    BASEOBJECT(UIElement);
+    ATOMIC_OBJECT(UIElement, Animatable);
 
 public:
     /// Construct.

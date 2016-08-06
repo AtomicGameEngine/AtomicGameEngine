@@ -85,7 +85,7 @@ void PlatformAddCmd::Run()
         return;
     }
 
-    LOGINFOF("Adding platform: %s", platformToAdd_.CString());
+    ATOMIC_LOGINFOF("Adding platform: %s", platformToAdd_.CString());
 
     project->AddPlatform(platform->GetPlatformID());
 

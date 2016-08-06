@@ -31,7 +31,7 @@ namespace ToolCore
 
 class BuildCmd: public Command
 {
-    OBJECT(BuildCmd);
+    ATOMIC_OBJECT(BuildCmd, Command);
 
 public:
 

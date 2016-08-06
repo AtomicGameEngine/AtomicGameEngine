@@ -29,18 +29,18 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-EVENT(E_PROJECTLOADED, ProjectLoaded)
+ATOMIC_EVENT(E_PROJECTLOADED, ProjectLoaded)
 {
-    PARAM(P_PROJECTPATH, ProjectPath);    // string
+    ATOMIC_PARAM(P_PROJECTPATH, ProjectPath);    // string
 }
 
-EVENT(E_PROJECTUNLOADED, ProjectUnloaded)
+ATOMIC_EVENT(E_PROJECTUNLOADED, ProjectUnloaded)
 {
 }
 
-EVENT(E_PROJECTUSERPREFSAVED, ProjectUserPrefSaved)
+ATOMIC_EVENT(E_PROJECTUSERPREFSAVED, ProjectUserPrefSaved)
 {
-    PARAM(P_PREFS, Prefs);    // ProjectUserPrefs
+    ATOMIC_PARAM(P_PREFS, Prefs);    // ProjectUserPrefs
 }
 
 

@@ -35,7 +35,7 @@ class Project;
 
 class AssetDatabase : public Object
 {
-    OBJECT(AssetDatabase);
+    ATOMIC_OBJECT(AssetDatabase, Object);
 
 public:
     /// Construct.

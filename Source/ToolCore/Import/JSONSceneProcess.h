@@ -29,7 +29,7 @@
 #include <Atomic/Graphics/Technique.h>
 #include <Atomic/Graphics/Texture2D.h>
 #include <Atomic/Graphics/Material.h>
-#include <Atomic/Atomic3D/Model.h>
+#include <Atomic/Graphics/Model.h>
 #include <Atomic/Scene/Scene.h>
 
 using namespace Atomic;
@@ -53,7 +53,7 @@ class JSONTimeOfDay;
 class JSONSceneProcess : public Object
 {
 
-    OBJECT(JSONSceneProcess);
+    ATOMIC_OBJECT(JSONSceneProcess, Object);
 
 public:
 

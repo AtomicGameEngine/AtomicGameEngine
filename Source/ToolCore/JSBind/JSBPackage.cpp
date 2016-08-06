@@ -158,7 +158,7 @@ bool JSBPackage::ContainsConstantAllPackages(const String& constantName)
 
 bool JSBPackage::Load(const String& packageFolder)
 {
-    LOGINFOF("Loading Package: %s", packageFolder.CString());
+    ATOMIC_LOGINFOF("Loading Package: %s", packageFolder.CString());
 
     JSBind* jsbind = GetSubsystem<JSBind>();
 
@@ -166,7 +166,7 @@ bool JSBPackage::Load(const String& packageFolder)
 
     if (!jsonFile->IsOpen())
     {
-        LOGERRORF("Unable to open package json: %s", (packageFolder + "Package.json").CString());
+        ATOMIC_LOGERRORF("Unable to open package json: %s", (packageFolder + "Package.json").CString());
         return false;
     }
 
@@ -174,7 +174,7 @@ bool JSBPackage::Load(const String& packageFolder)
 
     if (!packageJSON->BeginLoad(*jsonFile))
     {
-        LOGERRORF("Unable to parse package json: %s", (packageFolder + "Package.json").CString());
+        ATOMIC_LOGERRORF("Unable to parse package json: %s", (packageFolder + "Package.json").CString());
         return false;
     }
 
@@ -193,7 +193,7 @@ bool JSBPackage::Load(const String& packageFolder)
 
             if (!depPackage->Load(jsbind->GetSourceRootFolder() + dpackageFolder))
             {
-                LOGERRORF("Unable to load package dependency: %s", dpackageFolder.CString());
+                ATOMIC_LOGERRORF("Unable to load package dependency: %s", dpackageFolder.CString());
                 return false;
             }
 
@@ -263,7 +263,7 @@ bool JSBPackage::Load(const String& packageFolder)
 
         if (!module->Load(packageFolder + moduleName + ".json"))
         {
-            LOGERRORF("Unable to load module json: %s", (packageFolder + moduleName + ".json").CString());
+            ATOMIC_LOGERRORF("Unable to load module json: %s", (packageFolder + moduleName + ".json").CString());
             return false;
         }
 

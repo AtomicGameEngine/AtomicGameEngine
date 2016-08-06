@@ -65,7 +65,7 @@ namespace Atomic
 
         if (!*finit)
         {
-            LOGERRORF("Native Plugin: Unable to get atomic_plugin_init entry point in %s", pluginLibrary.CString());
+            ATOMIC_LOGERRORF("Native Plugin: Unable to get atomic_plugin_init entry point in %s", pluginLibrary.CString());
             return false;
         }
 
@@ -81,18 +81,18 @@ namespace Atomic
 
          duk_context* ctx = vm->GetJSContext();
 
-         LOGINFOF("Loading Native Plugin: %s", pluginLibrary.CString());
+         ATOMIC_LOGINFOF("Loading Native Plugin: %s", pluginLibrary.CString());
 
          if (!jsplugin_get_entry_points(pluginLibrary, &validatefunc, &initfunc, errorMsg))
          {
-             LOGERRORF("%s", errorMsg.CString());
+             ATOMIC_LOGERRORF("%s", errorMsg.CString());
              return false;
          }
 
          int version = ATOMIC_JSPLUGIN_VERSION;
          if (!validatefunc(version, &gJSVMExports, sizeof(JSVMImports)))
          {
-             LOGERRORF("Native Plugin: atomic_plugin_validate failed: %s", pluginLibrary.CString());
+             ATOMIC_LOGERRORF("Native Plugin: atomic_plugin_validate failed: %s", pluginLibrary.CString());
              return false;
          }
 
@@ -109,7 +109,7 @@ namespace Atomic
         if (duk_pcall(ctx, 1) != DUK_EXEC_SUCCESS)
         {
             success = false;
-            LOGERRORF("Native Plugin: error calling atomic_plugin_init %s with error %s",
+            ATOMIC_LOGERRORF("Native Plugin: error calling atomic_plugin_init %s with error %s",
                 pluginLibrary.CString(),
                 duk_safe_to_string(ctx, -1));
         }
@@ -118,7 +118,7 @@ namespace Atomic
             if (!duk_is_boolean(ctx, -1) || !duk_to_boolean(ctx, -1))
             {
                 success = false;
-                LOGERRORF("Native Plugin: error calling atomic_plugin_init, didn't return true %s", pluginLibrary.CString());
+                ATOMIC_LOGERRORF("Native Plugin: error calling atomic_plugin_init, didn't return true %s", pluginLibrary.CString());
             }
         }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,48 @@
 
 #include "../DebugNew.h"
 
+
 namespace Atomic
 {
+
+TypeInfo::TypeInfo(const char* typeName, const TypeInfo* baseTypeInfo) :
+    type_(typeName),
+    typeName_(typeName),
+    baseTypeInfo_(baseTypeInfo)
+{
+}
+
+TypeInfo::~TypeInfo()
+{
+}
+
+bool TypeInfo::IsTypeOf(StringHash type) const
+{
+    const TypeInfo* current = this;
+    while (current)
+    {
+        if (current->GetType() == type)
+            return true;
+
+        current = current->GetBaseTypeInfo();
+    }
+
+    return false;
+}
+
+bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
+{
+    const TypeInfo* current = this;
+    while (current)
+    {
+        if (current == typeInfo)
+            return true;
+
+        current = current->GetBaseTypeInfo();
+    }
+
+    return false;
+}
 
 Object::Object(Context* context) :
     context_(context)
@@ -83,6 +123,26 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
     }
 }
 
+bool Object::IsTypeOf(StringHash type)
+{
+    return GetTypeInfoStatic()->IsTypeOf(type);
+}
+
+bool Object::IsTypeOf(const TypeInfo* typeInfo)
+{
+    return GetTypeInfoStatic()->IsTypeOf(typeInfo);
+}
+
+bool Object::IsInstanceOf(StringHash type) const
+{
+    return GetTypeInfo()->IsTypeOf(type);
+}
+
+bool Object::IsInstanceOf(const TypeInfo* typeInfo) const
+{
+    return GetTypeInfo()->IsTypeOf(typeInfo);
+}
+
 void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
 {
     if (!handler)
@@ -120,6 +180,18 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
 
     context_->AddEventReceiver(this, sender, eventType);
 }
+
+#if ATOMIC_CXX11
+void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
+{
+    SubscribeToEvent(eventType, new EventHandler11Impl(function, userData));
+}
+
+void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
+{
+    SubscribeToEvent(sender, eventType, new EventHandler11Impl(function, userData));
+}
+#endif
 
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
@@ -227,7 +299,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Sending events is only supported from the main thread");
+        ATOMIC_LOGERROR("Sending events is only supported from the main thread");
         return;
     }
 
@@ -236,7 +308,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     Context* context = context_;
     HashSet<Object*> processed;
 
-    context->BeginSendEvent(this, eventType, eventData);
+// ATOMIC BEGIN
+    context->GlobalBeginSendEvent(this, eventType, eventData);
+// ATOMIC END
+
+    context->BeginSendEvent(this, eventType);
 
     // Check first the specific event receivers
     const HashSet<Object*>* group = context->GetEventReceivers(this, eventType);
@@ -256,7 +332,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             // If self has been destroyed as a result of event handling, exit
             if (self.Expired())
             {
-                context->EndSendEvent(this, eventType, eventData);
+                context->EndSendEvent();
                 return;
             }
 
@@ -288,7 +364,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
                 if (self.Expired())
                 {
-                    context->EndSendEvent(this,eventType,  eventData);
+                    context->EndSendEvent();
                     return;
                 }
 
@@ -314,7 +390,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
                     if (self.Expired())
                     {
-                        context->EndSendEvent(this, eventType, eventData);
+                        context->EndSendEvent();
                         return;
                     }
 
@@ -325,12 +401,32 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    context->EndSendEvent(this,eventType, eventData);
+    context->EndSendEvent();
+
+// ATOMIC BEGIN
+    context->GlobalEndSendEvent(this,eventType, eventData);
+// ATOMIC END
+
 }
 
 VariantMap& Object::GetEventDataMap() const
 {
     return context_->GetEventDataMap();
+}
+
+const Variant& Object::GetGlobalVar(StringHash key) const
+{
+    return context_->GetGlobalVar(key);
+}
+
+const VariantMap& Object::GetGlobalVars() const
+{
+    return context_->GetGlobalVars();
+}
+
+void Object::SetGlobalVar(StringHash key, const Variant& value)
+{
+    context_->SetGlobalVar(key, value);
 }
 
 Object* Object::GetSubsystem(StringHash type) const
@@ -446,6 +542,26 @@ void Object::RemoveEventSender(Object* sender)
             handler = eventHandlers_.Next(handler);
         }
     }
+}
+
+
+Atomic::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
+{
+    StringHash id(eventName);
+    GetEventNameMap()[id] = eventName;
+    return id;
+}
+
+const String& EventNameRegistrar::GetEventName(StringHash eventID)
+{
+    HashMap<StringHash, String>::ConstIterator it = GetEventNameMap().Find(eventID);
+    return  it != GetEventNameMap().End() ? it->second_ : String::EMPTY ;
+}
+
+HashMap<StringHash, String>& EventNameRegistrar::GetEventNameMap()
+{
+    static HashMap<StringHash, String> eventNames_;
+    return eventNames_;
 }
 
 }

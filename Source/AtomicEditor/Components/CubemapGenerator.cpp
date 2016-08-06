@@ -67,13 +67,13 @@ bool CubemapGenerator::Render()
 
     if(!InitRender())
     {
-        LOGERRORF("Unable to init render");
+        ATOMIC_LOGERRORF("Unable to init render");
         return false;
     }
 
     GetScene()->SendEvent(E_CUBEMAPRENDERBEGIN);
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(CubemapGenerator, HandleBeginFrame));
-    SubscribeToEvent(E_ENDFRAME, HANDLER(CubemapGenerator, HandleEndFrame));
+    SubscribeToEvent(E_BEGINFRAME, ATOMIC_HANDLER(CubemapGenerator, HandleBeginFrame));
+    SubscribeToEvent(E_ENDFRAME, ATOMIC_HANDLER(CubemapGenerator, HandleEndFrame));
 
     return true;
 
@@ -98,7 +98,7 @@ bool CubemapGenerator::InitPaths()
     {
         if (!fileSystem->CreateDirs(pathName,  "Cubemaps/" + fileName + "/"))
         {
-            LOGERRORF("CubemapGenerator::InitRender - Unable to create path: %s", outputPathAbsolute_.CString());
+            ATOMIC_LOGERRORF("CubemapGenerator::InitRender - Unable to create path: %s", outputPathAbsolute_.CString());
             return false;
         }
     }
@@ -122,7 +122,7 @@ bool CubemapGenerator::InitRender()
 
     if (sceneEditor_.Null())
     {
-        LOGERROR("CubemapGenerator::InitRender - unable to get scene editor");
+        ATOMIC_LOGERROR("CubemapGenerator::InitRender - unable to get scene editor");
         return false;
     }
 
@@ -330,8 +330,8 @@ void CubemapGenerator::RegisterObject(Context* context)
 {
     context->RegisterFactory<CubemapGenerator>();
 
-    ATTRIBUTE("Name Prefix", String, namePrefix_, "Cubemap", AM_DEFAULT);
-    ATTRIBUTE("Image Size", int, imageSize_, 512, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Name Prefix", String, namePrefix_, "Cubemap", AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Image Size", int, imageSize_, 512, AM_DEFAULT);
 
 }
 

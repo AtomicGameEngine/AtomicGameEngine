@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,13 @@
 #include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 
+// ATOMIC BEGIN
 #include <Bullet/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
 #include <Bullet/src/BulletDynamics/ConstraintSolver/btHingeConstraint.h>
 #include <Bullet/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <Bullet/src/BulletDynamics/ConstraintSolver/btSliderConstraint.h>
 #include <Bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+// ATOMIC END
 
 namespace Atomic
 {
@@ -84,18 +86,18 @@ void Constraint::RegisterObject(Context* context)
 {
     context->RegisterFactory<Constraint>(PHYSICS_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
-    ATTRIBUTE("Position", Vector3, position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE("Rotation", Quaternion, rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE("Other Body Position", Vector3, otherPosition_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE("Other Body Rotation", Quaternion, otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
-    ACCESSOR_ATTRIBUTE("High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("CFM Parameter", GetCFM, SetCFM, float, 0.0f, AM_DEFAULT);
-    ATTRIBUTE("Disable Collision", bool, disableCollision_, false, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ENUM_ATTRIBUTE("Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Position", Vector3, position_, Vector3::ZERO, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Rotation", Quaternion, rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Other Body Position", Vector3, otherPosition_, Vector3::ZERO, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Other Body Rotation", Quaternion, otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    ATOMIC_ACCESSOR_ATTRIBUTE("High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("CFM Parameter", GetCFM, SetCFM, float, 0.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Disable Collision", bool, disableCollision_, false, AM_DEFAULT);
 }
 
 void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -163,7 +165,7 @@ void Constraint::GetDependencyNodes(PODVector<Node*>& dest)
 
 void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug && physicsWorld_ && constraint_ && IsEnabledEffective())
+    if (debug && physicsWorld_ && constraint_)
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);
@@ -302,7 +304,7 @@ void Constraint::SetWorldPosition(const Vector3& position)
         MarkNetworkUpdate();
     }
     else
-        LOGWARNING("Constraint not created, world position could not be stored");
+        ATOMIC_LOGWARNING("Constraint not created, world position could not be stored");
 }
 
 void Constraint::SetHighLimit(const Vector2& limit)
@@ -454,7 +456,7 @@ void Constraint::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            ATOMIC_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
 
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
         physicsWorld_->AddConstraint(this);
@@ -484,7 +486,7 @@ void Constraint::OnMarkedDirty(Node* node)
 
 void Constraint::CreateConstraint()
 {
-    PROFILE(CreateConstraint);
+    ATOMIC_PROFILE(CreateConstraint);
 
     cachedWorldScale_ = node_->GetWorldScale();
 

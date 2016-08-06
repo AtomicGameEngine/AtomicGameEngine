@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -129,7 +129,21 @@ struct ATOMIC_API ResourceRef
     {
     }
 
-    // Construct from another ResourceRef.
+    /// Construct with type and resource name.
+    ResourceRef(const String& type, const String& name) :
+        type_(type),
+        name_(name)
+    {
+    }
+
+    /// Construct with type and resource name.
+    ResourceRef(const char* type, const char* name) :
+        type_(type),
+        name_(name)
+    {
+    }
+
+    /// Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),
         name_(rhs.name_)
@@ -947,8 +961,8 @@ public:
         return type_ == VAR_QUATERNION ? *reinterpret_cast<const Quaternion*>(&value_) : Quaternion::IDENTITY;
     }
 
-    /// Return color or default on type mismatch.
-    const Color& GetColor() const { return type_ == VAR_COLOR ? *reinterpret_cast<const Color*>(&value_) : Color::WHITE; }
+    /// Return color or default on type mismatch. Vector4 is aliased to Color if necessary.
+    const Color& GetColor() const { return (type_ == VAR_COLOR || type_ == VAR_VECTOR4) ? *reinterpret_cast<const Color*>(&value_) : Color::WHITE; }
 
     /// Return string or empty on type mismatch.
     const String& GetString() const { return type_ == VAR_STRING ? *reinterpret_cast<const String*>(&value_) : String::EMPTY; }
@@ -960,7 +974,7 @@ public:
     }
 
     /// Return %VectorBuffer containing the buffer or empty on type mismatch.
-    const VectorBuffer GetVectorBuffer() const;
+    VectorBuffer GetVectorBuffer() const;
 
     /// Return void pointer or null on type mismatch. RefCounted pointer will be converted.
     void* GetVoidPtr() const
@@ -1102,7 +1116,7 @@ private:
 /// Return variant type from type.
 template <typename T> VariantType GetVariantType();
 
-/// Return variant type from concrete types.
+// Return variant type from concrete types
 template <> inline VariantType GetVariantType<int>() { return VAR_INT; }
 
 template <> inline VariantType GetVariantType<unsigned>() { return VAR_INT; }
@@ -1135,7 +1149,7 @@ template <> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RE
 
 template <> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
 
-template <> inline VariantType GetVariantType<StringVector >() { return VAR_STRINGVECTOR; }
+template <> inline VariantType GetVariantType<StringVector>() { return VAR_STRINGVECTOR; }
 
 template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
 
@@ -1148,5 +1162,80 @@ template <> inline VariantType GetVariantType<Matrix3>() { return VAR_MATRIX3; }
 template <> inline VariantType GetVariantType<Matrix3x4>() { return VAR_MATRIX3X4; }
 
 template <> inline VariantType GetVariantType<Matrix4>() { return VAR_MATRIX4; }
+
+// Specializations of Variant::Get<T>
+template <> ATOMIC_API int Variant::Get<int>() const;
+
+template <> ATOMIC_API unsigned Variant::Get<unsigned>() const;
+
+template <> ATOMIC_API StringHash Variant::Get<StringHash>() const;
+
+template <> ATOMIC_API bool Variant::Get<bool>() const;
+
+template <> ATOMIC_API float Variant::Get<float>() const;
+
+template <> ATOMIC_API double Variant::Get<double>() const;
+
+template <> ATOMIC_API const Vector2& Variant::Get<const Vector2&>() const;
+
+template <> ATOMIC_API const Vector3& Variant::Get<const Vector3&>() const;
+
+template <> ATOMIC_API const Vector4& Variant::Get<const Vector4&>() const;
+
+template <> ATOMIC_API const Quaternion& Variant::Get<const Quaternion&>() const;
+
+template <> ATOMIC_API const Color& Variant::Get<const Color&>() const;
+
+template <> ATOMIC_API const String& Variant::Get<const String&>() const;
+
+template <> ATOMIC_API const IntRect& Variant::Get<const IntRect&>() const;
+
+template <> ATOMIC_API const IntVector2& Variant::Get<const IntVector2&>() const;
+
+template <> ATOMIC_API const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const;
+
+template <> ATOMIC_API void* Variant::Get<void*>() const;
+
+template <> ATOMIC_API RefCounted* Variant::Get<RefCounted*>() const;
+
+template <> ATOMIC_API const Matrix3& Variant::Get<const Matrix3&>() const;
+
+template <> ATOMIC_API const Matrix3x4& Variant::Get<const Matrix3x4&>() const;
+
+template <> ATOMIC_API const Matrix4& Variant::Get<const Matrix4&>() const;
+
+template <> ATOMIC_API ResourceRef Variant::Get<ResourceRef>() const;
+
+template <> ATOMIC_API ResourceRefList Variant::Get<ResourceRefList>() const;
+
+template <> ATOMIC_API VariantVector Variant::Get<VariantVector>() const;
+
+template <> ATOMIC_API StringVector Variant::Get<StringVector>() const;
+
+template <> ATOMIC_API VariantMap Variant::Get<VariantMap>() const;
+
+template <> ATOMIC_API Vector2 Variant::Get<Vector2>() const;
+
+template <> ATOMIC_API Vector3 Variant::Get<Vector3>() const;
+
+template <> ATOMIC_API Vector4 Variant::Get<Vector4>() const;
+
+template <> ATOMIC_API Quaternion Variant::Get<Quaternion>() const;
+
+template <> ATOMIC_API Color Variant::Get<Color>() const;
+
+template <> ATOMIC_API String Variant::Get<String>() const;
+
+template <> ATOMIC_API IntRect Variant::Get<IntRect>() const;
+
+template <> ATOMIC_API IntVector2 Variant::Get<IntVector2>() const;
+
+template <> ATOMIC_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const;
+
+template <> ATOMIC_API Matrix3 Variant::Get<Matrix3>() const;
+
+template <> ATOMIC_API Matrix3x4 Variant::Get<Matrix3x4>() const;
+
+template <> ATOMIC_API Matrix4 Variant::Get<Matrix4>() const;
 
 }

@@ -39,7 +39,7 @@ class UIElement;
 /// Message box dialog.
 class ATOMIC_API MessageBox : public Object
 {
-    OBJECT(MessageBox);
+    ATOMIC_OBJECT(MessageBox, Object);
 
 public:
     /// Construct. If layout file is not given, use the default message box layout. If style file is not given, use the default style file from root UI element.

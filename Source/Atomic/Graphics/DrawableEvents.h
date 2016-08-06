@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,23 +28,41 @@ namespace Atomic
 {
 
 /// AnimatedModel bone hierarchy created.
-EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
+ATOMIC_EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// AnimatedModel animation trigger.
-EVENT(E_ANIMATIONTRIGGER, AnimationTrigger)
+ATOMIC_EVENT(E_ANIMATIONTRIGGER, AnimationTrigger)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_NAME, Name);                    // String
-    PARAM(P_TIME, Time);                    // Float
-    PARAM(P_DATA, Data);                    // User-defined data type
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_ANIMATION, Animation);          // Animation pointer
+    ATOMIC_PARAM(P_NAME, Name);                    // String
+    ATOMIC_PARAM(P_TIME, Time);                    // Float
+    ATOMIC_PARAM(P_DATA, Data);                    // User-defined data type
 }
-/// Terrain geometry created.
-EVENT(E_TERRAINCREATED, TerrainCreated)
+
+/// AnimatedModel animation finished or looped.
+ATOMIC_EVENT(E_ANIMATIONFINISHED, AnimationFinished)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_ANIMATION, Animation);          // Animation pointer
+    ATOMIC_PARAM(P_NAME, Name);                    // String
+    ATOMIC_PARAM(P_LOOPED, Looped);                // Bool
+}
+
+/// Particle effect finished.
+ATOMIC_EVENT(E_PARTICLEEFFECTFINISHED, ParticleEffectFinished)
+{
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_EFFECT, Effect);                // ParticleEffect pointer
+}
+
+/// Terrain geometry created.
+ATOMIC_EVENT(E_TERRAINCREATED, TerrainCreated)
+{
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 }

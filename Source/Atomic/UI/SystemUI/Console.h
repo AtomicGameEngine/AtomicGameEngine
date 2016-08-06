@@ -45,7 +45,7 @@ class UIElement;
 /// %Console window with log history and command line prompt.
 class ATOMIC_API Console : public Object
 {
-    OBJECT(Console);
+    ATOMIC_OBJECT(Console, Object);
 
 public:
     /// Construct.

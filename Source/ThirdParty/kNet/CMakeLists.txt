@@ -14,9 +14,7 @@
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
-#set (TARGET_NAME kNet)
-
-include_directories(include)
+set (TARGET_NAME kNet)
 
 file (GLOB kNetSourceFiles src/*.cpp)
 file (GLOB kNetHeaderFiles include/*.h include/kNet/*.h include/kNet/*.inl)
@@ -34,9 +32,7 @@ if (WIN32)
 
    add_definitions (-D_WINSOCKAPI_)
    add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-   # ATOMIC: Disable KNET_MEMORY_LEAK_CHECK, only used on Windows
-   # redefines new/delete and causes a compilation problem on VS2015 Update 1
-   # add_definitions (-DKNET_MEMORY_LEAK_CHECK)
+   add_definitions (-DKNET_MEMORY_LEAK_CHECK)
 elseif (UNIX)
    file (GLOB kNetUnixSourceFiles src/unix/*.cpp)
    file (GLOB kNetUnixHeaderFiles include/*.h include/kNet/*.h include/kNet/unix/*.h)
@@ -48,7 +44,7 @@ elseif (UNIX)
    list (APPEND kNetSourceFiles ${kNetUnixSourceFiles})
    list (APPEND kNetHeaderFiles ${kNetUnixHeaderFiles})
 
-   add_definitions (-DKNET_UNIX)
+   # Urho3D: KNET_UNIX definition removed
 endif ()
 
 # Urho3D: set DEBUG_CPP_NAME only on Windows, Xcode project file can not be opened if this is included
@@ -62,4 +58,13 @@ endif ()
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 
-add_library(kNet ${SOURCE_FILES})
+# Define dependency libs
+set (INCLUDE_DIRS include)
+
+# Setup target
+setup_library ()
+
+# Install headers for building and using the Urho3D library (install dependency for Urho3D/Network/Connection.h and Urho3D/Network/Network.h)
+install_header_files (DIRECTORY include/kNet/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet FILES_MATCHING PATTERN *.h *.inl USE_FILE_SYMLINK)     # Note: the trailing slash is significant
+file (GLOB kNetHeaderFiles include/*.h)
+install_header_files (FILES ${kNetHeaderFiles} DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet)

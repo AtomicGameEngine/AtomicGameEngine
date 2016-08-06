@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,17 +30,21 @@
 #include "../Resource/Decompress.h"
 
 #include <JO/jo_jpeg.h>
-#include <SDL/include/SDL_surface.h>
-#include <STB/stb_image.h>
-#include <STB/stb_image_write.h>
 
-#include "../DebugNew.h"
+// ATOMIC BEGIN
+#include <SDL/include/SDL_surface.h>
 
 #ifdef ATOMIC_PLATFORM_DESKTOP
 #include <libsquish/squish.h>
 #endif
 
-extern "C" unsigned char* stbi_write_png_to_mem(unsigned char* pixels, int stride_bytes, int x, int y, int n, int* out_len);
+// ATOMIC END
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <STB/stb_image.h>
+#include <STB/stb_image_write.h>
+#include "../DebugNew.h"
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
@@ -101,6 +105,7 @@ static const unsigned DDPF_RGB = 0x00000040;
 static const unsigned DDPF_LUMINANCE = 0x00020000;
 static const unsigned DDPF_NORMAL = 0x80000000;  // nvidia specific
 // ATOMIC END
+
 
 namespace Atomic
 {
@@ -267,9 +272,11 @@ Image::Image(Context* context) :
     height_(0),
     depth_(0),
     components_(0),
+    numCompressedLevels_(0),
     cubemap_(false),
     array_(false),
-    sRGB_(false)
+    sRGB_(false),
+    compressedFormat_(CF_NONE)
 {
 }
 
@@ -323,7 +330,7 @@ bool Image::BeginLoad(Deserializer& source)
                 fourCC = 0;
                 break;
             default:
-                LOGERROR("Unrecognized DDS DXGI image format");
+                ATOMIC_LOGERROR("Unrecognized DDS DXGI image format");
                 return false;
             }
 
@@ -357,7 +364,7 @@ bool Image::BeginLoad(Deserializer& source)
             if (ddsd.ddpfPixelFormat_.dwRGBBitCount_ != 32 && ddsd.ddpfPixelFormat_.dwRGBBitCount_ != 24 &&
                 ddsd.ddpfPixelFormat_.dwRGBBitCount_ != 16)
             {
-                LOGERROR("Unsupported DDS pixel byte size");
+                ATOMIC_LOGERROR("Unsupported DDS pixel byte size");
                 return false;
             }
             compressedFormat_ = CF_RGBA;
@@ -365,7 +372,7 @@ bool Image::BeginLoad(Deserializer& source)
             break;
 
         default:
-            LOGERROR("Unrecognized DDS image format");
+            ATOMIC_LOGERROR("Unrecognized DDS image format");
             return false;
         }
 
@@ -394,22 +401,22 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
-            for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
+            for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
             {
-                blocksWide = (Max(x, 1) + 3) / 4;
-                blocksHeight = (Max(y, 1) + 3) / 4;
-                dataSize += blockSize * blocksWide * blocksHeight * Max(z, 1);
+                blocksWide = (Max(x, 1U) + 3) / 4;
+                blocksHeight = (Max(y, 1U) + 3) / 4;
+                dataSize += blockSize * blocksWide * blocksHeight * Max(z, 1U);
             }
         }
         else
         {
-            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, 1);
+            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, 1U);
             // Calculate mip data size
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
-            for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
-                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1) * Max(y, 1) * Max(z, 1);
+            for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
+                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1U) * Max(y, 1U) * Max(z, 1U);
         }
 
         // Do not use a shared ptr here, in case nothing is refcounting the image outside this function.
@@ -449,25 +456,26 @@ bool Image::BeginLoad(Deserializer& source)
         // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
         if (compressedFormat_ == CF_RGBA)
         {
-            PROFILE(ConvertDDSToRGBA);
+            ATOMIC_PROFILE(ConvertDDSToRGBA);
 
-            SharedPtr<Image> currentImage(this);
-            while (currentImage.NotNull())
+            currentImage = this;
+
+            while (currentImage)
             {
                 unsigned sourcePixelByteSize = ddsd.ddpfPixelFormat_.dwRGBBitCount_ >> 3;
                 unsigned numPixels = dataSize / sourcePixelByteSize;
 
 #define ADJUSTSHIFT(mask, l, r) \
                 if (mask && mask >= 0x100) \
-                                { \
-                                                    while ((mask >> r) >= 0x100) \
-                        ++r; \
-                                } \
-                        else if (mask && mask < 0x80) \
-                                { \
-                                                    while ((mask << l) < 0x80) \
-                        ++l; \
-                                }
+                { \
+                    while ((mask >> r) >= 0x100) \
+                    ++r; \
+                } \
+                else if (mask && mask < 0x80) \
+                { \
+                    while ((mask << l) < 0x80) \
+                    ++l; \
+                }
 
                 unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
                 unsigned rShiftR = 0, gShiftR = 0, bShiftR = 0, aShiftR = 0;
@@ -481,7 +489,6 @@ bool Image::BeginLoad(Deserializer& source)
                 ADJUSTSHIFT(aMask, aShiftL, aShiftR)
 
                 SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
-                SetMemoryUse(numPixels * 4);
 
                 switch (sourcePixelByteSize)
                 {
@@ -537,6 +544,7 @@ bool Image::BeginLoad(Deserializer& source)
 
                 // Replace with converted data
                 currentImage->data_ = rgbaData;
+                currentImage->SetMemoryUse(numPixels * 4);
                 currentImage = currentImage->GetNextSibling();
             }
         }
@@ -561,25 +569,25 @@ bool Image::BeginLoad(Deserializer& source)
 
         if (endianness != 0x04030201)
         {
-            LOGERROR("Big-endian KTX files not supported");
+            ATOMIC_LOGERROR("Big-endian KTX files not supported");
             return false;
         }
 
         if (type != 0 || format != 0)
         {
-            LOGERROR("Uncompressed KTX files not supported");
+            ATOMIC_LOGERROR("Uncompressed KTX files not supported");
             return false;
         }
 
         if (faces > 1 || depth > 1)
         {
-            LOGERROR("3D or cube KTX files not supported");
+            ATOMIC_LOGERROR("3D or cube KTX files not supported");
             return false;
         }
 
         if (mipmaps == 0)
         {
-            LOGERROR("KTX files without explicitly specified mipmap count not supported");
+            ATOMIC_LOGERROR("KTX files without explicitly specified mipmap count not supported");
             return false;
         }
 
@@ -632,7 +640,7 @@ bool Image::BeginLoad(Deserializer& source)
 
         if (compressedFormat_ == CF_NONE)
         {
-            LOGERROR("Unsupported texture format in KTX file");
+            ATOMIC_LOGERROR("Unsupported texture format in KTX file");
             return false;
         }
 
@@ -650,7 +658,7 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned levelSize = source.ReadUInt();
             if (levelSize + dataOffset > dataSize)
             {
-                LOGERROR("KTX mipmap level data size exceeds file size");
+                ATOMIC_LOGERROR("KTX mipmap level data size exceeds file size");
                 return false;
             }
 
@@ -679,13 +687,13 @@ bool Image::BeginLoad(Deserializer& source)
 
         if (depth > 1 || numFaces > 1)
         {
-            LOGERROR("3D or cube PVR files not supported");
+            ATOMIC_LOGERROR("3D or cube PVR files not supported");
             return false;
         }
 
         if (mipmapCount == 0)
         {
-            LOGERROR("PVR files without explicitly specified mipmap count not supported");
+            ATOMIC_LOGERROR("PVR files without explicitly specified mipmap count not supported");
             return false;
         }
 
@@ -738,7 +746,7 @@ bool Image::BeginLoad(Deserializer& source)
 
         if (compressedFormat_ == CF_NONE)
         {
-            LOGERROR("Unsupported texture format in PVR file");
+            ATOMIC_LOGERROR("Unsupported texture format in PVR file");
             return false;
         }
 
@@ -762,7 +770,7 @@ bool Image::BeginLoad(Deserializer& source)
         unsigned char* pixelData = GetImageData(source, width, height, components);
         if (!pixelData)
         {
-            LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
+            ATOMIC_LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
             return false;
         }
         SetSize(width, height, components);
@@ -775,17 +783,17 @@ bool Image::BeginLoad(Deserializer& source)
 
 bool Image::Save(Serializer& dest) const
 {
-    PROFILE(SaveImage);
+    ATOMIC_PROFILE(SaveImage);
 
     if (IsCompressed())
     {
-        LOGERROR("Can not save compressed image " + GetName());
+        ATOMIC_LOGERROR("Can not save compressed image " + GetName());
         return false;
     }
 
     if (!data_)
     {
-        LOGERROR("Can not save zero-sized image " + GetName());
+        ATOMIC_LOGERROR("Can not save zero-sized image " + GetName());
         return false;
     }
 
@@ -812,7 +820,7 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
 
     if (components > 4)
     {
-        LOGERROR("More than 4 color components are not supported");
+        ATOMIC_LOGERROR("More than 4 color components are not supported");
         return false;
     }
 
@@ -876,7 +884,7 @@ void Image::SetData(const unsigned char* pixelData)
 
     if (IsCompressed())
     {
-        LOGERROR("Can not set new pixel data for a compressed image");
+        ATOMIC_LOGERROR("Can not set new pixel data for a compressed image");
         return;
     }
 
@@ -890,7 +898,7 @@ bool Image::LoadColorLUT(Deserializer& source)
 
     if (fileID == "DDS " || fileID == "\253KTX" || fileID == "PVR\3")
     {
-        LOGERROR("Invalid image format, can not load image");
+        ATOMIC_LOGERROR("Invalid image format, can not load image");
         return false;
     }
 
@@ -900,12 +908,12 @@ bool Image::LoadColorLUT(Deserializer& source)
     unsigned char* pixelDataIn = GetImageData(source, width, height, components);
     if (!pixelDataIn)
     {
-        LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
+        ATOMIC_LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
         return false;
     }
     if (components != 3)
     {
-        LOGERROR("Invalid image format, can not load image");
+        ATOMIC_LOGERROR("Invalid image format, can not load image");
         return false;
     }
 
@@ -942,7 +950,7 @@ bool Image::FlipHorizontal()
 
     if (depth_ > 1)
     {
-        LOGERROR("FlipHorizontal not supported for 3D images");
+        ATOMIC_LOGERROR("FlipHorizontal not supported for 3D images");
         return false;
     }
 
@@ -966,7 +974,7 @@ bool Image::FlipHorizontal()
     {
         if (compressedFormat_ > CF_DXT5)
         {
-            LOGERROR("FlipHorizontal not yet implemented for other compressed formats than RGBA & DXT1,3,5");
+            ATOMIC_LOGERROR("FlipHorizontal not yet implemented for other compressed formats than RGBA & DXT1,3,5");
             return false;
         }
 
@@ -979,7 +987,7 @@ bool Image::FlipHorizontal()
             CompressedLevel level = GetCompressedLevel(i);
             if (!level.data_)
             {
-                LOGERROR("Got compressed level with no data, aborting horizontal flip");
+                ATOMIC_LOGERROR("Got compressed level with no data, aborting horizontal flip");
                 return false;
             }
 
@@ -1009,7 +1017,7 @@ bool Image::FlipVertical()
 
     if (depth_ > 1)
     {
-        LOGERROR("FlipVertical not supported for 3D images");
+        ATOMIC_LOGERROR("FlipVertical not supported for 3D images");
         return false;
     }
 
@@ -1027,7 +1035,7 @@ bool Image::FlipVertical()
     {
         if (compressedFormat_ > CF_DXT5)
         {
-            LOGERROR("FlipVertical not yet implemented for other compressed formats than DXT1,3,5");
+            ATOMIC_LOGERROR("FlipVertical not yet implemented for other compressed formats than DXT1,3,5");
             return false;
         }
 
@@ -1040,7 +1048,7 @@ bool Image::FlipVertical()
             CompressedLevel level = GetCompressedLevel(i);
             if (!level.data_)
             {
-                LOGERROR("Got compressed level with no data, aborting vertical flip");
+                ATOMIC_LOGERROR("Got compressed level with no data, aborting vertical flip");
                 return false;
             }
 
@@ -1064,17 +1072,17 @@ bool Image::FlipVertical()
 
 bool Image::Resize(int width, int height)
 {
-    PROFILE(ResizeImage);
+    ATOMIC_PROFILE(ResizeImage);
 
     if (IsCompressed())
     {
-        LOGERROR("Resize not supported for compressed images");
+        ATOMIC_LOGERROR("Resize not supported for compressed images");
         return false;
     }
 
     if (depth_ > 1)
     {
-        LOGERROR("Resize not supported for 3D images");
+        ATOMIC_LOGERROR("Resize not supported for 3D images");
         return false;
     }
 
@@ -1126,36 +1134,47 @@ void Image::Clear(const Color& color)
 
 void Image::ClearInt(unsigned uintColor)
 {
-    PROFILE(ClearImage);
+    ATOMIC_PROFILE(ClearImage);
 
     if (!data_)
         return;
 
     if (IsCompressed())
     {
-        LOGERROR("Clear not supported for compressed images");
+        ATOMIC_LOGERROR("Clear not supported for compressed images");
         return;
     }
 
-    unsigned char* src = (unsigned char*)&uintColor;
-    for (unsigned i = 0; i < width_ * height_ * depth_ * components_; ++i)
-        data_[i] = src[i % components_];
+    if (components_ == 4)
+    {
+        unsigned color = uintColor;
+        unsigned* data = (unsigned*)GetData();
+        unsigned* data_end = (unsigned*)(GetData() + width_ * height_ * depth_ * components_);
+        for (; data < data_end; ++data)
+            *data = color;
+    }
+    else
+    {
+        unsigned char* src = (unsigned char*)&uintColor;
+        for (unsigned i = 0; i < width_ * height_ * depth_ * components_; ++i)
+            data_[i] = src[i % components_];
+    }
 }
 
 bool Image::SaveBMP(const String& fileName) const
 {
-    PROFILE(SaveImageBMP);
+    ATOMIC_PROFILE(SaveImageBMP);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        ATOMIC_LOGERROR("Access denied to " + fileName);
         return false;
     }
 
     if (IsCompressed())
     {
-        LOGERROR("Can not save compressed image to BMP");
+        ATOMIC_LOGERROR("Can not save compressed image to BMP");
         return false;
     }
 
@@ -1167,41 +1186,29 @@ bool Image::SaveBMP(const String& fileName) const
 
 bool Image::SavePNG(const String& fileName) const
 {
-    PROFILE(SaveImagePNG);
+    ATOMIC_PROFILE(SaveImagePNG);
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-    {
-        LOGERROR("Access denied to " + fileName);
-        return false;
-    }
-
-    if (IsCompressed())
-    {
-        LOGERROR("Can not save compressed image to PNG");
-        return false;
-    }
-
-    if (data_)
-        return stbi_write_png(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), 0) != 0;
+    File outFile(context_, fileName, FILE_WRITE);
+    if (outFile.IsOpen())
+        return Image::Save(outFile); // Save uses PNG format
     else
         return false;
 }
 
 bool Image::SaveTGA(const String& fileName) const
 {
-    PROFILE(SaveImageTGA);
+    ATOMIC_PROFILE(SaveImageTGA);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        ATOMIC_LOGERROR("Access denied to " + fileName);
         return false;
     }
 
     if (IsCompressed())
     {
-        LOGERROR("Can not save compressed image to TGA");
+        ATOMIC_LOGERROR("Can not save compressed image to TGA");
         return false;
     }
 
@@ -1213,18 +1220,18 @@ bool Image::SaveTGA(const String& fileName) const
 
 bool Image::SaveJPG(const String& fileName, int quality) const
 {
-    PROFILE(SaveImageJPG);
+    ATOMIC_PROFILE(SaveImageJPG);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        ATOMIC_LOGERROR("Access denied to " + fileName);
         return false;
     }
 
     if (IsCompressed())
     {
-        LOGERROR("Can not save compressed image to JPG");
+        ATOMIC_LOGERROR("Can not save compressed image to JPG");
         return false;
     }
 
@@ -1232,136 +1239,6 @@ bool Image::SaveJPG(const String& fileName, int quality) const
         return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
     else
         return false;
-}
-
-bool Image::SaveDDS(const String& fileName) const
-{
-#if !defined(ATOMIC_PLATFORM_DESKTOP)
-
-    LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
-    return false;
-
-#else
-    PROFILE(SaveImageDDS);
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-    {
-        LOGERROR("Access denied to " + fileName);
-        return false;
-    }
-
-    if (IsCompressed())
-    {
-        LOGERROR("Can not save compressed image to DDS");
-        return false;
-    }
-
-    if (data_)
-    {
-        // #623 BEGIN TODO: Should have an abstract ImageReader and ImageWriter classes
-        // with subclasses for particular image output types. Also should have image settings in the image meta.
-        // ImageReader/Writers should also support a progress callback so UI can be updated.
-
-        if (!width_ || !height_)
-        {
-            LOGERRORF("Attempting to save zero width/height DDS to %s", fileName.CString());
-            return false;
-        }
-
-        squish::u8 *inputData = (squish::u8 *) data_.Get();
-
-        SharedPtr<Image> tempImage;
-
-        // libsquish expects 4 channel RGBA, so create a temporary image if necessary
-        if (components_ != 4)
-        {
-            if (components_ != 3)
-            {
-                LOGERROR("Can only save images with 3 or 4 components to DDS");
-                return false;
-            }
-
-            tempImage = new Image(context_);
-            tempImage->SetSize(width_, height_, 4);
-
-            squish::u8* srcBits = (squish::u8*) data_;
-            squish::u8* dstBits = (squish::u8*) tempImage->data_;
-
-            for (unsigned i = 0; i < (unsigned) width_ * (unsigned) height_; i++)
-            {
-                *dstBits++ = *srcBits++;
-                *dstBits++ = *srcBits++;
-                *dstBits++ = *srcBits++;
-                *dstBits++ = 255;
-            }
-
-            inputData = (squish::u8 *) tempImage->data_.Get();
-        }
-        
-        unsigned squishFlags = HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1;
-
-        // Use a slow but high quality colour compressor (the default). (TODO: expose other settings as parameter)
-        squishFlags |= squish::kColourClusterFit;
-
-        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_,  squishFlags);
-
-        SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
-
-        squish::CompressImage(inputData, width_, height_, compressedData.Get(), squishFlags);
-
-        DDSurfaceDesc2 sdesc;
-
-        if (sizeof(sdesc) != 124)
-        {
-            LOGERROR("Image::SaveDDS - sizeof(DDSurfaceDesc2) != 124");
-            return false;
-        }
-        memset(&sdesc, 0, sizeof(sdesc));
-        sdesc.dwSize_ = 124;
-        sdesc.dwFlags_ = DDSD_CAPS | DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT;
-        sdesc.dwWidth_ = width_;
-        sdesc.dwHeight_ = height_;
-
-        sdesc.ddpfPixelFormat_.dwSize_ = 32;        
-        sdesc.ddpfPixelFormat_.dwFlags_ = DDPF_FOURCC | (HasAlphaChannel() ? DDPF_ALPHAPIXELS : 0);
-        sdesc.ddpfPixelFormat_.dwFourCC_ = HasAlphaChannel() ? FOURCC_DXT5 : FOURCC_DXT1;
-
-        SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
-
-        if (!dest->IsOpen())
-        {
-            LOGERRORF("Failed to open DXT image file for writing %s", fileName.CString());
-            return false;
-        }
-        else
-        {
-
-            dest->Write((void*)"DDS ", 4);
-            dest->Write((void*)&sdesc, sizeof(sdesc));
-
-            bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
-
-            if (!success)
-                LOGERRORF("Failed to write image to DXT, file size mismatch %s", fileName.CString());
-
-            return success;
-        }        
-        // #623 END TODO
-    }    
-#endif
-
-    return false;
-}
-
-bool Image::IsPOT() const
-{
-    return IsPowerOfTwo(width_) && IsPowerOfTwo(height_);
-}
-
-bool Image::HasAlphaChannel() const
-{
-    return components_ > 3;
 }
 
 Color Image::GetPixel(int x, int y) const
@@ -1484,19 +1361,19 @@ SharedPtr<Image> Image::GetNextLevel() const
 {
     if (IsCompressed())
     {
-        LOGERROR("Can not generate mip level from compressed data");
+        ATOMIC_LOGERROR("Can not generate mip level from compressed data");
         return SharedPtr<Image>();
     }
     if (components_ < 1 || components_ > 4)
     {
-        LOGERROR("Illegal number of image components for mip level generation");
+        ATOMIC_LOGERROR("Illegal number of image components for mip level generation");
         return SharedPtr<Image>();
     }
 
     if (nextLevel_)
         return nextLevel_;
 
-    PROFILE(CalculateImageMipLevel);
+    ATOMIC_PROFILE(CalculateImageMipLevel);
 
     int widthOut = width_ / 2;
     int heightOut = height_ / 2;
@@ -1785,17 +1662,17 @@ SharedPtr<Image> Image::ConvertToRGBA() const
 {
     if (IsCompressed())
     {
-        LOGERROR("Can not convert compressed image to RGBA");
+        ATOMIC_LOGERROR("Can not convert compressed image to RGBA");
         return SharedPtr<Image>();
     }
     if (components_ < 1 || components_ > 4)
     {
-        LOGERROR("Illegal number of image components for conversion to RGBA");
+        ATOMIC_LOGERROR("Illegal number of image components for conversion to RGBA");
         return SharedPtr<Image>();
     }
     if (!data_)
     {
-        LOGERROR("Can not convert image without data to RGBA");
+        ATOMIC_LOGERROR("Can not convert image without data to RGBA");
         return SharedPtr<Image>();
     }
 
@@ -1857,12 +1734,12 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
     if (compressedFormat_ == CF_NONE)
     {
-        LOGERROR("Image is not compressed");
+        ATOMIC_LOGERROR("Image is not compressed");
         return level;
     }
     if (index >= numCompressedLevels_)
     {
-        LOGERROR("Compressed image mip level out of bounds");
+        ATOMIC_LOGERROR("Compressed image mip level out of bounds");
         return level;
     }
 
@@ -1893,7 +1770,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
             if (offset + level.dataSize_ > GetMemoryUse())
             {
-                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                ATOMIC_LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
                          " Datasize: " + String(GetMemoryUse()));
                 level.data_ = 0;
                 return level;
@@ -1931,7 +1808,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
             if (offset + level.dataSize_ > GetMemoryUse())
             {
-                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                ATOMIC_LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
                          " Datasize: " + String(GetMemoryUse()));
                 level.data_ = 0;
                 return level;
@@ -1969,7 +1846,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
 
             if (offset + level.dataSize_ > GetMemoryUse())
             {
-                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                ATOMIC_LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
                          " Datasize: " + String(GetMemoryUse()));
                 level.data_ = 0;
                 return level;
@@ -1993,13 +1870,13 @@ Image* Image::GetSubimage(const IntRect& rect) const
 
     if (depth_ > 1)
     {
-        LOGERROR("Subimage not supported for 3D images");
+        ATOMIC_LOGERROR("Subimage not supported for 3D images");
         return 0;
     }
 
     if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
     {
-        LOGERROR("Can not get subimage from image " + GetName() + " with invalid region");
+        ATOMIC_LOGERROR("Can not get subimage from image " + GetName() + " with invalid region");
         return 0;
     }
 
@@ -2075,7 +1952,7 @@ Image* Image::GetSubimage(const IntRect& rect) const
 
         if (!subimageLevels)
         {
-            LOGERROR("Subimage region from compressed image " + GetName() + " did not produce any data");
+            ATOMIC_LOGERROR("Subimage region from compressed image " + GetName() + " did not produce any data");
             return 0;
         }
 
@@ -2094,64 +1971,6 @@ Image* Image::GetSubimage(const IntRect& rect) const
     }
 }
 
-bool Image::SetSubimage(const Image* image, const IntRect& rect)
-{
-    if (!data_)
-        return false;
-
-    if (depth_ > 1 || IsCompressed())
-    {
-        LOGERROR("SetSubimage not supported for Compressed or 3D images");
-        return false;
-    }
-
-    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
-    {
-        LOGERROR("Can not set subimage in image " + GetName() + " with invalid region");
-        return false;
-    }
-
-    int width = rect.Width();
-    int height = rect.Height();
-    if (width == image->GetWidth() && height == image->GetHeight())
-    {
-        int components = Min((int)components_, (int)image->components_);
-
-        unsigned char* src = image->GetData();
-        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
-        for (int i = 0; i < height; ++i)
-        {
-            memcpy(dest, src, width * components);
-                
-            src += width * image->components_;
-            dest += width_ * components_;
-        }
-    }
-    else
-    {
-        unsigned uintColor;
-        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
-        unsigned char* src = (unsigned char*)&uintColor;
-        for (int y = 0; y < height; ++y)
-        {
-            for (int x = 0; x < width; ++x)
-            {
-                // Calculate float coordinates between 0 - 1 for resampling
-                float xF = (image->width_ > 1) ? (float)x / (float)(width - 1) : 0.0f;
-                float yF = (image->height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
-                uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
-
-                memcpy(dest, src, components_);
-
-                dest += components_;
-            }
-            dest += (width_ - width) * components_;
-        }
-    }
-
-    return true;
-}
-
 SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
 {
     if (!data_)
@@ -2159,19 +1978,19 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
 
     if (depth_ > 1)
     {
-        LOGERROR("Can not get SDL surface from 3D image");
+        ATOMIC_LOGERROR("Can not get SDL surface from 3D image");
         return 0;
     }
 
     if (IsCompressed())
     {
-        LOGERROR("Can not get SDL surface from compressed image " + GetName());
+        ATOMIC_LOGERROR("Can not get SDL surface from compressed image " + GetName());
         return 0;
     }
 
     if (components_ < 3)
     {
-        LOGERROR("Can not get SDL surface from image " + GetName() + " with less than 3 components");
+        ATOMIC_LOGERROR("Can not get SDL surface from image " + GetName() + " with less than 3 components");
         return 0;
     }
 
@@ -2213,7 +2032,7 @@ SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
         SDL_UnlockSurface(surface);
     }
     else
-        LOGERROR("Failed to create SDL surface from image " + GetName());
+        ATOMIC_LOGERROR("Failed to create SDL surface from image " + GetName());
 
     return surface;
 }
@@ -2223,7 +2042,7 @@ void Image::PrecalculateLevels()
     if (!data_ || IsCompressed())
         return;
 
-    PROFILE(PrecalculateImageMipLevels);
+    ATOMIC_PROFILE(PrecalculateImageMipLevels);
 
     nextLevel_.Reset();
 
@@ -2255,5 +2074,192 @@ void Image::FreeImageData(unsigned char* pixelData)
 
     stbi_image_free(pixelData);
 }
+
+// ATOMIC BEGIN
+bool Image::SaveDDS(const String& fileName) const
+{
+#if !defined(ATOMIC_PLATFORM_DESKTOP)
+
+    ATOMIC_LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
+    return false;
+
+#else
+    ATOMIC_PROFILE(SaveImageDDS);
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        ATOMIC_LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        ATOMIC_LOGERROR("Can not save compressed image to DDS");
+        return false;
+    }
+
+    if (data_)
+    {
+        // #623 BEGIN TODO: Should have an abstract ImageReader and ImageWriter classes
+        // with subclasses for particular image output types. Also should have image settings in the image meta.
+        // ImageReader/Writers should also support a progress callback so UI can be updated.
+
+        if (!width_ || !height_)
+        {
+            ATOMIC_LOGERRORF("Attempting to save zero width/height DDS to %s", fileName.CString());
+            return false;
+        }
+
+        squish::u8 *inputData = (squish::u8 *) data_.Get();
+
+        SharedPtr<Image> tempImage;
+
+        // libsquish expects 4 channel RGBA, so create a temporary image if necessary
+        if (components_ != 4)
+        {
+            if (components_ != 3)
+            {
+                ATOMIC_LOGERROR("Can only save images with 3 or 4 components to DDS");
+                return false;
+            }
+
+            tempImage = new Image(context_);
+            tempImage->SetSize(width_, height_, 4);
+
+            squish::u8* srcBits = (squish::u8*) data_;
+            squish::u8* dstBits = (squish::u8*) tempImage->data_;
+
+            for (unsigned i = 0; i < (unsigned) width_ * (unsigned) height_; i++)
+            {
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = 255;
+            }
+
+            inputData = (squish::u8 *) tempImage->data_.Get();
+        }
+
+        unsigned squishFlags = HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1;
+
+        // Use a slow but high quality colour compressor (the default). (TODO: expose other settings as parameter)
+        squishFlags |= squish::kColourClusterFit;
+
+        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_,  squishFlags);
+
+        SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
+
+        squish::CompressImage(inputData, width_, height_, compressedData.Get(), squishFlags);
+
+        DDSurfaceDesc2 sdesc;
+
+        if (sizeof(sdesc) != 124)
+        {
+            ATOMIC_LOGERROR("Image::SaveDDS - sizeof(DDSurfaceDesc2) != 124");
+            return false;
+        }
+        memset(&sdesc, 0, sizeof(sdesc));
+        sdesc.dwSize_ = 124;
+        sdesc.dwFlags_ = DDSD_CAPS | DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT;
+        sdesc.dwWidth_ = width_;
+        sdesc.dwHeight_ = height_;
+
+        sdesc.ddpfPixelFormat_.dwSize_ = 32;
+        sdesc.ddpfPixelFormat_.dwFlags_ = DDPF_FOURCC | (HasAlphaChannel() ? DDPF_ALPHAPIXELS : 0);
+        sdesc.ddpfPixelFormat_.dwFourCC_ = HasAlphaChannel() ? FOURCC_DXT5 : FOURCC_DXT1;
+
+        SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
+
+        if (!dest->IsOpen())
+        {
+            ATOMIC_LOGERRORF("Failed to open DXT image file for writing %s", fileName.CString());
+            return false;
+        }
+        else
+        {
+
+            dest->Write((void*)"DDS ", 4);
+            dest->Write((void*)&sdesc, sizeof(sdesc));
+
+            bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
+
+            if (!success)
+                ATOMIC_LOGERRORF("Failed to write image to DXT, file size mismatch %s", fileName.CString());
+
+            return success;
+        }
+        // #623 END TODO
+    }
+#endif
+
+    return false;
+}
+
+bool Image::HasAlphaChannel() const
+{
+    return components_ > 3;
+}
+
+bool Image::SetSubimage(const Image* image, const IntRect& rect)
+{
+    if (!data_)
+        return false;
+
+    if (depth_ > 1 || IsCompressed())
+    {
+        ATOMIC_LOGERROR("SetSubimage not supported for Compressed or 3D images");
+        return false;
+    }
+
+    if (rect.left_ < 0 || rect.top_ < 0 || rect.right_ > width_ || rect.bottom_ > height_ || !rect.Width() || !rect.Height())
+    {
+        ATOMIC_LOGERROR("Can not set subimage in image " + GetName() + " with invalid region");
+        return false;
+    }
+
+    int width = rect.Width();
+    int height = rect.Height();
+    if (width == image->GetWidth() && height == image->GetHeight())
+    {
+        int components = Min((int)components_, (int)image->components_);
+
+        unsigned char* src = image->GetData();
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        for (int i = 0; i < height; ++i)
+        {
+            memcpy(dest, src, width * components);
+
+            src += width * image->components_;
+            dest += width_ * components_;
+        }
+    }
+    else
+    {
+        unsigned uintColor;
+        unsigned char* dest = data_.Get() + (rect.top_ * width_ + rect.left_) * components_;
+        unsigned char* src = (unsigned char*)&uintColor;
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                // Calculate float coordinates between 0 - 1 for resampling
+                float xF = (image->width_ > 1) ? (float)x / (float)(width - 1) : 0.0f;
+                float yF = (image->height_ > 1) ? (float)y / (float)(height - 1) : 0.0f;
+                uintColor = image->GetPixelBilinear(xF, yF).ToUInt();
+
+                memcpy(dest, src, components_);
+
+                dest += components_;
+            }
+            dest += (width_ - width) * components_;
+        }
+    }
+
+    return true;
+}
+
+
+// ATOMIC END
 
 }

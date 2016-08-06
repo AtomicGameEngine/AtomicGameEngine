@@ -433,22 +433,22 @@ void JSBClass::Dump()
 {
     if (name_ != nativeName_)
     {
-        LOGINFOF("Class: %s (%s)", name_.CString(), nativeName_.CString());
+        ATOMIC_LOGINFOF("Class: %s (%s)", name_.CString(), nativeName_.CString());
     }
     else
     {
-        LOGINFOF("Class: %s", name_.CString());
+        ATOMIC_LOGINFOF("Class: %s", name_.CString());
     }
 
-    LOGINFOF("   IsObject: %s", IsObject() ? "true" : "false");
+    ATOMIC_LOGINFOF("   IsObject: %s", IsObject() ? "true" : "false");
 
     if (baseClasses_.Size())
     {
-        LOGINFOF("   Bases:");
+        ATOMIC_LOGINFOF("   Bases:");
         for (unsigned i = 0; i < baseClasses_.Size(); i++)
         {
 
-            LOGINFOF("      %s", baseClasses_.At(i)->GetName().CString());
+            ATOMIC_LOGINFOF("      %s", baseClasses_.At(i)->GetName().CString());
         }
     }
 

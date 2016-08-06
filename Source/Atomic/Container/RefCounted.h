@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "HashMap.h"
+#include "Atomic/Atomic.h"
 
 namespace Atomic
 {
@@ -34,12 +34,13 @@ typedef void (*RefCountedDeletedFunction)(RefCounted*);
 typedef const void* ClassID;
 
 /// Macro to be included in RefCounted derived classes for efficient RTTI
-#define REFCOUNTED(typeName) \
+#define ATOMIC_REFCOUNTED(typeName) \
     public: \
         virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
         static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
 
 // ATOMIC END
+
 
 /// Reference count structure.
 struct RefCount
@@ -86,7 +87,8 @@ public:
     /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
 
-    // ATOMIC BEGIN
+// ATOMIC BEGIN
+
     virtual bool IsObject() const { return false; }
 
     virtual ClassID GetClassID() const  = 0;
@@ -96,9 +98,7 @@ public:
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
     inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
 
-    static void SetRefCountedDeletedFunction(RefCountedDeletedFunction function) { refCountedDeletedFunction_ = function; }
-
-    // ATOMIC END
+// ATOMIC END
 
 private:
     /// Prevent copy construction.
@@ -111,9 +111,7 @@ private:
 
     // ATOMIC BEGIN
     void* jsHeapPtr_;
-    static RefCountedDeletedFunction refCountedDeletedFunction_;
     // ATOMIC END
-
 
 };
 

@@ -37,7 +37,7 @@ class UIDragObject;
 class UIDragDrop : public Object
 {
 
-    OBJECT(UIDragDrop);
+    ATOMIC_OBJECT(UIDragDrop, Object);
 
 public:
     /// Construct.

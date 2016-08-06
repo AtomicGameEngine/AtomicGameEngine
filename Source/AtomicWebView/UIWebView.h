@@ -40,7 +40,7 @@ class UIWebView : public UIWidget
 {
     friend class WebViewWidget;
 
-    OBJECT(UIWebView)
+    ATOMIC_OBJECT(UIWebView, UIWidget)
 
 public:
 

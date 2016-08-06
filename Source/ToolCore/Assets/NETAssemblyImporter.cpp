@@ -70,7 +70,7 @@ namespace ToolCore
 
             if (!assemblyJSON_.IsObject())
             {
-                LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly json for %s", asset_->GetPath().CString());
+                ATOMIC_LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly json for %s", asset_->GetPath().CString());
             }
             else
             {
@@ -80,7 +80,7 @@ namespace ToolCore
                 {
                     if (!assemblyFile->ParseAssemblyJSON(assemblyJSON_))
                     {
-                        LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly %s", asset_->GetPath().CString());
+                        ATOMIC_LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly %s", asset_->GetPath().CString());
                     }
                     else
                     {
@@ -96,7 +96,7 @@ namespace ToolCore
                 else
                 {
 
-                    LOGERRORF("NETAssemblyImporter::HandleResult - Unable to get CSComponentAssembly resource for %s", asset_->GetPath().CString());
+                    ATOMIC_LOGERRORF("NETAssemblyImporter::HandleResult - Unable to get CSComponentAssembly resource for %s", asset_->GetPath().CString());
 
                 }
                     
@@ -112,7 +112,7 @@ namespace ToolCore
 
         if (!service)
         {
-            LOGERRORF("NETAssemblyImporter::Import - Unable to get AtomicNETService subsystem importing %s", asset_->GetPath().CString());
+            ATOMIC_LOGERRORF("NETAssemblyImporter::Import - Unable to get AtomicNETService subsystem importing %s", asset_->GetPath().CString());
             return false;
         }
 

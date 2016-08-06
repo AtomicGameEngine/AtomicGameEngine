@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,9 +63,6 @@ static const int MSG_REMOTEEVENT = 0x14;
 static const int MSG_REMOTENODEEVENT = 0x15;
 /// Server->client: info about package.
 static const int MSG_PACKAGEINFO = 0x16;
-
-/// Server->client, Client->server: string message
-static const int MSG_STRING = 0x17;
 
 /// Fixed content ID for client controls update.
 static const unsigned CONTROLS_CONTENT_ID = 1;

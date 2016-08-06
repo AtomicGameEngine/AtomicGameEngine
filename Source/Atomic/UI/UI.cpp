@@ -123,7 +123,7 @@ UI::UI(Context* context) :
     changedEventsBlocked_(0)
 {
 
-    SubscribeToEvent(E_EXITREQUESTED, HANDLER(UI, HandleExitRequested));
+    SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(UI, HandleExitRequested));
 
 }
 
@@ -180,7 +180,7 @@ void UI::SetBlockChangedEvents(bool blocked)
 
         if (changedEventsBlocked_ < 0)
         {
-            LOGERROR("UI::BlockChangedEvents - mismatched block calls, setting to 0");
+            ATOMIC_LOGERROR("UI::BlockChangedEvents - mismatched block calls, setting to 0");
             changedEventsBlocked_ = 0;
         }
     }
@@ -217,22 +217,22 @@ void UI::Initialize(const String& languageFile)
     rootWidget_->SetSize(width, height);
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UI, HandleMouseWheel));
-    SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(UI, HandleKeyUp));
-    SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
-    SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
-    SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
-    SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, ATOMIC_HANDLER(UI, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONUP, ATOMIC_HANDLER(UI, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, ATOMIC_HANDLER(UI, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEWHEEL, ATOMIC_HANDLER(UI, HandleMouseWheel));
+    SubscribeToEvent(E_KEYDOWN, ATOMIC_HANDLER(UI, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, ATOMIC_HANDLER(UI, HandleKeyUp));
+    SubscribeToEvent(E_TEXTINPUT, ATOMIC_HANDLER(UI, HandleTextInput));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(UI, HandleUpdate));
+    SubscribeToEvent(E_SCREENMODE, ATOMIC_HANDLER(UI, HandleScreenMode));
+    SubscribeToEvent(SystemUI::E_CONSOLECLOSED, ATOMIC_HANDLER(UI, HandleConsoleClosed));
 
-    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(UI, HandleTouchEnd));
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
+    SubscribeToEvent(E_TOUCHBEGIN, ATOMIC_HANDLER(UI, HandleTouchBegin));
+    SubscribeToEvent(E_TOUCHEND, ATOMIC_HANDLER(UI, HandleTouchEnd));
+    SubscribeToEvent(E_TOUCHMOVE, ATOMIC_HANDLER(UI, HandleTouchMove));
 
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, ATOMIC_HANDLER(UI, HandleRenderUpdate));
 
     // register the UIDragDrop subsystem (after we have subscribed to events, so it is processed after)
     context_->RegisterSubsystem(new UIDragDrop(context_));
@@ -477,7 +477,7 @@ void UI::TBFileReader(const char* filename, void** data, unsigned* length)
     SharedPtr<File> file = cache->GetFile(filename);
     if (!file || !file->IsOpen())
     {
-        LOGERRORF("UI::TBFileReader: Unable to load file: %s", filename);
+        ATOMIC_LOGERRORF("UI::TBFileReader: Unable to load file: %s", filename);
         return;
     }
 

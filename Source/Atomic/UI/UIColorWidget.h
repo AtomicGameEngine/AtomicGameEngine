@@ -33,7 +33,7 @@ namespace Atomic
 /// doesn't need to be loaded 2x (once for Texture2D and once for say a UIImageWidget)
 class UIColorWidget : public UIWidget
 {
-    OBJECT(UIColorWidget)
+    ATOMIC_OBJECT(UIColorWidget, UIWidget)
 
 public:
 

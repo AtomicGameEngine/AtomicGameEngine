@@ -22,7 +22,7 @@
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
-#include <Atomic/Atomic3D/ParticleEffect.h>
+#include <Atomic/Graphics/ParticleEffect.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"

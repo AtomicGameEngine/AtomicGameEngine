@@ -36,7 +36,7 @@ namespace ToolCore
 
 class OpenAssetImporter : public Object
 {
-    OBJECT(OpenAssetImporter);
+    ATOMIC_OBJECT(OpenAssetImporter, Object);
 
 public:
 

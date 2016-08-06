@@ -28,8 +28,10 @@ class btSerializer;
 #include <stdlib.h>
 #endif //DEBUG_CHECK_DEQUANTIZATION
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btVector3.h"
 #include "../../LinearMath/btAlignedAllocator.h"
+// ATOMIC END
 
 #ifdef BT_USE_DOUBLE_PRECISION
 #define btQuantizedBvhData btQuantizedBvhDoubleData
@@ -157,9 +159,10 @@ public:
 	virtual void processNode(int subPart, int triangleIndex) = 0;
 };
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btAlignedAllocator.h"
 #include "../../LinearMath/btAlignedObjectArray.h"
-
+// ATOMIC END
 
 
 ///for code readability:

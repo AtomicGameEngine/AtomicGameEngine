@@ -220,7 +220,7 @@ public:
         }
         sig += ");";
 
-        LOGINFOF("      %s", sig.CString());
+        ATOMIC_LOGINFOF("      %s", sig.CString());
 
     }
 

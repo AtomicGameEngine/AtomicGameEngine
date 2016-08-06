@@ -88,7 +88,7 @@ enum UI_LAYOUT_DISTRIBUTION_POSITION
 
 class UILayoutParams : public Object
 {
-    OBJECT(UILayoutParams)
+    ATOMIC_OBJECT(UILayoutParams, Object)
 
 public:
 
@@ -115,7 +115,7 @@ private:
 
 class UILayout : public UIWidget
 {
-    OBJECT(UILayout)
+    ATOMIC_OBJECT(UILayout, UIWidget)
 
 public:
 

@@ -52,9 +52,9 @@ namespace Atomic
 
 UIDragDrop::UIDragDrop(Context* context) : Object(context)
 {
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UIDragDrop,HandleMouseMove));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UIDragDrop,HandleMouseUp));
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UIDragDrop,HandleMouseDown));
+    SubscribeToEvent(E_MOUSEMOVE, ATOMIC_HANDLER(UIDragDrop,HandleMouseMove));
+    SubscribeToEvent(E_MOUSEBUTTONUP, ATOMIC_HANDLER(UIDragDrop,HandleMouseUp));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, ATOMIC_HANDLER(UIDragDrop,HandleMouseDown));
 
     SharedPtr<UIFontDescription> fd(new UIFontDescription(context));
     fd->SetId("Vera");

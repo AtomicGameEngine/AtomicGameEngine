@@ -29,8 +29,9 @@ class btPersistentManifold;
 class btIDebugDraw;
 struct InplaceSolverIslandCallback;
 
+// ATOMIC BEGIN
 #include "../../LinearMath/btAlignedObjectArray.h"
-
+// ATOMIC END
 
 ///btDiscreteDynamicsWorld provides discrete rigid body simulation
 ///those classes replace the obsolete CcdPhysicsEnvironment/CcdPhysicsController

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ public:
     }
 
     /// Construct from a float array.
-    Matrix3(const float* data) :
+    explicit Matrix3(const float* data) :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),

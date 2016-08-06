@@ -44,7 +44,7 @@ class JSBModule;
 class JSBHeader : public Object
 {
 
-    OBJECT(JSBHeader)
+    ATOMIC_OBJECT(JSBHeader, Object)
 
 public:
 

@@ -31,7 +31,7 @@ namespace Atomic
 class UIDragObject : public Object
 {
 
-    OBJECT(UIDragObject);
+    ATOMIC_OBJECT(UIDragObject, Object);
 
 public:
     /// Construct.

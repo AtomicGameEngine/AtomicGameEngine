@@ -237,7 +237,7 @@ bool ConvertTextInputEvent(StringHash eventType, VariantMap& eventData, CefKeyEv
 {
    if (eventType != "TextInput")
     {
-        LOGERROR("ConvertTextInputEvent - Unknown event type");
+        ATOMIC_LOGERROR("ConvertTextInputEvent - Unknown event type");
         return false;
     }
 

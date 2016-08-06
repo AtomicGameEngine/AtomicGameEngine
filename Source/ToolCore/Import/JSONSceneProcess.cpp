@@ -34,11 +34,11 @@
 
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Zone.h>
-#include <Atomic/Atomic3D/AnimatedModel.h>
-#include <Atomic/Atomic3D/StaticModel.h>
-#include <Atomic/Atomic3D/LMStaticModel.h>
-#include <Atomic/Atomic3D/Terrain.h>
-#include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Graphics/AnimatedModel.h>
+#include <Atomic/Graphics/StaticModel.h>
+#include <Atomic/Graphics/LMStaticModel.h>
+#include <Atomic/Graphics/Terrain.h>
+#include <Atomic/Graphics/Animation.h>
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Physics/CollisionShape.h>
 #include <Atomic/Physics/RigidBody.h>
@@ -413,7 +413,7 @@ bool JSONSceneProcess::ProcessModels()
             geometry.Push(geom);
 
             geom->SetIndexBuffer(ib);
-            geom->SetVertexBuffer(0, vb, vertexElementMask);
+            geom->SetVertexBuffer(0, vb);
             geom->SetDrawRange(TRIANGLE_LIST, start, submesh.Size(), false);
 
             start += submesh.Size();
@@ -585,7 +585,7 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONMeshCollider* jmes
 
     if (!model || !model->GetModel())
     {
-        LOGWARNING("Missing model for MeshCollier");
+        ATOMIC_LOGWARNING("Missing model for MeshCollier");
         return true;
     }
 

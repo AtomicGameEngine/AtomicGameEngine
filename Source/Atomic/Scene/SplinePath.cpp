@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,6 @@ SplinePath::SplinePath(Context* context) :
     traveled_(0.f),
     length_(0.f),
     dirty_(false),
-    controlledNode_(NULL),
     controlledIdAttr_(0)
 {
     UpdateNodeIds();
@@ -51,13 +50,13 @@ void SplinePath::RegisterObject(Context* context)
 {
     context->RegisterFactory<SplinePath>(LOGIC_CATEGORY);
 
-    ENUM_ACCESSOR_ATTRIBUTE("Interpolation Mode", GetInterpolationMode, SetInterpolationMode, InterpolationMode,
+    ATOMIC_ENUM_ACCESSOR_ATTRIBUTE("Interpolation Mode", GetInterpolationMode, SetInterpolationMode, InterpolationMode,
         interpolationModeNames, BEZIER_CURVE, AM_FILE);
-    ATTRIBUTE("Speed", float, speed_, 1.f, AM_FILE);
-    ATTRIBUTE("Traveled", float, traveled_, 0.f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Elapsed Time", float, elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
-    ACCESSOR_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr, VariantVector, Variant::emptyVariantVector,
+    ATOMIC_ATTRIBUTE("Speed", float, speed_, 1.f, AM_FILE);
+    ATOMIC_ATTRIBUTE("Traveled", float, traveled_, 0.f, AM_FILE | AM_NOEDIT);
+    ATOMIC_ATTRIBUTE("Elapsed Time", float, elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NODEIDVECTOR);
 }
 

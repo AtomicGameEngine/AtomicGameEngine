@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,82 +28,125 @@ namespace Atomic
 {
 
 /// Complete rebuild of navigation mesh.
-EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
+ATOMIC_EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_MESH, Mesh); // NavigationMesh pointer
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_MESH, Mesh); // NavigationMesh pointer
 }
 
 /// Partial bounding box rebuild of navigation mesh.
-EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
+ATOMIC_EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_MESH, Mesh); // NavigationMesh pointer
-    PARAM(P_BOUNDSMIN, BoundsMin); // Vector3
-    PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_MESH, Mesh); // NavigationMesh pointer
+    ATOMIC_PARAM(P_BOUNDSMIN, BoundsMin); // Vector3
+    ATOMIC_PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
 }
 
 /// Crowd agent formation.
-EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
+ATOMIC_EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_INDEX, Index); // unsigned
-    PARAM(P_SIZE, Size); // unsigned
-    PARAM(P_POSITION, Position); // Vector3 [in/out]
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_INDEX, Index); // unsigned
+    ATOMIC_PARAM(P_SIZE, Size); // unsigned
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3 [in/out]
+}
+
+/// Crowd agent formation specific to a node.
+ATOMIC_EVENT(E_CROWD_AGENT_NODE_FORMATION, CrowdAgentNodeFormation)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_INDEX, Index); // unsigned
+    ATOMIC_PARAM(P_SIZE, Size); // unsigned
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3 [in/out]
 }
 
 /// Crowd agent has been repositioned.
-EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
+ATOMIC_EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_VELOCITY, Velocity); // Vector3
-    PARAM(P_ARRIVED, Arrived); // bool
-    PARAM(P_TIMESTEP, TimeStep); // float
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_VELOCITY, Velocity); // Vector3
+    ATOMIC_PARAM(P_ARRIVED, Arrived); // bool
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep); // float
+}
+
+/// Crowd agent has been repositioned, specific to a node
+ATOMIC_EVENT(E_CROWD_AGENT_NODE_REPOSITION, CrowdAgentNodeReposition)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_VELOCITY, Velocity); // Vector3
+    ATOMIC_PARAM(P_ARRIVED, Arrived); // bool
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep); // float
 }
 
 /// Crowd agent's internal state has become invalidated. This is a special case of CrowdAgentStateChanged event.
-EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
+ATOMIC_EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_VELOCITY, Velocity); // Vector3
-    PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
-    PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_VELOCITY, Velocity); // Vector3
+    ATOMIC_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    ATOMIC_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+}
+
+/// Crowd agent's internal state has become invalidated. This is a special case of CrowdAgentStateChanged event.
+ATOMIC_EVENT(E_CROWD_AGENT_NODE_FAILURE, CrowdAgentNodeFailure)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_VELOCITY, Velocity); // Vector3
+    ATOMIC_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    ATOMIC_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
 }
 
 /// Crowd agent's state has been changed.
-EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
+ATOMIC_EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_VELOCITY, Velocity); // Vector3
-    PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
-    PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_VELOCITY, Velocity); // Vector3
+    ATOMIC_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    ATOMIC_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+}
+
+/// Crowd agent's state has been changed.
+ATOMIC_EVENT(E_CROWD_AGENT_NODE_STATE_CHANGED, CrowdAgentNodeStateChanged)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_VELOCITY, Velocity); // Vector3
+    ATOMIC_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    ATOMIC_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
 }
 
 /// Addition of obstacle to dynamic navigation mesh.
-EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
+ATOMIC_EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_RADIUS, Radius); // float
-    PARAM(P_HEIGHT, Height); // float
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_RADIUS, Radius); // float
+    ATOMIC_PARAM(P_HEIGHT, Height); // float
 }
 
 /// Removal of obstacle from dynamic navigation mesh.
-EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
+ATOMIC_EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_RADIUS, Radius); // float
-    PARAM(P_HEIGHT, Height); // float
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
+    ATOMIC_PARAM(P_POSITION, Position); // Vector3
+    ATOMIC_PARAM(P_RADIUS, Radius); // float
+    ATOMIC_PARAM(P_HEIGHT, Height); // float
 }
 
 }

@@ -16,10 +16,11 @@ subject to the following restrictions:
 #ifndef BT_TYPED_CONSTRAINT_H
 #define BT_TYPED_CONSTRAINT_H
 
-
+// ATOMIC BEGIN
 #include "../../LinearMath/btScalar.h"
 #include "btSolverConstraint.h"
 #include "../../BulletDynamics/Dynamics/btRigidBody.h"
+// ATOMIC END
 
 #ifdef BT_USE_DOUBLE_PRECISION
 #define btTypedConstraintData2		btTypedConstraintDoubleData

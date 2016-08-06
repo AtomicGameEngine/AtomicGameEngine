@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,7 @@ enum AsyncLoadState
 /// Base class for resources.
 class ATOMIC_API Resource : public Object
 {
-    OBJECT(Resource);
-    BASEOBJECT(Resource);
+    ATOMIC_OBJECT(Resource, Object);
 
 public:
     /// Construct.

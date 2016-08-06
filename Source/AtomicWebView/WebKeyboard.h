@@ -41,7 +41,6 @@ struct WebKeyEvent
     bool repeat;
     int key;
     int scanCode;
-    unsigned raw;
     int buttons;
     int qual;
     bool keyDown;
@@ -54,7 +53,6 @@ struct WebKeyEvent
             repeat = eventData[KeyDown::P_REPEAT].GetBool();
             key = eventData[KeyDown::P_KEY].GetInt();
             scanCode = eventData[KeyDown::P_SCANCODE].GetInt();
-            raw = eventData[KeyDown::P_RAW].GetUInt();
             buttons = eventData[KeyDown::P_BUTTONS].GetInt();
             qual = eventData[KeyDown::P_QUALIFIERS].GetInt();
         }
@@ -63,7 +61,6 @@ struct WebKeyEvent
             keyDown = false;
             key = eventData[KeyUp::P_KEY].GetInt();
             scanCode = eventData[KeyUp::P_SCANCODE].GetInt();
-            raw = eventData[KeyUp::P_RAW].GetUInt();
             buttons = eventData[KeyUp::P_BUTTONS].GetInt();
             qual = eventData[KeyUp::P_QUALIFIERS].GetInt();
         }

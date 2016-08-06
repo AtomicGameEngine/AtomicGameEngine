@@ -42,7 +42,7 @@ namespace SystemUI
 
 class UI : public Object, private tb::TBWidgetListener
 {
-    OBJECT(UI)
+    ATOMIC_OBJECT(UI, Object)
 
 public:
 

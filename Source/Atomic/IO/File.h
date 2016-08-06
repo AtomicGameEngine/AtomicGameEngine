@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,34 +27,35 @@
 #include "../IO/Deserializer.h"
 #include "../IO/Serializer.h"
 
-#ifdef ANDROID
-#include <SDL/include/SDL_rwops.h>
+#ifdef __ANDROID__
+struct SDL_RWops;
 #endif
 
 namespace Atomic
 {
 
-  #ifdef ANDROID
-  extern const char* APK;
+#ifdef __ANDROID__
+extern const char* APK;
 
-  // Macro for checking if a given pathname is inside APK's assets directory
-  #define IS_ASSET(p) p.StartsWith(APK)
-  // Macro for truncating the APK prefix string from the asset pathname and at the same time patching the directory name components (see custom_rules.xml)
-  #ifdef ASSET_DIR_INDICATOR
-  #define ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
-  #else
-  #define ASSET(p) p.Substring(5).CString()
-  #endif
-  #endif
-  
+// Macro for checking if a given pathname is inside APK's assets directory
+#define ATOMIC_IS_ASSET(p) p.StartsWith(APK)
+// Macro for truncating the APK prefix string from the asset pathname and at the same time patching the directory name components (see custom_rules.xml)
+#ifdef ASSET_DIR_INDICATOR
+#define ATOMIC_ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
+#else
+#define ATOMIC_ASSET(p) p.Substring(5).CString()
+#endif
+#endif
+
 /// File open mode.
 enum FileMode
 {
     FILE_READ = 0,
     FILE_WRITE,
     FILE_READWRITE,
-    FILE_WRITE_UPDATE,
+// ATOMIC BEGIN
     FILE_APPEND
+// ATOMIC END
 };
 
 class PackageFile;
@@ -62,7 +63,7 @@ class PackageFile;
 /// %File opened either through the filesystem or from within a package file.
 class ATOMIC_API File : public Object, public Deserializer, public Serializer
 {
-    OBJECT(File);
+    ATOMIC_OBJECT(File, Object);
 
 public:
     /// Construct.
@@ -76,8 +77,6 @@ public:
 
     /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
-    /// Reads a text file, ensuring data from file is 0 terminated
-    virtual void ReadText(String& text);
     /// Set position from the beginning of the file.
     virtual unsigned Seek(unsigned position);
     /// Write bytes to the file. Return number of bytes actually written.
@@ -99,9 +98,6 @@ public:
     void Flush();
     /// Change the file name. Used by the resource system.
     void SetName(const String& name);
-    /// Set the fullpath to the file
-    void SetFullPath(const String& path) { fullPath_ = path; }
-
 
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
@@ -114,28 +110,36 @@ public:
 
     /// Return whether the file originates from a package.
     bool IsPackaged() const { return offset_ != 0; }
+
+    // ATOMIC BEGIN
+
+    /// Reads a text file, ensuring data from file is 0 terminated
+    virtual void ReadText(String& text);
+
     /// Return the fullpath to the file
     const String& GetFullPath() const { return fullPath_; }
 
-    // Atomic Begin
     /// Copy a file from a source file, must be opened and FILE_WRITE
     /// Unlike FileSystem.Copy this copy works when the source file is in a package file
     bool Copy(File* srcFile);
-    // Atomic End
 
+    // ATOMIC END
 
 private:
+    /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.
+    bool OpenInternal(const String& fileName, FileMode mode, bool fromPackage = false);
+    /// Perform the file read internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful. This does not handle compressed package file reading.
+    bool ReadInternal(void* dest, unsigned size);
+    /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
+    void SeekInternal(unsigned newPosition);
+
     /// File name.
     String fileName_;
-
-    /// Full path to file
-    String fullPath_;
-
     /// Open mode.
     FileMode mode_;
     /// File handle.
     void* handle_;
-#ifdef ANDROID
+#ifdef __ANDROID__
     /// SDL RWops context for Android asset loading.
     SDL_RWops* assetHandle_;
 #endif
@@ -157,6 +161,13 @@ private:
     bool readSyncNeeded_;
     /// Synchronization needed before write -flag.
     bool writeSyncNeeded_;
+
+    // ATOMIC BEGIN
+
+    /// Full path to file
+    String fullPath_;
+
+    // ATOMIC END
 };
 
 }

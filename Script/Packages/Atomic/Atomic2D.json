@@ -3,7 +3,7 @@
 	"sources" : ["Source/Atomic/Atomic2D"],
 	"includes" : ["<Atomic/Graphics/Texture2D.h>", "<Atomic/Scene/Node.h>", "<Atomic/Graphics/Material.h>"],
 	"classes" : [ "SpriteSheet2D", "Sprite2D", "Drawable2D", "StaticSprite2D", "AnimationSet2D", "AnimatedSprite2D",
-				 "CollisionShape2D", "CollisionBox2D", "RigidBody2D", "Animation2D", "CollisionChain2D",
+				 "CollisionShape2D", "CollisionBox2D", "RigidBody2D", "CollisionChain2D",
 				 "CollisionCircle2D", "CollisionEdge2D", "CollisionPolygon2D",
 				 "Constraint2D", "ConstraintDistance2D", "ConstraintFriction2D", "ConstraintGear2D",
 				 "ConstraintMotor2D", "ConstraintMouse2D", "ConstraintPrismatic2D", "ConstraintPulley2D",
@@ -12,6 +12,7 @@
 				 "TileMap2D", "PropertySet2D", "Tile2D", "TileMapObject2D", "TileMapLayer2D",
 				 "TmxLayer2D", "TmxTileLayer2D", "TmxObjectGroup2D", "TmxImageLayer2D", "TmxFile2D",
 				 "Light2DGroup", "Light2D", "DirectionalLight2D", "PositionalLight2D", "PointLight2D"],
+	"jsmodulepreamble" : ["using namespace Atomic::Spriter;"],			 
 	"overloads" : {
 		"AnimatedSprite2D" : {
 			"SetAnimation" : ["String", "LoopMode2D"]

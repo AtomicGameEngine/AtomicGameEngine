@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ public:
     }
 
     /// Construct from a float array.
-    Vector4(const float* data) :
+    explicit Vector4(const float* data) :
         x_(data[0]),
         y_(data[1]),
         z_(data[2]),

@@ -56,7 +56,7 @@ struct RemoteGameServer
 /// Client for master server, see Script/AtomicMasterServer for example master server implementation
 class ATOMIC_API MasterServerClient : public Object
 {
-    OBJECT(MasterServerClient);
+    ATOMIC_OBJECT(MasterServerClient, Object);
 
 public:
 

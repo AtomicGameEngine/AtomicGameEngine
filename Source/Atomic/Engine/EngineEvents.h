@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@ namespace Atomic
 {
 
 /// A command has been entered on the console.
-EVENT(E_CONSOLECOMMAND, ConsoleCommand)
+ATOMIC_EVENT(E_CONSOLECOMMAND, ConsoleCommand)
 {
-    PARAM(P_COMMAND, Command);              // String
-    PARAM(P_ID, Id);                        // String
+    ATOMIC_PARAM(P_COMMAND, Command);              // String
+    ATOMIC_PARAM(P_ID, Id);                        // String
 }
 
 }

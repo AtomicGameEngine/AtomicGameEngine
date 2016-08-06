@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,6 +57,13 @@ unsigned Deserializer::GetChecksum()
     return 0;
 }
 
+long long Deserializer::ReadInt64()
+{
+    long long ret;
+    Read(&ret, sizeof ret);
+    return ret;
+}
+
 int Deserializer::ReadInt()
 {
     int ret;
@@ -74,6 +81,13 @@ short Deserializer::ReadShort()
 signed char Deserializer::ReadByte()
 {
     signed char ret;
+    Read(&ret, sizeof ret);
+    return ret;
+}
+
+unsigned long long Deserializer::ReadUInt64()
+{
+    unsigned long long ret;
     Read(&ret, sizeof ret);
     return ret;
 }

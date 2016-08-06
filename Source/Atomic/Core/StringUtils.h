@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,14 +39,14 @@ ATOMIC_API float ToFloat(const char* source);
 ATOMIC_API double ToDouble(const String& source);
 /// Parse a double from a C string.
 ATOMIC_API double ToDouble(const char* source);
-/// Parse an integer from a string.
-ATOMIC_API int ToInt(const String& source);
-/// Parse an integer from a C string.
-ATOMIC_API int ToInt(const char* source);
-/// Parse an unsigned integer from a string.
-ATOMIC_API unsigned ToUInt(const String& source);
-/// Parse an unsigned integer from a C string.
-ATOMIC_API unsigned ToUInt(const char* source);
+/// Parse an integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API int ToInt(const String& source, int base = 10);
+/// Parse an integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API int ToInt(const char* source, int base = 10);
+/// Parse an unsigned integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API unsigned ToUInt(const String& source, int base = 10);
+/// Parse an unsigned integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API unsigned ToUInt(const char* source, int base = 10);
 /// Parse a Color from a string.
 ATOMIC_API Color ToColor(const String& source);
 /// Parse a Color from a C string.
@@ -79,9 +79,9 @@ ATOMIC_API Vector3 ToVector3(const char* source);
 ATOMIC_API Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
 /// Parse a Vector4 from a C string.
 ATOMIC_API Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
-/// Parse a float, Vector or Matrix variant from a string.
+/// Parse a float, Vector or Matrix variant from a string. Return empty variant on illegal input.
 ATOMIC_API Variant ToVectorVariant(const String& source);
-/// Parse a float, Vector or Matrix variant from a C string.
+/// Parse a float, Vector or Matrix variant from a C string. Return empty variant on illegal input.
 ATOMIC_API Variant ToVectorVariant(const char* source);
 /// Parse a Matrix3 from a string.
 ATOMIC_API Matrix3 ToMatrix3(const String& source);
@@ -113,8 +113,6 @@ ATOMIC_API unsigned GetStringListIndex(const char* value, const String* strings,
 ATOMIC_API unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false);
 /// Return a formatted string.
 ATOMIC_API String ToString(const char* formatString, ...);
-/// Return a formatted string.
-ATOMIC_API String ToStringVariadic(const char* formatString, va_list args);
 /// Return whether a char is an alphabet letter.
 ATOMIC_API bool IsAlpha(unsigned ch);
 /// Return whether a char is a digit.
@@ -123,5 +121,11 @@ ATOMIC_API bool IsDigit(unsigned ch);
 ATOMIC_API unsigned ToUpper(unsigned ch);
 /// Return char in lowercase.
 ATOMIC_API unsigned ToLower(unsigned ch);
+/// Convert a memory size into a formatted size string, of the style "1.5 Mb".
+ATOMIC_API String GetFileSizeString(unsigned long long memorySize);
+
+// ATOMIC BEGIN
+ATOMIC_API String ToStringVariadic(const char* formatString, va_list args);
+// ATOMIC END
 
 }

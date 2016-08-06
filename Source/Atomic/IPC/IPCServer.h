@@ -27,16 +27,16 @@
 
 namespace Atomic
 {
-    EVENT(E_IPCCMD, IPCCmd)
+    ATOMIC_EVENT(E_IPCCMD, IPCCmd)
     {
-        PARAM(P_COMMAND, Command);
-        PARAM(P_ID, ID); // unsigned
+        ATOMIC_PARAM(P_COMMAND, Command);
+        ATOMIC_PARAM(P_ID, ID); // unsigned
     }
 
-    EVENT(E_IPCCMDRESULT, IPCCmdResult)
+    ATOMIC_EVENT(E_IPCCMDRESULT, IPCCmdResult)
     {
-        PARAM(P_COMMAND, Command);
-        PARAM(P_ID, ID); // unsigned
+        ATOMIC_PARAM(P_COMMAND, Command);
+        ATOMIC_PARAM(P_ID, ID); // unsigned
     }
 
     class IPCBroker;
@@ -44,7 +44,7 @@ namespace Atomic
     /// IPCResultHandler
     class IPCResultHandler : public Object
     {
-        OBJECT(IPCResultHandler)
+        ATOMIC_OBJECT(IPCResultHandler, Object)
 
     public:
         /// Construct.
@@ -61,7 +61,7 @@ namespace Atomic
     /// IPCServer
     class IPCServer : public Object
     {
-        OBJECT(IPCServer)
+        ATOMIC_OBJECT(IPCServer, Object)
 
     public:
         /// Construct.

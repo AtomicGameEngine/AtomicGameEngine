@@ -87,7 +87,7 @@ void BindCmd::Run()
 
     context_->RegisterSubsystem(jsbind);
 
-    LOGINFOF("Loading Package");
+    ATOMIC_LOGINFOF("Loading Package");
     jsbind->LoadPackage(sourceRootFolder_, packageFolder_, bindPlatform_);
 
     jsbind->GenerateJavaScriptBindings();

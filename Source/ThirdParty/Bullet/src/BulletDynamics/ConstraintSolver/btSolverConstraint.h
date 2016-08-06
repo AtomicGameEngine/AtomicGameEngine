@@ -17,10 +17,12 @@ subject to the following restrictions:
 #define BT_SOLVER_CONSTRAINT_H
 
 class	btRigidBody;
+// ATOMIC BEGIN
 #include "../../LinearMath/btVector3.h"
 #include "../../LinearMath/btMatrix3x3.h"
 #include "btJacobianEntry.h"
 #include "../../LinearMath/btAlignedObjectArray.h"
+// ATOMIC END
 
 //#define NO_FRICTION_TANGENTIALS 1
 #include "btSolverBody.h"

@@ -89,7 +89,7 @@ bool PlayCmd::LaunchPlayerProcess(const String& command, const Vector<String>& a
 
 void PlayCmd::Run()
 {
-    LOGINFOF("Playing project");
+    ATOMIC_LOGINFOF("Playing project");
 
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();

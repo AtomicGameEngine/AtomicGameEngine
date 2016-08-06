@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,9 @@
 #include "../Atomic2D/TileMapLayer2D.h"
 #include "../Atomic2D/TmxFile2D.h"
 
+// ATOMIC BEGIN
 #include "../Atomic2D/RigidBody2D.h"
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -311,6 +313,8 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
             staticSprite->SetLayer(drawOrder_);
             staticSprite->SetOrderInLayer(y * width + x);
 
+            // ATOMIC BEGIN
+
             // collision
             RigidBody2D *body = NULL;
             TmxObjectGroup2D* group = tile->GetObjectGroup();
@@ -335,6 +339,9 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 
             }
 
+
+            // ATOMIC END
+
             nodes_[y * width + x] = tileNode;
         }
     }
@@ -352,7 +359,11 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
         const TileMapObject2D* object = objectGroup->GetObject(i);
 
         // Create dummy node for all object
+
+        // ATOMIC BEGIN
         SharedPtr<Node> objectNode(GetNode()->CreateChild(object->GetName()));
+        // ATOMIC END
+
         objectNode->SetTemporary(true);
         objectNode->SetPosition(object->GetPosition());
 
@@ -393,6 +404,8 @@ void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
     nodes_.Push(imageNode);
 }
 
+// ATOMIC BEGIN
+
 const String& TileMapLayer2D::GetName() const
 {
     static String none("");
@@ -401,4 +414,7 @@ const String& TileMapLayer2D::GetName() const
 
     return none;
 }
+
+// ATOMIC END
+
 }

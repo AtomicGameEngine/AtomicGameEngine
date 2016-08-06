@@ -31,7 +31,7 @@ namespace Atomic
 
     class AppBase : public Application
     {
-        OBJECT(AppBase)
+        ATOMIC_OBJECT(AppBase, Application)
 
     public:
         /// Construct.

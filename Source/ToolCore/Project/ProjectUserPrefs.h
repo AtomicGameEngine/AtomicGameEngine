@@ -35,7 +35,7 @@ class ProjectUserPrefs : public Object
 {
     friend class Project;
 
-    OBJECT(ProjectUserPrefs);
+    ATOMIC_OBJECT(ProjectUserPrefs, Object);
 
 public:
     /// Construct.

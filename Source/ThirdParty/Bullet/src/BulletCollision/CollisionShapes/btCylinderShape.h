@@ -17,8 +17,10 @@ subject to the following restrictions:
 #define BT_CYLINDER_MINKOWSKI_H
 
 #include "btBoxShape.h"
+// ATOMIC BEGIN
 #include "../../BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 #include "../../LinearMath/btVector3.h"
+// ATOMIC END
 
 /// The btCylinderShape class implements a cylinder shape primitive, centered around the origin. Its central axis aligned with the Y axis. btCylinderShapeX is aligned with the X axis and btCylinderShapeZ around the Z axis.
 ATTRIBUTE_ALIGNED16(class) btCylinderShape : public btConvexInternalShape

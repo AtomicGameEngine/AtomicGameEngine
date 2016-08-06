@@ -35,7 +35,7 @@ class IPCBroker : public IPCChannel
 {
     friend class IPC;
 
-    OBJECT(IPCBroker);
+    ATOMIC_OBJECT(IPCBroker, IPCChannel);
 
 public:
     /// Construct.

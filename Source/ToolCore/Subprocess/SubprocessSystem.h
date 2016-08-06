@@ -31,20 +31,20 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-EVENT(E_SUBPROCESSOUTPUT, SubprocessOutput)
+ATOMIC_EVENT(E_SUBPROCESSOUTPUT, SubprocessOutput)
 {
-    PARAM(P_TEXT, Text);      // string
+    ATOMIC_PARAM(P_TEXT, Text);      // string
 }
 
-EVENT(E_SUBPROCESSCOMPLETE, SubprocessComplete)
+ATOMIC_EVENT(E_SUBPROCESSCOMPLETE, SubprocessComplete)
 {
-    PARAM(P_PROCESSKEY, ProcessKey); // unsigned
-    PARAM(P_RETCODE, RetCode);      // int (return code of process)
+    ATOMIC_PARAM(P_PROCESSKEY, ProcessKey); // unsigned
+    ATOMIC_PARAM(P_RETCODE, RetCode);      // int (return code of process)
 }
 
 class SubprocessSystem : public Object
 {
-    OBJECT(SubprocessSystem);
+    ATOMIC_OBJECT(SubprocessSystem, Object);
 
 public:
     /// Construct.

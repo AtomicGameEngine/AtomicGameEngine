@@ -29,7 +29,7 @@ namespace ToolCore
 
 class PlatformMac : public Platform
 {
-    OBJECT(PlatformMac);
+    ATOMIC_OBJECT(PlatformMac, Platform);
 
 public:
 

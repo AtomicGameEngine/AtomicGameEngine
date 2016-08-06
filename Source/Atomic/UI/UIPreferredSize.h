@@ -49,7 +49,7 @@ class UIPreferredSize : public RefCounted
 {
     friend class UIWidget;
 
-    REFCOUNTED(UIPreferredSize)
+    ATOMIC_REFCOUNTED(UIPreferredSize)
 
 public:
 

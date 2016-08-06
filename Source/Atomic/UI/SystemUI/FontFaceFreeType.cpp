@@ -46,7 +46,7 @@ namespace SystemUI
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
-    OBJECT(FreeTypeLibrary);
+    ATOMIC_OBJECT(FreeTypeLibrary, Object);
 
 public:
     /// Construct.
@@ -55,7 +55,7 @@ public:
     {
         FT_Error error = FT_Init_FreeType(&library_);
         if (error)
-            LOGERROR("Could not initialize FreeType library");
+            ATOMIC_LOGERROR("Could not initialize FreeType library");
     }
 
     /// Destruct.
@@ -108,34 +108,34 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     if (pointSize <= 0)
     {
-        LOGERROR("Zero or negative point size");
+        ATOMIC_LOGERROR("Zero or negative point size");
         return false;
     }
 
     if (!fontDataSize)
     {
-        LOGERROR("Could not create font face from zero size data");
+        ATOMIC_LOGERROR("Could not create font face from zero size data");
         return false;
     }
 
     error = FT_New_Memory_Face(library, fontData, fontDataSize, 0, &face);
     if (error)
     {
-        LOGERROR("Could not create font face");
+        ATOMIC_LOGERROR("Could not create font face");
         return false;
     }
     error = FT_Set_Char_Size(face, 0, pointSize * 64, FONT_DPI, FONT_DPI);
     if (error)
     {
         FT_Done_Face(face);
-        LOGERROR("Could not set font point size " + String(pointSize));
+        ATOMIC_LOGERROR("Could not set font point size " + String(pointSize));
         return false;
     }
 
     face_ = face;
 
     unsigned numGlyphs = (unsigned)face->num_glyphs;
-    LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
+    ATOMIC_LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
 
     PODVector<unsigned> charCodes(numGlyphs);
     for (unsigned i = 0; i < numGlyphs; ++i)
@@ -210,7 +210,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, NULL, &kerningTableSize);
         if (error)
         {
-            LOGERROR("Could not get kerning table length");
+            ATOMIC_LOGERROR("Could not get kerning table length");
             return false;
         }
 
@@ -218,7 +218,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         error = FT_Load_Sfnt_Table(face, tagKern, 0, kerningTable, &kerningTableSize);
         if (error)
         {
-            LOGERROR("Could not load kerning table");
+            ATOMIC_LOGERROR("Could not load kerning table");
             return false;
         }
 
@@ -266,7 +266,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
             }
         }
         else
-            LOGWARNING("Can not read kerning information: not version 0");
+            ATOMIC_LOGWARNING("Can not read kerning information: not version 0");
     }
 
     if (loadAllGlyphs)

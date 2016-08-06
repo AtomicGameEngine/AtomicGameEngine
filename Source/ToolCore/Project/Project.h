@@ -37,7 +37,7 @@ class Project : public Object
 {
     friend class ProjectFile;
 
-    OBJECT(Project);
+    ATOMIC_OBJECT(Project, Object);
 
 public:
     /// Construct.

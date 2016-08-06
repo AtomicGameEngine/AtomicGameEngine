@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,8 @@
 //
 
 #pragma once
+
+#include "Atomic/Atomic.h"
 
 #include "../Container/Allocator.h"
 #include "../Container/Swap.h"
@@ -89,6 +91,8 @@ class ATOMIC_API ListBase
 public:
     /// Construct.
     ListBase() :
+        head_(0),
+        tail_(0),
         allocator_(0),
         size_(0)
     {

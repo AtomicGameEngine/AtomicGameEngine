@@ -17,7 +17,9 @@ subject to the following restrictions:
 #define BT_CONE_MINKOWSKI_H
 
 #include "btConvexInternalShape.h"
+// ATOMIC BEGIN
 #include "../../BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
+// ATOMIC END
 
 ///The btConeShape implements a cone shape primitive, centered around the origin and aligned with the Y axis. The btConeShapeX is aligned around the X axis and btConeShapeZ around the Z axis.
 ATTRIBUTE_ALIGNED16(class) btConeShape : public btConvexInternalShape

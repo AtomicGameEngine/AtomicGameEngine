@@ -33,7 +33,7 @@ class ListViewItem;
 
 class UIListView : public UIWidget
 {
-    OBJECT(UIListView);
+    ATOMIC_OBJECT(UIListView, UIWidget);
 
 public:
     /// Construct.

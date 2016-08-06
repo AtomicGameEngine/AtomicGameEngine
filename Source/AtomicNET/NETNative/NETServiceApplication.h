@@ -30,7 +30,7 @@ namespace Atomic
 
     class NETServiceApplication : public IPCClientApp
     {
-        OBJECT(NETServiceApplication)
+        ATOMIC_OBJECT(NETServiceApplication, IPCClientApp)
 
     public:
 

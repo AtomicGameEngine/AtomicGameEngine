@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,45 +28,47 @@ namespace Atomic
 {
 
 /// Frame begin event.
-EVENT(E_BEGINFRAME, BeginFrame)
+ATOMIC_EVENT(E_BEGINFRAME, BeginFrame)
 {
-    PARAM(P_FRAMENUMBER, FrameNumber);      // unsigned
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_FRAMENUMBER, FrameNumber);      // unsigned
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Application-wide logic update event.
-EVENT(E_UPDATE, Update)
+ATOMIC_EVENT(E_UPDATE, Update)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Application-wide logic post-update event.
-EVENT(E_POSTUPDATE, PostUpdate)
+ATOMIC_EVENT(E_POSTUPDATE, PostUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Render update event.
-EVENT(E_RENDERUPDATE, RenderUpdate)
+ATOMIC_EVENT(E_RENDERUPDATE, RenderUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Post-render update event.
-EVENT(E_POSTRENDERUPDATE, PostRenderUpdate)
+ATOMIC_EVENT(E_POSTRENDERUPDATE, PostRenderUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Frame end event.
-EVENT(E_ENDFRAME, EndFrame)
+ATOMIC_EVENT(E_ENDFRAME, EndFrame)
 {
 }
 
+// ATOMIC BEGIN
 /// Updating paused or resumed event.
-EVENT(E_UPDATESPAUSEDRESUMED, UpdatesPaused)
+ATOMIC_EVENT(E_UPDATESPAUSEDRESUMED, UpdatesPaused)
 {
-    PARAM(P_PAUSED, Paused);            // bool
+    ATOMIC_PARAM(P_PAUSED, Paused);            // bool
 }
+// ATOMIC END
 
 }

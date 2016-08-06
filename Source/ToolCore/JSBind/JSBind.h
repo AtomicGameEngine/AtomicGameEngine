@@ -34,7 +34,7 @@ class JSBPackage;
 class JSBind : public Object
 {
 
-    OBJECT(JSBind)
+    ATOMIC_OBJECT(JSBind, Object)
 
 public:
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class RigidBody2D;
 /// 2D collision shape component.
 class ATOMIC_API CollisionShape2D : public Component
 {
-    OBJECT(CollisionShape2D);
+    ATOMIC_OBJECT(CollisionShape2D, Component);
 
 public:
     /// Construct.
