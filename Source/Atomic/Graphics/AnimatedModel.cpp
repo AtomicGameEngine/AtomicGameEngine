@@ -757,6 +757,15 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         return;
     }
 
+// ATOMIC BEGIN
+
+    // We don't create bones in editor for now until can address prefabs using temporary flag
+    // ie. prefab and bone nodes should use tags
+
+    bool dontCreateBonesHack = context_->GetEditorContext();
+
+// ATOMIC END
+
     if (isMaster_)
     {
         // Check if bone structure has stayed compatible (reloading the model.) In that case retain the old bones and animations
@@ -800,9 +809,13 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         FinalizeBoneBoundingBoxes();
 
         Vector<Bone>& bones = skeleton_.GetModifiableBones();
+
+// ATOMIC BEGIN
         // Create scene nodes for the bones
-        if (createBones)
+        if (createBones && !dontCreateBonesHack)
         {
+// ATOMIC END
+
             for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
                 // Create bones as local, as they are never to be directly synchronized over the network
@@ -837,9 +850,10 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         AnimatedModel* master = node_->GetComponent<AnimatedModel>();
         if (master && master != this)
             master->FinalizeBoneBoundingBoxes();
-
-        if (createBones)
+// ATOMIC BEGIN
+        if (createBones && !dontCreateBonesHack)
         {
+// ATOMIC END
             Vector<Bone>& bones = skeleton_.GetModifiableBones();
             for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
