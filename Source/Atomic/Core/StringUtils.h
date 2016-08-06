@@ -39,14 +39,14 @@ ATOMIC_API float ToFloat(const char* source);
 ATOMIC_API double ToDouble(const String& source);
 /// Parse a double from a C string.
 ATOMIC_API double ToDouble(const char* source);
-/// Parse an integer from a string.
-ATOMIC_API int ToInt(const String& source);
-/// Parse an integer from a C string.
-ATOMIC_API int ToInt(const char* source);
-/// Parse an unsigned integer from a string.
-ATOMIC_API unsigned ToUInt(const String& source);
-/// Parse an unsigned integer from a C string.
-ATOMIC_API unsigned ToUInt(const char* source);
+/// Parse an integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API int ToInt(const String& source, int base = 10);
+/// Parse an integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API int ToInt(const char* source, int base = 10);
+/// Parse an unsigned integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API unsigned ToUInt(const String& source, int base = 10);
+/// Parse an unsigned integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+ATOMIC_API unsigned ToUInt(const char* source, int base = 10);
 /// Parse a Color from a string.
 ATOMIC_API Color ToColor(const String& source);
 /// Parse a Color from a C string.

@@ -1867,6 +1867,19 @@ void Input::HandleSDLEvent(void* sdlEvent)
             return;
     }
 
+    // Possibility for custom handling or suppression of default handling for the SDL event
+    {
+        using namespace SDLRawInput;
+
+        VariantMap eventData = GetEventDataMap();
+        eventData[P_SDLEVENT] = &evt;
+        eventData[P_CONSUMED] = false;
+        SendEvent(E_SDLRAWINPUT, eventData);
+
+        if (eventData[P_CONSUMED].GetBool())
+            return;
+    }
+
     switch (evt.type)
     {
         case SDL_KEYDOWN:
@@ -2401,7 +2414,10 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // Update input right at the beginning of the frame
+    SendEvent(E_INPUTBEGIN);
     Update();
+    SendEvent(E_INPUTEND);
+
 }
 
 #ifdef __EMSCRIPTEN__

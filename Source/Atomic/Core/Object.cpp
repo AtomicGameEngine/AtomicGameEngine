@@ -25,8 +25,6 @@
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
-#include "../Core/EventProfiler.h"
-#include "../Container/HashMap.h"
 
 #include "../DebugNew.h"
 
@@ -305,16 +303,6 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         return;
     }
 
-#ifdef ATOMIC_PROFILING
-    EventProfiler* eventProfiler = 0;
-    if (EventProfiler::IsActive())
-    {
-        eventProfiler = GetSubsystem<EventProfiler>();
-        if (eventProfiler)
-            eventProfiler->BeginBlock(eventType);
-    }
-#endif
-
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
@@ -324,7 +312,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->GlobalBeginSendEvent(this, eventType, eventData);
 // ATOMIC END
 
-    context->BeginSendEvent(this);
+    context->BeginSendEvent(this, eventType);
 
     // Check first the specific event receivers
     const HashSet<Object*>* group = context->GetEventReceivers(this, eventType);
@@ -345,10 +333,6 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             if (self.Expired())
             {
                 context->EndSendEvent();
-#ifdef ATOMIC_PROFILING
-                if (eventProfiler)
-                    eventProfiler->EndBlock();
-#endif
                 return;
             }
 
@@ -381,10 +365,6 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (self.Expired())
                 {
                     context->EndSendEvent();
-#ifdef ATOMIC_PROFILING
-                    if (eventProfiler)
-                         eventProfiler->EndBlock();
-#endif
                     return;
                 }
 
@@ -411,10 +391,6 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     if (self.Expired())
                     {
                         context->EndSendEvent();
-#ifdef ATOMIC_PROFILING
-                        if (eventProfiler)
-                            eventProfiler->EndBlock();
-#endif
                         return;
                     }
 
@@ -431,10 +407,6 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->GlobalEndSendEvent(this,eventType, eventData);
 // ATOMIC END
 
-#ifdef ATOMIC_PROFILING
-    if (eventProfiler)
-        eventProfiler->EndBlock();
-#endif
 }
 
 VariantMap& Object::GetEventDataMap() const
@@ -447,9 +419,9 @@ const Variant& Object::GetGlobalVar(StringHash key) const
     return context_->GetGlobalVar(key);
 }
 
-const VariantMap& Object::GetGlobalVars() const 
-{ 
-    return context_->GetGlobalVars(); 
+const VariantMap& Object::GetGlobalVars() const
+{
+    return context_->GetGlobalVars();
 }
 
 void Object::SetGlobalVar(StringHash key, const Variant& value)
@@ -574,13 +546,13 @@ void Object::RemoveEventSender(Object* sender)
 
 
 Atomic::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
-{  
+{
     StringHash id(eventName);
     GetEventNameMap()[id] = eventName;
     return id;
 }
 
-const String& EventNameRegistrar::GetEventName(StringHash eventID) 
+const String& EventNameRegistrar::GetEventName(StringHash eventID)
 {
     HashMap<StringHash, String>::ConstIterator it = GetEventNameMap().Find(eventID);
     return  it != GetEventNameMap().End() ? it->second_ : String::EMPTY ;

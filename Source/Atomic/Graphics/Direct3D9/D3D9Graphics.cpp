@@ -262,6 +262,7 @@ Graphics::Graphics(Context* context) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    hardwareShadowSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     instancingSupport_(false),
@@ -2363,7 +2364,7 @@ void Graphics::CheckFeatureSupport()
 {
     anisotropySupport_ = true;
     dxtTextureSupport_ = true;
-    
+
     // Reset features first
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
@@ -2646,4 +2647,3 @@ void Graphics::SetUBO(unsigned object)
 // ATOMIC END
 
 }
-

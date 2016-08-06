@@ -223,6 +223,23 @@ ATOMIC_EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 
+/// Raw SDL input event.
+ATOMIC_EVENT(E_SDLRAWINPUT, SDLRawInput)
+{
+    ATOMIC_PARAM(P_SDLEVENT, SDLEvent);           // SDL_Event*
+    ATOMIC_PARAM(P_CONSUMED, Consumed);            // bool
+}
+
+/// Input handling begins.
+ATOMIC_EVENT(E_INPUTBEGIN, InputBegin)
+{
+}
+
+/// Input handling ends.
+ATOMIC_EVENT(E_INPUTEND, InputEnd)
+{
+}
+
 // ATOMIC BEGIN
 
 /// Application pause requested.

@@ -25,15 +25,14 @@
 #include "../Audio/Audio.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
-#include "../Core/ProcessUtils.h"
-#include "../Core/Profiler.h"
 #include "../Core/EventProfiler.h"
+#include "../Core/ProcessUtils.h"
 #include "../Core/WorkQueue.h"
 #include "../Engine/Engine.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Renderer.h"
-#include "../IO/FileSystem.h"
 #include "../Input/Input.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
 
@@ -290,6 +289,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             ATOMIC_LOGERRORF(
                 "Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
                 resourcePackages[i].CString());
+            return false;
         }
     }
 
@@ -357,7 +357,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "ExternalWindow"))
             graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
-        graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
+        graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Atomic").GetString());
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
         graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
         graphics->SetOrientations(GetParameter(parameters, "Orientations", "LandscapeLeft LandscapeRight").GetString());
@@ -585,35 +585,39 @@ void Engine::Exit()
 
 void Engine::DumpProfiler()
 {
+#ifdef ATOMIC_LOGGING
+    if (!Thread::IsMainThread())
+        return;
+
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
         ATOMIC_LOGRAW(profiler->PrintData(true, true) + "\n");
+#endif
 }
 
 void Engine::DumpResources(bool dumpFileName)
 {
 #ifdef ATOMIC_LOGGING
+    if (!Thread::IsMainThread())
+        return;
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
-    ATOMIC_LOGRAW("\n");
-
     if (dumpFileName)
     {
         ATOMIC_LOGRAW("Used resources:\n");
-        for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
-            i != resourceGroups.End(); ++i)
+        for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin(); i != resourceGroups.End(); ++i)
         {
             const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
             if (dumpFileName)
             {
-                for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
-                    j != resources.End(); ++j)
+                for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin(); j != resources.End(); ++j)
                     ATOMIC_LOGRAW(j->second_->GetName() + "\n");
             }
         }
     }
     else
-        ATOMIC_LOGRAW(cache->PrintMemoryUsage());
+        ATOMIC_LOGRAW(cache->PrintMemoryUsage() + "\n");
 #endif
 }
 
