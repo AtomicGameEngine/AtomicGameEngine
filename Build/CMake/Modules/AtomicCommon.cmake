@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 #
 
+include (CMakeParseArguments)
+
 # Urho compatibility
 add_definitions(-DATOMIC_CXX11=1)
 
