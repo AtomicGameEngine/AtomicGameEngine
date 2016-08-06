@@ -2333,7 +2333,7 @@ void Graphics::Restore()
             {                      // so remove this context and let it fall back to GL2
                 SDL_GL_DeleteContext(impl_->context_);
                 impl_->context_ = NULL;
-                LOGINFOF ( "Mesa GL Driver: %s detected, forcing GL2 context creation.  Please use gl2 command line option to avoid this warning.", driverx.CString() );
+                ATOMIC_LOGINFOF ( "Mesa GL Driver: %s detected, forcing GL2 context creation.  Please use gl2 command line option to avoid this warning.", driverx.CString() );
             }
         }
     }
