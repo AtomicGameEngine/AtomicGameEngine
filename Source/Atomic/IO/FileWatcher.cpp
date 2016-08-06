@@ -103,7 +103,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     }
     else
     {
-        LOGDEBUGF("FileWatcher::StartWatching - Ignoring non-writable path %s", nativePath.CString());
+        ATOMIC_LOGDEBUGF("FileWatcher::StartWatching - Ignoring non-writable path %s", nativePath.CString());
         return false;
     }
 
