@@ -232,7 +232,10 @@ bool Engine::Initialize(const VariantMap& parameters)
             unsigned j = 0;
             for (; j < resourcePrefixPaths.Size(); ++j)
             {
-                String packageName = resourcePrefixPaths[j] + resourcePaths[i] + ".pak";
+                // ATOMIC BEGIN
+                String packageName = resourcePrefixPaths[j] + resourcePaths[i] + PAK_EXTENSION;
+                // ATOMIC END
+
                 if (fileSystem->FileExists(packageName))
                 {
                     if (cache->AddPackageFile(packageName))
@@ -324,7 +327,9 @@ bool Engine::Initialize(const VariantMap& parameters)
 
                 // Add all the found package files (non-recursive)
                 Vector<String> paks;
-                fileSystem->ScanDir(paks, autoLoadPath, "*.pak", SCAN_FILES, false);
+                // ATOMIC BEGIN
+                fileSystem->ScanDir(paks, autoLoadPath, ToString("*.%s", PAK_EXTENSION), SCAN_FILES, false);
+                // ATOMIC END
                 for (unsigned y = 0; y < paks.Size(); ++y)
                 {
                     String pak = paks[y];
@@ -372,8 +377,10 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 
         if (!graphics->SetMode(
-            GetParameter(parameters, "WindowWidth", 0).GetInt(),
-            GetParameter(parameters, "WindowHeight", 0).GetInt(),
+// ATOMIC BEGIN
+            GetParameter(parameters, "WindowMaximized", false).GetBool() ? 0 : GetParameter(parameters, "WindowWidth", 0).GetInt(),
+            GetParameter(parameters, "WindowMaximized", false).GetBool() ? 0 : GetParameter(parameters, "WindowHeight", 0).GetInt(),
+// ATOMIC END
             GetParameter(parameters, "FullScreen", true).GetBool(),
             GetParameter(parameters, "Borderless", false).GetBool(),
             GetParameter(parameters, "WindowResizable", false).GetBool(),
@@ -918,6 +925,13 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "touch")
                 ret["TouchEmulation"] = true;
+            // ATOMIC BEGIN
+            else if (argument == "logname" && !value.Empty())
+            {
+                ret["LogName"] = value;
+                ++i;
+            }
+            // ATOMIC END
 #ifdef ATOMIC_TESTING
             else if (argument == "timeout" && !value.Empty())
             {

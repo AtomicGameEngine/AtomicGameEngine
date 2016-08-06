@@ -124,4 +124,8 @@ ATOMIC_API unsigned ToLower(unsigned ch);
 /// Convert a memory size into a formatted size string, of the style "1.5 Mb".
 ATOMIC_API String GetFileSizeString(unsigned long long memorySize);
 
+// ATOMIC BEGIN
+ATOMIC_API String ToStringVariadic(const char* formatString, va_list args);
+// ATOMIC END
+
 }

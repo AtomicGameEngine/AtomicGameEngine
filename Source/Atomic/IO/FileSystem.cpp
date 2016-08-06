@@ -812,7 +812,9 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
 
-    String filterExtension = filter.Substring(filter.Find('.'));
+// ATOMIC BEGIN
+    String filterExtension = filter.Substring(filter.FindLast('.'));
+// ATOMIC END
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 

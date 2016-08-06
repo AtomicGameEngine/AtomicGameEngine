@@ -698,4 +698,15 @@ String GetFileSizeString(unsigned long long memorySize)
     return output;
 }
 
+// ATOMIC BEGIN
+
+String ToStringVariadic(const char* formatString, va_list args)
+{
+    String ret;
+    ret.AppendWithFormatArgs(formatString, args);
+    return ret;
+}
+
+// ATOMIC END
+
 }

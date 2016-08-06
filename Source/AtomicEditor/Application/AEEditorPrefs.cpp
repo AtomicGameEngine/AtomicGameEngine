@@ -128,8 +128,12 @@ namespace AtomicEditor
 
             prefs[editor ? "editorWindow" : "playerWindow"] = window;
 
+
+            // TODO: add highDPI support
+            bool highDPI = false;
+
             //Setting the mode to 0 width/height will use engine defaults for window size and layout
-            graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample(), editor);
+            graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), highDPI, graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample());
 
             SavePreferences(prefs);
         }

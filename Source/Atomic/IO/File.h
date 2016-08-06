@@ -52,7 +52,10 @@ enum FileMode
 {
     FILE_READ = 0,
     FILE_WRITE,
-    FILE_READWRITE
+    FILE_READWRITE,
+// ATOMIC BEGIN
+    FILE_APPEND
+// ATOMIC END
 };
 
 class PackageFile;

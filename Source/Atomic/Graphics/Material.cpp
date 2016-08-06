@@ -1270,4 +1270,12 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
         SetShaderParameterAnimation(finishedNames[i], 0);
 }
 
+// ATOMIC BEGIN
+const char** Material::GetTextureUnitNames()
+{
+    return textureUnitNames;
+}
+// ATOMIC END
+
+
 }

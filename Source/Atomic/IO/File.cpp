@@ -49,7 +49,10 @@ static const wchar_t* openMode[] =
     L"rb",
     L"wb",
     L"r+b",
-    L"w+b"
+    L"w+b",
+// ATOMIC BEGIN
+    L"a+b"
+// ATOMIC END
 };
 #else
 static const char* openMode[] =
@@ -57,7 +60,10 @@ static const char* openMode[] =
     "rb",
     "wb",
     "r+b",
-    "w+b"
+    "w+b",
+// ATOMIC BEGIN
+    "a+b"
+// ATOMIC END
 };
 #endif
 
