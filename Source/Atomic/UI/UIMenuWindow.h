@@ -23,6 +23,7 @@
 #pragma once
 
 #include <TurboBadger/tb_select_item.h>
+#include <TurboBadger/tb_menu_window.h>
 #include "UIWidget.h"
 
 namespace Atomic
@@ -50,6 +51,8 @@ protected:
 private:
 
     tb::TBSelectItemSource* source_;
+    
+    void FixMenu( tb::TBMenuWindow* ); // get rid of scrollbars for menu popups
 
 };
 
