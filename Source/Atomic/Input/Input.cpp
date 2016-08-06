@@ -696,9 +696,7 @@ void Input::SetMouseModeEmscriptenFinal(MouseMode mode, bool suppressEvent)
             SetMouseVisibleEmscripten(true, suppressEvent);
         }
 
-        UI* const ui = GetSubsystem<UI>();
-        Cursor* const cursor = ui->GetCursor();
-        SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+        SetMouseGrabbed(!mouseVisible_, suppressEvent);
     }
     else if (mode == MM_RELATIVE && emscriptenPointerLock_)
     {
@@ -729,9 +727,6 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
     const MouseMode previousMode = mouseMode_;
     mouseMode_ = mode;
 
-    UI* const ui = GetSubsystem<UI>();
-    Cursor* const cursor = ui->GetCursor();
-
     // Handle changing from previous mode
     if (previousMode == MM_RELATIVE)
         ResetMouseVisible();
@@ -741,7 +736,7 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
     {
         // Attempt to cancel pending pointer-lock requests
         emscriptenInput_->ExitPointerLock(suppressEvent);
-        SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+        SetMouseGrabbed(!mouseVisible_, suppressEvent);
     }
     else if (mode == MM_ABSOLUTE)
     {
@@ -753,14 +748,13 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
             }
             else
             {
-                if (!cursor)
-                    SetMouseVisible(true, suppressEvent);
+                SetMouseVisible(true, suppressEvent);
                 // Deferred mouse mode change to pointer-lock callback
                 mouseMode_ = previousMode;
                 emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);
             }
 
-            SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+            SetMouseGrabbed(!(mouseVisible_), suppressEvent);
         }
     }
     else if (mode == MM_RELATIVE)
@@ -768,7 +762,7 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
         if (emscriptenPointerLock_)
         {
             SetMouseVisibleEmscripten(false, true);
-            SetMouseGrabbed(!(cursor && cursor->IsVisible()), suppressEvent);
+            SetMouseGrabbed(true, suppressEvent);
         }
         else
         {

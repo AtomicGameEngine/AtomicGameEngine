@@ -14,8 +14,9 @@ if (NOT ATOMIC_BUILD_2D)
     add_subdirectory(StanHull)
 endif()
 
+add_subdirectory(SDL)
+
 if (NOT EMSCRIPTEN)
-    add_subdirectory(SDL)
     add_subdirectory(Recast)
     add_subdirectory(Civetweb)
     add_subdirectory(Detour)
