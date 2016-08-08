@@ -22,6 +22,7 @@
 // http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 
 import EditorUI = require("ui/EditorUI");
+import Preferences = require("editor/Preferences");
 
 class ColorChooser extends Atomic.UIWindow {
 
@@ -76,6 +77,8 @@ class ColorChooser extends Atomic.UIWindow {
 
         (<Atomic.UIButton>this.getWidget("cokbutton")).onClick = () => {
 
+            Preferences.getInstance().addColorHistory(this.infohex.text);
+
             this.sendEvent("UIWidgetEditComplete", { widget : this });
             this.unsubscribeFromEvent("WidgetDeleted");
             this.close();
@@ -121,6 +124,16 @@ class ColorChooser extends Atomic.UIWindow {
 
         Atomic.ui.blockChangedEvents = true;
 
+        var colorhist = Preferences.getInstance().colorHistory;
+        (<Atomic.UIColorWidget>this.getWidget("chistory0")).setColorString(colorhist[0]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory1")).setColorString(colorhist[1]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory2")).setColorString(colorhist[2]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory3")).setColorString(colorhist[3]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory4")).setColorString(colorhist[4]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory5")).setColorString(colorhist[5]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory6")).setColorString(colorhist[6]);
+        (<Atomic.UIColorWidget>this.getWidget("chistory7")).setColorString(colorhist[7]);
+
         this.oldcolor.setAlpha( startRGBA[3] * 255 );
         this.a_sld.setValue(this.rgbhsla[6]);
 
@@ -130,9 +143,8 @@ class ColorChooser extends Atomic.UIWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
+        let changed = false;
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
-
-            let changed = false;
             let hsltargets = ["colorwheel", "lslider"];
             let rgbtargets = {
                 "redselect" : 0,
@@ -142,7 +154,7 @@ class ColorChooser extends Atomic.UIWindow {
                 "blueselect" : 2,
                 "blueslider" : 2,
                 "alphaslider" : 3
-            }
+            };
 
             if (hsltargets.indexOf(ev.target.id) > -1) {
 
@@ -163,12 +175,58 @@ class ColorChooser extends Atomic.UIWindow {
                 this.update_hslwidgets();
 
             }
+        }
 
-            if (changed) {
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
-                this.sendEvent("ColorChooserChanged", { widget : this });
-
+            if ( ev.target.id == "history0" || ev.target.id == "history1"
+                    || ev.target.id == "history2" || ev.target.id == "history3"
+                    || ev.target.id == "history4" || ev.target.id == "history5"
+                    || ev.target.id == "history6" || ev.target.id == "history7") {
+                var which = ev.target.id.charAt(7); //parseInt(ev.target.id); // which button was pressed
+                var colorcell = Preferences.getInstance().colorHistory[which]; // get the string
+                this.ColorFromString ( colorcell );
             }
+
+        }
+
+        if (changed) {
+
+            this.sendEvent("ColorChooserChanged", { widget : this });
+
+        }
+
+    }
+
+    ColorFromString ( colorString: String ) {
+
+        let changed = false;
+        let hslx = colorString.split ( "," );
+        if ( colorString.indexOf( "#" ) == 0 && colorString.length == 7 ) { // decode well formed RGB
+
+            this.rgbhsla[0] = parseInt ( colorString.slice ( 1, 3 ), 16 );
+            this.rgbhsla[1] = parseInt ( colorString.slice ( 3, 5 ), 16 );
+            this.rgbhsla[2] = parseInt ( colorString.slice ( 5, 7 ), 16 );
+            this.recalc_hsl();
+            changed = true;
+
+        }
+        else if ( hslx.length == 2 ) {  // decode HSL
+
+            this.rgbhsla[3] = parseFloat ( hslx[0] );
+            this.rgbhsla[4] = parseFloat ( hslx[1] );
+            this.rgbhsla[5] = parseFloat ( hslx[2] );
+            this.recalc_rgb();
+            changed = true;
+
+        }
+
+        if (changed) {
+
+            this.fixcolor();
+            this.update_hslwidgets();
+            this.update_rgbwidgets();
+            this.sendEvent("ColorChooserChanged", { widget : this });
 
         }
 
