@@ -133,7 +133,7 @@ void MasterServerClient::SendMessageToMasterServer(const String& msg)
 {
     if (masterTCPConnection_)
     {
-        String netString = String(msg.Length()) + ':' + msg;
+        String netString = String(msg.Length()) + ":" + msg;
         masterTCPConnection_->Send(netString.CString(), netString.Length());
     }
     else
