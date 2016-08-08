@@ -230,7 +230,7 @@ void PrintUnicode(const String& str, bool error)
 
 void PrintUnicodeLine(const String& str, bool error)
 {
-    PrintUnicode(str + '\n', error);
+    PrintUnicode(str + "\n", error);
 }
 
 void PrintLine(const String& str, bool error)

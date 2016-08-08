@@ -640,7 +640,7 @@ bool FileSystem::DirExists(const String& pathName) const
     if (ATOMIC_IS_ASSET(fixedName))
     {
         // Split the pathname into two components: the longest parent directory path and the last name component
-        String assetPath(ATOMIC_ASSET((fixedName + '/')));
+        String assetPath(ATOMIC_ASSET((fixedName + "/")));
         String parentPath;
         unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
