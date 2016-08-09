@@ -353,6 +353,25 @@ public:
     static const Vector2 DOWN;
     /// (1,1) vector.
     static const Vector2 ONE;
+
+    // ATOMIC BEGIN
+
+    /// Set components to minimum of this and other vector
+    void ComponentwiseMin(const Vector2& rhs)
+    {
+        if (rhs.x_ < x_) x_ = rhs.x_;
+        if (rhs.y_ < y_) y_ = rhs.y_;
+    }
+
+    /// Set components to maximum of this and other vector
+    void ComponentwiseMax(const Vector2& rhs)
+    {
+        if (rhs.x_ > x_) x_ = rhs.x_;
+        if (rhs.y_ > y_) y_ = rhs.y_;
+    }
+
+    // ATOMIC END
+
 };
 
 /// Multiply Vector2 with a scalar

@@ -438,6 +438,27 @@ public:
     static const Vector3 BACK;
     /// (1,1,1) vector.
     static const Vector3 ONE;
+
+    // ATOMIC BEGIN
+
+    /// Set components to minimum of this and other vector
+    void ComponentwiseMin(const Vector3& rhs)
+    {
+        if (rhs.x_ < x_) x_ = rhs.x_;
+        if (rhs.y_ < y_) y_ = rhs.y_;
+        if (rhs.z_ < z_) z_ = rhs.z_;
+    }
+
+    /// Set components to maximum of this and other vector
+    void ComponentwiseMax(const Vector3& rhs)
+    {
+        if (rhs.x_ > x_) x_ = rhs.x_;
+        if (rhs.y_ > y_) y_ = rhs.y_;
+        if (rhs.z_ > z_) z_ = rhs.z_;
+    }
+
+    // ATOMIC END
+
 };
 
 /// Multiply Vector3 with a scalar.

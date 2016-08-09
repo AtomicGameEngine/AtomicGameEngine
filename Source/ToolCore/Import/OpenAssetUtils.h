@@ -114,4 +114,7 @@ void CollectMeshes(const aiScene* scene, OutModel& model, aiNode* node);
 
 void DumpNodes(aiNode* rootNode, unsigned level);
 
+// LIGHTMAP UV GEN
+void GenerateLightmapUV(aiMesh* mesh, const Matrix3x4& vertexTransform, const Matrix3& normalTransform);
+
 }

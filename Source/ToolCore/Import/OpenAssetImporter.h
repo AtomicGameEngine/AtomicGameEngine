@@ -107,6 +107,7 @@ private:
     aiNode* rootNode_;
 
     String inputName_;
+    String sourceAssetFilename_;
     String sourceAssetPath_;
     String resourcePath_;
     String outPath_;
