@@ -270,7 +270,7 @@ bool Asset::CreateImporter()
         textureFormats.Push(".dds");
 
         // todo, externalize recognizers
-        if (ext == ".fbx" || ext == ".blend" || ext == ".dae" || ext == ".mdl")
+        if (ext == ".fbx" || ext == ".blend" || ext == ".dae" || ext == ".mdl" || ext == ".obj")
         {
             importer_ = new ModelImporter(context_, this);
         }
