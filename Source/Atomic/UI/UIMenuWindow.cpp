@@ -68,6 +68,15 @@ void UIMenuWindow::Show(UISelectItemSource* source, int x, int y)
         ((TBMenuWindow*)widget_)->Show(source_, TBPopupAlignment());
     }
 
+    TBMenuWindow* src = (TBMenuWindow*)widget_ ;
+    TBSelectList* list = src->GetList();
+
+    int swidth = src->GetRect().w;
+    int num = list->GetNumItems()-1;
+    int sheight = list->GetItemWidget(num)->GetRect().y + list->GetItemWidget(num)->GetRect().h + 4;
+
+    if ( src->GetRect().h != sheight )
+        src->SetSize(swidth, sheight);
 
 }
 
@@ -89,13 +98,10 @@ void UIMenuWindow::FixMenu( tb::TBMenuWindow *mymenu ) // get rid of scrollbars 
 {
     if ( mymenu )
     {
-        TBScrollContainer *mys = mymenu->GetList()->GetScrollContainer();  // this is the magic.
-        if ( mys->GetScrollMode() != SCROLL_MODE_OFF )
-        {
-            mys->SetScrollMode(SCROLL_MODE_OFF);
-            mys->SetAdaptContentSize(false);
-            mys->SetAdaptToContentSize(true);
-        }
+        TBScrollContainer *mys = mymenu->GetList()->GetScrollContainer();
+        mys->SetScrollMode(SCROLL_MODE_OFF);
+        mys->SetAdaptToContentSize(true);
+        mys->SetAdaptContentSize(false);
     }
 }
 
