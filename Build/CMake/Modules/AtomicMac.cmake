@@ -18,6 +18,10 @@ add_definitions(-DATOMIC_PLATFORM_OSX -DATOMIC_OPENGL -DKNET_UNIX)
 
 if (CMAKE_GENERATOR STREQUAL "Xcode")
     add_definitions(-DATOMIC_XCODE)
+    else()
+        # When not using XCode, linker takes a long time, which this flag seems to be being passed during xcode builds
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Xlinker -no_deduplicate")
+        set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Xlinker -no_deduplicate")
 endif()
 
 list (APPEND ATOMIC_LINK_LIBRARIES GLEW)
