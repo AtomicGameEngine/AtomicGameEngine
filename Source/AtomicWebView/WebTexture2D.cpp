@@ -32,6 +32,7 @@
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/GraphicsImpl.h>
 #include <Atomic/Graphics/Technique.h>
+#include <SDL/include/SDL_mouse.h>
 
 #include "WebClient.h"
 #include "WebTexture2D.h"
@@ -73,6 +74,52 @@ public:
 
         popupRectOriginal_ = rect;
         popupRect_ = GetPopupRectInWebView(popupRectOriginal_);
+    }
+    void OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& custom_cursor_info) OVERRIDE
+    {
+       SDL_Cursor *c;
+
+       SDL_SystemCursor id = SDL_SYSTEM_CURSOR_ARROW;
+
+       switch(type)
+       {
+       case CT_IBEAM:
+           id = SDL_SYSTEM_CURSOR_IBEAM;
+           break;
+       case CT_WAIT:
+           id = SDL_SYSTEM_CURSOR_WAIT;
+           break;
+       case CT_CROSS:
+           id = SDL_SYSTEM_CURSOR_CROSSHAIR;
+           break;
+       case CT_HAND:
+           id = SDL_SYSTEM_CURSOR_HAND;
+           break;
+       case CT_NORTHEASTSOUTHWESTRESIZE:
+           id = SDL_SYSTEM_CURSOR_SIZENESW;
+           break;
+       case CT_NORTHWESTSOUTHEASTRESIZE:
+           id = SDL_SYSTEM_CURSOR_SIZENWSE;
+           break;
+       case CT_EASTWESTRESIZE:
+           id = SDL_SYSTEM_CURSOR_SIZEWE;
+           break;
+       case CT_NORTHSOUTHRESIZE:
+           id = SDL_SYSTEM_CURSOR_SIZENS;
+           break;
+       case CT_MOVE:
+           id = SDL_SYSTEM_CURSOR_SIZEALL;
+           break;
+       case CT_NOTALLOWED:
+           id = SDL_SYSTEM_CURSOR_NO;
+           break;
+       case CT_POINTER:
+           break;
+       default:
+           break;
+       }
+       c = SDL_CreateSystemCursor(id);
+       SDL_SetCursor(c);
     }
 
     CefRect GetPopupRectInWebView(const CefRect& original_rect) {
