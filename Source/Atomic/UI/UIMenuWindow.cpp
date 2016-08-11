@@ -57,7 +57,11 @@ void UIMenuWindow::Show(UISelectItemSource* source, int x, int y)
 
     source_ = source->GetTBItemSource();
 
-    FixMenu( (TBMenuWindow*)widget_ );  // get rid of scrollbars for menu popups
+    // get rid of scrollbars for menu popups, reconfigure menu container
+    TBScrollContainer *mys = ((TBMenuWindow*)widget_ )->GetList()->GetScrollContainer();
+    mys->SetScrollMode(SCROLL_MODE_OFF);
+    mys->SetAdaptToContentSize(true);
+    mys->SetAdaptContentSize(false);
 
     if (x != -1 && y != -1)
     {
@@ -68,15 +72,12 @@ void UIMenuWindow::Show(UISelectItemSource* source, int x, int y)
         ((TBMenuWindow*)widget_)->Show(source_, TBPopupAlignment());
     }
 
-    TBMenuWindow* src = (TBMenuWindow*)widget_ ;
-    TBSelectList* list = src->GetList();
-
-    int swidth = src->GetRect().w;
-    int num = list->GetNumItems()-1;
+    TBMenuWindow* src = (TBMenuWindow*)widget_; // get rid of scrollbars for menu popups, fix size
+    TBSelectList* list = ((TBMenuWindow*)widget_ )->GetList();
+    int num = list->GetNumItems() - 1;
     int sheight = list->GetItemWidget(num)->GetRect().y + list->GetItemWidget(num)->GetRect().h + 4;
-
     if ( src->GetRect().h != sheight )
-        src->SetSize(swidth, sheight);
+        src->SetSize(src->GetRect().w, sheight);
 
 }
 
@@ -93,17 +94,5 @@ void UIMenuWindow::Close()
     ((TBMenuWindow*)widget_)->Close();
 
 }
-
-void UIMenuWindow::FixMenu( tb::TBMenuWindow *mymenu ) // get rid of scrollbars for menu popups
-{
-    if ( mymenu )
-    {
-        TBScrollContainer *mys = mymenu->GetList()->GetScrollContainer();
-        mys->SetScrollMode(SCROLL_MODE_OFF);
-        mys->SetAdaptToContentSize(true);
-        mys->SetAdaptContentSize(false);
-    }
-}
-
 
 }

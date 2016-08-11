@@ -51,8 +51,6 @@ protected:
 private:
 
     tb::TBSelectItemSource* source_;
-    
-    void FixMenu( tb::TBMenuWindow* ); // get rid of scrollbars for menu popups
 
 };
 
