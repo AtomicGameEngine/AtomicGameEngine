@@ -459,7 +459,7 @@ void JSComponent::UpdateEventSubscription()
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, ATOMIC_HANDLER(JSComponent, HandleScenePostUpdate));
         currentEventMask_ |= USE_POSTUPDATE;
     }
-    else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    else if (!needPostUpdate && (currentEventMask_ & USE_POSTUPDATE))
     {
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
         currentEventMask_ &= ~USE_POSTUPDATE;
