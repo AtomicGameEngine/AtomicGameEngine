@@ -210,6 +210,7 @@ void UIEditField::OnFocusChanged(bool focused)
         if (focused)
         {
             styleEdit->selection.SelectAll();
+            firstFocusFlag_ = true;
         }
         else
         {
@@ -228,21 +229,23 @@ bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
         SendEvent(E_UIWIDGETEDITCOMPLETE, eventData);
         return true;
     }
-   // else if (ev.type == EVENT_TYPE_POINTER_DOWN)
-   // {
-   //     // Select the entire value in the field when it is selected
-   //     if (widget_  && widget_->IsCaptured() == false)
-   //     {
-   //         // safe cast?
-   //         TBEditField* w = (TBEditField*) widget_;
+    else if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    {
+        // Select the entire value in the field when it is selected
+        if (widget_ && firstFocusFlag_)
+        {
+            firstFocusFlag_ = false;
 
-   //         TBStyleEdit* styleEdit = w->GetStyleEdit();
-   //         if (styleEdit != NULL)
-   //         {
-   //             styleEdit->selection.SelectAll();
-   //         }
-   //     }
-   // }
+            // safe cast?
+            TBEditField* w = (TBEditField*) widget_;
+
+            TBStyleEdit* styleEdit = w->GetStyleEdit();
+            if (styleEdit != NULL)
+            {
+                styleEdit->selection.SelectAll();
+            }
+        }
+    }
 
     return UIWidget::OnEvent(ev);
 }
