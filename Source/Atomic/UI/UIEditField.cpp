@@ -194,6 +194,31 @@ void UIEditField::SetTextAlign(UI_TEXT_ALIGN align)
 
 }
 
+void UIEditField::OnFocusChanged(bool focused)
+{
+    UIWidget::OnFocusChanged(focused);
+
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    TBStyleEdit* styleEdit = w->GetStyleEdit();
+    if (styleEdit != NULL)
+    {
+        if (focused)
+        {
+            styleEdit->selection.SelectAll();
+        }
+        else
+        {
+            styleEdit->selection.SelectNothing();
+        }
+    }
+
+}
+
 bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
@@ -203,6 +228,21 @@ bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
         SendEvent(E_UIWIDGETEDITCOMPLETE, eventData);
         return true;
     }
+   // else if (ev.type == EVENT_TYPE_POINTER_DOWN)
+   // {
+   //     // Select the entire value in the field when it is selected
+   //     if (widget_  && widget_->IsCaptured() == false)
+   //     {
+   //         // safe cast?
+   //         TBEditField* w = (TBEditField*) widget_;
+
+   //         TBStyleEdit* styleEdit = w->GetStyleEdit();
+   //         if (styleEdit != NULL)
+   //         {
+   //             styleEdit->selection.SelectAll();
+   //         }
+   //     }
+   // }
 
     return UIWidget::OnEvent(ev);
 }

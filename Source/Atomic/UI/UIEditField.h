@@ -72,6 +72,7 @@ protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
+    virtual void OnFocusChanged(bool focused);
 private:
 
 };
