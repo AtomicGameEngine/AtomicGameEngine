@@ -1,39 +1,86 @@
+# == Atomic Color Chooser =====================================================
+
+definitions
+	colorspot
+		lp: width: 60, height: 26, max-width: 70, max-height: 32
+
 TBLayout: axis: y, distribution: gravity, position: left
-	lp: min-width: 300
 	TBLayout: axis: x, distribution: gravity
-		TBColorWheel: id: colorwheel, skin: HSVSkin
-				lp: width: 256, height: 256
-		TBSlider: id: lslider, axis: y, min: 0, max: 255, value: 128
-	TBLayout: axis: x, distribution: available, gravity: left right
-		TBColorWidget: id: colornew, color: blue, skin: Checkerboard
-				lp: width: 128, height: 64, max-width: 150, max-height: 80
-		TBColorWidget: id: colorold, color: red, skin: Checkerboard
-				lp: width: 128, height: 64, max-width: 150, max-height: 80
-	TBLayout: axis: y, distribution: gravity
 		TBLayout: axis: x, distribution: gravity
-			TBTextField: text: " R ", id: redlabel
-			TBInlineSelect: id: redselect, min: 0, max: 255, connection: rconn
-			TBSlider: id: redslider, min: 0, max: 255, connection: rconn
-		TBLayout: axis: x, distribution: gravity
-			TBTextField: text: " G ", id: greenlabel
-			TBInlineSelect: id: greenselect, min: 0, max: 255, connection: gconn
-			TBSlider: id: greenslider, min: 0, max: 255, connection: gconn
-		TBLayout: axis: x, distribution: gravity
-			TBTextField: text: " B ", id: bluelabel
-			TBInlineSelect: id: blueselect, min: 0, max: 255, connection: bconn
-			TBSlider: id: blueslider, min: 0, max: 255, connection: bconn
-		TBSeparator: gravity: left right
-		TBLayout: axis: x, distribution: gravity
-			TBTextField: text: " A ", id: alphalabel
-			TBInlineSelect: id: alphaselect, min: 0, max: 255, connection: aconn
-			TBSlider: id: alphaslider, min: 0, max: 255, value: 255, connection: aconn
-		TBSeparator: gravity: left right
+			TBColorWheel: id: colorwheel, skin: HSVSkin
+					lp: width: 256, height: 256
+			TBSlider: id: lslider, axis: y, min: 0, max: 255, value: 128
+
+		TBLayout: axis: y, distribution: gravity
+
+			TBLayout: axis: x, distribution: available, gravity: left right
+				TBColorWidget: id: colornew, color: blue, skin: Checkerboard
+					lp: width: 128, height: 64, max-width: 150, max-height: 80
+					TBTextField: text: "  New color"
+				TBColorWidget: id: colorold, color: red, skin: Checkerboard
+					lp: width: 128, height: 64, max-width: 150, max-height: 80
+					TBTextField: text: "  Old color"
+
+			TBLayout: axis: x, distribution: gravity
+				TBTextField: text: " R ", id: redlabel
+				TBInlineSelect: id: redselect, min: 0, max: 255, connection: rconn
+				TBSlider: id: redslider, min: 0, max: 255, connection: rconn
+			TBLayout: axis: x, distribution: gravity
+				TBTextField: text: " G ", id: greenlabel
+				TBInlineSelect: id: greenselect, min: 0, max: 255, connection: gconn
+				TBSlider: id: greenslider, min: 0, max: 255, connection: gconn
+			TBLayout: axis: x, distribution: gravity
+				TBTextField: text: " B ", id: bluelabel
+				TBInlineSelect: id: blueselect, min: 0, max: 255, connection: bconn
+				TBSlider: id: blueslider, min: 0, max: 255, connection: bconn
+			TBSeparator: gravity: left right
+			TBLayout: axis: x, distribution: gravity
+				TBTextField: text: " A ", id: alphalabel
+				TBInlineSelect: id: alphaselect, min: 0, max: 255, connection: aconn
+				TBSlider: id: alphaslider, min: 0, max: 255, value: 255, connection: aconn
+
+	TBLayout: axis: y, distribution: gravity, spacing: 8
+
+		TBLayout: axis: x, distribution: available, gravity: left
+			TBButton: id: history0
+				@include definitions>colorspot
+				TBColorWidget: id: chistory0, color: #000000, skin: Checkerboard
+			TBButton: id: history1
+				@include definitions>colorspot
+				TBColorWidget: id: chistory1, color: #ffffff, skin: Checkerboard
+			TBButton: id: history2
+				@include definitions>colorspot
+				TBColorWidget: id: chistory2, color: #00ff00, skin: Checkerboard
+			TBButton: id: history3
+				@include definitions>colorspot
+				TBColorWidget: id: chistory3, color: #0000ff, skin: Checkerboard
+			TBButton: id: history4
+				@include definitions>colorspot
+				TBColorWidget: id: chistory4, color: #ff0000, skin: Checkerboard
+			TBButton: id: history5
+				@include definitions>colorspot
+				TBColorWidget: id: chistory5, color: #ff00ff, skin: Checkerboard
+			TBButton: id: history6
+				@include definitions>colorspot
+				TBColorWidget: id: chistory6, color: #ffff00, skin: Checkerboard
+			TBButton: id: history7
+				@include definitions>colorspot
+				TBColorWidget: id: chistory7, color: #668866, skin: Checkerboard
+
 		TBLayout: axis: x, distribution: available, gravity: left right
-			TBEditField: id: infohex, text: "#000000", readonly: 1
-				font: size: 16
-			TBEditField: id: infohsl, text: "0.0, 0.0, 0,0", readonly: 1
-				font: size: 16
-	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout:
-		TBButton: text: OK, id: cokbutton
-		TBButton: text: Cancel, id: ccancelbutton
+			TBLayout: axis: x, distribution: available, gravity: left
+				TBTextField: text: "RGB ", text-align: right
+					font: size: 15
+				TBEditField: id: infohex, text: "#000000", readonly: 1
+					font: size: 15
+			TBLayout: axis: x, distribution: available, gravity: left
+				TBTextField: text: "HSL ", text-align: right
+					font: size: 15
+				TBEditField: id: infohsl, text: "-0.00, -0.00, -0,00", readonly: 1
+					font: size: 15
+
+		TBSeparator: gravity: left right, skin: AESeparator
+
+		TBLayout:
+			TBButton: text: OK, id: cokbutton
+			TBButton: text: Cancel, id: ccancelbutton

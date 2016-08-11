@@ -75,7 +75,8 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             if (ev.target.id == "choose_sdk_path") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath("Please choose the root folder of your Android SDK" , "");
+                var currsdk = this.sdkPathEdit.text;
+                var path = fileUtils.findPath("Please choose the root folder of your Android SDK" , currsdk );
                 if ( path.length > 0 )
                     this.sdkPathEdit.text = path;
 
@@ -84,7 +85,8 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             } else if (ev.target.id == "choose_ant_path") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.getAntPath("");
+                var currant = this.antPathEdit.text;
+                var path = fileUtils.getAntPath(currant);
                 if ( path.length > 0 )
                     this.antPathEdit.text = path;
 
@@ -93,7 +95,8 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             }  else if (ev.target.id == "choose_jdk_root") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath("Please choose the root folder of your JDK" , "");
+                var currjdk = this.jdkRootEdit.text;
+                var path = fileUtils.findPath("Please choose the root folder of your JDK" , currjdk );
                 if ( path.length > 0 )
                     this.jdkRootEdit.text = path;
 
@@ -105,14 +108,16 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
             }  else if (ev.target.id == "choose_and_auth") {
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath( "Please choose the folder of your ant.properties", "");
+                var currauth = this.releaseNameEdit.text;
+                var path = fileUtils.findPath( "Please choose the folder of your ant.properties", currauth );
                 if ( path.length > 0 )
                     this.releaseNameEdit.text = path;
                 return true;
 
             }  else if (ev.target.id == "choose_icon") {
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath("Please choose the folder with drawable folders" , "");
+                var curricon = this.iconNameEdit.text;
+                var path = fileUtils.findPath("Please choose the folder with drawable folders" , curricon);
                 if ( path.length > 0 ) {
                     this.iconNameEdit.text = path;
                     this.updateIconButton();

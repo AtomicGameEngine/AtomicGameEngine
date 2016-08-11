@@ -148,9 +148,9 @@ class WelcomeFrame extends ScriptWidget {
         descField.readOnly = true;
         descField.wrapping = true;
 
-        var styleDesc = "<color #A9A9A9>" + example.desc + "</color>";
+        descField.skinBg = "AccentColor4";
 
-        descField.text = styleDesc;
+        descField.text = example.desc;
 
         descField.adaptToContentSize = true;
 

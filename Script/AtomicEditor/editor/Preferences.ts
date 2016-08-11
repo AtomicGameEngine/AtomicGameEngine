@@ -65,6 +65,26 @@ class Preferences {
         this.write();
     }
 
+    addColorHistory(path: string): void {
+        var index = this._prefs.colorHistory.indexOf(path);   // search array for entry
+        if (index >= 0) {                                     // if its in there, 
+            this._prefs.colorHistory.splice(index, 1);        // REMOVE it.
+        }
+        this._prefs.colorHistory.unshift(path);               // now add it to beginning of array
+        this.updateColorHistory(true);                        // update and write out
+    }
+
+    updateColorHistory(write: boolean = false): void {
+
+        var len = this._prefs.colorHistory.length;                 // we only need indexes 0-7 now
+        var over = 8;
+        if ( len >= over )                                         // have MOaR than we need
+            this._prefs.colorHistory.splice( over, len - over );   // remove the excess
+
+        if (write)
+            this.write();
+    }
+
     getPreferencesFullPath(): string {
         var filePath = this.fileSystem.getAppPreferencesDir("AtomicEditor", "Preferences");
         filePath += "prefs.json";
@@ -151,6 +171,10 @@ class Preferences {
 
     get recentProjects(): string[] {
         return this._prefs.recentProjects;
+    }
+
+    get colorHistory(): string[] {
+        return this._prefs.colorHistory;
     }
 
     get uiData(): UserInterfaceData {
@@ -323,6 +347,8 @@ class PreferencesFormat {
 
         this.recentProjects = [];
 
+        this.colorHistory = [ "#000000", "#ffffff", "#00ff00", "#0000ff", "#ff0000", "#ff00ff", "#ffff00", "#668866" ];
+
         this.editorWindow = {
             x: 0,
             y: 0,
@@ -377,6 +403,11 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
+        if (!prefs.colorHistory) {
+            prefs.colorHistory = this.colorHistory;
+            updatedMissingDefaults = true;
+        }
+
         if (!prefs.editorWindow) {
             prefs.editorWindow = this.editorWindow;
             updatedMissingDefaults = true;
@@ -411,6 +442,7 @@ class PreferencesFormat {
     codeEditor: MonacoEditorSettings;
     uiData: UserInterfaceData;
     editorBuildData: EditorBuildData;
+    colorHistory: string[];
 }
 
 export = Preferences;
