@@ -425,6 +425,7 @@ export class RenameAsset extends ModalWindow {
         this.resizeToFitContent();
         this.center();
 
+        this.nameEdit.setFocus();
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {

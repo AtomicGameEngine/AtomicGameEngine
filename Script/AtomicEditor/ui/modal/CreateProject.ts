@@ -64,6 +64,9 @@ class CreateProject extends ModalWindow {
         this.projectPathField.text = userDocuments;
         this.populateLanguageSelectionList();
 
+        // Need to manually set the focus so the contents get auto-selected
+        this.projectNameField.setFocus();
+
         this.resizeToFitContent();
         this.center();
 

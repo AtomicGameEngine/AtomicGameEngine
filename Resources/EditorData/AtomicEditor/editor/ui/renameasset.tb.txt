@@ -6,10 +6,9 @@ TBLayout: axis: y, distribution: gravity, position: left
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout: gravity: left right, distribution-position: right bottom
 		TBTextField: text: "New Name:"
-		TBEditField: id: new_name, autofocus: 1
+		TBEditField: id: new_name
 			lp: min-width: 180
 	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout: 
+	TBLayout:
 		TBButton: text: Rename, id: rename
 		TBButton: text: Cancel, id: cancel
-		
