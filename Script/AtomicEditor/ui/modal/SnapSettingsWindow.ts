@@ -38,6 +38,7 @@ class SnapSettingsWindow extends ModalWindow {
 
         this.refreshWidgets();
 
+        this.transXEditField.setFocus();
     }
 
     apply() {

@@ -93,6 +93,7 @@ export class CreateFolder extends ModalWindow {
         this.resourcePath = resourcePath;
         this.init("New Folder", "AtomicEditor/editor/ui/resourcenewfolder.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("folder_name");
+        this.nameField.setFocus();
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -142,6 +143,7 @@ export class CreateComponent extends ModalWindow {
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
         this.templateField = <Atomic.UISelectDropdown>this.getWidget("template_list");
         this.loadTemplatesList();
+        this.nameField.setFocus();
     }
 
     /**
@@ -228,6 +230,7 @@ export class CreateScript extends ModalWindow {
         this.nameField = <Atomic.UIEditField>this.getWidget("script_name");
         this.templateField = <Atomic.UISelectDropdown>this.getWidget("template_list");
         this.loadTemplatesList();
+        this.nameField.setFocus();
     }
 
     /**
@@ -312,6 +315,7 @@ export class CreateScene extends ModalWindow {
         this.resourcePath = resourcePath;
         this.init("New Scene", "AtomicEditor/editor/ui/resourcecreateresource.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
+        this.nameField.setFocus();
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -364,6 +368,7 @@ export class CreateMaterial extends ModalWindow {
         this.resourcePath = resourcePath;
         this.init("New Material", "AtomicEditor/editor/ui/resourcecreateresource.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
+        this.nameField.setFocus();
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -425,6 +430,7 @@ export class RenameAsset extends ModalWindow {
         this.resizeToFitContent();
         this.center();
 
+        this.nameEdit.setFocus();
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {

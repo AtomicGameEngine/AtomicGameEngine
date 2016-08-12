@@ -1,10 +1,9 @@
 TBLayout: axis: y, distribution: gravity, position: left
-	TBLayout: 
+	TBLayout:
 		TBTextField: text: "Folder Name:"
-		TBEditField: id: folder_name, autofocus: 1
+		TBEditField: id: folder_name
 			lp: min-width: 180
 	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout: 
+	TBLayout:
 		TBButton: text: Create, id: create
 		TBButton: text: Cancel, id: cancel
-		
