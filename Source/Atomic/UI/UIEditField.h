@@ -74,10 +74,9 @@ protected:
 
     virtual void OnFocusChanged(bool focused);
 
+private:
     // Used to keep track of if we have just been focused for the click select
     bool firstFocusFlag_;
-private:
-
 };
 
 }

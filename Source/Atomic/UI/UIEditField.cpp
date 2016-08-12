@@ -33,7 +33,8 @@ using namespace tb;
 namespace Atomic
 {
 
-UIEditField::UIEditField(Context* context, bool createWidget) : UIWidget(context, false)
+UIEditField::UIEditField(Context* context, bool createWidget) : UIWidget(context, false),
+    firstFocusFlag_(false)
 {
     if (createWidget)
     {
