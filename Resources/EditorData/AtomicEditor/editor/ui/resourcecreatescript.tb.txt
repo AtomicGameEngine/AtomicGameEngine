@@ -1,7 +1,7 @@
 TBLayout: axis: y, distribution: gravity, position: left
 	TBLayout:
 		TBTextField: text: "Script Name:"
-		TBEditField: id: script_name
+		TBEditField: id: script_name, autofocus: 1
 			lp: min-width: 180
 	TBLayout: distribution: gravity
 		TBTextField: text: "Script Template:"

@@ -1,7 +1,7 @@
 TBLayout: axis: y, distribution: gravity, position: left
 	TBLayout:
 		TBTextField: text: "Name:"
-		TBEditField: id: component_name
+		TBEditField: id: component_name, autofocus: 1
 			lp: min-width: 180
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:
