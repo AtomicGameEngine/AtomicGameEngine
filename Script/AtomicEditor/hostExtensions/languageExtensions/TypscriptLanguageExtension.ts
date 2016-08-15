@@ -165,6 +165,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
             menu.addItem(this.compileOnSaveMenuItem);
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+            menu.addItem(new Atomic.UIMenuItem("Generate External Editor Project", `${this.name}.generateexternalproject`));
             this.menuCreated = true;
         }
     }
@@ -316,6 +317,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 case "compileproject":
                     this.doFullCompile();
                     return true;
+                case "generateexternalproject":
+                    this.generateExternalProject();
+                    return true;
             }
         }
     }
@@ -337,6 +341,42 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         WebView.WebBrowserHost.setGlobalStringProperty("TypeScriptLanguageExtension", "tsConfig", JSON.stringify(tsConfig));
     }
 
+    generateExternalProject ()
+    {
+      var projectPath : string = ToolCore.toolSystem.project.projectPath;
+
+      // Create TypeScript folder in project root
+      var tsPath : string = projectPath + "TypeScript/";
+      Atomic.getFileSystem().createDir(tsPath);
+
+      // Copy the Atomic.d.ts definition file to the TypeScript folder
+      var toolDataDir : string = ToolCore.toolEnvironment.toolDataDir;
+      Atomic.getFileSystem().copy(toolDataDir + "/TypeScriptSupport/Atomic.d.ts", tsPath + "Atomic.d.ts");
+
+      // Generate a tsconfig.json file
+      var config = new Atomic.File(projectPath + "tsconfig.json", Atomic.FILE_WRITE);
+      config.writeString
+(`
+{
+    "compilerOptions": {
+        "noEmitOnError": true,
+        "noImplicitAny": false,
+        "target": "ES5",
+        "module": "commonjs",
+        "outDir": "./Resources",
+        "rootDir": "./Resources",
+        "declaration": false,
+        "inlineSourceMap": false,
+        "removeComments": false,
+        "allowJs": true,
+        "noLib": true,
+        "allowNonTsExtensions": true,
+    }
+}
+`);
+
+      config.close();
+    }
     /**
      * Perform a full compile of the TypeScript
      */

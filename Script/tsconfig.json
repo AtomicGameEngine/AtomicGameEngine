@@ -109,15 +109,8 @@
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
         "./AtomicEditor/ui/UIEvents.ts",
-        "./TypeScript/Atomic.d.ts",
-        "./TypeScript/AtomicApp.d.ts",
-        "./TypeScript/AtomicNETScript.d.ts",
-        "./TypeScript/AtomicPlayer.d.ts",
         "./TypeScript/AtomicWork.d.ts",
         "./TypeScript/duktape.d.ts",
-        "./TypeScript/Editor.d.ts",
-        "./TypeScript/EditorWork.d.ts",
-        "./TypeScript/ToolCore.d.ts",
-        "./TypeScript/WebView.d.ts"
+        "./TypeScript/EditorWork.d.ts"
     ]
 }
