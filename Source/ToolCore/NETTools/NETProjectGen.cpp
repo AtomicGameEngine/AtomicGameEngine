@@ -108,9 +108,17 @@ namespace ToolCore
             for (unsigned j = 0; j < result.Size(); j++)
             {
                 XMLElement compile = igroup.CreateChild("Compile");
+                
+                String path = sourceFolder + result[j];
+
+                String relativePath;
+                
+                if (GetRelativePath(projectPath_, GetPath(path), relativePath))
+                {
+                    path = relativePath + GetFileName(path) + GetExtension(path);
+                }
 
                 // IMPORTANT: / Slash direction breaks intellisense :/
-                String path = sourceFolder + result[j];
                 path.Replace('/', '\\');
 
                 compile.SetAttribute("Include", path.CString());
@@ -183,11 +191,38 @@ namespace ToolCore
                 continue;
             }
 
-            String refpath = ref + ".dll";
             xref = igroup.CreateChild("Reference");
             xref.SetAttribute("Include", ref);
 
         }
+
+        Project* project = projectGen_->GetAtomicProject();
+
+        if (project)
+        {
+            Vector<String> result;
+            GetSubsystem<FileSystem>()->ScanDir(result, project->GetResourcePath(), "*.dll", SCAN_FILES, true);
+
+            for (unsigned j = 0; j < result.Size(); j++)
+            {
+                String path = project->GetResourcePath() + result[j];
+
+                String relativePath;
+
+                if (GetRelativePath(projectPath_, GetPath(path), relativePath))
+                {
+                    if (projectGen_->GetCSProjectByName(GetFileName(path)))
+                        continue;
+
+                    path = relativePath + GetFileName(path) + GetExtension(path);
+                }
+
+                xref = igroup.CreateChild("Reference");
+                xref.SetAttribute("Include", path);
+            }
+
+        }
+
     }
 
     void NETCSProject::CreateProjectReferencesItemGroup(XMLElement &projectRoot)
@@ -411,7 +446,16 @@ namespace ToolCore
             afterBuild.SetAttribute("Name", "AfterBuild");
             XMLElement copy = afterBuild.CreateChild("Copy");
             copy.SetAttribute("SourceFiles", "$(TargetPath)");
-            copy.SetAttribute("DestinationFolder", projectPath_ + "../../../Resources/");
+
+            String destPath = projectPath_ + "../../../Resources/";
+            String relativePath;            
+
+            if (GetRelativePath(projectPath_, atomicProject->GetResourcePath(), relativePath))
+            {
+                destPath = AddTrailingSlash(relativePath);
+            }
+
+            copy.SetAttribute("DestinationFolder", destPath);
 
             // Create the AtomicProject.csproj.user file if it doesn't exist
             String userSettingsFilename = projectPath_ + name_ + ".csproj.user";
@@ -531,7 +575,8 @@ namespace ToolCore
         return true;
     }
 
-    NETSolution::NETSolution(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen)
+    NETSolution::NETSolution(Context* context, NETProjectGen* projectGen, bool rewrite) : NETProjectBase(context, projectGen),
+       rewriteSolution_(rewrite)
     {
 
     }
@@ -613,6 +658,13 @@ namespace ToolCore
 
         source += "EndGlobal\n";
 
+        if (!rewriteSolution_)
+        { 
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            if (fileSystem->Exists(slnPath))
+                return;
+        }
+        
         SharedPtr<File> output(new File(context_, slnPath, FILE_WRITE));
         output->Write(source.CString(), source.Length());
         output->Close();
@@ -644,7 +696,8 @@ namespace ToolCore
         return true;
     }
 
-    NETProjectGen::NETProjectGen(Context* context) : Object(context)
+    NETProjectGen::NETProjectGen(Context* context) : Object(context),
+        rewriteSolution_(false)
     {
 
     }
@@ -704,10 +757,18 @@ namespace ToolCore
         return true;
     }
 
+    void NETProjectGen::SetRewriteSolution(bool rewrite)
+    {
+        rewriteSolution_ = rewrite;
+
+        if (solution_.NotNull())
+            solution_->SetRewriteSolution(rewrite);
+    }
+
     bool NETProjectGen::LoadProject(const JSONValue &root)
     {
 
-        solution_ = new NETSolution(context_, this);
+        solution_ = new NETSolution(context_, this, rewriteSolution_);
 
         solution_->Load(root["solution"]);
 

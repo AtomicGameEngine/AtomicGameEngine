@@ -76,6 +76,10 @@ namespace ToolCore
         void HandleAssetRenamed(StringHash eventType, VariantMap& eventData);
         void HandleAssetMoved(StringHash eventType, VariantMap& eventData);
 
+        void HandleAssetNew(StringHash eventType, VariantMap& eventData);
+        void HandleAssetScanBegin(StringHash eventType, VariantMap& eventData);
+        void HandleAssetScanEnd(StringHash eventType, VariantMap& eventData);
+
         void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
         void HandleProjectUnloaded(StringHash eventType, VariantMap& eventData);
 
