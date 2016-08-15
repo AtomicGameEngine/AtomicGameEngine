@@ -43,6 +43,19 @@ ATOMIC_EVENT(E_ASSETIMPORTERROR, AssetImportError)
     ATOMIC_PARAM(P_ERROR, Error);                  // string
 }
 
+ATOMIC_EVENT(E_ASSETSCANBEGIN, AssetScanBegin)
+{
+}
+
+ATOMIC_EVENT(E_ASSETSCANEND, AssetScanEnd)
+{
+}
+
+ATOMIC_EVENT(E_ASSETNEW, AssetNew)
+{
+    ATOMIC_PARAM(P_GUID, GUID);                  // string
+}
+
 ATOMIC_EVENT(E_ASSETRENAMED, AssetRenamed)
 {
     ATOMIC_PARAM(P_ASSET, Asset);                  // asset ptr

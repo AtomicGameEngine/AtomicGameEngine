@@ -30,6 +30,7 @@
 
 #include "../ToolSystem.h"
 #include "../Assets/AssetEvents.h"
+#include "../Assets/AssetDatabase.h"
 #include "../Project/Project.h"
 #include "../Project/ProjectEvents.h"
 
@@ -225,6 +226,8 @@ namespace ToolCore
 
         if (solutionDirty_)
         {
+            // set to false in case of error, we don't want to keep trying to 
+            // rebuild, TODO: better error handling
             solutionDirty_ = false;
             GenerateSolution();
         }
@@ -260,6 +263,22 @@ namespace ToolCore
             projectAssemblyDirty_ = true;
 
     }
+
+    void NETProjectSystem::HandleAssetScanBegin(StringHash eventType, VariantMap& eventData)
+    {
+
+    }
+
+    void NETProjectSystem::HandleAssetScanEnd(StringHash eventType, VariantMap& eventData)
+    {
+        if (solutionDirty_)
+        {
+            // set to false in case of error, we don't want to keep trying to 
+            // rebuild, TODO: better error handling
+            solutionDirty_ = false;
+            GenerateSolution();
+        }
+    }
     
     void NETProjectSystem::HandleProjectUnloaded(StringHash eventType, VariantMap& eventData)
     {
@@ -271,9 +290,21 @@ namespace ToolCore
 
     }
 
+    void NETProjectSystem::HandleAssetNew(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace ResourceAdded;
+
+        const String& guid = eventData[P_GUID].ToString();
+
+        Asset* asset = GetSubsystem<AssetDatabase>()->GetAssetByGUID(guid);
+
+        if (asset->GetExtension() == ".cs")
+            solutionDirty_ = true;
+    }
+
     void NETProjectSystem::HandleResourceAdded(StringHash eventType, VariantMap& eventData)
     {
-
+        
     }
 
     void NETProjectSystem::HandleResourceRemoved(StringHash eventType, VariantMap& eventData)
@@ -302,11 +333,15 @@ namespace ToolCore
         SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectLoaded));
         SubscribeToEvent(E_PROJECTUNLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectUnloaded));
 
+        SubscribeToEvent(E_ASSETSCANBEGIN, ATOMIC_HANDLER(NETProjectSystem, HandleAssetScanBegin));
+        SubscribeToEvent(E_ASSETSCANEND, ATOMIC_HANDLER(NETProjectSystem, HandleAssetScanEnd));
+
         SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(NETProjectSystem, HandleFileChanged));
 
         SubscribeToEvent(E_RESOURCEADDED, ATOMIC_HANDLER(NETProjectSystem, HandleResourceAdded));
         SubscribeToEvent(E_RESOURCEREMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleResourceRemoved));
 
+        SubscribeToEvent(E_ASSETNEW, ATOMIC_HANDLER(NETProjectSystem, HandleAssetNew));
         SubscribeToEvent(E_ASSETRENAMED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetRenamed));
         SubscribeToEvent(E_ASSETMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetMoved));
 

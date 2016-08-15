@@ -210,6 +210,15 @@ public:
     /// Returns a formatted string containing the memory actively used.
     String PrintMemoryUsage() const;
 
+    // ATOMIC BEGIN
+    
+    /// Get the number of resource directories
+    unsigned GetNumResourceDirs() const { return resourceDirs_.Size(); }
+    /// Get resource directory at a given index
+    const String& GetResourceDir(unsigned index) const { return index < resourceDirs_.Size() ? resourceDirs_[index] : String::EMPTY; }
+
+    // ATOMIC END
+
 private:
     /// Find a resource.
     const SharedPtr<Resource>& FindResource(StringHash type, StringHash nameHash);

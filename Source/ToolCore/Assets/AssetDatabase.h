@@ -75,7 +75,7 @@ private:
     void HandleFileChanged(StringHash eventType, VariantMap& eventData);
     void HandleResourceLoadFailed(StringHash eventType, VariantMap& eventData);
 
-    void AddAsset(SharedPtr<Asset>& asset);
+    void AddAsset(SharedPtr<Asset>& asset, bool newAsset = false);
 
     void PruneOrphanedDotAssetFiles();
 
@@ -94,6 +94,8 @@ private:
     HashMap<StringHash, unsigned> assetImportErrorTimes_;
 
     Vector<String> usedGUID_;
+
+    unsigned assetScanDepth_;
 
 };
 

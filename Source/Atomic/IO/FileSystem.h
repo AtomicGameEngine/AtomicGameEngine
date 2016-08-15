@@ -166,6 +166,11 @@ ATOMIC_API bool IsAbsolutePath(const String& pathName);
 
 // ATOMIC BEGIN
 ATOMIC_API bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath);
+ATOMIC_API String GetSanitizedPath(const String& path);
+
+/// Given two absolute directory paths, get the relative path from one to the other
+/// Returns false if either path isn't absolute, or if they are unrelated
+ATOMIC_API bool GetRelativePath(const String& fromPath, const String& toPath, String& output);
 // ATOMIC END
 
 }

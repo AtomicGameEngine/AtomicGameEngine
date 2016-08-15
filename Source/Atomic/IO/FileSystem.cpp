@@ -1243,8 +1243,8 @@ bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath)
     if (!IsAbsolutePath(absParentPath) || !IsAbsolutePath(fullPath))
         return false;
 
-    String path1 = AddTrailingSlash(absParentPath);
-    String path2 = AddTrailingSlash(GetPath(fullPath));
+    String path1 = AddTrailingSlash(GetSanitizedPath(absParentPath));
+    String path2 = AddTrailingSlash(GetSanitizedPath(GetPath(fullPath)));
 
     if (path2.StartsWith(path1))
         return true;
@@ -1252,7 +1252,63 @@ bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath)
     return false;
 }
 
+String GetSanitizedPath(const String& path)
+{
+    String sanitized = GetInternalPath(path);
 
+    StringVector parts = sanitized.Split('/');
+
+    sanitized = String::Joined(parts, "/");
+
+    return sanitized;
+}
+
+bool GetRelativePath(const String& fromPath, const String& toPath, String& output)
+{
+    output = String::EMPTY;
+
+    String from = GetSanitizedPath(fromPath);
+    String to = GetSanitizedPath(toPath);
+
+    StringVector fromParts = from.Split('/');
+    StringVector toParts = to.Split('/');
+
+    if (!fromParts.Size() || !toParts.Size())
+        return false;
+
+    if (fromParts == toParts)
+    {
+        return true;
+    }
+
+    // no common base?
+    if (fromParts[0] != toParts[0])
+        return false;
+
+    int startIdx;
+
+    for (startIdx = 0; startIdx < toParts.Size(); startIdx++)
+    {
+        if (startIdx >= fromParts.Size() || fromParts[startIdx] != toParts[startIdx])
+            break;       
+    }
+
+    if (startIdx == toParts.Size())
+        return false;
+
+    for (int i = 0; i < (int)fromParts.Size() - startIdx; i++)
+    {
+        output += "../";
+    }
+
+    for (int i = startIdx; i < (int) toParts.Size(); i++)
+    {
+        output += toParts[i] + "/";
+    }
+
+    return true;
+
+}
 
 // ATOMIC END
 

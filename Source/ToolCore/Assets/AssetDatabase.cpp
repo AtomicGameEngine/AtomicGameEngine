@@ -42,7 +42,8 @@
 namespace ToolCore
 {
 
-AssetDatabase::AssetDatabase(Context* context) : Object(context)
+AssetDatabase::AssetDatabase(Context* context) : Object(context),
+    assetScanDepth_(0)
 {
     SubscribeToEvent(E_LOADFAILED, ATOMIC_HANDLER(AssetDatabase, HandleResourceLoadFailed));
     SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(AssetDatabase, HandleProjectLoaded));
@@ -229,7 +230,7 @@ String AssetDatabase::GetDotAssetFilename(const String& path)
 
 }
 
-void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
+void AssetDatabase::AddAsset(SharedPtr<Asset>& asset, bool newAsset)
 {
 
     assert(asset->GetGUID().Length());
@@ -242,6 +243,13 @@ void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
     asset->UpdateFileTimestamp();
 
     VariantMap eventData;
+
+    if (newAsset)
+    {        
+        eventData[AssetNew::P_GUID] = asset->GetGUID();
+        SendEvent(E_ASSETNEW, eventData);
+    }
+
     eventData[ResourceAdded::P_GUID] = asset->GetGUID();
     SendEvent(E_RESOURCEADDED, eventData);
 }
@@ -316,6 +324,13 @@ void AssetDatabase::PreloadAssets()
 
 void AssetDatabase::Scan()
 {
+    if (!assetScanDepth_)
+    {
+        SendEvent(E_ASSETSCANBEGIN);
+    }
+
+    assetScanDepth_++;
+
     PruneOrphanedDotAssetFiles();
 
     FileSystem* fs = GetSubsystem<FileSystem>();
@@ -358,7 +373,9 @@ void AssetDatabase::Scan()
             SharedPtr<Asset> asset(new Asset(context_));
 
             if (asset->SetPath(path))
-                AddAsset(asset);
+            {
+                AddAsset(asset, true);
+            }
         }
         else
         {
@@ -389,6 +406,12 @@ void AssetDatabase::Scan()
     if (ImportDirtyAssets())
         Scan();
 
+    assetScanDepth_--;
+
+    if (!assetScanDepth_)
+    {
+        SendEvent(E_ASSETSCANEND);
+    }
 }
 
 void AssetDatabase::GetFolderAssets(String folder, PODVector<Asset*>& assets) const

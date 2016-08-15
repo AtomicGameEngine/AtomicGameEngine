@@ -111,7 +111,7 @@ namespace ToolCore
 
     public:
 
-        NETSolution(Context* context, NETProjectGen* projectGen);
+        NETSolution(Context* context, NETProjectGen* projectGen, bool rewrite = false);
         virtual ~NETSolution();
 
         bool Load(const JSONValue& root);
@@ -126,6 +126,10 @@ namespace ToolCore
         // Registers a NuGet package, returns true if the package hasn't been previously registered
         bool RegisterPackage(const String& package);
 
+        /// If true, the sln file will rewritten if it exists, default is false
+        void SetRewriteSolution(bool rewrite) { rewriteSolution_ = rewrite; }
+
+
     private:
 
         void GenerateSolution(const String& slnPath);
@@ -134,6 +138,7 @@ namespace ToolCore
         String outputPath_;
         String solutionGUID_;
         Vector<String> packages_;
+        bool rewriteSolution_;
 
     };
 
@@ -167,11 +172,17 @@ namespace ToolCore
 
         String GenerateUUID();
 
+        /// If true, the sln file will rewritten if it exists, default is false
+        void SetRewriteSolution(bool rewrite);
+
         bool LoadProject(const JSONValue& root);
         bool LoadProject(const String& projectPath);
         bool LoadProject(Project* project);
 
     private:
+
+        // if true, the solution (sln) file will be recreated if it exists
+        bool rewriteSolution_;
 
         String scriptPlatform_;
 
