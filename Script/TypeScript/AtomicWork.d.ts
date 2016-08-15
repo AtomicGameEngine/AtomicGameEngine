@@ -46,6 +46,65 @@ declare module Atomic {
 
     }
 
+    export interface Ray {
+        /** Ray origin */
+        origin: Atomic.Vector3;
+
+        /** Ray direction */
+        direction: Atomic.Vector3;
+    }
+
+    export interface Camera {
+        getScreenRay(x: number, y: number): Atomic.Ray;
+    }
+
+    export interface Octree {
+        /**
+         * Cast a ray returing a single hit
+         * @param  {Atomic.Ray} ray
+         * @param  {Atomic.RayQueryLevel} level defaults to Atomic.RAY_TRIANGLE
+         * @param  {number} maxDistance defaults to Atomic.M_INFINITY
+         * @param  {number} drawableFlags defaults to Atomic.DRAWABLE_ANY
+         * @param  {number} viewMask defaults to Atomic.DEFAULT_VIEWMASK
+         * @return {Atomic.RayQueryResult}
+         */
+        rayCastSingle(ray: Atomic.Ray, level?: Atomic.RayQueryLevel, maxDistance?: number, drawableFlags?: number, viewMask?: number):Atomic.RayQueryResult;
+
+        /**
+         * Cast a ray returning all hits
+         * @param  {Atomic.Ray} ray
+         * @param  {Atomic.RayQueryLevel} level defaults to Atomic.RAY_TRIANGLE
+         * @param  {number} maxDistance defaults to Atomic.M_INFINITY
+         * @param  {number} drawableFlags defaults to Atomic.DRAWABLE_ANY
+         * @param  {number} viewMask defaults to Atomic.DEFAULT_VIEWMASK
+         * @return {Atomic.RayQueryResult}
+         */
+        rayCast(ray: Atomic.Ray, level?: Atomic.RayQueryLevel, maxDistance?: number, drawableFlags?: number, viewMask?: number):Atomic.RayQueryResult[];
+    }
+
+    export interface RayQueryResult {
+        /** Hit position in world space. */
+        position: Atomic.Vector3;
+
+        /** Hit normal in world space. Negation of ray direction if per-triangle data not available. */
+        normal: Atomic.Vector3;
+
+        /** Hit texture position */
+        textureUV: Atomic.Vector2;
+
+        /** Distance from ray origin. */
+        distance:number;
+
+        /** Drawable. */
+        drawable: any;
+
+        /** Scene node. */
+        node: Atomic.Node;
+
+        /** Drawable specific subobject if applicable. */
+        subObject: number;
+    }
+
     export interface KeyDownEvent {
 
         // keycode
