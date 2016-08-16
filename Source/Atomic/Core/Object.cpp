@@ -564,4 +564,36 @@ HashMap<StringHash, String>& EventNameRegistrar::GetEventNameMap()
     return eventNames_;
 }
 
+// ATOMIC BEGIN
+
+void Object::UnsubscribeFromEventReceiver(Object* receiver)
+{
+    EventHandler* handler = eventHandlers_.First();
+    EventHandler* previous = 0;
+
+    while (handler)
+    {
+        if (handler->GetReceiver() == receiver)
+        {
+
+            if (handler->GetSender())
+                context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());
+            else
+                context_->RemoveEventReceiver(this, handler->GetEventType());
+
+            EventHandler* next = eventHandlers_.Next(handler);
+            eventHandlers_.Erase(handler, previous);
+            handler = next;
+        }
+        else
+        {
+            previous = handler;
+            handler = eventHandlers_.Next(handler);
+        }
+    }
+
+}
+
+// ATOMIC END
+
 }

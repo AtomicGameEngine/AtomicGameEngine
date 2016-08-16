@@ -187,6 +187,9 @@ public:
 
     virtual bool IsObject() const { return true; }
 
+    /// Unsubscribe from event for specific receiver (where the event handler isn't necessarily in the subscribed object)
+    void UnsubscribeFromEventReceiver(Object* receiver);
+
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
     static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic("Object"); return typeNameStatic; }
 

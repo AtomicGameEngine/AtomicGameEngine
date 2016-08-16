@@ -113,7 +113,18 @@ JSEventHelper::JSEventHelper(Context* context, Object* object) :
 
 JSEventHelper::~JSEventHelper()
 {
+    Clear();
+}
 
+void JSEventHelper::Clear()
+{
+    UnsubscribeFromAllEvents();
+
+    if (!object_.Expired())
+    {
+        object_->UnsubscribeFromEventReceiver(this);
+    }
+    
 }
 
 void JSEventHelper::AddEventHandler(StringHash eventType)
