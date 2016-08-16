@@ -49,7 +49,7 @@ String FileUtils::OpenProjectFileDialog()
     String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
 
     nfdresult_t result = NFD_OpenDialog( "atomic",
-                                upath.CString(),
+                                GetNativePath(upath).CString(),
                                 &outPath);
 
     String fullpath;
@@ -89,7 +89,7 @@ String FileUtils::NewProjectFileDialog()
     String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
 
     nfdresult_t result = NFD_ChooseDirectory( "Please choose the root folder for your project",
-                                upath.CString(),
+                                GetNativePath(upath).CString(),
                                 &outPath);
 
 
@@ -117,7 +117,7 @@ String FileUtils::GetBuildPath(const String& defaultPath)
     if ( defaultPath.Length() > 0) ppath = defaultPath;
 
     nfdresult_t result = NFD_ChooseDirectory( "Please choose the build folder",
-                               ppath.CString(),
+                                GetNativePath(ppath).CString(),
                                 &outPath);
 
     if (outPath && result == NFD_OKAY)
@@ -150,8 +150,8 @@ String FileUtils::GetAntPath(const String& defaultPath)
     if ( defaultPath.Length() > 0) ppath = defaultPath;
 
     nfdresult_t result = NFD_ChooseDirectory(msg.CString(),
-        ppath.CString(),
-        &outPath);
+                        GetNativePath(ppath).CString(),
+                        &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
@@ -173,7 +173,7 @@ String FileUtils::GetMobileProvisionPath()
     String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
 
     nfdresult_t result = NFD_OpenDialog( "mobileprovision",
-                                upath.CString(),
+                                GetNativePath(upath).CString(),
                                 &outPath);
 
     String fullpath;
@@ -212,8 +212,8 @@ String FileUtils::FindPath(const String& title, const String& defaultPath)
     if ( defaultPath.Length() > 0) upath = defaultPath;
 
     nfdresult_t result = NFD_ChooseDirectory(title.CString(),
-        upath.CString(),
-        &outPath);
+                        GetNativePath(upath).CString(),
+                        &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
@@ -237,7 +237,7 @@ String FileUtils::FindFile (const String& filterlist, const String& defaultPath)
     if ( defaultPath.Length() > 0) upath = defaultPath;
 
     nfdresult_t result = NFD_OpenDialog( filterlist.CString(),
-        upath.CString(),
+        GetNativePath(upath).CString(),
         &outPath);
 
     if (outPath && result == NFD_OKAY)

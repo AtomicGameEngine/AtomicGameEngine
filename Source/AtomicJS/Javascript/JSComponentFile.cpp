@@ -112,8 +112,6 @@ JSComponent* JSComponentFile::CreateJSComponent()
         {
             component = js_to_class_instance<JSComponent>(ctx, -1, 0);
             component->scriptClassInstance_ = true;
-            // store reference below so pop doesn't gc the component
-            component->UpdateReferences();
         }
 
         duk_pop(ctx);

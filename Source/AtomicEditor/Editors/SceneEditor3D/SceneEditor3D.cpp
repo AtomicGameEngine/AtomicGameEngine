@@ -248,6 +248,9 @@ void SceneEditor3D::Close(bool navigateToAvailableResource)
     data["Scene"] = scene_;
     SendEvent("EditorSceneClosed", data);
 
+    selection_ = 0;
+    editHistory_ = 0;
+
     if (sceneImporter_.NotNull())
     {
         sceneImporter_->SetSceneCamPosition(sceneView_->GetCameraNode()->GetWorldPosition());

@@ -40,14 +40,12 @@ UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
     preferredSize_(new UIPreferredSize()),
     multiTouch_(false)
 {
-    AddRef();
-
     if (createWidget)
     {
         widget_ = new TBWidget();
         widget_->SetDelegate(this);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
-    }
+    }    
 
 }
 
@@ -191,23 +189,30 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
 
 void UIWidget::OnDelete()
 {
-    if (widget_)
-    {
-        // if we don't have a UI subsystem, we are exiting
-        UI* ui = GetSubsystem<UI>();
-        if (ui)
-            ui->UnwrapWidget(widget_);
-    }
-
-    widget_ = 0;
-
     VariantMap eventData;
     eventData[WidgetDeleted::P_WIDGET] = this;
     SendEvent(E_WIDGETDELETED, eventData);
 
-    UnsubscribeFromAllEvents();
+    UnsubscribeFromAllEvents();   
 
-    ReleaseRef();
+    if (widget_)
+    {
+        // if we don't have a UI subsystem, we are exiting
+        UI* ui = GetSubsystem<UI>();
+
+        if (ui)
+        { 
+            if (ui->UnwrapWidget(widget_))
+            {
+                widget_ = 0;
+                ReleaseRef();
+                return;
+            }
+        }
+    }
+
+    widget_ = 0;
+
 }
 
 void UIWidget::AddChildAfter(UIWidget* child, UIWidget* otherChild)

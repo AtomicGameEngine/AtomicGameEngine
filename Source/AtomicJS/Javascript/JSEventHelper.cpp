@@ -145,7 +145,7 @@ void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
 
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-    if (object_.Null())
+    if (object_.Expired())
         return;
 
     JSVM* vm = JSVM::GetJSVM(0);

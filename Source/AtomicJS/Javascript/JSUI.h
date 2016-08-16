@@ -49,18 +49,12 @@ private:
 
     void PushWidgetEventObject(VariantMap& eventData);
 
-    void HandleObjectAdded(StringHash eventType, VariantMap& eventData);
-    void HandleObjectRemoved(StringHash eventType, VariantMap& eventData);
-
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
-    void HandleWidgetDeleted(StringHash eventType, VariantMap& eventData);
     void HandleWidgetLoaded(StringHash eventType, VariantMap& eventData);
     void HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData);
 
     void GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets);
-
-    HashMap<StringHash, bool> uiTypes_;
 
 };
 

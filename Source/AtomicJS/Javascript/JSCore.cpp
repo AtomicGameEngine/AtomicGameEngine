@@ -73,7 +73,9 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         duk_pop(ctx); // pop null or undefined
 
         // construct a new event helper
-        js_push_class_object_instance(ctx, new JSEventHelper(object->GetContext(), object));
+        JSEventHelper* eventHelper = new JSEventHelper(object->GetContext(), object);
+        eventHelper->SetInstantiationType(INSTANTIATION_JAVASCRIPT);
+        js_push_class_object_instance(ctx, eventHelper);
 
         duk_push_object(ctx);
         duk_put_prop_string(ctx, -2, "__eventHelperFunctions");

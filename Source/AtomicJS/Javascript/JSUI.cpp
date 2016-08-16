@@ -42,50 +42,9 @@ JSUI::JSUI(Context* context) : Object(context),
 
     SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(JSUI, HandleUpdate));
 
-    SubscribeToEvent(E_JSOBJECTADDED, ATOMIC_HANDLER(JSUI, HandleObjectAdded));
-
-    // for debugging only, commented out otherwise
-    //SubscribeToEvent(E_JSOBJECTREMOVED, HANDLER(JSUI, HandleObjectRemoved));
-
-    SubscribeToEvent(E_WIDGETDELETED, ATOMIC_HANDLER(JSUI, HandleWidgetDeleted));
     SubscribeToEvent(E_WIDGETEVENT, ATOMIC_HANDLER(JSUI, HandleWidgetEvent));
     SubscribeToEvent(E_WIDGETLOADED, ATOMIC_HANDLER(JSUI, HandleWidgetLoaded));
     SubscribeToEvent(E_POPUPMENUSELECT, ATOMIC_HANDLER(JSUI, HandlePopupMenuSelect));
-
-    duk_push_global_stash(ctx_);
-    duk_push_object(ctx_);
-    duk_put_prop_string(ctx_, -2, "__jsui_widgetkeepalive");
-    duk_pop(ctx_);
-
-    uiTypes_["UIWidget"] = true;
-    uiTypes_["UIButton"] = true;
-    uiTypes_["UIView"] = true;
-    uiTypes_["UIEditField"] = true;
-    uiTypes_["UITextField"] = true;
-    uiTypes_["UIImageWidget"] = true;
-    uiTypes_["UILayout"] = true;
-    uiTypes_["UIMenuWindow"] = true;
-    uiTypes_["UIWindow"] = true;
-    uiTypes_["UIClickLabel"] = true;
-    uiTypes_["UICheckBox"] = true;
-    uiTypes_["UISelectLost"] = true;
-    uiTypes_["UIListView"] = true;
-    uiTypes_["UIMessageWindow"] = true;
-    uiTypes_["UISkinImage"] = true;
-    uiTypes_["UITabContainer"] = true;
-    uiTypes_["UISceneView"] = true;
-    uiTypes_["UIContainer"] = true;
-    uiTypes_["UISection"] = true;
-    uiTypes_["UIInlineSelect"] = true;
-    uiTypes_["UITextureWidget"] = true;
-    uiTypes_["UIScrollContainer"] = true;
-    uiTypes_["UISeparator"] = true;
-    uiTypes_["UIDimmer"] = true;
-    uiTypes_["UISelectDropdown"] = true;
-    uiTypes_["UIPopupWindow"] = true;
-    uiTypes_["UISlider"] = true;
-    uiTypes_["UIColorWidget"] = true;
-    uiTypes_["UIColorWheel"] = true;
 
 }
 
@@ -106,58 +65,7 @@ void JSUI::GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets
 
 }
 
-void JSUI::HandleObjectAdded(StringHash eventType, VariantMap& eventData)
-{
-    RefCounted* ref = static_cast<RefCounted*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
 
-    assert(ref->IsObject());
-
-    Object* o = (Object*) ref;
-
-    // for any UI type, we make sure it is kept alive
-    if (uiTypes_.Contains(o->GetType()))
-    {
-        assert(o->JSGetHeapPtr());
-
-        duk_push_global_stash(ctx_);
-        duk_get_prop_string(ctx_, -1, "__jsui_widgetkeepalive");
-        // can't use instance as key, as this coerces to [Object] for
-        // string property, pointer will be string representation of
-        // address, so, unique key
-        duk_push_pointer(ctx_, o);
-        duk_push_heapptr(ctx_, o->JSGetHeapPtr());
-        duk_put_prop(ctx_, -3);
-        duk_pop_2(ctx_);
-
-    }
-
-}
-
-void JSUI::HandleObjectRemoved(StringHash eventType, VariantMap& eventData)
-{
-    Object* o = static_cast<Object*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
-
-    ATOMIC_LOGINFOF("Removing %s", o->GetTypeName().CString());
-
-}
-
-void JSUI::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
-{
-    UIWidget* widget = static_cast<UIWidget*>(eventData[WidgetDeleted::P_WIDGET].GetPtr());
-
-    if (!widget->JSGetHeapPtr())
-        return;
-
-    duk_push_global_stash(ctx_);
-    duk_get_prop_string(ctx_, -1, "__jsui_widgetkeepalive");
-    // can't use instance as key, as this coerces to [Object] for
-    // string property, pointer will be string representation of
-    // address, so, unique key
-    duk_push_pointer(ctx_, widget);
-    duk_del_prop(ctx_, -2);
-    duk_pop_2(ctx_);
-
-}
 
 void JSUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {

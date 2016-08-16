@@ -250,9 +250,19 @@ namespace ToolCore
             projectPath = GetParentPath(projectPath);
 
         solutionPath_ = AddTrailingSlash(projectPath) + "AtomicNET/Solution/AtomicProject.sln";
-        projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resource/AtomicProject.dll";
+        projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resources/AtomicProject.dll";
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        // TODO: We need a better way of marking C# projects
+        StringVector results;
+        fileSystem->ScanDir(results, AddTrailingSlash(projectPath) + "Resources", "*.cs", SCAN_FILES, true);
+        if (!results.Size())
+        {
+            fileSystem->ScanDir(results, AddTrailingSlash(projectPath) + "Resources", "*.dll", SCAN_FILES, true);
+            if (!results.Size())
+                return;
+        }            
 
         // if the solution or project assemblies don't exist mark as dirty
 
