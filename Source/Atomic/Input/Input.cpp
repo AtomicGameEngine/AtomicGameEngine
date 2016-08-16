@@ -338,7 +338,7 @@ bool JoystickState::StartRumble()
         haptic_ = SDL_HapticOpen(joystickID_);
         if (haptic_ == NULL)
         {
-            ATOMIC_LOGERRORF( "Unable to access haptic device[%d] %s", joystickID_, hname );
+            ATOMIC_LOGERRORF( "Unable to access haptic device[%d] %s", joystickID_, hname ? hname : "Unknown" );
             canRumble_ = false;
             return false;
         }
@@ -347,7 +347,7 @@ bool JoystickState::StartRumble()
 
         if ( SDL_HapticRumbleSupported(haptic_) == SDL_FALSE)
         {
-            ATOMIC_LOGERRORF( "The device `%s` does not support haptic operations", joystickID_, hname );
+            ATOMIC_LOGERRORF( "The device `%s` does not support haptic operations", hname ? hname : "Unknown");
             SDL_HapticClose(haptic_);
             haptic_ = NULL;   
             canRumble_ = false;
@@ -1203,6 +1203,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 // ATOMIC END
 
 }
+
 
 bool Input::RemoveScreenJoystick(SDL_JoystickID id)
 {
