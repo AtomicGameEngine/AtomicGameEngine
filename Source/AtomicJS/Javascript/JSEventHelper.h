@@ -62,6 +62,8 @@ public:
     void AddEventHandler(StringHash eventType);
     void AddEventHandler(Object* sender, StringHash eventType);
 
+    void Clear();
+
 private:
 
     void HandleEvent(StringHash eventType, VariantMap& eventData);
