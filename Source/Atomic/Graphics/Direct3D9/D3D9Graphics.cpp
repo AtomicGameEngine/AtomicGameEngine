@@ -280,7 +280,8 @@ Graphics::Graphics(Context* context) :
     SetTextureUnitMappings();
 
     // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE
+		| SDL_INIT_TIMER | SDL_INIT_HAPTIC );  // ATOMIC BEGIN  HAPTIC  //ATOMIC END
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);

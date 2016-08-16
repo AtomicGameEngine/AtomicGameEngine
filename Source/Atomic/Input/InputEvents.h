@@ -29,6 +29,7 @@
 #include <SDL/include/SDL_gamecontroller.h>
 #include <SDL/include/SDL_keycode.h>
 #include <SDL/include/SDL_mouse.h>
+#include <SDL/include/SDL_haptic.h>
 // ATOMIC END
 
 namespace Atomic
