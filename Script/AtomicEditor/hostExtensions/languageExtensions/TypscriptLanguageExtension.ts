@@ -343,39 +343,22 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
     generateExternalProject ()
     {
-      var projectPath : string = ToolCore.toolSystem.project.projectPath;
+      var projectDir : string = ToolCore.toolSystem.project.projectPath;
 
       // Create TypeScript folder in project root
-      var tsPath : string = projectPath + "TypeScript/";
-      Atomic.getFileSystem().createDir(tsPath);
+      var projectDirTypeScript : string = Atomic.addTrailingSlash(projectDir + "TypeScript");
+      Atomic.getFileSystem().createDir(projectDirTypeScript);
 
       // Copy the Atomic.d.ts definition file to the TypeScript folder
       var toolDataDir : string = ToolCore.toolEnvironment.toolDataDir;
-      Atomic.getFileSystem().copy(toolDataDir + "/TypeScriptSupport/Atomic.d.ts", tsPath + "Atomic.d.ts");
+      var typescriptSupportDir : string = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
+      Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypeScript + "Atomic.d.ts");
 
       // Generate a tsconfig.json file
-      var config = new Atomic.File(projectPath + "tsconfig.json", Atomic.FILE_WRITE);
-      config.writeString
-(`
-{
-    "compilerOptions": {
-        "noEmitOnError": true,
-        "noImplicitAny": false,
-        "target": "ES5",
-        "module": "commonjs",
-        "outDir": "./Resources",
-        "rootDir": "./Resources",
-        "declaration": false,
-        "inlineSourceMap": false,
-        "removeComments": false,
-        "allowJs": true,
-        "noLib": true,
-        "allowNonTsExtensions": true,
-    }
-}
-`);
-
+      var config = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
+      config.writeString(JSON.stringify(defaultCompilerOptions));
       config.close();
+
     }
     /**
      * Perform a full compile of the TypeScript
