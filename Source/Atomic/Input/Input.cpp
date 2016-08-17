@@ -312,6 +312,9 @@ void JoystickState::Initialize(unsigned numButtons, unsigned numAxes, unsigned n
 
 void JoystickState::Reset()
 {
+// ATOMIC BEGIN
+    StopRumble();
+// ATOMIC END    
     for (unsigned i = 0; i < buttons_.Size(); ++i)
     {
         buttons_[i] = false;
@@ -322,6 +325,87 @@ void JoystickState::Reset()
     for (unsigned i = 0; i < hats_.Size(); ++i)
         hats_[i] = HAT_CENTER;
 }
+
+// ATOMIC BEGIN
+
+/// Initialize the Rumble section of SDL Haptics
+/// if an error occurs, unset the canRumble_ to stop further init attempts, until Reset is called.
+bool JoystickState::StartRumble()
+{
+    if ( haptic_ == NULL && canRumble_ )
+    {
+        const char *hname = SDL_HapticName(joystickID_);
+        haptic_ = SDL_HapticOpen(joystickID_);
+        if (haptic_ == NULL)
+        {
+            ATOMIC_LOGERRORF( "Unable to access haptic device[%d] %s", joystickID_, hname ? hname : "Unknown" );
+            canRumble_ = false;
+            return false;
+        }
+
+        SDL_ClearError();
+
+        if ( SDL_HapticRumbleSupported(haptic_) == SDL_FALSE)
+        {
+            ATOMIC_LOGERRORF( "The device `%s` does not support haptic operations", hname ? hname : "Unknown");
+            SDL_HapticClose(haptic_);
+            haptic_ = NULL;   
+            canRumble_ = false;
+            return false;
+        }
+
+        SDL_ClearError();
+
+        if ( SDL_HapticRumbleInit(haptic_) != 0)
+        {
+            ATOMIC_LOGERRORF( "Failed to initialize rumble: %s", SDL_GetError());
+            canRumble_ = false;
+            return false;
+        }
+    }
+    return true;
+}
+
+/// clean up rumble 
+void JoystickState::StopRumble()
+{
+    if ( haptic_ )
+    {
+        SDL_HapticRumbleStop(haptic_);
+        SDL_HapticClose(haptic_);        
+        haptic_ = NULL;
+    }
+    canRumble_ = true;
+}
+
+///  return if the joystick or game controller supports the force feedback rumble.
+bool JoystickState::IsRumble()
+{
+    if ( canRumble_ )
+        if ( !StartRumble() ) 
+            return false;
+    
+    if ( haptic_ )
+    {
+        return SDL_HapticRumbleSupported(haptic_);
+    }
+    return false;
+}
+
+/// rumble player, strength is from 0.0 to 1.0, length is in milliseconds, 1000 is equal to 1 second.
+void JoystickState::DoRumble( float strength, unsigned int len)
+{
+    StartRumble();  // lazy initialization
+ 
+    if ( haptic_ && canRumble_ )
+    {
+        float stren1 = Clamp (strength, 0.0f, 1.0f ); 
+        if (SDL_HapticRumblePlay(haptic_, stren1, len ) != 0 )
+            ATOMIC_LOGINFOF( "Failed to play rumble: %s\n", SDL_GetError() );
+    }
+ }
+// ATOMIC END    
+    
 
 Input::Input(Context* context) :
     Object(context),
@@ -1120,6 +1204,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
 }
 
+
 bool Input::RemoveScreenJoystick(SDL_JoystickID id)
 {
     if (!joysticks_.Contains(id))
@@ -1510,6 +1595,13 @@ void Input::Initialize()
 
     graphics_ = graphics;
 
+// ATOMIC BEGIN
+    //  get user gamecontroller configs for SDL
+    FileSystem* fs = GetSubsystem<FileSystem>();
+    const String configName = fs->GetUserDocumentsDir() + "/gamecontrollerdb.txt"; 
+    SDL_GameControllerAddMappingsFromFile(configName.CString());
+// ATOMIC END
+
     // In external window mode only visible mouse is supported
     if (graphics_->GetExternalWindow())
         mouseVisible_ = true;
@@ -1715,6 +1807,22 @@ void Input::PushTouchIndex(int touchID)
     if (!inserted)
         availableTouchIDs_.Push(index);
 }
+// ATOMIC BEGIN
+bool Input::GetJoystickRumble(unsigned int id)
+{
+    JoystickState *jss = GetJoystick((SDL_JoystickID)id);
+    if (jss)
+        return jss->IsRumble();
+    return false;
+}
+
+void Input::JoystickRumble(unsigned int id, float strength, unsigned int length)
+{
+    JoystickState *jss = GetJoystick((SDL_JoystickID)id);
+    if (jss)
+        jss->DoRumble( strength, length);
+}
+// ATOMIC END
 
 void Input::SendInputFocusEvent()
 {

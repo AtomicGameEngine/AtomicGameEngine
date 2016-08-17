@@ -80,7 +80,12 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0), controller_(0)
+        joystick_(0), joystickID_(0), controller_(0),
+// ATOMIC BEGIN
+        haptic_(0),
+        canRumble_(true),
+// ATOMIC END
+        name_()
     {
     }
 
@@ -113,6 +118,14 @@ struct JoystickState
     /// Return hat position.
     int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
 
+    // ATOMIC BEGIN
+    /// Haptic aka Rumble support
+    bool StartRumble();
+    void StopRumble();
+    bool IsRumble();
+    void DoRumble( float strength, unsigned int length); 
+    // ATOMIC END
+
     /// SDL joystick.
     SDL_Joystick* joystick_;
     /// SDL joystick instance ID.
@@ -120,6 +133,9 @@ struct JoystickState
     /// SDL game controller.
     SDL_GameController* controller_;
     // ATOMIC BEGIN
+    /// Haptic support
+    SDL_Haptic *haptic_;
+    bool canRumble_;
     /// UI element containing the screen joystick.
     // UIElement* screenJoystick_;
     // ATOMIC END
@@ -307,6 +323,10 @@ public:
 // ATOMIC BEGIN
     void SimulateButtonDown(int button);
     void SimulateButtonUp(int button);
+    
+    bool GetJoystickRumble(unsigned int id);  /// return if rumble is supported on game controller
+    void JoystickRumble(unsigned int id, float strength, unsigned int length); /// produce rumble
+
 // ATOMIC END
 
 private:
