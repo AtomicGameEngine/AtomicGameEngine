@@ -118,28 +118,6 @@ int UIWindow_GetResizeToFitContentRect(duk_context* ctx)
 
 }
 
-int UI_DebugGetUIKeepAliveCount(duk_context* ctx)
-{
-    duk_push_global_stash(ctx);
-    duk_get_prop_string(ctx, -1, "__jsui_widgetkeepalive");
-
-    duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
-
-    double count = 0;
-
-    while (duk_next(ctx, -1 , 0)) {
-
-        duk_pop(ctx);  /* pop_key */
-        count++;
-    }
-
-    duk_pop_n(ctx, 3);  /* pop enum object, keep alive object, and stash */
-
-    duk_push_number(ctx, count);
-
-    return 1;
-}
-
 int UI_DebugGetWrappedWidgetCount(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -159,9 +137,6 @@ void jsapi_init_ui(JSVM* vm)
 
     duk_push_c_function(ctx, UI_DebugGetWrappedWidgetCount, 0);
     duk_put_prop_string(ctx, -2, "debugGetWrappedWidgetCount");
-
-    duk_push_c_function(ctx, UI_DebugGetUIKeepAliveCount, 0);
-    duk_put_prop_string(ctx, -2, "debugGetUIKeepAliveCount");
 
     duk_pop_2(ctx);
 

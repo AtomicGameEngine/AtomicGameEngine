@@ -193,11 +193,14 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
 {
     // If no bones or no bone-level testing, use the StaticModel test
     RayQueryLevel level = query.level_;
-    if (level < RAY_TRIANGLE || !skeleton_.GetNumBones())
+
+    // ATOMIC BEGIN
+    if ((level < RAY_TRIANGLE || !skeleton_.GetNumBones()) || context_->GetEditorContext())
     {
         StaticModel::ProcessRayQuery(query, results);
         return;
     }
+    // ATOMIC END
 
     // Check ray hit distance to AABB before proceeding with bone-level tests
     if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)

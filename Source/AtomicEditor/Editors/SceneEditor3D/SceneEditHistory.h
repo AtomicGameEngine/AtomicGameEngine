@@ -66,7 +66,7 @@ private:
 
     void AddUndoOp(SelectionEditOp* op);
 
-    SharedPtr<SceneEditor3D> sceneEditor_;
+    WeakPtr<SceneEditor3D> sceneEditor_;
 
     SelectionEditOp* curSelEditOp_;
 

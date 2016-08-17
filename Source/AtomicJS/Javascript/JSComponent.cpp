@@ -157,46 +157,6 @@ void JSComponent::SetUpdateEventMask(unsigned char mask)
     }
 }
 
-void JSComponent::UpdateReferences(bool remove)
-{
-    if (context_->GetEditorContext())
-        return;
-
-    duk_context* ctx = vm_->GetJSContext();
-
-    int top = duk_get_top(ctx);
-
-    duk_push_global_stash(ctx);
-    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-
-    // can't use instance as key, as this coerces to [Object] for
-    // string property, pointer will be string representation of
-    // address, so, unique key
-
-    if (node_)
-    {
-        duk_push_pointer(ctx, (void*) node_);
-        if (remove)
-            duk_push_undefined(ctx);
-        else
-            js_push_class_object_instance(ctx, node_);
-
-        duk_put_prop(ctx, -3);
-    }
-
-    duk_push_pointer(ctx, (void*) this);
-    if (remove)
-        duk_push_undefined(ctx);
-    else
-        js_push_class_object_instance(ctx, this);
-
-    duk_put_prop(ctx, -3);
-
-    duk_pop_2(ctx);
-
-    assert(duk_get_top(ctx) == top);
-}
-
 void JSComponent::ApplyAttributes()
 {
 }
@@ -209,9 +169,6 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
     duk_context* ctx = vm_->GetJSContext();
 
     duk_idx_t top = duk_get_top(ctx);
-
-    // store, so pop doesn't clear
-    UpdateReferences();
 
     // apply fields
 
@@ -407,12 +364,9 @@ void JSComponent::OnNodeSet(Node* node)
 {
     if (node)
     {
-        UpdateReferences();
     }
     else
     {
-        // We are being detached from a node: execute user-defined stop function and prepare for destruction
-        UpdateReferences(true);
         Stop();
     }
 }

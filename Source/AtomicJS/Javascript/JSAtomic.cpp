@@ -361,9 +361,9 @@ void jsapi_init_atomic(JSVM* vm)
     // Node registry
     duk_push_global_stash(ctx);
     duk_push_object(ctx);
-    duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-    duk_push_object(ctx);
     duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_VARIANTMAP_CACHE);
+    duk_push_object(ctx);
+    duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_INDEX_REFCOUNTED_REGISTRY);
     duk_pop(ctx);
 
     duk_push_c_function(ctx, js_openConsoleWindow, 0);

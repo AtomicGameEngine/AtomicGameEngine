@@ -129,8 +129,6 @@ private:
     /// Called on physics post-update, fixed timestep.
     virtual void FixedPostUpdate(float timeStep);
 
-    void UpdateReferences(bool remove = false);
-
     /// Requested event subscription mask.
     unsigned char updateEventMask_;
     /// Current event subscription mask.

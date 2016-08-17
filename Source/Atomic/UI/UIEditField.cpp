@@ -210,7 +210,8 @@ void UIEditField::OnFocusChanged(bool focused)
     {
         if (focused)
         {
-            styleEdit->selection.SelectAll();
+            if (!w->GetMultiline())
+                styleEdit->selection.SelectAll();
             firstFocusFlag_ = true;
         }
         else
@@ -241,7 +242,7 @@ bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
             TBEditField* w = (TBEditField*) widget_;
 
             TBStyleEdit* styleEdit = w->GetStyleEdit();
-            if (styleEdit != NULL)
+            if (styleEdit != NULL && !w->GetMultiline())
             {
                 styleEdit->selection.SelectAll();
             }

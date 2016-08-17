@@ -94,6 +94,8 @@ class InspectorFrame extends ScriptWidget {
 
             }
 
+            // FIXME: Duktape is leaking selection object without nulling out
+            selection = null;
         }
 
     }

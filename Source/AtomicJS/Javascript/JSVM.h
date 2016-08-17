@@ -91,7 +91,7 @@ public:
     void GC();
     JSMetrics* GetMetrics() { return metrics_; }
 
-    void DumpJavascriptObjects() {}
+    void DumpJavascriptObjects();
 
 #ifdef JSVM_DEBUG
 
@@ -103,17 +103,19 @@ public:
     }
 #endif
 
+    // Returns if the given object is stashed
+    bool GetStashed(RefCounted* refcounted) const;
 
-    inline void AddObject(void* heapptr, RefCounted* object)
+    inline void AddObject(void* heapptr, RefCounted* object, InstantiationType instantiationType)
     {
         assert(!object->JSGetHeapPtr());
 
         object->JSSetHeapPtr(heapptr);
+        object->SetInstantiationType(instantiationType);
 
 #ifdef JSVM_DEBUG
         assert(heapToObject_.Find(heapptr) == heapToObject_.End());
 #endif
-
 
         heapToObject_[heapptr] = object;
 
@@ -122,6 +124,29 @@ public:
         if (itr != removedHeapPtr_.End())
             removedHeapPtr_.Erase(itr);
 #endif
+        
+        if (instantiationType != INSTANTIATION_JAVASCRIPT)
+        {
+            if (!object->Refs())
+            {
+                ATOMIC_LOGWARNING("JSVM::AddObject, native or C# instantiated object added with 0 refs");
+            }
+            else
+            {
+                // stash
+                Stash(object);
+            }
+        }
+        else
+        {
+            if (object->Refs() != 0)
+            {
+                // we already have a native reference, so need to stash
+                Stash(object);
+            }
+        }
+
+        object->AddRefSilent();
 
         if (object->IsObject())
         {
@@ -152,6 +177,8 @@ public:
 #endif
 
     }
+
+    void Stash(RefCounted* refCounted);
 
     inline RefCounted* GetObjectPtr(void* heapptr, bool allowNull = false)
     {
@@ -197,7 +224,13 @@ public:
 
     int GetRealLineNumber(const String& fileName, const int lineNumber);
 
+    unsigned GetStashCount() const { return stashCount_; }
+    unsigned GetTotalStashCount() const { return totalStashCount_;  }
+    unsigned GetTotalUnstashCount() const { return totalUnstashCount_; }
+
 private:
+
+    void Unstash(RefCounted* refCounted);
 
     struct JSAPIPackageRegistration
     {
@@ -225,6 +258,8 @@ private:
         JSVMPackageRegistrationSettingsFunction registrationSettingsFunction;
         VariantMap settings;
     };
+
+    static void OnRefCountChanged(RefCounted* refCounted, int refCount);
 
     void SubscribeToEvents();
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -255,6 +290,9 @@ private:
 
     static Vector<JSAPIPackageRegistration*> packageRegistrations_;
 
+    unsigned stashCount_;
+    unsigned totalStashCount_;
+    unsigned totalUnstashCount_;
 
     static JSVM* instance_;
 

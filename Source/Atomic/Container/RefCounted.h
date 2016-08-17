@@ -23,14 +23,26 @@
 #pragma once
 
 #include "Atomic/Atomic.h"
+#include "Vector.h"
 
 namespace Atomic
 {
 
 // ATOMIC BEGIN
 
+/// Instantation type, native code, JS, or C#
+enum InstantiationType
+{
+    INSTANTIATION_NATIVE = 0,
+    INSTANTIATION_JAVASCRIPT = 1,
+    INSTANTIATION_NET = 2
+};
+
 class RefCounted;
-typedef void (*RefCountedDeletedFunction)(RefCounted*);
+
+// function that is called when ref count goes to 1 or 2+, used for script object lifetime
+typedef void (*RefCountChangedFunction)(RefCounted*, int refCount);
+
 typedef const void* ClassID;
 
 /// Macro to be included in RefCounted derived classes for efficient RTTI
@@ -40,7 +52,6 @@ typedef const void* ClassID;
         static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
 
 // ATOMIC END
-
 
 /// Reference count structure.
 struct RefCount
@@ -91,12 +102,21 @@ public:
 
     virtual bool IsObject() const { return false; }
 
+    /// Increment reference count. Do not call any lifetime book keeping
+    void AddRefSilent();
+
     virtual ClassID GetClassID() const  = 0;
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
     /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
     inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
+
+    inline InstantiationType GetInstantiationType()  const { return instantiationType_; }
+    inline void SetInstantiationType(InstantiationType type) { instantiationType_ = type; }
+
+    static void AddRefCountChangedFunction(RefCountChangedFunction function);
+    static void RemoveRefCountChangedFunction(RefCountChangedFunction function);
 
 // ATOMIC END
 
@@ -110,7 +130,12 @@ private:
     RefCount* refCount_;
 
     // ATOMIC BEGIN
+
+    InstantiationType instantiationType_;
     void* jsHeapPtr_;
+
+    static PODVector<RefCountChangedFunction> refCountChangedFunctions_;
+
     // ATOMIC END
 
 };

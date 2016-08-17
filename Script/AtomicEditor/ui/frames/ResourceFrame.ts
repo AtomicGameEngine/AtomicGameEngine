@@ -161,6 +161,8 @@ class ResourceFrame extends ScriptWidget {
 
         editor.unsubscribeFromAllEvents();
 
+        (<EditorRootContentWidget> editor.rootContentWidget).editor = null;
+
         var editors = Object.keys(this.editors);
 
         var closedIndex = editors.indexOf(editor.fullPath);
@@ -216,6 +218,7 @@ class ResourceFrame extends ScriptWidget {
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
+
             var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
 
             if (w && w.editor) {

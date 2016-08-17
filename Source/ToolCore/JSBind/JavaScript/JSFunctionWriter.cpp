@@ -311,15 +311,16 @@ void JSFunctionWriter::WriteConstructor(String& source)
         }
 
         source.AppendWithFormat("if (!duk_get_top(ctx) || !duk_is_pointer(ctx, 0))\n"\
-                                "{\n"\
-                                "%s\n"\
-                                "%s* native = new %s(%s);\n" \
-                                "vm->AddObject(ptr, native);\n"\
-                                "}\n" \
-                                "else if (duk_is_pointer(ctx, 0))\n" \
-                                "{\n" \
-                                "vm->AddObject(ptr, (RefCounted*) duk_get_pointer(ctx, 0));\n" \
-                                "}\n", marshal.CString(), klass->GetNativeName().CString(), klass->GetNativeName().CString(), sparams.CString());
+            "{\n"\
+            "%s\n"\
+            "%s* native = new %s(%s);\n" \
+            "vm->AddObject(ptr, native, INSTANTIATION_JAVASCRIPT);\n"\
+            "}\n" \
+            "else if (duk_is_pointer(ctx, 0))\n" \
+            "{\n" \
+            "RefCounted* rc = (RefCounted*) duk_get_pointer(ctx, 0);\n" \
+            "vm->AddObject(ptr, rc, rc->GetInstantiationType());\n" \
+            "}\n", marshal.CString(), klass->GetNativeName().CString(), klass->GetNativeName().CString(), sparams.CString());
     }
     else
     {
@@ -343,12 +344,7 @@ void JSFunctionWriter::WriteConstructor(String& source)
         source.Append("duk_push_this(ctx);\n "\
                       "duk_push_c_function(ctx, jsb_finalizer_RefCounted, 1);\n "\
                       "duk_set_finalizer(ctx, -2);\n "\
-                      \
-                      "RefCounted* ref = JSVM::GetJSVM(ctx)->GetObjectPtr(duk_get_heapptr(ctx, -1));\n "\
-                      "ref->AddRef();\n "\
-                      \
                       "duk_pop(ctx);\n");
-
     }
 
     source += "   return 0;";

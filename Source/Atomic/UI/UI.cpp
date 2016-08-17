@@ -631,7 +631,7 @@ void UI::WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget)
     assert (!widgetWrap_.Contains(tbwidget));
 
     widgetWrap_[tbwidget] = widget;
-
+    widget->AddRef();
 }
 
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)
@@ -650,7 +650,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIPopupWindow* popupWindow = new UIPopupWindow(context_, false);
         popupWindow->SetWidget(widget);
-        widgetWrap_[widget] = popupWindow;
+        WrapWidget(popupWindow, widget);
         return popupWindow;
     }
 
@@ -658,7 +658,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIDimmer* dimmer = new UIDimmer(context_, false);
         dimmer->SetWidget(widget);
-        widgetWrap_[widget] = dimmer;
+        WrapWidget(dimmer, widget);
         return dimmer;
     }
 
@@ -666,7 +666,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIScrollContainer* container = new UIScrollContainer(context_, false);
         container->SetWidget(widget);
-        widgetWrap_[widget] = container;
+        WrapWidget(container, widget);
         return container;
     }
 
@@ -674,39 +674,39 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIInlineSelect* select = new UIInlineSelect(context_, false);
         select->SetWidget(widget);
-        widgetWrap_[widget] = select;
+        WrapWidget(select, widget);
         return select;
     }
 
     if (widget->IsOfType<TBSlider>())
     {
-        UISlider* select = new UISlider(context_, false);
-        select->SetWidget(widget);
-        widgetWrap_[widget] = select;
-        return select;
+        UISlider* slider = new UISlider(context_, false);
+        slider->SetWidget(widget);
+        WrapWidget(slider, widget);
+        return slider;
     }
 
     if (widget->IsOfType<TBColorWidget>())
     {
-        UIColorWidget* select = new UIColorWidget(context_, false);
-        select->SetWidget(widget);
-        widgetWrap_[widget] = select;
-        return select;
+        UIColorWidget* colorWidget = new UIColorWidget(context_, false);
+        colorWidget->SetWidget(widget);
+        WrapWidget(colorWidget, widget);
+        return colorWidget;
     }
 
     if (widget->IsOfType<TBColorWheel>())
     {
-        UIColorWheel* select = new UIColorWheel(context_, false);
-        select->SetWidget(widget);
-        widgetWrap_[widget] = select;
-        return select;
+        UIColorWheel* colorWheel = new UIColorWheel(context_, false);
+        colorWheel->SetWidget(widget);
+        WrapWidget(colorWheel, widget);
+        return colorWheel;
     }
 
     if (widget->IsOfType<TBSection>())
     {
         UISection* section = new UISection(context_, false);
         section->SetWidget(widget);
-        widgetWrap_[widget] = section;
+        WrapWidget(section, widget);
         return section;
     }
 
@@ -714,7 +714,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UISeparator* sep = new UISeparator(context_, false);
         sep->SetWidget(widget);
-        widgetWrap_[widget] = sep;
+        WrapWidget(sep, widget);
         return sep;
     }
 
@@ -722,7 +722,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIContainer* container = new UIContainer(context_, false);
         container->SetWidget(widget);
-        widgetWrap_[widget] = container;
+        WrapWidget(container, widget);
         return container;
     }
 
@@ -730,7 +730,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UISelectDropdown* select = new UISelectDropdown(context_, false);
         select->SetWidget(widget);
-        widgetWrap_[widget] = select;
+        WrapWidget(select, widget);
         return select;
     }
 
@@ -742,7 +742,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
         UIButton* button = new UIButton(context_, false);
         button->SetWidget(widget);
-        widgetWrap_[widget] = button;
+        WrapWidget(button, widget);
         return button;
     }
 
@@ -750,7 +750,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UITextField* textfield = new UITextField(context_, false);
         textfield->SetWidget(widget);
-        widgetWrap_[widget] = textfield;
+        WrapWidget(textfield, widget);
         return textfield;
     }
 
@@ -758,7 +758,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIEditField* editfield = new UIEditField(context_, false);
         editfield->SetWidget(widget);
-        widgetWrap_[widget] = editfield;
+        WrapWidget(editfield, widget);
         return editfield;
     }
 
@@ -766,7 +766,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UISkinImage* skinimage = new UISkinImage(context_, "", false);
         skinimage->SetWidget(widget);
-        widgetWrap_[widget] = skinimage;
+        WrapWidget(skinimage, widget);
         return skinimage;
     }
 
@@ -774,14 +774,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIImageWidget* imagewidget = new UIImageWidget(context_, false);
         imagewidget->SetWidget(widget);
-        widgetWrap_[widget] = imagewidget;
+        WrapWidget(imagewidget, widget);
         return imagewidget;
     }
     if (widget->IsOfType<TBClickLabel>())
     {
         UIClickLabel* nwidget = new UIClickLabel(context_, false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
@@ -789,7 +789,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UICheckBox* nwidget = new UICheckBox(context_, false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
@@ -797,7 +797,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UISelectList* nwidget = new UISelectList(context_, false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
@@ -805,7 +805,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIMessageWindow* nwidget = new UIMessageWindow(context_, NULL, "", false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
@@ -813,7 +813,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UITabContainer* nwidget = new UITabContainer(context_, false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
@@ -821,7 +821,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UISceneView* nwidget = new UISceneView(context_, false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
@@ -830,7 +830,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UILayout* layout = new UILayout(context_, (UI_AXIS) widget->GetAxis(), false);
         layout->SetWidget(widget);
-        widgetWrap_[widget] = layout;
+        WrapWidget(layout, widget);
         return layout;
     }
 
@@ -838,7 +838,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     {
         UIWidget* nwidget = new UIWidget(context_, false);
         nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
+        WrapWidget(nwidget, widget);
         return nwidget;
     }
 
