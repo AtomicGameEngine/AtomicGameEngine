@@ -1822,6 +1822,19 @@ void Input::JoystickRumble(unsigned int id, float strength, unsigned int length)
     if (jss)
         jss->DoRumble( strength, length);
 }
+
+void Input::JoystickSimulateMouseMove(int xpos, int ypos) /// moves the on screen cursor
+{
+    IntVector2 position(xpos,ypos);
+    SetMousePosition(position);
+}
+
+void Input::JoystickSimulateMouseButton(int button) /// simulated mouse press down & up
+{
+    SetMouseButton( button, true );
+    SetMouseButton( button, false );
+}
+
 // ATOMIC END
 
 void Input::SendInputFocusEvent()

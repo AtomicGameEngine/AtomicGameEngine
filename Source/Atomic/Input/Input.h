@@ -326,6 +326,8 @@ public:
     
     bool GetJoystickRumble(unsigned int id);  /// return if rumble is supported on game controller
     void JoystickRumble(unsigned int id, float strength, unsigned int length); /// produce rumble
+    void JoystickSimulateMouseMove(int xpos, int ypos); /// moves the on screen cursor
+    void JoystickSimulateMouseButton(int button); /// simulated mouse press down & up
 
 // ATOMIC END
 
