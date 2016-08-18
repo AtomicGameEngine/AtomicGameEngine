@@ -82,9 +82,9 @@ bool JSComponentFile::PushModule()
 
 }
 
-JSComponent* JSComponentFile::CreateJSComponent()
+SharedPtr<JSComponent> JSComponentFile::CreateJSComponent()
 {
-    JSComponent* component = NULL;
+    SharedPtr<JSComponent> component;
 
     if (!scriptClass_)
     {
@@ -118,7 +118,7 @@ JSComponent* JSComponentFile::CreateJSComponent()
 
     }
 
-    if (!component)
+    if (component.Null())
     {
         ATOMIC_LOGERRORF("Failed to create script class from component file %s", GetName().CString());
         component =  new JSComponent(context_);
