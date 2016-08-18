@@ -129,6 +129,8 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
     Project* project = tsystem->GetProject();
 
     if (!project)
@@ -166,8 +168,12 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
     vargs = args.Split(' ');
 
     if (managed)
-    {            
-        vargs.Insert(0, ToString("\"%s\"", (fileSystem->GetProgramDir() + "Resources/").CString()));        
+    {
+#ifdef ATOMIC_DEV_BUILD
+        vargs.Insert(0, ToString("\"%s/Resources/\"", tenv->GetRootSourceDir().CString()));
+#else
+        vargs.Insert(0, ToString("\"%s\"", (fileSystem->GetProgramDir() + "Resources/").CString()));
+#endif
         vargs.Insert(0, "--resourcePrefix");
     }
 
@@ -176,6 +182,13 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     if (addArgs.Length() > 0)
         vargs.Insert(0, addArgs.Split(' '));
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
+
+    vargs.Insert(0, playerBinary);
+    playerBinary = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono64";
+
+#endif
 
     String dump;
     dump.Join(vargs, " ");

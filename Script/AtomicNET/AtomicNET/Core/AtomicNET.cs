@@ -89,10 +89,14 @@ namespace AtomicEngine
             NativeCore.Initialize();
             CSComponentCore.Initialize();
 
+            string[] arguments = Environment.GetCommandLineArgs();
+            foreach (string arg in arguments)
+                AppBase.AddArgument(arg);
+
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csb_Atomic_NETCore_Initialize(ref CoreDelegates delegates);        
+        private static extern IntPtr csb_Atomic_NETCore_Initialize(ref CoreDelegates delegates);
 
         private static Context context;
         private static CoreDelegates coreDelegates;

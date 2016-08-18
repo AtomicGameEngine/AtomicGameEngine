@@ -169,7 +169,7 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 
     // AtomicNET
 
-#ifdef _DEBUG
+#ifdef ATOMIC_DEBUG
     String config = "Debug";
 #else
     String config = "Release";

@@ -42,13 +42,6 @@ namespace Atomic
         IPCClientApp(context)
     {
 
-#ifdef WIN32
-        ParseArguments(GetCommandLineW());        
-#else
-        #warning Implement Argument Parsing
-#endif
-        arguments_ = GetArguments();
-
     }
 
     void NETServiceApplication::Setup()

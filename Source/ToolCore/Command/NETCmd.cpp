@@ -170,21 +170,6 @@ void NETCmd::Run()
         netService_ = new AtomicNETService(context_);
         context_->RegisterSubsystem(netService_);
 
-        /*
-
-        VariantMap cmd;
-        cmd["command"] = "parse";
-        cmd["assemblyPath"] = assemblyPath_;
-
-        netService_->QueueCommand(cmd);
-
-        cmd.Clear();
-        cmd["command"] = "exit";
-
-        netService_->QueueCommand(cmd);
-
-        */
-
         if (!netService_->Start())
         {
             Error("Unable to start AtomicNETService");

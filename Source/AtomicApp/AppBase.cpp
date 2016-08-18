@@ -38,12 +38,25 @@ namespace Atomic
 {
 
     Vector<String> AppBase::engineConfigSearchPaths_;
+    Vector<String> AppBase::arguments_;
 
     AppBase::AppBase(Context* context) :
         Application(context)
     {
         // Copy arguments
-        arguments_ = GetArguments();
+        if (!arguments_.Size())
+        {
+            arguments_ = GetArguments();
+        }
+        else
+        {
+            String commandline = String::Joined(arguments_, " ");
+
+            ParseArguments(commandline, false);
+
+            arguments_ = GetArguments();
+        }
+
     }
 
     AppBase::~AppBase()

@@ -159,8 +159,6 @@ namespace ToolCore
             }
         }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
         Project* project = GetSubsystem<ToolSystem>()->GetProject();
         NETBuildSystem* buildSystem = GetSubsystem<NETBuildSystem>();
 
@@ -174,8 +172,6 @@ namespace ToolCore
             }
 
         }
-#endif
-
     }
 
     bool NETProjectSystem::GenerateSolution()
@@ -336,8 +332,6 @@ namespace ToolCore
     {
         Clear();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
         SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(NETProjectSystem, HandleUpdate));
 
         SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectLoaded));
@@ -354,6 +348,9 @@ namespace ToolCore
         SubscribeToEvent(E_ASSETNEW, ATOMIC_HANDLER(NETProjectSystem, HandleAssetNew));
         SubscribeToEvent(E_ASSETRENAMED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetRenamed));
         SubscribeToEvent(E_ASSETMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetMoved));
+
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 

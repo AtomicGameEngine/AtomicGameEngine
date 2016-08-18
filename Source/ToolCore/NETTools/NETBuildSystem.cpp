@@ -250,6 +250,12 @@ namespace ToolCore
                 return;
             }
 
+            const String configuration = curBuild_->configuration_;
+
+            Vector<String> args;
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
             String cmdToolsPath = Poco::Environment::get("VS140COMNTOOLS").c_str();
 
             if (!cmdToolsPath.Length())
@@ -260,10 +266,8 @@ namespace ToolCore
 
             String vcvars64 = ToString("%s..\\..\\VC\\bin\\amd64\\vcvars64.bat", cmdToolsPath.CString());
 
-            const String configuration = curBuild_->configuration_;
-
             String cmd = "cmd";
-            Vector<String> args;
+
             args.Push("/A");
             args.Push("/C");
 
@@ -279,6 +283,24 @@ namespace ToolCore
 
             args.Push(compile);
 
+#else
+
+            String compile;
+
+            String cmd = "bash";
+            args.Push("-c");
+
+            if (requiresNuGet)
+            {
+                compile += ToString("/Library/Frameworks/Mono.framework/Versions/Current/Commands/nuget restore \"%s\" && ", solutionPath.CString());
+            }
+
+            compile += ToString("/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild \"%s\" /p:Configuration=%s /p:Platform=\"Any CPU\"", solutionPath.CString(), configuration.CString());
+
+            args.Push(compile);
+
+#endif
+
             curBuild_->allArgs_.Join(args, " ");
 
             SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
@@ -286,7 +308,7 @@ namespace ToolCore
 
             try
             {
-                subprocess = subs->Launch(cmd, args, "C:\\");
+                subprocess = subs->Launch(cmd, args, "");
             }
             catch (Poco::SystemException)
             {
@@ -340,7 +362,7 @@ namespace ToolCore
         platform = "LINUX";
 #endif
 
-#ifdef _DEBUG
+#ifdef ATOMIC_DEBUG
         configuration = "Debug";
 #else
         configuration = "Release";

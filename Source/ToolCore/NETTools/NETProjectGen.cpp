@@ -615,8 +615,9 @@ namespace ToolCore
             const String& projectName = p->GetName();
             const String& projectGUID = p->GetProjectGUID();
 
+            const String CSharpProjectGUID = "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC";
             source += ToString("Project(\"{%s}\") = \"%s\", \"%s\\%s.csproj\", \"{%s}\"\n",
-                solutionGUID_.CString(), projectName.CString(), projectName.CString(),
+                CSharpProjectGUID.CString(), projectName.CString(), projectName.CString(),
                 projectName.CString(), projectGUID.CString());
 
             projectGen_->GetCSProjectDependencies(p, depends);
@@ -634,7 +635,7 @@ namespace ToolCore
                 source += "\tEndProjectSection\n";
             }
 
-            source += "\tEndProject\n";
+            source += "EndProject\n";
         }
 
         source += "Global\n";
