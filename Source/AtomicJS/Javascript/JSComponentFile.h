@@ -54,7 +54,7 @@ public:
 
     bool GetScriptClass() { return scriptClass_; }
 
-    JSComponent* CreateJSComponent();
+    SharedPtr<JSComponent> CreateJSComponent();
     bool PushModule();
 
 private:

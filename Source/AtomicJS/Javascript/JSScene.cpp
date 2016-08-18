@@ -66,7 +66,7 @@ static int Node_CreateJSComponent(duk_context* ctx)
         return 1;
     }
 
-    JSComponent* jsc = file->CreateJSComponent();
+    SharedPtr<JSComponent> jsc = file->CreateJSComponent();
 
     node->AddComponent(jsc, jsc->GetID(), LOCAL);
 
