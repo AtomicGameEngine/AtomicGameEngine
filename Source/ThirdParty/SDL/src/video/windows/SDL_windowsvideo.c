@@ -119,8 +119,12 @@ WIN_CreateDevice(int devindex)
 
         // Urho3D: call SetProcessDPIAware if available to prevent Windows 8.1 from performing unwanted scaling
         data->SetProcessDPIAware = (BOOL (WINAPI *)()) SDL_LoadFunction(data->userDLL, "SetProcessDPIAware");
-        if (data->SetProcessDPIAware)
-            data->SetProcessDPIAware();
+        // ATOMIC BEGIN
+        // Do not call this as it is messing up on high dpi monitors, need a better solution
+        // and MSDN has SetProcessDPIAware, SetProcessDPIAwareness, and advice to use app manifest instead :/
+        //if (data->SetProcessDPIAware)
+        //    data->SetProcessDPIAware();
+        // ATOMIC END
     }
 
     data->shcoreDLL = SDL_LoadObject("SHCORE.DLL");
