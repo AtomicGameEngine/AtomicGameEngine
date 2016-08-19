@@ -345,19 +345,23 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     {
       var projectDir : string = ToolCore.toolSystem.project.projectPath;
 
-      // Create TypeScript folder in project root
-      var projectDirTypeScript : string = Atomic.addTrailingSlash(projectDir + "TypeScript");
-      Atomic.getFileSystem().createDir(projectDirTypeScript);
+      // Create the typings folder in project root
+      var projectDirTypings : string = Atomic.addTrailingSlash(projectDir + "typings/main/ambient/atomicgameengine");
+      Atomic.getFileSystem().createDir(projectDirTypings);
 
-      // Copy the Atomic.d.ts definition file to the TypeScript folder
+      // Copy the Atomic.d.ts definition file to the typings folder
       var toolDataDir : string = ToolCore.toolEnvironment.toolDataDir;
       var typescriptSupportDir : string = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
-      Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypeScript + "Atomic.d.ts");
+      Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
 
       // Generate a tsconfig.json file
-      var config = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
-      config.writeString(JSON.stringify(defaultCompilerOptions));
-      config.close();
+      defaultCompilerOptions.noLib = false;
+      var tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
+      let tsconfig = {
+        compilerOptions: defaultCompilerOptions
+      };
+      tsconfigFile.writeString(JSON.stringify(tsconfig));
+      tsconfigFile.close();
 
     }
     /**
