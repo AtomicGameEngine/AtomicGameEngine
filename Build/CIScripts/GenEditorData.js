@@ -51,9 +51,11 @@ namespace('build', function() {
     fs.copySync(atomicRoot + "Build/Docs/Readme.md", jsDocFolder + "Readme.md");
     fs.copySync(atomicRoot + "Build/Docs/atomic-theme", jsDocFolder + "atomic-theme");
 
+
     cmds = [
       "git clone https://github.com/AtomicGameEngine/AtomicExamples " + buildDir + "AtomicExamples && rm -rf " + buildDir + "AtomicExamples/.git",
-      "cd " + jsDocFolder + " && npm install typedoc@0.3.12",
+      "cd " + jsDocFolder + " && echo {} > package.json", // newer versions of npm require package.json to be in the folder or else it searches up the heirarchy
+      "cd " + jsDocFolder + " && npm install typedoc",
       "cd " + jsDocFolder + " && ./node_modules/.bin/typedoc --out out ../../../Script/TypeScript/dist/Atomic.d.ts --module commonjs --includeDeclarations --mode file --theme atomic-theme --name 'Atomic Game Engine' --readme ./Readme.md",
     ];
 
