@@ -304,6 +304,9 @@ public:
         if (function->isStatic())
             jfunction->SetStatic(true);
 
+        if (!function->isPublic())
+            jfunction->SetSkip(true);
+
         // see if we support return type
         if (function->hasReturnType() && !function->returnType().type()->isVoidType())
         {
@@ -536,6 +539,9 @@ public:
 
             Declaration* decl = symbol->asDeclaration();
 
+            if (name == "RefCounted" && getNameString(symbol->name()) == "RefCounted")
+                int i = 0;
+
             // if the function describes the body in the header
             Function* function = symbol->asFunction();
 
@@ -547,10 +553,6 @@ public:
             {
                 if (function->isPureVirtual())
                     jclass->SetAbstract();
-
-                // only want public functions
-                if (!symbol->isPublic())
-                    continue;
 
                 JSBFunction* jfunction = processFunction(jclass, function);
                 if (jfunction)

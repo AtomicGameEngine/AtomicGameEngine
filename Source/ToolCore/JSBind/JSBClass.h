@@ -151,6 +151,9 @@ public:
     JSBModule* GetModule() { return module_; }
     JSBPackage* GetPackage() { return module_->GetPackage(); }
 
+    bool HasPrivateConstruct() { return hasPrivateConstruct_; }
+    void SetHasPrivateConstruct(bool value = true) { hasPrivateConstruct_ = value; }
+
     bool IsNumberArray() { return numberArrayElements_ != 0; }
     int  GetNumberArrayElements() { return numberArrayElements_;}
     const String& GetArrayElementType() const { return arrayElementType_; }
@@ -210,6 +213,8 @@ private:
 
     bool hasProperties_;
     HashMap<String, JSBProperty*> properties_;
+
+    bool hasPrivateConstruct_;
 
 };
 
