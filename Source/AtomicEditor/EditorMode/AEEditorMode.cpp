@@ -172,7 +172,13 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 #ifdef ATOMIC_DEV_BUILD
         vargs.Insert(0, ToString("\"%s/Resources/\"", tenv->GetRootSourceDir().CString()));
 #else
+
+#ifdef ATOMIC_PLATFORM_OSX
+        vargs.Insert(0, ToString("\"%s\"", (fileSystem->GetProgramDir() + "../Resources/").CString()));
+#else
         vargs.Insert(0, ToString("\"%s\"", (fileSystem->GetProgramDir() + "Resources/").CString()));
+#endif
+
 #endif
         vargs.Insert(0, "--resourcePrefix");
     }

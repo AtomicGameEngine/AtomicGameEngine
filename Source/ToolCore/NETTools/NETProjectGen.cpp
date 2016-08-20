@@ -315,11 +315,17 @@ namespace ToolCore
 
         String startArguments;
 
-        #ifdef ATOMIC_DEV_BUILD
+#ifdef ATOMIC_DEV_BUILD
             String playerBin = tenv->GetAtomicNETRootDir() + cfg + "/AtomicIPCPlayer.exe";
-        #else
-            String playerBin = tenv->GetAtomicNETRootDir() + "Release/AtomicIPCPlayer.exe";
+#else
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            String playerBin = tenv->GetAtomicNETRootDir() + "Release/AtomicIPCPlayer.exe";            
+
+#ifdef ATOMIC_PLATFORM_OSX
+            startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "../Resources/").CString());
+#else
             startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "Resources/").CString());
+#endif
         #endif
 
 
