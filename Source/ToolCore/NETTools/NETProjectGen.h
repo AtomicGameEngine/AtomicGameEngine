@@ -84,6 +84,9 @@ namespace ToolCore
         void CreateMainPropertyGroup(XMLElement &projectRoot);
         void CreateDebugPropertyGroup(XMLElement &projectRoot);
         void CreateReleasePropertyGroup(XMLElement &projectRoot);
+
+        void CreateCustomCommands(XMLElement &propertyGroup, const String& cfg);
+
         void CreateAssemblyInfo();
         void GetAssemblySearchPaths(String& paths);
 
