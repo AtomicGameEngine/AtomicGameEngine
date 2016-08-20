@@ -190,9 +190,11 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
         vargs.Insert(0, addArgs.Split(' '));
 
 #ifndef ATOMIC_PLATFORM_WINDOWS
-
-    vargs.Insert(0, playerBinary);
-    playerBinary = tenv->GetMonoExecutableDir() + "mono64";
+    if (managed)
+    {
+        vargs.Insert(0, playerBinary);
+        playerBinary = tenv->GetMonoExecutableDir() + "mono64";
+    }
 
 #endif
 

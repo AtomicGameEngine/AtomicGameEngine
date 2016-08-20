@@ -354,7 +354,7 @@ namespace ToolCore
         pgroup.CreateChild("PlatformTarget").SetValue("x64");
 
 #ifndef ATOMIC_PLATFORM_WINDOWS
-        CreateCustomCommands(pgroup, "Debug");
+        CreateCustomCommands(pgroup, "Release");
 #endif
 
     }
@@ -376,7 +376,7 @@ namespace ToolCore
         pgroup.CreateChild("PlatformTarget").SetValue("x64");
 
 #ifndef ATOMIC_PLATFORM_WINDOWS
-        CreateCustomCommands(pgroup, "Release");
+        CreateCustomCommands(pgroup, "Debug");
 #endif
 
     }
