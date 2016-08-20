@@ -139,7 +139,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
         if (isCompileOnSave && ToolCore.netProjectSystem) {
 
             // for now, only support compile on save when not using VS
-            if (!ToolCore.netProjectSystem.visualStudioAvailable)
+            if (!ToolCore.netProjectSystem.iDEAvailable)
                 ToolCore.netProjectSystem.buildAtomicProject();
         }
 

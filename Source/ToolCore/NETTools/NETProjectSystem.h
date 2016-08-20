@@ -50,7 +50,7 @@ namespace ToolCore
         NETProjectSystem(Context* context);
         virtual ~NETProjectSystem();
 
-        bool GetVisualStudioAvailable() const { return visualStudioPath_.Length() != 0; }
+        bool GetIDEAvailable() const { return idePath_.Length() != 0; }
 
         const String& GetSolutionPath() const { return solutionPath_; }
 
@@ -86,7 +86,7 @@ namespace ToolCore
         void Clear();
         void Initialize();
 
-        String visualStudioPath_;
+        String idePath_;
 
         String solutionPath_;
         String projectAssemblyPath_;
@@ -97,7 +97,7 @@ namespace ToolCore
         bool  projectAssemblyDirty_;
 
         // Visual Studio subprocess
-        WeakPtr<Subprocess> vsSubprocess_;
+        WeakPtr<Subprocess> ideSubprocess_;
 
     };
 
