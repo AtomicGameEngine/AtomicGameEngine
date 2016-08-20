@@ -51,9 +51,6 @@ namespace Atomic
         // NETService is always headless
         engineParameters_["Headless"] = true;
 
-        // FIXME AtomicNET:
-        // engineParameters_["ResourcePrefixPaths"] = "C:/Dev/atomic/AtomicGameEngine/Resources/";
-
         FileSystem* filesystem = GetSubsystem<FileSystem>();
         engineParameters_.InsertNew("LogName", filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "NETServiceApplication.log");
 

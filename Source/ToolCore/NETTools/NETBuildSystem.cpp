@@ -290,12 +290,14 @@ namespace ToolCore
             String cmd = "bash";
             args.Push("-c");
 
+            String xbuildBinary = tenv->GetMonoExecutableDir() + "xbuild";
+
             if (requiresNuGet)
             {
-                compile += ToString("/Library/Frameworks/Mono.framework/Versions/Current/Commands/nuget restore \"%s\" && ", solutionPath.CString());
+                compile += ToString("\"%s\" restore \"%s\" && ", nugetBinary.CString(), solutionPath.CString());
             }
 
-            compile += ToString("/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild \"%s\" /p:Configuration=%s /p:Platform=\"Any CPU\"", solutionPath.CString(), configuration.CString());
+            compile += ToString("\"%s\" \"%s\" /p:Configuration=%s /p:Platform=\"Any CPU\"", xbuildBinary.CString(), solutionPath.CString(), configuration.CString());
 
             args.Push(compile);
 

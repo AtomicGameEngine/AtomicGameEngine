@@ -186,7 +186,7 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 #ifndef ATOMIC_PLATFORM_WINDOWS
 
     vargs.Insert(0, playerBinary);
-    playerBinary = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono64";
+    playerBinary = tenv->GetMonoExecutableDir() + "mono64";
 
 #endif
 
