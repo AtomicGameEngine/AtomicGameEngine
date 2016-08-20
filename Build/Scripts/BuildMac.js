@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
 var path = require("path");
+var spawnSync = require('child_process').spawnSync
 var host = require("./Host");
 var atomicRoot = host.atomicRoot;
 
@@ -21,6 +22,8 @@ task('atomiceditor', {
     common.cleanCreateDir(host.getGenScriptRootDir("MACOSX"));
   }
 
+  var buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
+
   process.chdir(buildDir);
 
   var cmds = [];
@@ -28,7 +31,8 @@ task('atomiceditor', {
   cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -G Xcode");
   cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -target AtomicNETNative -configuration Release -parallelizeTargets -jobs 4")
 
-  cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json MACOSX Release");
+  if (buildAtomicNET)
+    cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json MACOSX Release");
 
   jake.exec(cmds, function() {
 
@@ -59,9 +63,9 @@ task('atomiceditor', {
       resourceDest + "ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
 
     // AtomicNET
-    fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
-      resourceDest + "ToolData/AtomicNET/Release");
-
+    if (buildAtomicNET)
+      fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
+        resourceDest + "ToolData/AtomicNET/Release");
 
     console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
 
