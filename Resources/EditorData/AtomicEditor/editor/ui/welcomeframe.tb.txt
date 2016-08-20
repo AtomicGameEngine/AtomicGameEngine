@@ -23,8 +23,8 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
                 "• Create a new project based on a 2D or 3D template.\n\n" \
                 "<color #D4FB79>Getting Started Videos & Javascript API Docs</color>\n" \
                 "<widget TBButton: id: 'getting_started' text: 'http://atomicgameengine.com/learn', skin: TBButton.link>\n\n" \
-                "<color #D4FB79>Forum</color>\n" \
-                "<widget TBButton: id: 'forum' text: 'http://atomicgameengine.com/forum', skin: TBButton.link>\n\n" \
+                "<color #D4FB79>Atomic Community</color>\n" \
+                "<widget TBButton: id: 'community' text: 'http://atomicgameengine.com/community', skin: TBButton.link>\n\n" \
                 "<color #D4FB79>Atomic Game Engine on GitHub</color>\n" \
                 "<widget TBButton: id: 'atomic_github' text: 'https://github.com/AtomicGameEngine', skin: TBButton.link>\n\n" \
                 "<color #D4FB79>Atomic Game Engine Funding Information</color>\n" \
