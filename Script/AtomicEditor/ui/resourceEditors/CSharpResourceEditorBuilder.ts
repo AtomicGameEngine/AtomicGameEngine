@@ -31,7 +31,7 @@ export default class CSharpResourceEditorBuilder extends AbstractTextResourceEdi
     canHandleResource(resourcePath: string) : boolean {
 
         /// Handled externally by VS, TODO: make this a preference
-        if (ToolCore.netProjectSystem.visualStudioAvailable)
+        if (ToolCore.netProjectSystem.iDEAvailable)
             return false;
 
         var ext = Atomic.getExtension(resourcePath).toLowerCase();

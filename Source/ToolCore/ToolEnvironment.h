@@ -87,6 +87,9 @@ public:
     const String& GetAtomicNETManagedPlayerBinary() { return atomicNETManagedPlayerBinary_; }
     const String& GetAtomicNETManagedIPCPlayerBinary() { return atomicNETManagedIPCPlayerBinary_; }
 
+    const String& GetMonoExecutableDir() { return monoExecutableDir_; }
+
+
 
     // OSX
     const String& GetPlayerAppFolder() { return playerAppFolder_; }
@@ -147,6 +150,7 @@ private:
     String atomicNETNuGetBinary_;
     String atomicNETManagedPlayerBinary_;
     String atomicNETManagedIPCPlayerBinary_;
+    String monoExecutableDir_;
 
     SharedPtr<ToolPrefs> toolPrefs_;
 };

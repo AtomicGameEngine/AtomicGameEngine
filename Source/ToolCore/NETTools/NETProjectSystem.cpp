@@ -65,7 +65,7 @@ namespace ToolCore
 
     void NETProjectSystem::OpenSolution()
     {
-        if (!visualStudioPath_.Length())
+        if (!idePath_.Length())
             return;
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
@@ -82,28 +82,37 @@ namespace ToolCore
 
     void NETProjectSystem::OpenSourceFile(const String& sourceFilePath)
     {
-        if (!visualStudioPath_.Length())
+        if (!idePath_.Length())
             return;
 
+        String command = idePath_;
         StringVector args;
 
-        if (vsSubprocess_.Expired())
+        if (ideSubprocess_.Expired())
         {
             SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
-            vsSubprocess_ = 0;
+            ideSubprocess_ = 0;
+
+#ifdef ATOMIC_PLATFORM_OSX
+
+            command = "open";
+            args.Push("-W");
+            args.Push("-a");
+            args.Push(idePath_);
+#endif
 
             args.Push(solutionPath_);
 
             if (sourceFilePath.Length())
-                args.Push(sourceFilePath);
+                args.Push(sourceFilePath);                       
 
             try
             {
-                vsSubprocess_ = subs->Launch(visualStudioPath_, args);
+                ideSubprocess_ = subs->Launch(command, args);
             }
             catch (Poco::SystemException)
             {
-                vsSubprocess_ = 0;
+                ideSubprocess_ = 0;
             }
 
         }
@@ -113,11 +122,26 @@ namespace ToolCore
                 return;
 
             try
-            {
+            {                
                 std::vector<std::string> args;
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
                 args.push_back("/edit");
+
+#elif defined ATOMIC_PLATFORM_OSX
+
+                command = "open";
+                args.push_back("-a");
+                args.push_back(idePath_.CString());
+
+#elif defined ATOMIC_PLATFORM_LINUX
+
+                args.push_back(idePath_.CString());
+
+#endif
                 args.push_back(sourceFilePath.CString());
-                Poco::Process::launch(visualStudioPath_.CString(), args);
+                Poco::Process::launch(command.CString(), args);
 
             }
             catch (Poco::SystemException)
@@ -159,8 +183,6 @@ namespace ToolCore
             }
         }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
         Project* project = GetSubsystem<ToolSystem>()->GetProject();
         NETBuildSystem* buildSystem = GetSubsystem<NETBuildSystem>();
 
@@ -174,8 +196,6 @@ namespace ToolCore
             }
 
         }
-#endif
-
     }
 
     bool NETProjectSystem::GenerateSolution()
@@ -336,8 +356,6 @@ namespace ToolCore
     {
         Clear();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
         SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(NETProjectSystem, HandleUpdate));
 
         SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectLoaded));
@@ -355,17 +373,38 @@ namespace ToolCore
         SubscribeToEvent(E_ASSETRENAMED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetRenamed));
         SubscribeToEvent(E_ASSETMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetMoved));
 
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
         // Query for Visual Studio 2015 path
-        visualStudioPath_ = Poco::Environment::get("VS140COMNTOOLS").c_str();
+        idePath_ = Poco::Environment::get("VS140COMNTOOLS").c_str();
 
-        if (visualStudioPath_.Length())
+        if (idePath_.Length())
         {
-            visualStudioPath_.Replace("Tools\\", "IDE\\devenv.exe");
+            idePath_.Replace("Tools\\", "IDE\\devenv.exe");
 
-            if (!fileSystem->FileExists(visualStudioPath_))
-                visualStudioPath_.Clear();
+            if (!fileSystem->FileExists(idePath_))
+                idePath_.Clear();
+        }
+
+#elif defined ATOMIC_PLATFORM_OSX
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        if (fileSystem->DirExists("/Applications/Xamarin Studio.app"))
+        {
+            idePath_ = "/Applications/Xamarin Studio.app/Contents/MacOS/XamarinStudio";
+        }
+
+#elif defined ATOMIC_PLATFORM_LINUX
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        if (fileSystem->FileExists("/usr/bin/monodevelop"))
+        {
+            idePath_ = "/usr/bin/monodevelop";
         }
 
 #endif

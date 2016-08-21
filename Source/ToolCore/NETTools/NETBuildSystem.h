@@ -59,7 +59,7 @@ namespace ToolCore
     public:
 
         NETBuild(Context* context, const String& solutionPath, const String& platform, const String& configuration);
-        virtual ~NETBuild() {};
+        virtual ~NETBuild() {}
 
     private:
         /// .sln or .json configuration file

@@ -19,7 +19,14 @@ add_library(AtomicNETNative SHARED ${SOURCE_FILES}  ${CSHARP_BINDINGS_SOURCE})
 
 add_dependencies(AtomicNETNative AtomicToolCheckScripts)
 
-target_link_libraries(AtomicNETNative AtomicNETScriptBindings AtomicNETScript AtomicJS AtomicPlayerLib AtomicPlayerJS AtomicApp ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicNETNative AtomicApp AtomicNETScriptBindings AtomicNETScript AtomicJS AtomicPlayerLib AtomicPlayerJS ${ATOMIC_LINK_LIBRARIES})
+
+if (LINUX)
+
+#https://github.com/nothings/stb/issues/280
+target_link_libraries(AtomicNETNative gcc_s gcc)
+
+endif()
 
 if (APPLE)
 

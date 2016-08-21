@@ -119,7 +119,10 @@ namespace Atomic
 #else
 
 #ifdef __APPLE__
-                    engineParameters_["ResourcePrefixPaths"] = "../Resources";
+                    if (!resourcePrefix.Length())
+                    {
+                        engineParameters_["ResourcePrefixPaths"] = "../Resources";
+                    }
 #else
                     if (!resourcePrefix.Length())
                     {

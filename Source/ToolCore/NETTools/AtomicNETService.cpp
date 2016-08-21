@@ -54,31 +54,24 @@ namespace ToolCore
     {
         // TODO: Needs to handle deployed tooling, release builds
 
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
         execPath = String::EMPTY;
         args.Clear();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
-        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-
-#ifdef _DEBUG
-
-        String config = "Debug";
-#else
-        String config = "Release";
-#endif
+#ifdef ATOMIC_PLATFORM_WINDOWS        
 
         execPath = tenv->GetAtomicNETCoreAssemblyDir() + "/AtomicNETService.exe";
 
-#elif ATOMIC_PLATFORM_OSX
+#elif defined ATOMIC_PLATFORM_OSX
 
-        execPath = "/usr/local/share/dotnet/dotnet";
+        execPath = tenv->GetMonoExecutableDir() + "mono64";
+        args.Push(tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNETService.exe");
 
-        args.Push("exec");
-        args.Push("--additionalprobingpath");
-        args.Push("/Users/josh/.nuget/packages");
-        args.Push("/Users/josh/Dev/atomic/AtomicGameEngine/Script/AtomicNET/AtomicNETService/bin/Debug/netcoreapp1.0/AtomicNETService.exe");
+#elif defined ATOMIC_PLATFORM_LINUX
 
+        execPath = "/usr/bin/mono";
+        args.Push(tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNETService.exe");
 #endif
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();

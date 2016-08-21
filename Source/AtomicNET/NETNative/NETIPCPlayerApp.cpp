@@ -44,13 +44,6 @@ namespace Atomic
         IPCPlayerApp(context)
     {
 
-#ifdef WIN32
-        ParseArguments(GetCommandLineW());
-#else
-        #warning Implement Argument Parsing
-#endif
-        arguments_ = GetArguments();
-
     }
 
     void NETIPCPlayerApp::Setup()

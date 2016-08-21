@@ -60,11 +60,17 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
 
         if (this.isNETProject && !this.menuCreated) {
 
+            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+
             // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
             const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("AtomicNET", {});
             menu.addItem(new Atomic.UIMenuItem("Open Solution", `${this.name}.opensolution`));
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
             menu.addItem(new Atomic.UIMenuItem("Generate Solution", `${this.name}.generatesolution`));
+
+            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
+            menu.addItem(this.compileOnSaveMenuItem);
+
             this.menuCreated = true;
         }
 
@@ -119,12 +125,24 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
     */
     save(ev: Editor.EditorEvents.SaveResourceEvent) {
 
+        if (Atomic.getExtension(ev.path) != ".cs") {
+            return;
+        }
+
         // let's check to see if we have created a csharp file
         if (!this.isNETProject) {
-            if (Atomic.getExtension(ev.path) == ".cs") {
-                this.isNETProject = true;
-            }
+            this.isNETProject = true;
         }
+
+        const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+
+        if (isCompileOnSave && ToolCore.netProjectSystem) {
+
+            // for now, only support compile on save when not using VS
+            if (!ToolCore.netProjectSystem.iDEAvailable)
+                ToolCore.netProjectSystem.buildAtomicProject();
+        }
+
     }
 
     /*** ProjectService implementation ****/
@@ -183,7 +201,13 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
                 case "generatesolution":
                     this.generateSolution();
                     return true;
-
+                case "compileonsave":
+                    let isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+                    // Toggle
+                    isCompileOnSave = !isCompileOnSave;
+                    this.serviceRegistry.projectServices.setUserPreference(this.name, "CompileOnSave", isCompileOnSave);
+                    this.compileOnSaveMenuItem.string = `Compile on Save: ${isCompileOnSave ? "On" : "Off"}`;
+                    return true;
             }
         }
     }

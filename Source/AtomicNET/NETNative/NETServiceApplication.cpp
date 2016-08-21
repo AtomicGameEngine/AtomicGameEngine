@@ -42,13 +42,6 @@ namespace Atomic
         IPCClientApp(context)
     {
 
-#ifdef WIN32
-        ParseArguments(GetCommandLineW());        
-#else
-        #warning Implement Argument Parsing
-#endif
-        arguments_ = GetArguments();
-
     }
 
     void NETServiceApplication::Setup()
@@ -57,9 +50,6 @@ namespace Atomic
 
         // NETService is always headless
         engineParameters_["Headless"] = true;
-
-        // FIXME AtomicNET:
-        // engineParameters_["ResourcePrefixPaths"] = "C:/Dev/atomic/AtomicGameEngine/Resources/";
 
         FileSystem* filesystem = GetSubsystem<FileSystem>();
         engineParameters_.InsertNew("LogName", filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "NETServiceApplication.log");

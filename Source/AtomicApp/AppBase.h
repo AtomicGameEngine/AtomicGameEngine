@@ -45,7 +45,7 @@ namespace Atomic
         /// Cleanup after the main loop. 
         virtual void Stop();
 
-        void AddArgument(const String& argument) { arguments_.Push(argument); }
+        static void AddArgument(const String& argument) { arguments_.Push(argument); }
 
         virtual void ProcessArguments();
 
@@ -55,7 +55,7 @@ namespace Atomic
 
         void ReadEngineConfig();
 
-        Vector<String> arguments_;
+        static Vector<String> arguments_;
         static Vector<String> engineConfigSearchPaths_;
 
         SharedPtr<JSVM> vm_;

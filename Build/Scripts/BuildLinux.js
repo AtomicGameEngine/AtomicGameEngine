@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
 var path = require("path");
+var spawnSync = require('child_process').spawnSync
 var host = require("./Host");
 var atomicRoot = host.atomicRoot;
 
@@ -21,12 +22,21 @@ namespace('build', function() {
             common.cleanCreateDir(host.getGenScriptRootDir("LINUX"));
         }
 
+        var buildAtomicNET = false;
+
+        // TODO: build box has old node
+        if (spawnSync)
+            buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
+
         process.chdir(buildDir);
 
         var cmds = [];
 
         cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=Release");
         cmds.push("make -j2")
+
+        if (buildAtomicNET)
+          cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json LINUX Release");
 
         jake.exec(cmds, function() {
 
@@ -53,6 +63,12 @@ namespace('build', function() {
             fs.copySync(buildDir +  "Source/AtomicPlayer/Application/AtomicPlayer",
             editorAppFolder + "Resources/ToolData/Deployment/Linux/AtomicPlayer");
 
+            // AtomicNET
+
+            if (buildAtomicNET) {
+              fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
+                 editorAppFolder + "Resources/ToolData/AtomicNET/Release");
+            }
 
             var binaryFiles = ["chrome-sandbox", "libcef.so", "natives_blob.bin", "snapshot_blob.bin"];
 

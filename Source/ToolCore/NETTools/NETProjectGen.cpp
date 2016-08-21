@@ -298,6 +298,45 @@ namespace ToolCore
         paths.Join(searchPaths, ";");
     }
 
+    void NETCSProject::CreateCustomCommands(XMLElement &propertyGroup, const String& cfg)
+    {
+        Project* atomicProject = projectGen_->GetAtomicProject();
+
+        if (!atomicProject)
+            return;
+
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
+        XMLElement customCommands = propertyGroup.CreateChild("CustomCommands").CreateChild("CustomCommands");
+
+        XMLElement xcommand = customCommands.CreateChild("Command");
+
+        xcommand.SetAttribute("type", "Execute");
+
+        String startArguments;
+
+#ifdef ATOMIC_DEV_BUILD
+            String playerBin = tenv->GetAtomicNETRootDir() + cfg + "/AtomicIPCPlayer.exe";
+#else
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            String playerBin = tenv->GetAtomicNETRootDir() + "Release/AtomicIPCPlayer.exe";            
+
+#ifdef ATOMIC_PLATFORM_OSX
+            startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "../Resources/").CString());
+#else
+            startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "Resources/").CString());
+#endif
+        #endif
+
+
+        startArguments += ToString("--project \"%s\"", atomicProject->GetProjectPath().CString());
+
+        String command = ToString("\"%s\"", playerBin.CString()) + " " + startArguments;
+
+        xcommand.SetAttribute("command", command);
+
+    }
+
     void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
     {
         XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
@@ -313,6 +352,10 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
         pgroup.CreateChild("PlatformTarget").SetValue("x64");
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
+        CreateCustomCommands(pgroup, "Release");
+#endif
 
     }
 
@@ -331,6 +374,10 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
         pgroup.CreateChild("PlatformTarget").SetValue("x64");
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
+        CreateCustomCommands(pgroup, "Debug");
+#endif
 
     }
 
@@ -444,6 +491,7 @@ namespace ToolCore
         {
             XMLElement afterBuild = project.CreateChild("Target");
             afterBuild.SetAttribute("Name", "AfterBuild");
+
             XMLElement copy = afterBuild.CreateChild("Copy");
             copy.SetAttribute("SourceFiles", "$(TargetPath)");
 
@@ -456,6 +504,14 @@ namespace ToolCore
             }
 
             copy.SetAttribute("DestinationFolder", destPath);
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
+
+            copy = afterBuild.CreateChild("Copy");
+            copy.SetAttribute("SourceFiles", "$(TargetPath).mdb");
+            copy.SetAttribute("DestinationFolder", destPath);
+
+#endif
 
             // Create the AtomicProject.csproj.user file if it doesn't exist
             String userSettingsFilename = projectPath_ + name_ + ".csproj.user";
@@ -615,8 +671,9 @@ namespace ToolCore
             const String& projectName = p->GetName();
             const String& projectGUID = p->GetProjectGUID();
 
+            const String CSharpProjectGUID = "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC";
             source += ToString("Project(\"{%s}\") = \"%s\", \"%s\\%s.csproj\", \"{%s}\"\n",
-                solutionGUID_.CString(), projectName.CString(), projectName.CString(),
+                CSharpProjectGUID.CString(), projectName.CString(), projectName.CString(),
                 projectName.CString(), projectGUID.CString());
 
             projectGen_->GetCSProjectDependencies(p, depends);
@@ -634,7 +691,7 @@ namespace ToolCore
                 source += "\tEndProjectSection\n";
             }
 
-            source += "\tEndProject\n";
+            source += "EndProject\n";
         }
 
         source += "Global\n";

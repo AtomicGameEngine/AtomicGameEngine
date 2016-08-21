@@ -45,13 +45,6 @@ namespace Atomic
         PlayerApp(context)
     {
 
-#ifdef WIN32
-        ParseArguments(GetCommandLineW());
-#else
-        #warning Implement Argument Parsing
-#endif
-        arguments_ = GetArguments();
-
     }
 
     void NETAtomicPlayer::Setup()
