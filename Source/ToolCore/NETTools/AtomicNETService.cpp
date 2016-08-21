@@ -68,6 +68,10 @@ namespace ToolCore
         execPath = tenv->GetMonoExecutableDir() + "mono64";
         args.Push(tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNETService.exe");
 
+#elif defined ATOMIC_PLATFORM_LINUX
+
+        execPath = "/usr/bin/mono";
+        args.Push(tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNETService.exe");
 #endif
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();

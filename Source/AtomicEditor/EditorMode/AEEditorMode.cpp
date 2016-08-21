@@ -193,7 +193,12 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
     if (managed)
     {
         vargs.Insert(0, playerBinary);
+
+#ifdef ATOMIC_PLATFORM_OSX
         playerBinary = tenv->GetMonoExecutableDir() + "mono64";
+#else
+        playerBinary = "mono";
+#endif
     }
 
 #endif

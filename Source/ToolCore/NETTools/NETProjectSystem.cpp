@@ -135,6 +135,10 @@ namespace ToolCore
                 args.push_back("-a");
                 args.push_back(idePath_.CString());
 
+#elif defined ATOMIC_PLATFORM_LINUX
+
+                args.push_back(idePath_.CString());
+
 #endif
                 args.push_back(sourceFilePath.CString());
                 Poco::Process::launch(command.CString(), args);
@@ -392,6 +396,15 @@ namespace ToolCore
         if (fileSystem->DirExists("/Applications/Xamarin Studio.app"))
         {
             idePath_ = "/Applications/Xamarin Studio.app/Contents/MacOS/XamarinStudio";
+        }
+
+#elif defined ATOMIC_PLATFORM_LINUX
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        if (fileSystem->FileExists("/usr/bin/monodevelop"))
+        {
+            idePath_ = "/usr/bin/monodevelop";
         }
 
 #endif

@@ -187,7 +187,7 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
     atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
     atomicNETManagedIPCPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicIPCPlayer.exe";
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#if defined ATOMIC_PLATFORM_WINDOWS || defined ATOMIC_PLATFORM_LINUX
     atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());
 #endif
 

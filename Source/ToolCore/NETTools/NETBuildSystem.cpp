@@ -294,7 +294,11 @@ namespace ToolCore
 
             if (requiresNuGet)
             {
+#ifdef ATOMIC_PLATFORM_OSX
                 compile += ToString("\"%s\" restore \"%s\" && ", nugetBinary.CString(), solutionPath.CString());
+#else
+                compile += ToString("mono \"%s\" restore \"%s\" && ", nugetBinary.CString(), solutionPath.CString());
+#endif
             }
 
             compile += ToString("\"%s\" \"%s\" /p:Configuration=%s /p:Platform=\"Any CPU\"", xbuildBinary.CString(), solutionPath.CString(), configuration.CString());
