@@ -22,7 +22,11 @@ namespace('build', function() {
             common.cleanCreateDir(host.getGenScriptRootDir("LINUX"));
         }
 
-        var buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
+        var buildAtomicNET = false;
+
+        // TODO: build box has old node
+        if (spawnSync)
+            buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
 
         process.chdir(buildDir);
 
