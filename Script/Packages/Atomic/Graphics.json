@@ -13,7 +13,7 @@
 			 	 "VertexBuffer", "Model",
  				 "StaticModel",
  				 "Animation", "AnimatedModel", "AnimationController", "AnimationState", "Billboard", "BillboardSet", "CustomGeometry",
- 				 "DecalSet", "ParticleEffect", "ParticleEmitter",
+ 				 "DecalSet", "ParticleEffect", "ParticleEmitter", "RibbonTrail",
  				 "Skybox", "StaticModelGroup", "Terrain", "TerrainPatch"],
 	"overloads" : {
 		"Viewport" : {
@@ -36,8 +36,6 @@
 		"CustomGeometry" : {
 			"SetMaterial" : ["Material"]
 		}
-
-
 	},
 	"typescript_decl" : {
 
