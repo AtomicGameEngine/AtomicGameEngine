@@ -158,6 +158,10 @@ void CSFunctionWriter::GenNativeCallParameters(String& sig)
                     args.Push(ToString("%s", ptype->name_.CString()));
 
             }
+            else if (ptype->type_->asVectorType())
+            {
+                args.Push(ToString("%s__vector", ptype->name_.CString()));
+            }
             else
             {
                 args.Push(ToString("%s", ptype->name_.CString()));
@@ -189,8 +193,51 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
     Indent();
 
-
     source += "\n";
+
+    // vector marshal
+
+    bool hasVectorMarshal = false;
+    Vector<JSBFunctionType*>& fparams = function_->GetParameters();
+
+    for (unsigned i = 0; i < fparams.Size(); i++)
+    {
+        JSBFunctionType* ftype = fparams[i];
+
+        JSBVectorType* vtype = ftype->type_->asVectorType();
+
+        if (!vtype)
+            continue;
+
+        JSBClassType* classType = vtype->vectorType_->asClassType();
+
+        if (!classType)
+            continue;
+
+        String className = classType->class_->GetName();
+
+        String vectorMarshal;
+
+        hasVectorMarshal = true;
+
+        if (vtype->isPODVector_)
+        {
+            const String& pname = ftype->name_;
+            source += IndentLine(ToString("PODVector<%s*> %s__vector;\n", className.CString(), pname.CString()));
+            source += IndentLine(ToString("if (%s) %s->AdaptToPODVector<%s*>(%s__vector);\n", pname.CString(), pname.CString(), className.CString(), pname.CString()));
+        }
+        else
+        {
+            // vectorMarshal = ToString("PODVector<%s*> %s__vector", className.CString(), ftype->name_.CString());
+        }
+
+        if (vectorMarshal.Length())
+        {
+            source += IndentLine(vectorMarshal);
+            vectorMarshal = String::EMPTY;
+        }
+    }
+
 
     bool returnValue = false;
     bool sharedPtrReturn = false;
@@ -214,9 +261,13 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     }
     else
     {
-        if (returnType != "void")
+        if (returnType != "void" && !hasVectorMarshal)
         {
             returnStatement = "return ";
+        }
+        else if (returnType != "void")
+        {
+            returnStatement = ToString("%s returnValue = ", returnType.CString());
         }
     }
 
@@ -255,6 +306,44 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
     source += IndentLine(line);
 
+    // Vector marshaling
+
+    for (unsigned i = 0; i < fparams.Size(); i++)
+    {
+        JSBFunctionType* ftype = fparams[i];
+
+        JSBVectorType* vtype = ftype->type_->asVectorType();
+
+        if (!vtype)
+            continue;
+
+        JSBClassType* classType = vtype->vectorType_->asClassType();
+
+        if (!classType)
+            continue;
+
+        String className = classType->class_->GetName();
+
+        String vectorMarshal;
+
+        if (vtype->isPODVector_)
+        {
+            const String& pname = ftype->name_;
+            source += IndentLine(ToString("if (%s) %s->AdaptFromPODVector<%s*>(%s__vector);\n", pname.CString(), pname.CString(), className.CString(), pname.CString()));
+        }
+        else
+        {
+            // vectorMarshal = ToString("PODVector<%s*> %s__vector", className.CString(), ftype->name_.CString());
+        }
+
+        if (vectorMarshal.Length())
+        {
+            source += IndentLine(vectorMarshal);
+            vectorMarshal = String::EMPTY;
+        }
+    }
+
+
     if (sharedPtrReturn)
     {
         source += IndentLine("if (returnValue.NotNull()) returnValue->AddRef();\n");
@@ -263,6 +352,10 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     else if (returnType == "const char*")
     {
         source += IndentLine("return returnValue.CString();\n");
+    }
+    else if (returnType != "void" && hasVectorMarshal)
+    {
+        source += IndentLine("return returnValue;\n");
     }
 
     Dedent();
@@ -588,6 +681,7 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
 
 void CSFunctionWriter::WriteManagedFunction(String& source)
 {
+
     JSBClass* klass = function_->GetClass();
     JSBPackage* package = klass->GetPackage();
 

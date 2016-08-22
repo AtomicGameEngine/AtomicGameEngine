@@ -92,16 +92,30 @@ public:
             if (classname.StartsWith("Atomic::"))
                 classname.Replace("Atomic::", "");
 
-            if (classname == "Vector")
+            if (classname == "Vector" || classname == "PODVector")
             {
                 if (ntype->name()->asTemplateNameId())
                 {
+                    bool isPointer = false;
+
                     const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
                     FullySpecifiedType pfst = tnid->templateArgumentAt(0);
-                    JSBType* vtype = processTypeConversion(pfst.type());
+
+                    Type* type = pfst.type();
+
+                    // unwrap pointer
+                    if (type->isPointerType())
+                    {
+                        isPointer = true;
+                        pfst = type->asPointerType()->elementType();
+                        type = pfst.type();
+                    }
+
+                    JSBType* vtype = processTypeConversion(type);
+
                     if (vtype)
                     {
-                        jtype = new JSBVectorType(vtype);
+                        jtype = new JSBVectorType(vtype, classname == "PODVector");
                     }
                 }
             }
@@ -212,10 +226,6 @@ public:
         }
 
         if (!jtype)
-            return NULL;
-
-        // read only vectors atm
-        if (!isConst && jtype->asVectorType())
             return NULL;
 
         bool skip = false;

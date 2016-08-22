@@ -225,13 +225,11 @@ class JSBVectorType : public JSBType
 
 public:
 
-    JSBType* vectorType_;
-
-    JSBVectorType(JSBType* vtype) : vectorType_(vtype) {}
+    JSBVectorType(JSBType* vtype, bool podVector = false) : vectorType_(vtype), isPODVector_(podVector) {}
 
     virtual JSBVectorType* asVectorType() { return this; }
 
-    String ToString() { return "Vector<" + vectorType_->ToString() + ">"; }
+    String ToString();
 
     virtual bool Match (JSBType* other)
     {
@@ -245,6 +243,10 @@ public:
 
         return true;
     }
+
+    JSBType* vectorType_;
+
+    bool isPODVector_;
 
 };
 

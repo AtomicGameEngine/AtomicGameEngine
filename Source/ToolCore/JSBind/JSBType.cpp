@@ -70,4 +70,14 @@ JSBType* JSBType::Parse(const String& value)
 
 }
 
+String JSBVectorType::ToString()
+{
+    if (vectorType_->asClassType())
+    {
+        return isPODVector_ ? "PODVector<" + vectorType_->ToString() + "*>" : "Vector<" + vectorType_->ToString() + "*>";
+    }
+
+    return isPODVector_ ? "PODVector<" + vectorType_->ToString() + ">" : "Vector<" + vectorType_->ToString() + ">";
+}
+
 }

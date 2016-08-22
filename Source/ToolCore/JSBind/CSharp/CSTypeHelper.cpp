@@ -179,9 +179,8 @@ String CSTypeHelper::GetManagedTypeString(JSBType* type)
     }
     else if (type->asVectorType())
     {
-        JSBVectorType* vectorType = type->asVectorType();
 
-        value = GetManagedTypeString(vectorType->vectorType_) + "[]";
+        value = ToString("Vector<%s>", type->asVectorType()->vectorType_->asClassType()->class_->GetName().CString());
     }
 
     return value;
@@ -255,7 +254,7 @@ String CSTypeHelper::GetNativeTypeString(JSBType* type)
     }
     else if (type->asVectorType())
     {
-        assert(0);
+        value = "ScriptVector*";//type->asVectorType()->ToString();
     }
 
     return value;
@@ -298,9 +297,8 @@ String CSTypeHelper::GetPInvokeTypeString(JSBType* type)
     }
     else if (type->asVectorType())
     {
-        JSBVectorType* vectorType = type->asVectorType();
-
-        value = GetManagedTypeString(vectorType->vectorType_) + "[]";
+        // ScriptVector
+        value = "IntPtr";
     }
 
     return value;
@@ -357,26 +355,44 @@ bool CSTypeHelper::OmitFunction(JSBFunction* function)
     if (!function)
         return false;
 
-    if (function->Skip())
+
+    if (function->GetSkipLanguage(BINDINGLANGUAGE_CSHARP))
         return true;
 
     if (function->IsDestructor())
+    {
+        function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
         return true;
+    }
 
     // We need to rename GetType
     if (function->GetName() == "GetType")
+    {
+        function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
         return true;
+    }
 
     // avoid vector type for now
     if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
+    {
+        function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
         return true;
+    }
 
     Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     for (unsigned i = 0; i < parameters.Size(); i++)
     {
-        if (parameters[i]->type_->asVectorType())
-            return true;
+        if (JSBVectorType* vtype = parameters[i]->type_->asVectorType())
+        {
+            if (!vtype->vectorType_->asClassType() || vtype->vectorType_->asClassType()->class_->IsNumberArray())
+            {
+                function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
+                return true;
+            }
+
+        }
+
     }
 
     return false;

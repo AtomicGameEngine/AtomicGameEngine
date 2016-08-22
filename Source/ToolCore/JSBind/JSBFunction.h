@@ -23,6 +23,7 @@
 #pragma once
 
 #include <Atomic/IO/Log.h>
+#include "JSBindTypes.h"
 #include "JSBClass.h"
 #include "JSBType.h"
 #include "JSBSymbol.h"
@@ -150,7 +151,14 @@ public:
     bool IsOverload() { return isOverload_; }
     bool IsVirtual() { return isVirtual_; }
     bool IsStatic() { return isStatic_; }
-    bool Skip() { return skip_; }
+
+    bool Skip(BindingLanguage language = BINDINGLANGUAGE_ANY)
+    {
+        if (skip_ || language == BINDINGLANGUAGE_ANY)
+            return skip_;
+
+        return GetSkipLanguage(language);
+    }
 
     JSBClass* GetClass() { return class_; }
     const String& GetPropertyName() { return propertyName_; }
@@ -174,6 +182,23 @@ public:
     void SetSkip(bool value) { skip_ = value; }
     void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
     void SetDocString(const String& docString) { docString_ = docString; }
+
+    void SetSkipLanguage(BindingLanguage language, bool skip = true)
+    {
+        bindSkip_[language] = skip;
+    }
+
+    /// Returns true is _skip is set or skip is set for specific binding language
+    bool GetSkipLanguage(BindingLanguage language) const
+    {
+        if (skip_)
+            return true;
+
+        if (bindSkip_.Contains(language))
+            return bindSkip_[language];
+
+        return false;
+    }
 
     int FirstDefaultParameter()
     {
@@ -244,7 +269,7 @@ private:
     bool isVirtual_;
     bool isStatic_;
     bool skip_;
-
+    HashMap<unsigned, bool> bindSkip_;
 };
 
 }

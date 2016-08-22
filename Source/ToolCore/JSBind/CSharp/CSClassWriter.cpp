@@ -188,9 +188,13 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     String line;
 
     if (klass_->GetBaseClass())
-        line = "public partial class " + klass_->GetName() + " : " + klass_->GetBaseClass()->GetName() + "\n";
+    {
+        line = ToString("public partial class %s%s : %s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "", klass_->GetBaseClass()->GetName().CString());
+    }
     else
-        line = "public partial class " + klass_->GetName() + "\n";
+    {
+        line = ToString("public partial class %s%s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "");
+    }
 
 
     source += IndentLine(line);
