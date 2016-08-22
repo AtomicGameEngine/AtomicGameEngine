@@ -46,6 +46,7 @@ geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "Anima
 geometryCreateSource.addItem(new Atomic.UIMenuItem("BillboardSet", "BillboardSet"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("CustomGeometry", "CustomGeometry"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("ParticleEmitter", "ParticleEmitter"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("RibbonTrail", "RibbonTrail"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Skybox", "SkyBox"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModelGroup", "StaticModelGroup"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Terrain", "Terrain"));
