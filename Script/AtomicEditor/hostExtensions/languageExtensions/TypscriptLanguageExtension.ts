@@ -165,6 +165,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
             menu.addItem(this.compileOnSaveMenuItem);
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+            menu.addItem(new Atomic.UIMenuItem("Generate External Editor Project", `${this.name}.generateexternalproject`));
             this.menuCreated = true;
         }
     }
@@ -316,6 +317,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 case "compileproject":
                     this.doFullCompile();
                     return true;
+                case "generateexternalproject":
+                    this.generateExternalProject();
+                    return true;
             }
         }
     }
@@ -337,6 +341,28 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         WebView.WebBrowserHost.setGlobalStringProperty("TypeScriptLanguageExtension", "tsConfig", JSON.stringify(tsConfig));
     }
 
+    generateExternalProject () {
+      var projectDir : string = ToolCore.toolSystem.project.projectPath;
+
+      // Create the typings folder in project root
+      var projectDirTypings : string = Atomic.addTrailingSlash(projectDir + "typings/main/ambient/atomicgameengine");
+      Atomic.getFileSystem().createDir(projectDirTypings);
+
+      // Copy the Atomic.d.ts definition file to the typings folder
+      var toolDataDir : string = ToolCore.toolEnvironment.toolDataDir;
+      var typescriptSupportDir : string = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
+      Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
+
+      // Generate a tsconfig.json file
+      defaultCompilerOptions.noLib = false;
+      var tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
+      let tsconfig = {
+        compilerOptions: defaultCompilerOptions
+      };
+      tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
+      tsconfigFile.close();
+
+    }
     /**
      * Perform a full compile of the TypeScript
      */
