@@ -341,8 +341,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         WebView.WebBrowserHost.setGlobalStringProperty("TypeScriptLanguageExtension", "tsConfig", JSON.stringify(tsConfig));
     }
 
-    generateExternalProject ()
-    {
+    generateExternalProject () {
       var projectDir : string = ToolCore.toolSystem.project.projectPath;
 
       // Create the typings folder in project root
@@ -360,7 +359,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
       let tsconfig = {
         compilerOptions: defaultCompilerOptions
       };
-      tsconfigFile.writeString(JSON.stringify(tsconfig));
+      tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
       tsconfigFile.close();
 
     }
