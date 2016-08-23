@@ -30,6 +30,13 @@ public:
         return refVector_[index];
     }
 
+    void Push(RefCounted* refCounted)
+    {
+        // TODO: check null?
+
+        refVector_.Push(SharedPtr<RefCounted>(refCounted));
+    }
+
     unsigned GetSize() const
     {
         return refVector_.Size();

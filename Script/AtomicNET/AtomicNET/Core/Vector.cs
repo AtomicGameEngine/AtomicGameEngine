@@ -18,10 +18,33 @@ namespace AtomicEngine
 			}
 		}
 
+		public void Push(T refCounted)
+		{
+			scriptVector.Push(refCounted);
+		}
+
 		public T At(uint index)
 		{
 			return (T) scriptVector.At(index);	
 		}
+
+
+		public T this[int key]
+		{
+			get
+			{
+				return At((uint)key);
+			}
+		}
+
+		public T this[uint key]
+		{
+			get
+			{
+				return At(key);
+			}
+		}
+
 
 
 		public static implicit operator IntPtr(Vector<T> vector)
