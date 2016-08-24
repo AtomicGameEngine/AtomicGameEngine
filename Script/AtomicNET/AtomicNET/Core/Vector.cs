@@ -7,8 +7,8 @@ using System.Runtime.InteropServices;
 namespace AtomicEngine
 {
 	// Type safe wrapper around ScriptVector
-    public class Vector<T> where T : RefCounted
-    {
+	public class Vector<T> where T : RefCounted
+	{
 
 		public uint Size
 		{
@@ -25,7 +25,7 @@ namespace AtomicEngine
 
 		public T At(uint index)
 		{
-			return (T) scriptVector.At(index);	
+			return (T)scriptVector.At(index);
 		}
 
 
@@ -54,6 +54,8 @@ namespace AtomicEngine
 
 			return vector.scriptVector.nativeInstance;
 		}
+
+		public ScriptVector GetScriptVector() { return scriptVector; }
 
 
 		ScriptVector scriptVector = new ScriptVector();

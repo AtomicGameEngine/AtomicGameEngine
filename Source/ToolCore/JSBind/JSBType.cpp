@@ -74,7 +74,16 @@ String JSBVectorType::ToString()
 {
     if (vectorType_->asClassType())
     {
-        return isPODVector_ ? "PODVector<" + vectorType_->ToString() + "*>" : "Vector<" + vectorType_->ToString() + "*>";
+        String classname = vectorType_->ToString();
+
+        if (vectorTypeIsSharedPtr_)
+            classname = "SharedPtr<" + classname + ">";
+        else if (vectorTypeIsWeakPtr_)
+            classname = "WeakPtr<" + classname + ">";
+        else
+            classname += "*";
+
+        return isPODVector_ ? "PODVector<" + classname + ">" : "Vector<" + classname + ">";
     }
 
     return isPODVector_ ? "PODVector<" + vectorType_->ToString() + ">" : "Vector<" + vectorType_->ToString() + ">";

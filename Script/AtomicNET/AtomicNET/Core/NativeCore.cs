@@ -161,7 +161,7 @@ namespace AtomicEngine
                 if (!w.TryGetTarget(out r))
                 {
                     // expired
-                    csb_AtomicEngine_ReleaseRef(native);
+                    csi_AtomicEngine_ReleaseRef(native);
                     nativeLookup.Remove(native);
                     nativesRemoved++;
                 }
@@ -233,18 +233,18 @@ namespace AtomicEngine
                     // we were seen before, but have since been GC'd, remove!
                     nativeLookup.Remove(native);
 
-                    if (csb_Atomic_RefCounted_Refs(native) == 1)
+                    if (csi_Atomic_RefCounted_Refs(native) == 1)
                     {
                         // only managed ref remains, so release and return null
-                        csb_AtomicEngine_ReleaseRef(native);
+                        csi_AtomicEngine_ReleaseRef(native);
                         return null;
                     }
 
-                    csb_AtomicEngine_ReleaseRef(native);
+                    csi_AtomicEngine_ReleaseRef(native);
                 }
             }
 
-            IntPtr classID = RefCounted.csb_Atomic_RefCounted_GetClassID(native);
+            IntPtr classID = RefCounted.csi_Atomic_RefCounted_GetClassID(native);
 
             // and store, with downcast support for instance Component -> StaticModel
             // we never want to hit this path for script inherited natives
@@ -268,10 +268,10 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csb_Atomic_AObject_GetTypeName(IntPtr self);
+        private static extern IntPtr csi_Atomic_AObject_GetTypeName(IntPtr self);
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern int csb_Atomic_RefCounted_Refs(IntPtr self);
+        private static extern int csi_Atomic_RefCounted_Refs(IntPtr self);
 
         public static void RegisterNativeType(NativeType nativeType)
         {
@@ -343,7 +343,7 @@ namespace AtomicEngine
         internal static Dictionary<Type, NativeType> typeToNativeType = new Dictionary<Type, NativeType>();
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern void csb_AtomicEngine_ReleaseRef(IntPtr refCounted);
+        private static extern void csi_AtomicEngine_ReleaseRef(IntPtr refCounted);
 
     }
 

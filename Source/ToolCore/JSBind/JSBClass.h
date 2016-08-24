@@ -24,6 +24,7 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "JSBindTypes.h"
 #include "JSBHeader.h"
 #include "JSBModule.h"
 
@@ -127,6 +128,9 @@ public:
     PODVector<JSBClass*>& GetBaseClasses() {return baseClasses_; }
     PODVector<JSBFunction*>& GetFunctions() { return functions_; }
 
+    // Get all functions, including those in base classes
+    void GetAllFunctions(PODVector<JSBFunction*>& functions);
+
     bool IsGeneric() { return isGeneric_; }
     bool IsAbstract() { return isAbstract_; }
 
@@ -156,7 +160,7 @@ public:
     int  GetNumberArrayElements() { return numberArrayElements_;}
     const String& GetArrayElementType() const { return arrayElementType_; }
 
-    JSBFunction* GetConstructor();
+    JSBFunction* GetConstructor(BindingLanguage bindingLanguage = BINDINGLANGUAGE_ANY );
 
     void SetAbstract(bool value = true) { isAbstract_ = value; }
     void SetObject(bool value = true) { isObject_ = value; }

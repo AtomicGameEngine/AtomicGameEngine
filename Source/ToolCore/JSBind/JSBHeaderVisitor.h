@@ -71,7 +71,7 @@ public:
         return nvisitor(name);
     }
 
-    JSBType* processTypeConversion(Type* type)
+    JSBType* processTypeConversion(Type* type, FullySpecifiedType fst)
     {
         JSBType* jtype = NULL;
 
@@ -94,30 +94,41 @@ public:
 
             if (classname == "Vector" || classname == "PODVector")
             {
-                if (ntype->name()->asTemplateNameId())
+                PODVector<TemplateType> types;
+                unwrapTemplateType(fst, types);
+
+                if (types.Size() == 2)
                 {
-                    bool isPointer = false;
-
-                    const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
-                    FullySpecifiedType pfst = tnid->templateArgumentAt(0);
-
-                    Type* type = pfst.type();
-
-                    // unwrap pointer
-                    if (type->isPointerType())
-                    {
-                        isPointer = true;
-                        pfst = type->asPointerType()->elementType();
-                        type = pfst.type();
-                    }
-
-                    JSBType* vtype = processTypeConversion(type);
+                    JSBType* vtype = processTypeConversion((Type*) types[1].type_, types[1].fstype_);
 
                     if (vtype)
                     {
                         jtype = new JSBVectorType(vtype, classname == "PODVector");
                     }
+
                 }
+                else if (types.Size() == 3 && ( getNameString(types[1].name_) == "SharedPtr" || getNameString(types[1].name_) == "WeakPtr"))
+                {
+                    JSBType* vtype = processTypeConversion((Type*) types[2].type_, types[2].fstype_);
+
+                    if (vtype)
+                    {
+                        JSBVectorType* jvtype = new JSBVectorType(vtype, classname == "PODVector");
+
+                        if (getNameString(types[1].name_) == "SharedPtr")
+                        {
+                            jvtype->vectorTypeIsSharedPtr_ = true;
+                        }
+                        else if (getNameString(types[1].name_) == "WeakPtr")
+                        {
+                            jvtype->vectorTypeIsWeakPtr_ = true;
+                        }
+
+                        jtype = jvtype;
+                    }
+
+                }
+
             }
             else if (classname == "String")
             {
@@ -157,6 +168,71 @@ public:
 
     }
 
+    struct TemplateType
+    {
+        FullySpecifiedType fstype_;
+        bool isPointer_;
+        bool isReference_;
+        const Name* name_;
+        const Type* type_;
+
+        static void Init(TemplateType& ttype)
+        {
+            ttype.isPointer_ = false;
+            ttype.isReference_ = false;
+            ttype.name_ = 0;
+            ttype.type_ = 0;
+        }
+    };
+
+    bool unwrapTemplateType(const FullySpecifiedType& fstype, PODVector<TemplateType>& types)
+    {
+        TemplateType ttype;
+
+        TemplateType::Init(ttype);
+
+        ttype.fstype_ = fstype;
+        ttype.type_ = fstype.type();
+
+        if (ttype.type_->isPointerType())
+        {
+            ttype.isPointer_=true;
+            FullySpecifiedType pfst = ttype.type_->asPointerType()->elementType();
+            ttype.type_ = pfst.type();
+        }
+
+        if (ttype.type_->isReferenceType())
+        {
+            ttype.isReference_=true;
+            FullySpecifiedType pfst = ttype.type_->asReferenceType()->elementType();
+            ttype.type_ = pfst.type();
+        }
+
+        const NamedType* ntype = ttype.type_->asNamedType();
+
+        if (!ntype)
+            return false;
+
+        if (ntype->name()->asTemplateNameId())
+        {
+            const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
+
+            ttype.name_ = tnid->identifier()->asNameId();
+
+            types.Push(ttype);
+
+            unwrapTemplateType(tnid->templateArgumentAt(0), types);
+
+            return true;
+        }
+
+        ttype.name_ = ntype->name();
+
+        types.Push(ttype);
+
+        return false;
+    }
+
     JSBFunctionType* processFunctionType(FullySpecifiedType fst, bool retType = false)
     {
         JSBType* jtype = NULL;
@@ -187,14 +263,18 @@ public:
             if (type->isNamedType())
             {
                 NamedType* ntype = type->asNamedType();
+
                 if (ntype->name()->asTemplateNameId())
                 {
-                    const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
-                    String classname = getNameString(tnid->identifier()->asNameId());
-                    if (classname == "SharedPtr")
+                    PODVector<TemplateType> types;
+                    unwrapTemplateType(fst, types);
+
+                    String classname = getNameString(types[0].name_);
+
+                    // SharedPtr
+                    if ( classname == "SharedPtr" && types.Size() == 2 )
                     {
-                        FullySpecifiedType pfst = tnid->templateArgumentAt(0);
-                        type = pfst.type();
+                        type = (Type*) types[1].type_;
                         isTemplate = true;
                         isSharedPtr = true;
                     }
@@ -214,7 +294,7 @@ public:
 
         if (!jtype)
         {
-            jtype = processTypeConversion(type);
+            jtype = processTypeConversion(type, fst);
 
             // explicit script string -> StringHash required
             if (jtype && jtype->asStringHashType())

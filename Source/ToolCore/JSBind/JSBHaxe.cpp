@@ -346,7 +346,7 @@ namespace ToolCore
             if (propertyNames.Size())
                 source_ += "\n";
 
-            JSBFunction* constructor = klass->GetConstructor();
+            JSBFunction* constructor = klass->GetConstructor(BINDINGLANGUAGE_JAVASCRIPT);
             if (constructor)
             {
                 ExportFunction(constructor);

@@ -28,7 +28,7 @@ namespace AtomicEngine
         public IntPtr nativeInstance = IntPtr.Zero;
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public static extern IntPtr csb_Atomic_RefCounted_GetClassID(IntPtr self);
+        public static extern IntPtr csi_Atomic_RefCounted_GetClassID(IntPtr self);
 
     }
 

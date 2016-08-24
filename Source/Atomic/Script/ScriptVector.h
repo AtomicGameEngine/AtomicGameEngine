@@ -43,33 +43,7 @@ public:
     }
 
     template <class T>
-    bool AdaptToPODVector(PODVector<T> vectorOut)
-    {
-        vectorOut.Clear();
-
-        for (unsigned i = 0; i < refVector_.Size(); i++)
-        {
-            vectorOut.Push(static_cast<T>(refVector_[i].Get()));
-        }
-
-        return true;
-
-    }
-
-    template <class T>
-    bool AdaptToVector(Vector<T> vectorOut)
-    {
-        vectorOut.Clear();
-
-        for (unsigned i = 0; i < refVector_.Size(); i++)
-        {
-            vectorOut.Push((T) refVector_[i]);
-        }
-
-    }
-
-    template <class T>
-    bool AdaptFromPODVector(PODVector<T> vectorIn)
+    bool AdaptFromVector(PODVector<T> vectorIn)
     {
 
         Vector<SharedPtr<RefCounted>> keepAlive = refVector_;
@@ -96,6 +70,95 @@ public:
             refVector_.Push((T) vectorIn[i]);
         }
 
+        return true;
+
+    }
+
+    template <class T>
+    bool AdaptFromVector(Vector<WeakPtr<T>> vectorIn)
+    {
+        Vector<SharedPtr<RefCounted>> keepAlive = refVector_;
+
+        refVector_.Clear();
+
+        for (unsigned i = 0; i < vectorIn.Size(); i++)
+        {
+            refVector_.Push(SharedPtr<RefCounted>((RefCounted*) vectorIn[i]));
+        }
+
+        return true;
+
+    }
+
+    template <class T>
+    bool AdaptFromVector(Vector<SharedPtr<T>> vectorIn)
+    {
+        Vector<SharedPtr<RefCounted>> keepAlive = refVector_;
+
+        refVector_.Clear();
+
+        for (unsigned i = 0; i < vectorIn.Size(); i++)
+        {
+            refVector_.Push(SharedPtr<RefCounted>((RefCounted*) vectorIn[i]));
+        }
+
+        return true;
+
+    }
+
+    template <class T>
+    bool AdaptToVector(PODVector<T> vectorOut)
+    {
+        vectorOut.Clear();
+
+        for (unsigned i = 0; i < refVector_.Size(); i++)
+        {
+            vectorOut.Push(static_cast<T>(refVector_[i].Get()));
+        }
+
+        return true;
+
+    }
+
+    template <class T>
+    bool AdaptToVector(Vector<T> vectorOut)
+    {
+        vectorOut.Clear();
+
+        for (unsigned i = 0; i < refVector_.Size(); i++)
+        {
+            vectorOut.Push((T) refVector_[i]);
+        }
+
+        return true;
+
+    }
+
+    template <class T>
+    bool AdaptToVector(Vector<SharedPtr<T>> vectorOut)
+    {
+        vectorOut.Clear();
+
+        for (unsigned i = 0; i < refVector_.Size(); i++)
+        {
+            vectorOut.Push(SharedPtr<T>((T) refVector_[i]));
+        }
+
+        return true;
+
+    }
+
+    template <class T>
+    bool AdaptToVector(Vector<WeakPtr<T>> vectorOut)
+    {
+        vectorOut.Clear();
+
+        for (unsigned i = 0; i < refVector_.Size(); i++)
+        {
+            vectorOut.Push(WeakPtr<T>((T) refVector_[i]));
+        }
+
+        return true;
     }
 
 

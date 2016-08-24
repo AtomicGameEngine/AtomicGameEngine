@@ -58,6 +58,7 @@ void JSBFunctionSignature::Parse()
 
 }
 
+
 bool JSBFunctionSignature::Match(JSBFunction* function)
 {
 
@@ -181,11 +182,20 @@ JSBClass* JSBClass::GetBaseClass()
 
 }
 
-JSBFunction* JSBClass::GetConstructor()
+void JSBClass::GetAllFunctions(PODVector<JSBFunction*>& functions)
+{
+    if (baseClasses_.Size())
+        baseClasses_[0]->GetAllFunctions(functions);
+
+    functions += functions_;
+
+}
+
+JSBFunction* JSBClass::GetConstructor(BindingLanguage bindingLanguage)
 {
     {
         for (unsigned i = 0; i < functions_.Size(); i++)
-            if (functions_[i]->IsConstructor() && !functions_[i]->Skip())
+            if (functions_[i]->IsConstructor() && !functions_[i]->Skip(bindingLanguage))
                 return functions_[i];
     }
 
@@ -340,9 +350,9 @@ void JSBClass::Process()
             {
                 function->SetOverload();
                 function2->SetOverload();
-                // initially set all overridden functions to skip
-                function->SetSkip(true);
-                function2->SetSkip(true);
+                // initially set all overridden functions to skip (for JavaScript)
+                function->SetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT);
+                function2->SetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT);
                 break;
             }
         }
@@ -363,7 +373,7 @@ void JSBClass::Process()
                 if (!override->Match(function))
                     continue;
 
-                function->SetSkip(false);
+                function->SetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT, false);
 
                 break;
 
