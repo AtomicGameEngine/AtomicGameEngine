@@ -522,7 +522,7 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
     }
     else if (function_->GetReturnType() && function_->GetReturnType()->type_->asVectorType())
     {
-        args.Push("ref ScriptVector returnValue");
+        args.Push("IntPtr returnValue");
     }
 
     String pstring;
@@ -726,7 +726,7 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
             sig += ", ";
 
         JSBClass* klass = function_->GetClass();
-        sig += "ref returnScriptVector";
+        sig += "returnScriptVector";
     }
 
 }
