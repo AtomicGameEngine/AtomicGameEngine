@@ -21,6 +21,8 @@
 //
 
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Physics/PhysicsEvents.h>
+#include <Atomic/Script/ScriptPhysics.h>
 
 #include "NETCore.h"
 #include "NETEventDispatcher.h"
@@ -48,6 +50,24 @@ namespace Atomic
 
         if (!netEvents_.Contains(eventType))
             return;
+
+        // Do any conversion that is necessary, will probably want to factor this into something better
+
+        if (eventType == E_NODECOLLISION)
+        {
+            VariantMap ncEventData;
+
+            SharedPtr<PhysicsNodeCollision> nodeCollison(new PhysicsNodeCollision());
+            nodeCollison->SetFromNodeCollisionEvent(eventData);
+            ncEventData[StringHash("PhysicsNodeCollision")] = nodeCollison;
+
+            ncEventData[eventType] = ncEventData;
+
+            NETCore::DispatchEvent(eventType.Value(), &ncEventData);
+
+            return;
+
+        }
 
         NETCore::DispatchEvent(eventType.Value(), &eventData);
 

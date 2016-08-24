@@ -14,8 +14,6 @@ namespace AtomicEngine
             return AtomicNET.GetSubsystem<T>();
         }
 
-
-
         internal void HandleEvent(uint eventType, ScriptVariantMap eventData)
         {
             eventHandlers[eventType](eventType, eventData);
