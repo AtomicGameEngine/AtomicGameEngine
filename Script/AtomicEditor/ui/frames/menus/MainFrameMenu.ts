@@ -293,8 +293,8 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 EditorUI.getModelOps().showAbout();
                 return true;
             }
-            if (refid == "help forums") {
-                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/");
+            if (refid == "help community") {
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/community/");
                 return true;
             } else if (refid == "help chat") {
                 Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/");
@@ -401,7 +401,7 @@ var helpItems = {
     "API Documentation": ["help api"],
     "-1": null,
     "Atomic Chat": ["help chat"],
-    "Atomic Forums": ["help forums"],
+    "Atomic Community": ["help community"],
     "-2": null,
     "Atomic Game Engine on GitHub": ["help github"],
     "About Atomic Editor": "about atomic editor"
