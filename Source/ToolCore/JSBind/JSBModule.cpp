@@ -352,6 +352,11 @@ void JSBModule::RegisterClass(String name)
 
         JSBClass* cls = new JSBClass(context_, this, name, nativeName);
 
+        if (genericClassnames_.Contains(name))
+        {
+            cls->SetGeneric();
+        }
+
         classes_[nativeName] = cls;
 
         package_->RegisterClass(cls);
@@ -444,6 +449,13 @@ bool JSBModule::Load(const String& jsonFilename)
     for (unsigned i = 0; i < classes.Size(); i++)
     {
         classnames_.Push(classes[i].GetString());
+    }
+
+    JSONArray classesGeneric = root.Get("classes_generic").GetArray();
+
+    for (unsigned i = 0; i < classesGeneric.Size(); i++)
+    {
+        genericClassnames_.Push(classesGeneric[i].GetString());
     }
 
     JSONValue classes_rename = root.Get("classes_rename");

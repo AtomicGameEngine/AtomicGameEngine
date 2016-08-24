@@ -1,3 +1,4 @@
+
 //
 // Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
 //
@@ -22,37 +23,14 @@
 
 #pragma once
 
-#include <Atomic/Container/Str.h>
-
-#include "../JSBClassWriter.h"
-
-using namespace Atomic;
-
 namespace ToolCore
 {
 
-class JSBPackage;
-class JSBClass;
-class JSBFunction;
-
-class JSClassWriter : public JSBClassWriter
+enum BindingLanguage
 {
-
-public:
-
-    JSClassWriter(JSBClass* klass);
-
-    void GenerateSource(String& sourceOut);
-
-private:
-
-    bool OmitFunction(JSBFunction* function);
-
-    void WriteFunctions(String& source);
-
-    void GenerateStaticFunctionsSource(String& source, String& packageName);
-    void GenerateNonStaticFunctionsSource(String& source, String& packageName);
-
+    BINDINGLANGUAGE_ANY = 0,
+    BINDINGLANGUAGE_JAVASCRIPT,
+    BINDINGLANGUAGE_CSHARP
 };
 
 }

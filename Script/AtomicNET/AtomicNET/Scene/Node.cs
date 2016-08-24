@@ -23,6 +23,42 @@ namespace AtomicEngine
             return (T) CreateComponent(type.Name, mode, id);
         }
 
+		public void GetChildrenWithComponent<T>(Vector<Node> dest, bool recursive = false)
+		{
+			var type = typeof(T);
+
+			// If we're a CSComponent, get "CSComponents" native side and filter here
+			if (type.IsSubclassOf(typeof(CSComponent)))
+			{
+				Vector<Node> temp = new Vector<Node>();
+
+				GetChildrenWithComponent(temp, "CSComponent", recursive);
+
+				// filter based on actual type
+
+				for (uint i = 0; i < temp.Size; i++)
+				{
+					var node = temp[i];
+
+					Vector<Component> components = new Vector<Component>();
+
+					node.GetComponents(components, "Component", false);
+
+					for (uint j = 0; j < components.Size; j++)
+					{
+						if (components[j].GetType() == type)
+						{
+							dest.Push(node);
+							break;
+						}						
+					}
+				}
+
+				return;
+			}
+
+			GetChildrenWithComponent(dest, type.Name, recursive);
+		}
 
     }
 

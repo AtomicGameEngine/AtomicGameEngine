@@ -1,5 +1,5 @@
 {
 	"name" : "Script",
 	"sources" : ["Source/Atomic/Script"],
-	"classes" : ["ScriptVariantMap", "ScriptComponent", "ScriptComponentFile"]
+	"classes" : ["ScriptVariantMap", "ScriptVector", "ScriptComponent", "ScriptComponentFile"]
 }

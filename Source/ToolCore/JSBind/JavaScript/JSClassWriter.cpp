@@ -47,7 +47,7 @@ void JSClassWriter::WriteFunctions(String& source)
     {
         JSBFunction* function = klass_->functions_.At(i);
 
-        if (function->Skip())
+        if (function->Skip(BINDINGLANGUAGE_JAVASCRIPT) || OmitFunction(function))
             continue;
 
         if (function->IsDestructor())
@@ -95,7 +95,7 @@ void JSClassWriter::GenerateStaticFunctionsSource(String& source, String& packag
     {
         JSBFunction* function = klass_->functions_.At(i);
 
-        if (function->Skip())
+        if (function->Skip(BINDINGLANGUAGE_JAVASCRIPT) || OmitFunction(function))
             continue;
 
         if (function->IsConstructor() || function->IsDestructor())
@@ -132,7 +132,7 @@ void JSClassWriter::GenerateNonStaticFunctionsSource(String& source, String& pac
     {
         JSBFunction* function = klass_->functions_.At(i);
 
-        if (function->Skip())
+        if (function->Skip(BINDINGLANGUAGE_JAVASCRIPT) || OmitFunction(function))
             continue;
 
         if (function->IsConstructor() || function->IsDestructor())
@@ -158,5 +158,39 @@ void JSClassWriter::GenerateNonStaticFunctionsSource(String& source, String& pac
     source.Append("duk_pop(ctx);\n");
 }
 
+bool JSClassWriter::OmitFunction(JSBFunction* function)
+{
+
+    if (function->GetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT))
+        return true;
+
+    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+
+    if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
+    {
+        if (!function->GetReturnType()->isConst_ || function->GetReturnType()->type_->asVectorType()->isPODVector_)
+        {
+            function->SetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT);
+            return true;
+        }
+    }
+
+    for (unsigned i = 0; i < parameters.Size(); i++)
+    {
+        JSBFunctionType* ptype = parameters[i];
+
+        if (ptype->type_->asVectorType())
+        {
+            if (!ptype->isConst_ || ptype->type_->asVectorType()->isPODVector_)
+            {
+                function->SetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT);
+                return true;
+            }
+        }
+    }
+
+    return false;
+
+}
 
 }

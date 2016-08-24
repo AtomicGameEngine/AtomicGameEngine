@@ -71,6 +71,16 @@ void CSTypeHelper::GenNativeFunctionParameterSignature(JSBFunction* function, St
         args.Push(ToString("%s* returnValue", function->GetReturnClass()->GetNativeName().CString()));
     }
 
+    if (function->GetReturnType())
+    {
+        JSBVectorType* vtype = function->GetReturnType()->type_->asVectorType();
+
+        if (vtype)
+        {
+            args.Push("ScriptVector* returnValue");
+        }
+    }
+
     sig.Join(args, ", ");
 
 }
@@ -117,6 +127,10 @@ String CSTypeHelper::GetNativeFunctionSignature(JSBFunction* function, String& r
         else
         {
             returnType = ToString("%s", CSTypeHelper::GetNativeTypeString(function->GetReturnType()).CString());
+
+            // ScriptVector is handled by a out parameter
+            if (returnType.Contains("ScriptVector"))
+                returnType = "void";
         }
     }
 
@@ -124,9 +138,9 @@ String CSTypeHelper::GetNativeFunctionSignature(JSBFunction* function, String& r
     String sig;
     GenNativeFunctionParameterSignature(function, sig);
 
-    String functionSig = ToString("csb_%s_%s_%s(%s)",
+    String functionSig = ToString("csb_%s_%s_%s_%u(%s)",
                 package->GetName().CString(), klass->GetName().CString(),
-                fname.CString(), sig.CString());
+                fname.CString(), function->GetID(), sig.CString());
 
     return functionSig;
 }
@@ -179,9 +193,8 @@ String CSTypeHelper::GetManagedTypeString(JSBType* type)
     }
     else if (type->asVectorType())
     {
-        JSBVectorType* vectorType = type->asVectorType();
 
-        value = GetManagedTypeString(vectorType->vectorType_) + "[]";
+        value = ToString("Vector<%s>", type->asVectorType()->vectorType_->asClassType()->class_->GetName().CString());
     }
 
     return value;
@@ -255,7 +268,7 @@ String CSTypeHelper::GetNativeTypeString(JSBType* type)
     }
     else if (type->asVectorType())
     {
-        assert(0);
+        value = "ScriptVector*";//type->asVectorType()->ToString();
     }
 
     return value;
@@ -298,9 +311,8 @@ String CSTypeHelper::GetPInvokeTypeString(JSBType* type)
     }
     else if (type->asVectorType())
     {
-        JSBVectorType* vectorType = type->asVectorType();
-
-        value = GetManagedTypeString(vectorType->vectorType_) + "[]";
+        // ScriptVector
+        value = "IntPtr";
     }
 
     return value;
@@ -357,26 +369,69 @@ bool CSTypeHelper::OmitFunction(JSBFunction* function)
     if (!function)
         return false;
 
-    if (function->Skip())
+
+    if (function->GetSkipLanguage(BINDINGLANGUAGE_CSHARP))
         return true;
 
     if (function->IsDestructor())
+    {
+        function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
         return true;
+    }
 
     // We need to rename GetType
     if (function->GetName() == "GetType")
+    {
+        function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
         return true;
+    }
 
-    // avoid vector type for now
-    if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
-        return true;
+    if (function->GetReturnType())
+    {
+        if (JSBVectorType* vtype = function->GetReturnType()->type_->asVectorType())
+        {
+            if (!vtype->vectorType_->asClassType() || vtype->vectorType_->asClassType()->class_->IsNumberArray())
+            {
+                function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
+                return true;
+            }
+        }
+    }
 
     Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     for (unsigned i = 0; i < parameters.Size(); i++)
     {
-        if (parameters[i]->type_->asVectorType())
-            return true;
+        if (JSBVectorType* vtype = parameters[i]->type_->asVectorType())
+        {
+            if (!vtype->vectorType_->asClassType() || vtype->vectorType_->asClassType()->class_->IsNumberArray())
+            {
+                function->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
+                return true;
+            }
+
+        }
+
+    }
+
+    // filter overloads which differ in PODVector vs Vector/StringHash vs String, etc
+
+    PODVector<JSBFunction*> allFunctions;
+    function->GetClass()->GetAllFunctions(allFunctions);
+
+    for (unsigned i = 0; i < allFunctions.Size(); i++)
+    {
+        JSBFunction* other = allFunctions[i];
+
+        if (other == function || other->GetSkipLanguage(BINDINGLANGUAGE_CSHARP))
+            continue;
+
+        if (other->Match(function))
+        {
+            if (other->GetClass() == function->GetClass())
+                other->SetSkipLanguage(BINDINGLANGUAGE_CSHARP);
+        }
+
     }
 
     return false;

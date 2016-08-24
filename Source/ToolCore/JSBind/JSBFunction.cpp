@@ -24,12 +24,30 @@
 
 namespace ToolCore
 {
+
+unsigned JSBFunction::idCounter_ = 1;
+
+JSBFunction::JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
+                                  isConstructor_(false), isDestructor_(false),
+                                  isGetter_(false), isSetter_(false),
+                                  isOverload_(false), skip_(false),
+                                  isVirtual_(false), isStatic_(false)
+{
+    id_ = idCounter_++;
+}
+
+
 void JSBFunction::Process()
 {
     if (skip_)
     {
         return;
     }
+
+    // only setup properties for methods which weren't skipped for JS, for example overloads
+
+    if (GetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT))
+        return;
 
     // if not already marked as a getter
     if (!isGetter_)

@@ -40,11 +40,11 @@ namespace AtomicEngine
 
         public static uint StringToStringHash(string value)
         {
-            return csb_Atomic_AtomicNET_StringToStringHash(value);
+            return csi_Atomic_AtomicNET_StringToStringHash(value);
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern uint csb_Atomic_AtomicNET_StringToStringHash(string name);
+        private static extern uint csi_Atomic_AtomicNET_StringToStringHash(string name);
 
         public static void Initialize()
         {
@@ -77,7 +77,7 @@ namespace AtomicEngine
             coreDelegates.eventDispatch = NativeCore.EventDispatch;
             coreDelegates.updateDispatch = NativeCore.UpdateDispatch;
 
-            IntPtr coreptr = csb_Atomic_NETCore_Initialize(ref coreDelegates);
+            IntPtr coreptr = csi_Atomic_NETCore_Initialize(ref coreDelegates);
 
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
@@ -96,7 +96,7 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csb_Atomic_NETCore_Initialize(ref CoreDelegates delegates);
+        private static extern IntPtr csi_Atomic_NETCore_Initialize(ref CoreDelegates delegates);
 
         private static Context context;
         private static CoreDelegates coreDelegates;
