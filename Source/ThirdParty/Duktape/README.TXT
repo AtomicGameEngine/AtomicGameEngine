@@ -11,6 +11,7 @@ exec_print_stdout([
 	'--support-feature-options',
 	'--option-file', dist + '/../config/examples/performance_sensitive.yaml',
 	'--option-file', dist + '/../config/examples/timing_sensitive.yaml',
+	'--option-file', dist + '/../config/examples/debugger_support.yaml',
 	'duk-config-header'
 ])
 
