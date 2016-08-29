@@ -1,5 +1,6 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,30 +23,31 @@
 
 #pragma once
 
-#include "Command.h"
+#include <AtomicApp/IPCClientApp.h>
 
-using namespace Atomic;
-
-namespace ToolCore
+namespace Atomic
 {
 
-class PlatformAddCmd: public Command
-{
-    ATOMIC_OBJECT(PlatformAddCmd, Command);
+    class NETServiceApplication : public IPCClientApp
+    {
+        ATOMIC_OBJECT(NETServiceApplication, IPCClientApp)
 
-public:
+    public:
 
-    PlatformAddCmd(Context* context);
-    virtual ~PlatformAddCmd();
+        static NETServiceApplication* CreateInternal();
 
-    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
+        int Initialize();
 
-    void Run();
+    private:
 
-private:
+        /// Construct.
+        NETServiceApplication(Context* context);
 
-    String platformToAdd_;
+        /// Setup before engine initialization. 
+        virtual void Setup();
+        /// Cleanup after the main loop. 
+        virtual void Stop();
 
-};
+    };
 
 }

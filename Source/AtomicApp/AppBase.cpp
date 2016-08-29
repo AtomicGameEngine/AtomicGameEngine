@@ -114,6 +114,19 @@ namespace Atomic
 
     }
 
+	bool AppBase::RunFrame()
+	{
+		engine_->RunFrame();
+
+		if (engine_->IsExiting())
+		{
+			return false;
+		}
+
+		return true;
+
+	}
+
     void AppBase::Stop()
     {
 

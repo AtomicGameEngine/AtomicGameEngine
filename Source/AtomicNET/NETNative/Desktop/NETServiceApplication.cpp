@@ -77,23 +77,6 @@ namespace Atomic
         return 0;
     }
 
-    bool NETServiceApplication::RunFrame()
-    {
-        engine_->RunFrame();
-
-        if (engine_->IsExiting())
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    void NETServiceApplication::Shutdown()
-    {
-        Stop();
-    }
-
     void NETServiceApplication::Stop()
     {
         Application::Stop();

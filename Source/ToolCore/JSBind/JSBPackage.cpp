@@ -201,6 +201,13 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
+	JSONArray jplatforms = root["platforms"].GetArray();
+
+	for (unsigned i = 0; i < jplatforms.Size(); i++)
+	{
+		platforms_.Push(jplatforms[i].GetString());
+	}
+
     JSONValue jmodulesExclude = root.Get("moduleExclude");
 
     if (jmodulesExclude.IsObject())
@@ -253,12 +260,6 @@ bool JSBPackage::Load(const String& packageFolder)
     {
         String moduleName = modules.GetArray()[i].GetString();
 
-        if (moduleExcludes_.Contains(jsbind->GetPlatform()))
-        {
-            if (moduleExcludes_[jsbind->GetPlatform()].Contains(moduleName))
-                continue;
-        }
-
         SharedPtr<JSBModule> module(new JSBModule(context_, this));
 
         if (!module->Load(packageFolder + moduleName + ".json"))
@@ -304,6 +305,44 @@ bool JSBPackage::Load(const String& packageFolder)
     ProcessModules();
 
     return true;
+}
+
+String JSBPackage::GetPlatformDefineGuard() const
+{
+	if (!platforms_.Size())
+		return String::EMPTY;
+
+	StringVector defines;
+
+	for (unsigned i = 0; i < platforms_.Size(); i++)
+	{
+		const String& platform = platforms_[i];
+
+		if (platform.ToLower() == "windows")
+			defines.Push("defined(ATOMIC_PLATFORM_WINDOWS)");
+		else if (platform.ToLower() == "macosx")
+			defines.Push("defined(ATOMIC_PLATFORM_OSX)");
+		else if (platform.ToLower() == "linux")
+			defines.Push("defined(ATOMIC_PLATFORM_LINUX)");
+		else if (platform.ToLower() == "android")
+			defines.Push("defined(ATOMIC_PLATFORM_ANDROID)");
+		else if (platform.ToLower() == "ios")
+			defines.Push("defined(ATOMIC_PLATFORM_IOS)");
+		else if (platform.ToLower() == "web")
+			defines.Push("defined(ATOMIC_PLATFORM_WEB)");
+		else
+		{
+			ATOMIC_LOGERRORF("Unknown package platform: %s", platform.CString());
+		}
+	}
+
+	if (!defines.Size())
+		return String::EMPTY;
+
+	String defineString = "#if " + String::Joined(defines, " || ");
+
+	return defineString;
+
 }
 
 }

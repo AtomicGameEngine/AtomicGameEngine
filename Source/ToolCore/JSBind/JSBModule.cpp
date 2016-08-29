@@ -92,6 +92,7 @@ void JSBModule::VisitHeaders()
 
     ProcessOverloads();
     ProcessExcludes();
+	ProcessClassExcludes();
     ProcessTypeScriptDecl();
     ProcessHaxeDecl();
 }
@@ -228,6 +229,38 @@ void JSBModule::ProcessExcludes()
             }
         }
     }
+}
+
+void JSBModule::ProcessClassExcludes()
+{
+    JSONValue root = moduleJSON_->GetRoot();
+
+    JSONValue excludes = root.Get("classExcludes");
+
+    if (excludes.IsObject())
+	{
+		Vector<String> classes = excludes.GetObject().Keys();
+
+		for (unsigned i = 0; i < classes.Size(); i++)
+		{
+			const String& classname = classes[i];
+
+			if (!classExcludes_.Contains(classname))
+			{
+				classExcludes_[classname] = Vector<String>();
+			}
+
+			JSONArray platforms = excludes[classname].GetArray();
+
+			for (unsigned j = 0; j < platforms.Size(); j++)
+			{
+				classExcludes_[classname].Push(platforms[j].GetString());
+			}
+
+		}
+
+	}
+
 }
 
 void JSBModule::ProcessTypeScriptDecl()
@@ -385,6 +418,155 @@ JSBEnum* JSBModule::GetEnum(const String& name)
 
 }
 
+String JSBModule::GetClassDefineGuard(const String& name, const String& language) const
+{
+	StringVector platforms;
+
+	if (!classExcludes_.TryGetValue(name, platforms) || !platforms.Size())
+		return String::EMPTY;
+
+	Vector<String> defines;
+
+	for (unsigned i = 0; i < platforms.Size(); i++)
+	{
+		String platform = platforms[i].ToLower();
+
+		if (platform == "windows")
+		{
+			if (language == "csharp")
+			{
+				if (!defines.Contains("!ATOMIC_DESKTOP"))
+					defines.Push("!ATOMIC_DESKTOP");
+			}
+			else
+			{
+				defines.Push("!defined(ATOMIC_PLATFORM_WINDOWS)");
+			}
+			
+		}
+		else if (platform == "macosx")
+		{
+			if (language == "csharp")
+			{
+				if (!defines.Contains("!ATOMIC_DESKTOP"))
+					defines.Push("!ATOMIC_DESKTOP");
+			}
+			else
+			{
+				defines.Push("!defined(ATOMIC_PLATFORM_OSX)");
+			}
+		}
+		else if (platform == "linux")
+		{
+			if (language == "csharp")
+			{
+				if (!defines.Contains("!ATOMIC_DESKTOP"))
+					defines.Push("!ATOMIC_DESKTOP");
+			}
+			else
+			{
+				defines.Push("!defined(ATOMIC_PLATFORM_LINUX)");
+			}
+		}
+		else if (platform == "android")
+		{
+			if (language == "csharp")
+			{
+				defines.Push("!ATOMIC_ANDROID");
+			}
+			else
+			{
+				defines.Push("!defined(ATOMIC_PLATFORM_ANDROID)");
+			}
+		}
+		else if (platform == "ios")
+		{
+			if (language == "csharp")
+			{
+				defines.Push("!ATOMIC_IOS");
+			}
+			else
+			{
+				defines.Push("!defined(ATOMIC_PLATFORM_IOS)");
+			}
+		}
+		else if (platform == "web")
+		{
+			if (language == "csharp")
+			{
+				defines.Push("!ATOMIC_WEB");
+			}
+			else
+			{
+				defines.Push("!defined(ATOMIC_PLATFORM_WEB)");
+			}
+		}
+		else
+		{
+			ATOMIC_LOGERRORF("Unknown package platform: %s", platform.CString());
+		}
+	}
+
+	if (!defines.Size())
+		return String::EMPTY;
+
+	String defineString = "#if " + String::Joined(defines, " && ");
+
+	return defineString;
+
+}
+
+String JSBModule::GetModuleDefineGuard() const
+{
+	// platform -> vector of modules
+	const HashMap<String, Vector<String>>& platformExcludes = package_->GetModuleExcludes();
+	HashMap<String, Vector<String>>::ConstIterator itr = platformExcludes.Begin();
+
+	Vector<String> defines;
+
+	while (itr != platformExcludes.End())
+	{
+		const String& platform = itr->first_;
+		const Vector<String>& modules = itr->second_;
+
+		for (unsigned i = 0; i < modules.Size(); i++)
+		{
+			if (modules[i].ToLower() == name_.ToLower())
+			{
+				if (platform.ToLower() == "windows")
+					defines.Push("!defined(ATOMIC_PLATFORM_WINDOWS)");
+				else if (platform.ToLower() == "macosx")
+					defines.Push("!defined(ATOMIC_PLATFORM_OSX)");
+				else if (platform.ToLower() == "linux")
+					defines.Push("!defined(ATOMIC_PLATFORM_LINUX)");
+				else if (platform.ToLower() == "android")
+					defines.Push("!defined(ATOMIC_PLATFORM_ANDROID)");
+				else if (platform.ToLower() == "ios")
+					defines.Push("!defined(ATOMIC_PLATFORM_IOS)");
+				else if (platform.ToLower() == "web")
+					defines.Push("!defined(ATOMIC_PLATFORM_WEB)");
+				else
+				{
+					ATOMIC_LOGERRORF("Unknown package platform: %s", platform.CString());
+				}
+
+				break;
+			}
+
+		}
+	
+		itr++;
+	}
+	
+	if (!defines.Size())
+		return String::EMPTY;
+
+	String defineString = "#if " + String::Joined(defines, " && ");
+
+	return defineString;
+	
+}
+
 bool JSBModule::ContainsConstant(const String& constantName)
 {
     return constants_.Contains(constantName);
@@ -412,6 +594,8 @@ void JSBModule::RegisterConstant(const String& constantName, const String& value
 bool JSBModule::Load(const String& jsonFilename)
 {    
     ATOMIC_LOGINFOF("Loading Module: %s", jsonFilename.CString());
+
+	JSBind* jsbind = GetSubsystem<JSBind>();
 
     SharedPtr<File> jsonFile(new File(context_, jsonFilename));
 
@@ -499,28 +683,6 @@ bool JSBModule::Load(const String& jsonFilename)
     {
         sourceDirs_.Push(sources.GetArray()[i].GetString());
     }
-
-    if (name_ == "Graphics")
-    {
-#ifdef _MSC_VER
-        JSBind* jsbind = GetSubsystem<JSBind>();
-        if (jsbind->GetPlatform() == "ANDROID" || jsbind->GetPlatform() == "WEB")
-        {
-            sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");
-        }
-        else
-        {
-#ifdef ATOMIC_D3D11
-            sourceDirs_.Push("Source/Atomic/Graphics/Direct3D11");
-#else
-            sourceDirs_.Push("Source/Atomic/Graphics/Direct3D9");
-#endif
-        }
-#else
-        sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");
-#endif
-    }
-
 
     ScanHeaders();
 

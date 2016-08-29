@@ -63,6 +63,8 @@ public:
 
     virtual bool RequiresProjectLoad() { return true; }
 
+	virtual const String& GetProjectPath() const { return String::EMPTY; }
+
     virtual bool RequiresLicenseValidation() { return false; }
 
 private:

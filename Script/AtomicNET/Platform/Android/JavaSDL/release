@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+err=0
+
+# Disallow unstaged changes in the working tree
+if ! git diff-files --quiet --ignore-submodules --
+then
+    echo >&2 "cannot $0: you have unstaged changes."
+    git diff-files --name-status -r --ignore-submodules -- >&2
+    err=1
+fi
+
+# Disallow uncommitted changes in the index
+if ! git diff-index --cached --quiet HEAD --ignore-submodules --
+then
+    echo >&2 "cannot $0: your index contains uncommitted changes."
+    git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
+    err=1
+fi
+
+if [ $err = 1 ]
+then
+    echo >&2 "Please commit or stash them."
+    exit 1
+fi
+
+read -r line < "VERSION"
+echo "Creating Git tag: $line"
+git tag -a "$line"
+if ! [ $? -eq 0 ]; then
+    exit 1
+fi
+
+./compile

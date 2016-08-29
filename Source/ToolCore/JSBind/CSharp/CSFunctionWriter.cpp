@@ -32,87 +32,8 @@
 #include "CSTypeHelper.h"
 #include "CSFunctionWriter.h"
 
-/*
- *
- C# getters/setters
- local instance storage so we're not constantly creating managed Vector3, etc
- Vector2/Vector3/BoundingBox, etc C# structs so assign by value
- Object lifetime
-
- C# enum of module types for type info?
- C# version of push class instance?
-
- new instance from C# needs constructor
- wrapping does not, wrapping doesn't use constructors at all (JS needs this for prototype)
-
- Store GCHandle to keep an object alive (Component, UI) C# side?
-
- typedef const void* ClassID;
- which changed based on address, so need register at startup
- so at package startup time, need to setup mapping between
- IntPtr and C# class, we also need to be able to new a class
- instance with existing native or create a native when new'ing from C#
-
- IntPtr to RefCounted native side is the "ID", like JSHeapPtr
-
- Lifetime:
-
- // you cannot derive from native engine classes, other than script components
-
- a C# instance can be new'd, handed to native, stored in native, the C# side could be GC'd
- future access to this instance would be a new instance
-
-*/
-
-
-/*
-
-// struct marshal Vector2, Vector3, BoundingBox, etc
-// RefCounted*
-// primitive bool, int, uint, float, double
-// String
-
-RefCounted* csb_Node_Constructor()
-{
-    return new Node(NETCore::GetContext());
-}
-
-void csb_Node_GetPosition(Node* self, Vector3* out)
-{
-    *out = self->GetPosition();
-}
-
-void csb_Node_SetPosition(Node* self, Vector3*__arg0)
-{
-    self->SetPosition(*__arg0);
-}
-
-void csb_Node_SetPosition(Node* self, Vector3*__arg0)
-{
-    self->SetPosition(*__arg0);
-}
-
-bool csb_Audio_Play(Audio* self)
-{
-    bool retValue = self->Play();
-    return retValue;
-}
-
-const RefCounted* csb_Node_GetParent(Node* self)
-{
-    const RefCounted* retValue = self->GetParent();
-    return RefCounted;
-}
-
-RefCounted* csb_ObjectAnimation_Constructor()
-{
-    return new ObjectAnimation(NETCore::GetContext());
-}
-
-*/
 namespace ToolCore
 {
-
 bool CSFunctionWriter::wroteConstructor_ = false;
 
 CSFunctionWriter::CSFunctionWriter(JSBFunction *function) : JSBFunctionWriter(function)
@@ -550,6 +471,7 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
     {
         for (unsigned int i = 0; i < parameters.Size(); i++)
         {
+			bool isStruct = false;
             JSBFunctionType* ptype = parameters.At(i);
 
             // ignore "Context" parameters
@@ -557,13 +479,29 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
             {
                 JSBClassType* classType = ptype->type_->asClassType();
                 JSBClass* klass = classType->class_;
+
                 if (klass->GetName() == "Context")
                 {
                     continue;
                 }
+
+				// TODO: we should have a better system for struct type in general
+				// This number array is really for JS
+				if (klass->IsNumberArray())
+				{
+					isStruct = true;
+				}
             }
 
-            sig += CSTypeHelper::GetManagedTypeString(ptype);
+			String managedTypeString = CSTypeHelper::GetManagedTypeString(ptype);
+
+			if (!ptype->isConst_ && (ptype->isReference_ && isStruct))
+			{
+				// pass by reference
+				managedTypeString = "ref " + managedTypeString;
+			}
+
+			sig += managedTypeString;
 
             String init = ptype->initializer_;
 
@@ -622,7 +560,7 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
 
     Indent();
 
-    source += IndentLine(ToString("var classType = typeof(%s);\n", klass->GetName().CString()));
+	source += IndentLine(ToString("var classType = typeof(%s);\n", klass->GetName().CString()));
     source += IndentLine("var thisType = this.GetType();\n");
     source += IndentLine("var thisTypeIsNative = NativeCore.IsNativeType(thisType);\n");    
     source += IndentLine("var nativeAncsestorType = NativeCore.GetNativeAncestorType(thisType);\n");

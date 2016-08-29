@@ -801,6 +801,11 @@ fallback:
                 "open", "(Ljava/lang/String;I)Ljava/io/InputStream;");
         inputStream = (*mEnv)->CallObjectMethod(mEnv, assetManager, mid, fileNameJString, 1 /* ACCESS_RANDOM */);
         if (Android_JNI_ExceptionOccurred(SDL_FALSE)) {
+
+// ATOMIC BEGIN
+// openAPKExpansionInputStream not supported under AtomicNET for now
+#ifdef ATOMIC_DISABLED
+
             /* Try fallback to APK expansion files */
             mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, context),
                 "openAPKExpansionInputStream", "(Ljava/lang/String;)Ljava/io/InputStream;");
@@ -816,6 +821,11 @@ fallback:
             if (Android_JNI_ExceptionOccurred(SDL_FALSE) || !inputStream) {
                 goto failure;
             }
+#endif
+            goto failure;
+
+// ATOMIC END
+
         }
 
         ctx->hidden.androidio.inputStreamRef = (*mEnv)->NewGlobalRef(mEnv, inputStream);

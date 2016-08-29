@@ -88,10 +88,17 @@ public:
     void SetDotNetModule(bool value) { dotNetModule_ = value; }
     bool GetDotNetModule() { return dotNetModule_; }
 
+	/// Define guard for specific module code
+	String GetModuleDefineGuard() const;
+
+	/// Define guard for specific module code
+	String GetClassDefineGuard(const String& name, const String& language = String::EMPTY) const;
+
 private:
 
     void ProcessOverloads();
     void ProcessExcludes();
+	void ProcessClassExcludes();
     void ProcessTypeScriptDecl();
     void ProcessHaxeDecl();
 
@@ -120,6 +127,8 @@ private:
     Vector<String> requirements_;
 
     SharedPtr<JSONFile> moduleJSON_;
+
+	HashMap<String, Vector<String>> classExcludes_;
 
     bool dotNetModule_;
 

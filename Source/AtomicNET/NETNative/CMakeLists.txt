@@ -5,7 +5,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D)
 
-set (CSATOMICDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/")
+set (CSATOMICDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/CSharp/Packages/")
 
 file (GLOB CSHARP_BINDINGS_SOURCE ${CSATOMICDIR}/Atomic/Native/*.cpp ${CSATOMICDIR}/Atomic/Native/*.h
                                   ${CSATOMICDIR}/AtomicNETNative/Native/*.cpp ${CSATOMICDIR}/AtomicNETNative/Native/*.h
@@ -13,9 +13,19 @@ file (GLOB CSHARP_BINDINGS_SOURCE ${CSATOMICDIR}/Atomic/Native/*.cpp ${CSATOMICD
                                   ${CSATOMICDIR}/AtomicApp/Native/*.cpp ${CSATOMICDIR}/AtomicApp/Native/*.h
                                   ${CSATOMICDIR}/AtomicPlayer/Native/*.cpp ${CSATOMICDIR}/AtomicPlayer/Native/*.h )
 
-file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
+file (GLOB SOURCE_FILES *.cpp *.h)
 
-add_library(AtomicNETNative SHARED ${SOURCE_FILES}  ${CSHARP_BINDINGS_SOURCE})
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
+    file (GLOB DESKTOP_SOURCE_FILES Desktop/*.cpp Desktop/*.h)
+    set (SOURCE_FILES ${SOURCE_FILES} ${DESKTOP_SOURCE_FILES})
+endif()
+
+if (ANDROID)
+	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
+	set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+endif()
+
+add_library(AtomicNETNative SHARED ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE})
 
 add_dependencies(AtomicNETNative AtomicToolCheckScripts)
 
@@ -38,6 +48,29 @@ if (APPLE)
 
 endif()
 
+if (MSVC)
+    set (ATOMICNET_NATIVE_PLATFORM Windows)
+elseif(APPLE)
+    if (IOS)
+        set (ATOMICNET_NATIVE_PLATFORM iOS)
+    else()
+        set (ATOMICNET_NATIVE_PLATFORM Mac)
+    endif()
+elseif(LINUX)
+  set (ATOMICNET_NATIVE_PLATFORM Linux)
+elseif(ANDROID)
+    set (ATOMICNET_NATIVE_PLATFORM Android)
+endif()
+
+set (ATOMICNET_NATIVE_DIR "${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>/Native/${ATOMICNET_NATIVE_PLATFORM}")
+
 add_custom_command( TARGET AtomicNETNative POST_BUILD
-                    COMMAND "${CMAKE_COMMAND}" ARGS -E make_directory \"${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>\"
-                    COMMAND "${CMAKE_COMMAND}" ARGS -E copy_if_different \"$<TARGET_FILE:AtomicNETNative>\" \"${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>\" )
+                    COMMAND "${CMAKE_COMMAND}" ARGS -E make_directory "\"${ATOMICNET_NATIVE_DIR}\""
+                    COMMAND "${CMAKE_COMMAND}" ARGS -E copy_if_different \"$<TARGET_FILE:AtomicNETNative>\" "\"${ATOMICNET_NATIVE_DIR}\"" )
+
+if (MSVC)
+
+    # Copy the D3D shader compiler (for pre-Windows 8)
+    add_custom_command( TARGET AtomicNETNative POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"${ATOMICNET_NATIVE_DIR}/D3DCompiler_47.dll\" )
+endif(MSVC)

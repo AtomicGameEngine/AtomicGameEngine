@@ -115,7 +115,7 @@ namespace ToolCore
     }
 
     bool JSBHaxe::IsOverride(JSBFunction* function) {
-        return findFunctionInBase(function);
+        return findFunctionInBase(function) != NULL;
     }
 
     JSBFunction* JSBHaxe::findFunctionInBase(JSBFunction* function) {

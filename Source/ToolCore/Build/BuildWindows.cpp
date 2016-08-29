@@ -28,6 +28,7 @@
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Project/Project.h"
+#include "../Project/ProjectSettings.h"
 #include "../Assets/AssetDatabase.h"
 
 #include "BuildWindows.h"
@@ -91,27 +92,30 @@ bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const Str
     return BuildBase::CheckIncludeResourceFile(resourceDir, fileName);
 }
 
-void BuildWindows::BuildManaged(const String& buildPath)
+bool BuildWindows::BuildManaged(const String& buildPath)
 {
-    BuildLog("Building Managed Application");
-
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     Project* project = toolSystem->GetProject();
+	ProjectSettings* settings = project->GetProjectSettings();
+
+	String projectPath = project->GetProjectPath();
+	String releaseBins = projectPath + "AtomicNET/Release/Bin/Desktop/";
+	String releaseExe = releaseBins + settings->GetName() + ".exe";
+
+	if (!fileSystem->FileExists(releaseExe))
+	{
+		BuildError(ToString("Error building managed project, please compile the release binary %s before building", releaseExe.CString()));
+		return false;
+	}
     
     StringVector results;
     StringVector filtered;
-    fileSystem->ScanDir(results, tenv->GetAtomicNETCoreAssemblyDir(), "", SCAN_FILES, false);
+
+    fileSystem->ScanDir(results, releaseBins, "", SCAN_FILES, false);
 
     StringVector filterList;
-
-    filterList.Push("AtomicIPCPlayer");
-    filterList.Push(".pdb");
-    filterList.Push("System.Collections.Immutable");
-    filterList.Push("System.Reflection.Metadata");
-    filterList.Push("ComponentTest");
-    filterList.Push("AtomicNETService");
 
     StringVector::Iterator itr = results.Begin();
     while (itr != results.End())
@@ -129,23 +133,16 @@ void BuildWindows::BuildManaged(const String& buildPath)
         itr++;
     }
 
-    String playerBinary = tenv->GetAtomicNETManagedPlayerBinary();
-   
-    if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer.exe"))
-        return;
-
     for (unsigned i = 0; i < filtered.Size(); i++)
     {
         String filename = filtered[i];
 
-        if (!BuildCopyFile(tenv->GetAtomicNETCoreAssemblyDir() + filename, buildPath_ + "/" + filename))
-            return;
+        if (!BuildCopyFile(releaseBins + filename, buildPath_ + "/" + filename))
+            return false;
 
     }
-    if (!BuildCopyFile(project->GetResourcePath() + "/AtomicProject.dll", buildPath_ + "/AtomicProject.dll"))
-        return;
 
-   
+	return true;
   
 }
 
@@ -198,6 +195,9 @@ void BuildWindows::Build(const String& buildPath)
     if (buildFailed_)
         return;
 
+	if (resourcesOnly_)
+		return;
+
     if (!BuildCreateDirectory(buildPath_ + "/Settings"))
         return;
 
@@ -209,11 +209,12 @@ void BuildWindows::Build(const String& buildPath)
             return;
     }
 
-    // TODO: Set project as managed and don't key off AtomicProject.dll
+    // TODO: Set project as managed and don't key off project assembly
 
-    if (fileSystem->FileExists(project->GetResourcePath() + "/AtomicProject.dll"))
+    if (fileSystem->FileExists(project->GetResourcePath() + project->GetProjectSettings()->GetName() + ".dll"))
     {
-        BuildManaged(buildPath);
+		if (!BuildManaged(buildPath))
+			return;
     }
     else
     {

@@ -1,0 +1,89 @@
+{
+    "solution" : {
+        "name" : "$ATOMIC_PROJECT_NAME$",
+        "outputPath" : "$ATOMIC_PROJECT_ROOT$/AtomicNET/Solution/"
+    },
+    "projects" : [
+        {
+            "name": "$ATOMIC_PROJECT_NAME$.Shared",
+            "outputType" : "Shared",
+            "projectGuid" : "071BB14E-7518-11E6-A32D-005056C00008",
+            "sources" : [
+                "$ATOMIC_PROJECT_ROOT$/Resources/"
+            ]
+        },
+        {
+            "name": "$ATOMIC_PROJECT_NAME$",
+            "outputType" : "Library",
+            "rootNamespace" : "",
+            "assemblyName" : "$ATOMIC_PROJECT_NAME$",
+            "assemblyOutputPath" : "$ATOMIC_PROJECT_ROOT$\\AtomicNET\\$ATOMIC_CONFIG$\\Bin\\Portable",
+            "projectGuid" : "071BB14F-7518-11E6-BF97-005056C00008",
+            "projectTypeGuids" : ["786C830F-07A1-408B-BD7F-6EE04809D6DB", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"],
+            "targetFrameworkProfile" : "Profile111",
+            "importProjects" : ["$(MSBuildExtensionsPath32)\\Microsoft\\Portable\\$(TargetFrameworkVersion)\\Microsoft.Portable.CSharp.targets"],
+            "references" : [
+                "AtomicNET"
+            ],
+            "sharedReferences" : [
+                "$ATOMIC_PROJECT_NAME$.Shared"
+            ],
+            "sources" : [
+            ]
+        },
+        {
+            "name": "$ATOMIC_PROJECT_NAME$.Desktop",
+            "platforms" : ["desktop"],
+            "outputType" : "Exe",
+            "defineConstants" : ["ATOMIC_DESKTOP"],
+            "rootNamespace" : "",
+            "assemblyName" : "$ATOMIC_PROJECT_NAME$",
+            "assemblyOutputPath" : "$ATOMIC_PROJECT_ROOT$\\AtomicNET\\$ATOMIC_CONFIG$\\Bin\\Desktop",
+            "projectGuid" : "071BB150-7518-11E6-AB1D-005056C00008",
+            "playerApplication" : true,
+            "references" : [
+                "System",
+                "System.Core" ,
+                "System.Xml.Linq",
+                "System.XML",
+                "AtomicNET.Desktop"
+            ],
+            "sharedReferences" : [
+                "$ATOMIC_PROJECT_NAME$.Shared"
+            ],
+            "sources" : [
+                "$ATOMIC_ROOT$/Script/AtomicNET/AtomicPlayer/AtomicPlayer.Common",
+                "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/Desktop"
+            ]
+        },
+        {
+            "name": "$ATOMIC_PROJECT_NAME$.Android",
+            "platforms" : ["android"],
+            "outputType" : "Library",
+            "defineConstants" : ["ATOMIC_ANDROID"],
+            "rootNamespace" : "",
+            "assemblyName" : "$ATOMIC_PROJECT_NAME$",
+            "projectTypeGuids" : ["EFBA0AD7-5A72-4C68-AF49-83D382785DCF", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"],
+            "projectGuid" : "071BD84E-7518-11E6-B60F-005056C00008",
+            "assemblyOutputPath" : "$ATOMIC_PROJECT_ROOT$\\AtomicNET\\$ATOMIC_CONFIG$\\Bin\\Android",
+            "androidApplication" : true,
+            "playerApplication" : true,
+            "references" : [
+                "Mono.Android",
+                "System",
+                "System.Core",
+                "System.Xml.Linq",
+                "System.Xml",
+                "AtomicNET.Android.SDL",
+                "AtomicNET.Android"
+            ],
+            "sharedReferences" : [
+                "$ATOMIC_PROJECT_NAME$.Shared"
+            ],
+            "sources" : [
+                "$ATOMIC_ROOT$/Script/AtomicNET/AtomicPlayer/AtomicPlayer.Common",
+                "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/Android"
+            ]
+        }
+    ]
+}

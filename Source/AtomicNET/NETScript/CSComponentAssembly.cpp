@@ -231,9 +231,7 @@ namespace Atomic
 
     bool CSComponentAssembly::BeginLoad(Deserializer& source)
     {
-        File* file = (File*) &source;
-
-        fullAssemblyPath_ = file->GetFullPath();
+		fullAssemblyPath_ = source.GetName();
 
         VariantMap eventData;
 

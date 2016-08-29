@@ -100,12 +100,6 @@ void BuildCmd::Run()
         return;
     }
 
-    if (!project->ContainsPlatform(platform->GetPlatformID()))
-    {
-        Error(ToString("Project does not contain platform: %s", buildPlatform_.CString()));
-        return;
-    }
-
     // create the build
     BuildBase* buildBase = platform->NewBuild(project);
     if (!assetsBuildTag_.Empty())

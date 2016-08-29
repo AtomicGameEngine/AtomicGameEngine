@@ -61,8 +61,8 @@ namespace('build', function() {
       fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
         editorAppFolder + "Resources/ToolData/AtomicNET/Release");
 
-      fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/D3DCompiler_47.dll",
-        editorAppFolder + "Resources/ToolData/AtomicNET/Release/D3DCompiler_47.dll");
+      fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
+        editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
 
       console.log("Atomic Editor build to ", editorAppFolder);
 

@@ -23,34 +23,28 @@
 
 #pragma once
 
-#include <AtomicApp/IPCClientApp.h>
+#include <AtomicApp/Player/IPCPlayerApp.h>
 
 namespace Atomic
 {
 
-    class NETServiceApplication : public IPCClientApp
+    class NETIPCPlayerApp : public IPCPlayerApp
     {
-        ATOMIC_OBJECT(NETServiceApplication, IPCClientApp)
+        ATOMIC_OBJECT(NETIPCPlayerApp,IPCPlayerApp)
 
     public:
 
-        static NETServiceApplication* CreateInternal();
+        static NETIPCPlayerApp* CreateInternal();
 
         int Initialize();
-
-        bool RunFrame();
-
-        void Shutdown();
 
     private:
 
         /// Construct.
-        NETServiceApplication(Context* context);
+        NETIPCPlayerApp(Context* context);
 
-        /// Setup before engine initialization. 
+        /// Setup before engine initialization.
         virtual void Setup();
-        /// Cleanup after the main loop. 
-        virtual void Stop();
 
     };
 

@@ -49,6 +49,15 @@ namespace Atomic
     void NETIPCPlayerApp::Setup()
     {
         IPCPlayerApp::Setup();
+
+		// TODO: we should always have a --project for IPCPlayer, however it is doing 
+		// double duty right now as managed player
+		StringVector args = GetArguments();
+		if (!args.Contains("--project"))
+		{
+			engineParameters_["ResourcePrefixPaths"] = "AtomicPlayer_Resources";
+			engineParameters_["ResourcePaths"] = "AtomicResources";
+		}
     }
 
     int NETIPCPlayerApp::Initialize()
@@ -73,30 +82,7 @@ namespace Atomic
 
         return 0;
     }
-
-    bool NETIPCPlayerApp::RunFrame()
-    {
-        engine_->RunFrame();
-
-        if (engine_->IsExiting())
-        {            
-            return false;
-        }
-
-        return true;
-        
-    }
     
-    void NETIPCPlayerApp::Shutdown()
-    {
-        Stop();
-    }
-
-    void NETIPCPlayerApp::Stop()
-    {
-        IPCPlayerApp::Stop();
-    }
-
     NETIPCPlayerApp* NETIPCPlayerApp::CreateInternal()
     {
         return new NETIPCPlayerApp(NETCore::GetContext());

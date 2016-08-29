@@ -7,12 +7,9 @@ namespace AtomicEngine
         ///  AtomicPlayer for NET deployments
         /// </summary>
         /// <param name="args"></param>
-        /// <param name="headless"></param>
         /// <returns></returns>
-        public static NETAtomicPlayer Create(string[] args, bool headless = false)
+        public static NETAtomicPlayer Create(string[] args)
         {
-            DeployedApp = true;
-
             // Initialize AtomicNET
             AtomicNET.Initialize();
 
@@ -21,8 +18,6 @@ namespace AtomicEngine
             app.Initialize();
 
             RegisterSubsystems();
-
-            ExecuteAtomicMain(args);
 
             return app;
         }

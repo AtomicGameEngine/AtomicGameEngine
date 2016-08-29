@@ -35,6 +35,7 @@
 
 #include "ProjectEvents.h"
 #include "ProjectFile.h"
+#include "ProjectSettings.h"
 #include "ProjectBuildSettings.h"
 #include "ProjectUserPrefs.h"
 #include "Project.h"
@@ -50,8 +51,10 @@ Project::Project(Context* context) :
     dirty_(false)
 {
     version_ = "1.0.0";
+
+	projectSettings_ = new ProjectSettings(context_);
     userPrefs_ = new ProjectUserPrefs(context_);
-    buildSettings_ = new ProjectBuildSettings(context_);
+    buildSettings_ = new ProjectBuildSettings(context_);	
 }
 
 Project::~Project()
@@ -96,34 +99,15 @@ bool Project::LoadBuildSettings()
     return true;
 }
 
-void Project::AddPlatform(PlatformID platformID)
+bool Project::LoadProjectSettings()
 {
-    if (ContainsPlatform(platformID))
-        return;
-
-    SetDirty();
-
-    platforms_.Push(platformID);
-
+	projectSettings_->Load(GetProjectPath() + "Settings/Project.json");
+	return true;
 }
 
-void Project::RemovePlatform(PlatformID platformID)
+bool Project::GetSupportsPlatform(const String& platform) const
 {
-    if (!ContainsPlatform(platformID))
-        return;
-
-}
-
-bool Project::ContainsPlatform(PlatformID platformID)
-{
-    for (List<PlatformID>::ConstIterator i = platforms_.Begin(); i != platforms_.End(); ++i)
-    {
-        if ((*i) == platformID)
-            return true;
-    }
-
-    return false;
-
+	return projectSettings_->GetSupportsPlatform(platform);
 }
 
 bool Project::Load(const String& fullpath)
@@ -149,12 +133,14 @@ bool Project::Load(const String& fullpath)
 
     loading_ = false;
 
+	LoadProjectSettings();
     LoadBuildSettings();
     LoadUserPrefs();
 
     if ( true /*result*/) {
         VariantMap data;
         data[ProjectLoaded::P_PROJECTPATH] = projectFilePath_;
+		data[ProjectLoaded::P_PROJECT] = this;
         SendEvent(E_PROJECTLOADED, data);
     }
 

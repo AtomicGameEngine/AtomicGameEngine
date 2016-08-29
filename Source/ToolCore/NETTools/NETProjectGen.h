@@ -32,6 +32,7 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+	class ProjectSettings;
     class NETProjectGen;
 
     class NETProjectBase : public Object
@@ -56,6 +57,8 @@ namespace ToolCore
 
     class NETCSProject : public NETProjectBase
     {
+		friend class NETSolution;
+
         ATOMIC_OBJECT(NETCSProject, NETProjectBase)
 
     public:
@@ -71,9 +74,18 @@ namespace ToolCore
         const Vector<String>& GetReferences() const { return references_; }
         const Vector<String>& GetPackages() const { return packages_; }
 
+		bool GetIsPCL() const { return projectTypeGuids_.Contains("{786C830F-07A1-408B-BD7F-6EE04809D6DB}"); }
+
         bool Generate();
 
     private:
+
+		// Portable Class Library
+		bool GenerateShared();
+
+		bool GenerateStandard();
+
+		bool GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output);
 
         bool CreateProjectFolder(const String& path);
 
@@ -85,10 +97,14 @@ namespace ToolCore
         void CreateDebugPropertyGroup(XMLElement &projectRoot);
         void CreateReleasePropertyGroup(XMLElement &projectRoot);
 
-        void CreateCustomCommands(XMLElement &propertyGroup, const String& cfg);
+		void CreateApplicationItems(XMLElement &projectRoot);
+		void CreateAndroidItems(XMLElement &projectRoot);
 
         void CreateAssemblyInfo();
         void GetAssemblySearchPaths(String& paths);
+
+		bool SupportsDesktop() const;
+		bool SupportsPlatform(const String& platform, bool explicitCheck = true) const;
 
         String name_;
         String projectGuid_;
@@ -103,9 +119,26 @@ namespace ToolCore
 
         XMLElement xmlRoot_;
 
+		Vector<String> platforms_;
         Vector<String> references_;
         Vector<String> packages_;
         Vector<String> sourceFolders_;
+
+		Vector<String> defineConstants_;
+
+		Vector<String> projectTypeGuids_;
+		Vector<String> importProjects_;
+		Vector<String> libraryProjectZips_;
+		Vector<String> transformFiles_;
+
+		String targetFrameworkProfile_;
+		Vector<String> sharedReferences_;
+
+		bool playerApplication_;
+
+		// Android
+		bool androidApplication_;
+		
     };
 
     class NETSolution : public NETProjectBase
@@ -154,19 +187,15 @@ namespace ToolCore
         NETProjectGen(Context* context);
         virtual ~NETProjectGen();
 
-        const String& GetScriptPlatform() { return scriptPlatform_; }
-
         NETSolution* GetSolution() { return solution_; }
 
         const Vector<SharedPtr<NETCSProject>>& GetCSProjects() { return projects_; }
-
-        Project* GetAtomicProject() const { return atomicProject_;  }
 
         NETCSProject* GetCSProjectByName(const String& name);
 
         bool GetCSProjectDependencies(NETCSProject * source, PODVector<NETCSProject*>& depends) const;
 
-        void SetScriptPlatform(const String& platform) { scriptPlatform_ = platform; }
+		const String& GetAtomicProjectPath() const { return atomicProjectPath_; }
 
         bool Generate();
 
@@ -178,20 +207,33 @@ namespace ToolCore
         /// If true, the sln file will rewritten if it exists, default is false
         void SetRewriteSolution(bool rewrite);
 
-        bool LoadProject(const JSONValue& root);
-        bool LoadProject(const String& projectPath);
-        bool LoadProject(Project* project);
+        bool LoadJSONProject(const String& jsonProjectPath);
+		bool LoadAtomicProject(const String& atomicProjectPath);
+
+		void AddGlobalDefineConstant(const String& constant) { globalDefineConstants_.Push(constant); }
+		const Vector<String>& GetGlobalDefineConstants() const { return globalDefineConstants_; }
+
+		void SetSupportedPlatforms(const StringVector& platforms);
+		bool GetSupportsPlatform(const String& platform) const;
+
+		ProjectSettings* GetProjectSettings() { return projectSettings_; }
 
     private:
+
+		bool LoadProject(const JSONValue& root);
+
+		/// Returns true if a project is included on the specifed platform
+		bool IncludeProjectOnPlatform(const JSONValue& projectRoot, const String& platform);
 
         // if true, the solution (sln) file will be recreated if it exists
         bool rewriteSolution_;
 
-        String scriptPlatform_;
-
-        SharedPtr<Project> atomicProject_;
+		String atomicProjectPath_;
         SharedPtr<NETSolution> solution_;
+		Vector<String> globalDefineConstants_;
         Vector<SharedPtr<NETCSProject>> projects_;
+
+		SharedPtr<ProjectSettings> projectSettings_;
 
     };
 

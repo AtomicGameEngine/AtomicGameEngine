@@ -38,10 +38,6 @@ namespace Atomic
 
         int Initialize();
 
-        bool RunFrame();
-
-        void Shutdown();
-
     private:
 
         /// Construct.

@@ -19,14 +19,6 @@ namespace('build', function() {
 
     var cmds = [];
 
-    var scriptModules = host.getScriptModules("ANDROID");
-    var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
-
-    // Generate bindings for each script package
-    for (var pkgName in scriptModules) {
-      cmds.push(bindCmd + "Script/Packages/" + pkgName + "/ ANDROID")
-    }
-
     if (os.platform() == "win32") {
       cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAndroid.bat");
     }

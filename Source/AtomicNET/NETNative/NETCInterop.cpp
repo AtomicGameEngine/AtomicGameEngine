@@ -113,10 +113,13 @@ namespace Atomic
         // IPC
         ATOMIC_EXPORT_API void csi_Atomic_IPC_SendEventToBrokerWithEventData(IPC* ipc, const char* eventType, ScriptVariantMap* variantMap)
         {
+
+#ifdef ATOMIC_PLATFORM_DESKTOP
             if (variantMap)
                 ipc->SendEventToBroker(eventType, variantMap->GetVariantMap());
             else
                 ipc->SendEventToBroker(eventType);
+#endif
 
         }
 
