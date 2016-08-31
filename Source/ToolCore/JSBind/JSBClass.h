@@ -24,6 +24,7 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "JSBindTypes.h"
 #include "JSBHeader.h"
 #include "JSBModule.h"
 
@@ -127,6 +128,10 @@ public:
     PODVector<JSBClass*>& GetBaseClasses() {return baseClasses_; }
     PODVector<JSBFunction*>& GetFunctions() { return functions_; }
 
+    // Get all functions, including those in base classes
+    void GetAllFunctions(PODVector<JSBFunction*>& functions);
+
+    bool IsGeneric() { return isGeneric_; }
     bool IsAbstract() { return isAbstract_; }
 
     /// Note that if we at some point want to generate bindings for JSBClass
@@ -155,10 +160,11 @@ public:
     int  GetNumberArrayElements() { return numberArrayElements_;}
     const String& GetArrayElementType() const { return arrayElementType_; }
 
-    JSBFunction* GetConstructor();
+    JSBFunction* GetConstructor(BindingLanguage bindingLanguage = BINDINGLANGUAGE_ANY );
 
     void SetAbstract(bool value = true) { isAbstract_ = value; }
     void SetObject(bool value = true) { isObject_ = value; }
+    void SetGeneric(bool value = true) { isGeneric_ = value; }
     void SetHeader(JSBHeader* header) { header_ = header; }
     void SetBaseClass(JSBClass* baseClass);
 
@@ -203,6 +209,7 @@ private:
 
     bool isAbstract_;
     bool isObject_;
+    bool isGeneric_;
 
     // Vector3, Color, etc are marshalled via arrays
     int numberArrayElements_;

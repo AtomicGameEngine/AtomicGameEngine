@@ -14,8 +14,6 @@ namespace AtomicEngine
             return AtomicNET.GetSubsystem<T>();
         }
 
-
-
         internal void HandleEvent(uint eventType, ScriptVariantMap eventData)
         {
             eventHandlers[eventType](eventType, eventData);
@@ -36,12 +34,12 @@ namespace AtomicEngine
         public void SendEvent(string eventType, ScriptVariantMap eventData = null)
         {
 
-            csb_Atomic_AObject_SendEvent(this.nativeInstance, eventType, eventData == null ? IntPtr.Zero : eventData.nativeInstance);
+            csi_Atomic_AObject_SendEvent(this.nativeInstance, eventType, eventData == null ? IntPtr.Zero : eventData.nativeInstance);
 
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern void csb_Atomic_AObject_SendEvent(IntPtr self, string eventType, IntPtr variantMap);
+        private static extern void csi_Atomic_AObject_SendEvent(IntPtr self, string eventType, IntPtr variantMap);
 
 
     }

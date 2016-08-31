@@ -111,7 +111,7 @@ void JSBTypeScript::End()
 
 void JSBTypeScript::ExportFunction(JSBFunction* function)
 {
-    if (function->Skip())
+    if (function->Skip(BINDINGLANGUAGE_JAVASCRIPT))
         return;
 
     String scriptName = "constructor";
@@ -228,11 +228,11 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
             JSBFunctionType* ftype = NULL;
 
-            if (prop->getter_ && !prop->getter_->Skip())
+            if (prop->getter_ && !prop->getter_->Skip(BINDINGLANGUAGE_JAVASCRIPT))
             {
                 ftype = prop->getter_->GetReturnType();
             }
-            else if (prop->setter_ && !prop->setter_->Skip())
+            else if (prop->setter_ && !prop->setter_->Skip(BINDINGLANGUAGE_JAVASCRIPT))
                 ftype = prop->setter_->GetParameters()[0];
 
             if (!ftype)
@@ -248,7 +248,7 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
         if (propertyNames.Size())
             source_ += "\n";
 
-        JSBFunction* constructor = klass->GetConstructor();
+        JSBFunction* constructor = klass->GetConstructor(BINDINGLANGUAGE_JAVASCRIPT);
         if (constructor)
         {
             ExportFunction(constructor);
@@ -262,7 +262,7 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
             JSBFunction* func = functions[j];
 
-            if (func->IsConstructor() || func->IsDestructor() || func->Skip())
+            if (func->IsConstructor() || func->IsDestructor() || func->Skip(BINDINGLANGUAGE_JAVASCRIPT))
                 continue;
 
             ExportFunction(func);

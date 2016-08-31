@@ -188,9 +188,13 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     String line;
 
     if (klass_->GetBaseClass())
-        line = "public partial class " + klass_->GetName() + " : " + klass_->GetBaseClass()->GetName() + "\n";
+    {
+        line = ToString("public partial class %s%s : %s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "", klass_->GetBaseClass()->GetName().CString());
+    }
     else
-        line = "public partial class " + klass_->GetName() + "\n";
+    {
+        line = ToString("public partial class %s%s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "");
+    }
 
 
     source += IndentLine(line);
@@ -215,7 +219,9 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     Dedent();
 
     // managed functions
-    bool wroteConstructor = false;
+
+    CSFunctionWriter::SetWroteConstructor(false);
+
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)
     {
         JSBFunction* function = klass_->functions_.At(i);
@@ -229,9 +235,6 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         if (CSTypeHelper::OmitFunction(function))
             continue;
 
-        if (function->IsConstructor())
-            wroteConstructor = true;
-
         CSFunctionWriter fwriter(function);
         fwriter.GenerateManagedSource(source);
 
@@ -239,7 +242,7 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
 
     // There are some constructors being skipped (like HTTPRequest as it uses a vector of strings in args)
     // Make sure we have at least a IntPtr version
-    if (!wroteConstructor)
+    if (!CSFunctionWriter::GetWroteConstructor() && klass_->GetName() != "RefCounted")
     {
         ATOMIC_LOGINFOF("WARNING: %s class didn't write a constructor, filling in generated native constructor", klass_->GetName().CString());
 
@@ -248,6 +251,8 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         source += IndentLine("{\n");
         source += IndentLine("}\n\n");
     }
+
+    CSFunctionWriter::SetWroteConstructor(false);
 
     source += IndentLine("}\n");
 

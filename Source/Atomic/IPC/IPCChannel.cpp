@@ -99,7 +99,7 @@ bool IPCChannel::Receive()
             break;
 
         VectorBuffer newBuffer;
-        newBuffer.Write(dataBuffer_.GetData() + dataBuffer_.GetPosition(), dataBuffer_.GetSize() - dataBuffer_.GetPosition());
+        newBuffer.SetData(dataBuffer_.GetData() + dataBuffer_.GetPosition(), dataBuffer_.GetSize() - dataBuffer_.GetPosition());
         newBuffer.Seek(0);
         dataBuffer_ = newBuffer;
     }

@@ -23,6 +23,7 @@
 #pragma once
 
 #include <Atomic/IO/Log.h>
+#include "JSBindTypes.h"
 #include "JSBClass.h"
 #include "JSBType.h"
 #include "JSBSymbol.h"
@@ -50,6 +51,12 @@ public:
     {
         if (!other)
             return false;
+
+        if (type_->asStringType() || type_->asStringHashType())
+        {
+           if (other->type_->asStringType() || other->type_->asStringHashType())
+               return true;
+        }
 
         if (isSharedPtr_ != other->isSharedPtr_)
             return false;
@@ -130,14 +137,7 @@ class JSBFunction : public JSBSymbol
 
 public:
 
-    JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
-                                   isConstructor_(false), isDestructor_(false),
-                                   isGetter_(false), isSetter_(false),
-                                   isOverload_(false), skip_(false),
-                                   isVirtual_(false), isStatic_(false)
-    {
-
-    }
+    JSBFunction(JSBClass* klass);
 
     const String& GetName() { return name_; }
 
@@ -150,7 +150,16 @@ public:
     bool IsOverload() { return isOverload_; }
     bool IsVirtual() { return isVirtual_; }
     bool IsStatic() { return isStatic_; }
-    bool Skip() { return skip_; }
+
+    bool Skip(BindingLanguage language = BINDINGLANGUAGE_ANY)
+    {
+        if (skip_ || language == BINDINGLANGUAGE_ANY)
+            return skip_;
+
+        return GetSkipLanguage(language);
+    }
+
+    unsigned GetID() const { return id_; }
 
     JSBClass* GetClass() { return class_; }
     const String& GetPropertyName() { return propertyName_; }
@@ -174,6 +183,31 @@ public:
     void SetSkip(bool value) { skip_ = value; }
     void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
     void SetDocString(const String& docString) { docString_ = docString; }
+
+    void SetSkipLanguage(BindingLanguage language, bool skip = true)
+    {
+        if (skip)
+        {
+            if (!skipLanguages_.Contains(language))
+                skipLanguages_.Push(language);
+        }
+        else
+        {
+            if (skipLanguages_.Contains(language))
+                skipLanguages_.Remove(language);
+
+        }
+    }
+
+    /// Returns true is _skip is set or skip is set for specific binding language
+    bool GetSkipLanguage(BindingLanguage language) const
+    {
+        if (skip_)
+            return true;
+
+        return skipLanguages_.Contains(language);
+
+    }
 
     int FirstDefaultParameter()
     {
@@ -226,6 +260,9 @@ public:
 
 private:
 
+    unsigned id_;
+    static unsigned idCounter_;
+
     SharedPtr<JSBClass> class_;
 
     String name_;
@@ -244,7 +281,7 @@ private:
     bool isVirtual_;
     bool isStatic_;
     bool skip_;
-
+    PODVector<BindingLanguage> skipLanguages_;
 };
 
 }

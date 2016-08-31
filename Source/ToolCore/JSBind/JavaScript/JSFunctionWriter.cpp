@@ -511,9 +511,20 @@ void JSFunctionWriter::WriteFunction(String& source)
         }
         else if (returnType->type_->asVectorType())
         {
+            JSBType* vectorType = returnType->type_->asVectorType()->vectorType_;
+
             source.Append("duk_push_array(ctx);\n");
             source.Append("for (unsigned i = 0; i < retValue.Size(); i++)\n{\n");
-            source.Append("duk_push_string(ctx, retValue[i].CString());\n");
+
+            if (vectorType->asClassType())
+            {
+                source.AppendWithFormat("js_push_class_object_instance(ctx, retValue[i], \"%s\");\n", vectorType->asClassType()->class_->GetName().CString());
+            }
+            else
+            {
+                source.Append("duk_push_string(ctx, retValue[i].CString());\n");
+            }
+
             source.Append("duk_put_prop_index(ctx, -2, i);\n}\n");
         }
 

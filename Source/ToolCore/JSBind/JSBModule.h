@@ -107,6 +107,8 @@ private:
     Vector<String> sourceDirs_;
     Vector<String> classnames_;
 
+    Vector<String> genericClassnames_;
+
     HashMap<String, String> classRenames_;
 
     // native name -> JSBClass

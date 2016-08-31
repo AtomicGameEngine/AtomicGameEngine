@@ -92,6 +92,8 @@ void CSModuleWriter::WriteIncludes(String& source)
         included.Push(header);
     }
 
+    source += "\n#include <Atomic/Script/ScriptVector.h>\n";
+
     source += ToString("\n#include \"CSPackage%s.h\"\n", module_->GetPackage()->GetName().CString());
 
 }

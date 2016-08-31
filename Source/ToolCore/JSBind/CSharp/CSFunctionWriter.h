@@ -46,6 +46,8 @@ public:
     void GenerateNativeSource(String& sourceOut);
     void GenerateManagedSource(String& sourceOut);
 
+    static void SetWroteConstructor(bool value) { wroteConstructor_ = value; }
+    static bool GetWroteConstructor() { return wroteConstructor_; }
 
 private:
 
@@ -55,6 +57,8 @@ private:
         String parameterName;
         String assignment;
     };
+
+    static bool wroteConstructor_;
 
     Vector<DefaultStructParameter> defaultStructParameters_;
 

@@ -28,11 +28,11 @@ namespace AtomicEngine
     {
         public void CopyVariantMap(IntPtr vm)
         {
-            csb_Atomic_AtomicNET_ScriptVariantMapCopyVariantMap(nativeInstance, vm);
+            csi_Atomic_AtomicNET_ScriptVariantMapCopyVariantMap(nativeInstance, vm);
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csb_Atomic_AtomicNET_ScriptVariantMapCopyVariantMap(IntPtr svm, IntPtr vm);
+        private static extern IntPtr csi_Atomic_AtomicNET_ScriptVariantMapCopyVariantMap(IntPtr svm, IntPtr vm);
 
     }
 

@@ -150,7 +150,7 @@ public:
         if (!other)
             return false;
 
-        return other->asStringType() == 0 ? false : true;
+        return (other->asStringType() == 0 && other->asStringHashType() == 0) ? false : true;
     }
 
 
@@ -169,7 +169,7 @@ public:
         if (!other)
             return false;
 
-        return other->asStringHashType() == 0 ? false : true;
+        return (other->asStringHashType() == 0 && other->asStringType() == 0)  ? false : true;
     }
 
 };
@@ -225,13 +225,14 @@ class JSBVectorType : public JSBType
 
 public:
 
-    JSBType* vectorType_;
-
-    JSBVectorType(JSBType* vtype) : vectorType_(vtype) {}
+    JSBVectorType(JSBType* vtype, bool podVector = false) : vectorType_(vtype),
+        vectorTypeIsWeakPtr_(false),
+        vectorTypeIsSharedPtr_(false),
+        isPODVector_(podVector) {}
 
     virtual JSBVectorType* asVectorType() { return this; }
 
-    String ToString() { return "Vector<" + vectorType_->ToString() + ">"; }
+    String ToString();
 
     virtual bool Match (JSBType* other)
     {
@@ -245,6 +246,11 @@ public:
 
         return true;
     }
+
+    JSBType* vectorType_;
+    bool vectorTypeIsWeakPtr_;
+    bool vectorTypeIsSharedPtr_;
+    bool isPODVector_;
 
 };
 

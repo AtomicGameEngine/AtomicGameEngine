@@ -28,6 +28,12 @@ namespace AtomicEngine
             Type[] updateParms = new Type[1] { typeof(float) };
             UpdateMethod = type.GetMethod("Update", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, updateParms, null);
 
+            Type[] postUpdateParms = new Type[1] { typeof(float) };
+            PostUpdateMethod = type.GetMethod("PostUpdate", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, postUpdateParms, null);
+
+            Type[] fixedUpdateParms = new Type[1] { typeof(float) };
+            FixedUpdateMethod = type.GetMethod("FixedUpdate", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, fixedUpdateParms, null);
+
             Type[] startParms = new Type[0] { };
             StartMethod = type.GetMethod("Start", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, startParms, null);
 
@@ -106,6 +112,47 @@ namespace AtomicEngine
 
         }
 
+        public void FixedUpdate(Object[] args)
+        {
+            if (FixedUpdateMethod == null)
+                return;
+
+            foreach (var instance in Instances)
+            { 
+                var node = instance.Node;
+
+                if (node != null && node.IsEnabled())
+                {
+
+                    if (node.Scene != null)
+                    {
+                        FixedUpdateMethod.Invoke(instance, args);
+                    }
+                }
+            }
+        }
+
+        public void PostUpdate(Object[] args)
+        {
+            if (PostUpdateMethod == null)
+                return;
+
+            foreach (var instance in Instances)
+            {
+                var node = instance.Node;
+
+                if (node != null && node.IsEnabled())
+                {
+
+                    if (node.Scene != null)
+                    {
+                        PostUpdateMethod.Invoke(instance, args);
+                    }
+                }
+            }
+        }
+
+
         public void Update(Object[] args)
         {
             if (StartMethod != null)
@@ -175,8 +222,11 @@ namespace AtomicEngine
         public FieldInfo[] InspectorFields;
         public Type Type;
 
-        public MethodInfo UpdateMethod = null;
+        public MethodInfo FixedUpdateMethod = null;
+        public MethodInfo PostUpdateMethod = null;
+        public MethodInfo UpdateMethod = null;        
         public MethodInfo StartMethod = null;
+        
 
         ScriptVariantMap fieldMap = new ScriptVariantMap();
 
@@ -201,6 +251,31 @@ namespace AtomicEngine
             }
 
         }
+
+        void HandlePhysicsPreStep(uint eventType, ScriptVariantMap eventData)
+        {
+            // TODO: eventData also has a PhysicsWorld pointer, which could be factored in for multiworld support
+
+            Object[] args = new Object[1] { eventData.GetFloat("timestep") };
+
+            foreach (var csinfo in csinfoLookup.Values)
+            {
+                csinfo.FixedUpdate(args);
+            }
+
+        }
+
+        void HandlePostUpdate(uint eventType, ScriptVariantMap eventData)
+        {
+            Object[] args = new Object[1] { eventData.GetFloat("timestep") };
+
+            foreach (var csinfo in csinfoLookup.Values)
+            {
+                csinfo.PostUpdate(args);
+            }
+
+        }
+
 
         void HandleComponentLoad(uint eventType, ScriptVariantMap eventData)
         {
@@ -272,10 +347,16 @@ namespace AtomicEngine
         internal static void Initialize()
         {
             instance = new CSComponentCore();
-
+            
             instance.SubscribeToEvent("CSComponentAssemblyReference", instance.HandleComponentAssemblyReference);
             instance.SubscribeToEvent("CSComponentLoad", instance.HandleComponentLoad);
             instance.SubscribeToEvent("Update", instance.HandleUpdate);
+
+            // PhysicsPreStep gets mapped to FixedUpdate
+            instance.SubscribeToEvent("PhysicsPreStep", instance.HandlePhysicsPreStep);
+
+            instance.SubscribeToEvent("PostUpdate", instance.HandlePostUpdate);
+
         }
 
         Dictionary<string, Dictionary<string, CSComponentInfo>> componentCache = new Dictionary<string, Dictionary<string, CSComponentInfo>>();

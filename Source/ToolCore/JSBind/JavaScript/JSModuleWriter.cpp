@@ -91,13 +91,13 @@ void JSModuleWriter::WriteClassDeclaration(String& source)
 
                 source.Append("duk_push_object(ctx);\n");
 
-                if (prop->getter_ && !prop->getter_->Skip())
+                if (prop->getter_ && !prop->getter_->Skip(BINDINGLANGUAGE_JAVASCRIPT))
                 {
                     source.AppendWithFormat("duk_push_c_function(ctx, jsb_class_%s_%s, 0);\n",
                                             klass->GetName().CString(), prop->getter_->GetName().CString());
                     source.Append("duk_put_prop_string(ctx, -2, \"get\");\n");
                 }
-                if (prop->setter_ && !prop->setter_->Skip())
+                if (prop->setter_ && !prop->setter_->Skip(BINDINGLANGUAGE_JAVASCRIPT))
                 {
                     source.AppendWithFormat("duk_push_c_function(ctx, jsb_class_%s_%s, 1);\n",
                                             klass->GetName().CString(), prop->setter_->GetName().CString());

@@ -195,7 +195,7 @@ void JSBDoc::ExportModuleClasses(JSBModule* module)
 
         }
 
-        JSBFunction* constructor = klass->GetConstructor();
+        JSBFunction* constructor = klass->GetConstructor(BINDINGLANGUAGE_JAVASCRIPT);
         if (constructor)
         {
             String docs = GenFunctionDoc(constructor);
