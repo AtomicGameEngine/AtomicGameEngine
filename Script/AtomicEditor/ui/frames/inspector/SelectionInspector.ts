@@ -168,6 +168,8 @@ class CSComponentSection extends ComponentSection {
 
         super(editType, inspector);
 
+        this.updateTextFromClassAttr();
+
         this.hasDynamicAttr = true;
 
         this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
@@ -187,7 +189,7 @@ class CSComponentSection extends ComponentSection {
 
           var attrInfos = csc.getAttributes();
           this.updateDynamicAttrInfos(attrInfos);
-
+          this.updateTextFromClassAttr();
         }
 
     }
@@ -203,6 +205,17 @@ class CSComponentSection extends ComponentSection {
         var attrInfos = csc.getAttributes();
         this.updateDynamicAttrInfos(attrInfos);
 
+    }
+
+    private updateTextFromClassAttr() {
+        this.text = this.editType.typeName;
+
+        var object = this.editType.getFirstObject();
+        if (object) {
+            var value = object.getAttribute("Class");
+            if (value)
+                this.text = value;
+        }
     }
 
 }
