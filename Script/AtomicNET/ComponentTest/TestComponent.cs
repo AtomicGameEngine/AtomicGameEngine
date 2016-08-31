@@ -40,7 +40,7 @@ namespace ComponentTest
         [Inspector("Textures/chest.png")]
         public Sprite2D MySprite2DValue;
 
-        [Inspector(DefaultValue = "Textures/chest.png")]
+        [Inspector(DefaultValue : "Textures/chest.png")]
         public Sprite2D MyOtherSprite2DValue;
     }
 

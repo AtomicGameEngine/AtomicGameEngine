@@ -1,17 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace AtomicEngine
 {
 
+    [AttributeUsage(AttributeTargets.Field)]
     public class InspectorAttribute : Attribute
     {
         public InspectorAttribute(string DefaultValue = "")
         {
         }
 
-        public string DefaultValue;
+        public readonly string DefaultValue;
     }
 
 }
