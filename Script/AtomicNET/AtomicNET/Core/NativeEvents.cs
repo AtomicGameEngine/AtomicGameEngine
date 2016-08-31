@@ -1,16 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace AtomicEngine
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void EventDispatchDelegate(uint eventType, IntPtr eventData);
+    public delegate void EventDispatchDelegate(IntPtr sender, uint eventType, IntPtr eventData);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void UpdateDispatchDelegate(float timeStep);
 
     public delegate void EventDelegate(uint eventType, ScriptVariantMap eventData);
+
+    public delegate void SenderEventDelegate(AObject sender, uint eventType, ScriptVariantMap eventData);
 
     public delegate void HandleUpdateDelegate(float timeStep);
 
