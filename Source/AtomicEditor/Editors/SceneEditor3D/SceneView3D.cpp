@@ -229,6 +229,11 @@ void SceneView3D::MoveCamera(float timeStep)
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
         pitch_ = Atomic::Clamp(pitch_, -90.0f, 90.0f);
+        input->SetMouseVisible(false);
+    }
+    else
+    {
+        input->SetMouseVisible(true);
     }
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
