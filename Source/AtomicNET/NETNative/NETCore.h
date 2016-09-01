@@ -28,7 +28,7 @@
 namespace Atomic
 {
 
-typedef void (*NETCoreEventDispatchFunction)(RefCounted* refCounted, unsigned eventID, VariantMap* eventData);
+typedef void (*NETCoreEventDispatchFunction)(Object* refCounted, unsigned eventID, VariantMap* eventData);
 typedef void (*NETCoreUpdateDispatchFunction)(float timeStep);
 
 struct NETCoreDelegates
@@ -54,7 +54,7 @@ public:
 
     static void RegisterNETEventType(unsigned eventType);
 
-    inline static void DispatchEvent(RefCounted* refCounted, unsigned eventID, VariantMap* eventData = nullptr) { eventDispatch_(refCounted, eventID, eventData); }
+    inline static void DispatchEvent(Object* refCounted, unsigned eventID, VariantMap* eventData = nullptr) { eventDispatch_(refCounted, eventID, eventData); }
     inline static void DispatchUpdateEvent(float timeStep) { if (updateDispatch_) updateDispatch_(timeStep); }
 
     /// We access this directly in binding code, where there isn't a context

@@ -37,15 +37,15 @@ namespace AtomicEngine
 
         static internal void SubscribeToEvent(AObject receiver, AObject sender, uint eventType)
         {
-            List<EventReceiver> eventReceivers;
+            List<EventSubscription> eventReceivers;
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
-                eventReceivers = eventReceiverLookup[eventType] = new List<EventReceiver>();
+                eventReceivers = eventReceiverLookup[eventType] = new List<EventSubscription>();
             }
 
             AObject obj;
-            foreach (EventReceiver er in eventReceivers)
+            foreach (EventSubscription er in eventReceivers)
             {
                 if (!er.Receiver.TryGetTarget(out obj))
                     continue; // GC'd
@@ -82,7 +82,7 @@ namespace AtomicEngine
                 }
             }
 
-            eventReceivers.Add(new EventReceiver(receiver, nativeSender));
+            eventReceivers.Add(new EventSubscription(receiver, nativeSender));
         }
 
         static internal void UnsubscribeFromEvent(AObject receiver, uint eventType)
@@ -92,12 +92,12 @@ namespace AtomicEngine
 
         static internal void UnsubscribeFromEvent(AObject receiver, RefCounted sender, uint eventType)
         {
-            List<EventReceiver> eventReceivers;
+            List<EventSubscription> eventReceivers;
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
                 return;
 
             AObject obj;
-            foreach (EventReceiver er in eventReceivers)
+            foreach (EventSubscription er in eventReceivers)
             {
                 if (!er.Receiver.TryGetTarget(out obj))
                     continue; // GC'd
@@ -125,7 +125,7 @@ namespace AtomicEngine
 
         public static void EventDispatch(IntPtr sender, uint eventType, IntPtr eventData)
         {
-            List<EventReceiver> eventReceivers;
+            List<EventSubscription> eventReceivers;
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
@@ -149,7 +149,7 @@ namespace AtomicEngine
             // iterate over copy of list so we can modify it while running
             ScriptVariantMap scriptMap = null;
             AObject receiver;
-            foreach (EventReceiver er in eventReceivers.ToList())
+            foreach (EventSubscription er in eventReceivers.ToList())
             {
                 // GC'd?
                 if (!er.Receiver.TryGetTarget(out receiver))
@@ -193,9 +193,9 @@ namespace AtomicEngine
 
             AObject obj;
 
-            foreach (List<EventReceiver> receiverList in eventReceiverLookup.Values)
+            foreach (List<EventSubscription> receiverList in eventReceiverLookup.Values)
             {
-                foreach (EventReceiver er in receiverList.ToList())
+                foreach (EventSubscription er in receiverList.ToList())
                 {
                     if (!er.Receiver.TryGetTarget(out obj))
                     {
@@ -403,7 +403,7 @@ namespace AtomicEngine
         internal static Dictionary<IntPtr, WeakReference<RefCounted>> nativeLookup = new Dictionary<IntPtr, WeakReference<RefCounted>>();
 
         // weak references here, hold a ref native side
-        internal static Dictionary<uint, List<EventReceiver>> eventReceiverLookup = new Dictionary<uint, List<EventReceiver>>();
+        internal static Dictionary<uint, List<EventSubscription>> eventReceiverLookup = new Dictionary<uint, List<EventSubscription>>();
 
 
         // Native ClassID to NativeType lookup
@@ -416,12 +416,12 @@ namespace AtomicEngine
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern void csi_AtomicEngine_ReleaseRef(IntPtr refCounted);
 
-        internal struct EventReceiver
+        internal struct EventSubscription
         {
             public WeakReference<AObject> Receiver;
             public IntPtr Sender;
 
-            public EventReceiver(AObject obj, IntPtr source)
+            public EventSubscription(AObject obj, IntPtr source)
             {
                 Receiver = new WeakReference<AObject>(obj);
                 Sender = source;
