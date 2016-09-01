@@ -17,210 +17,235 @@ using File = System.IO.File;
 namespace AtomicTools
 {
 
-	class AssemblyInspector
-	{
+    class AssemblyInspector
+    {
 
-		Dictionary<string, InspectorEnum> InspectorEnums = new Dictionary<string, InspectorEnum> ();
-		Dictionary<string, InspectorComponent> InspectorComponents = new Dictionary<string, InspectorComponent> ();
+        Dictionary<string, InspectorEnum> InspectorEnums = new Dictionary<string, InspectorEnum>();
+        Dictionary<string, InspectorComponent> InspectorComponents = new Dictionary<string, InspectorComponent>();
 
-		PEReader peFile;
-		MetadataReader metaReader;
+        PEReader peFile;
+        MetadataReader metaReader;
 
-		public AssemblyInspector ()
-		{
+        public AssemblyInspector()
+        {
 
-		}
+        }
 
-		public string DumpToJSON ()
-		{
-			var dict = new Dictionary<string, object> ();
+        public string DumpToJSON()
+        {
+            var dict = new Dictionary<string, object>();
 
-			var enumList = new List<object> ();
-			var componentList = new List<object> ();
+            var enumList = new List<object>();
+            var componentList = new List<object>();
 
-			foreach (var entry in InspectorEnums) {
-				enumList.Add (entry.Value.GetJSONDict ());
-			}
+            foreach (var entry in InspectorEnums)
+            {
+                enumList.Add(entry.Value.GetJSONDict());
+            }
 
-			foreach (var entry in InspectorComponents) {
-				componentList.Add (entry.Value.GetJSONDict ());
-			}
+            foreach (var entry in InspectorComponents)
+            {
+                componentList.Add(entry.Value.GetJSONDict());
+            }
 
-			dict ["enums"] = enumList;
-			dict ["components"] = componentList;
+            dict["enums"] = enumList;
+            dict["components"] = componentList;
 
-			return MiniJSON.Json.Serialize (dict);
+            return MiniJSON.Json.Serialize(dict);
 
-		}
+        }
 
-		public void Inspect (String pathToAssembly)
-		{
+        public void Inspect(String pathToAssembly)
+        {
 
-			using (var stream = File.OpenRead (pathToAssembly))
-			using (peFile = new PEReader (stream)) {
+            using (var stream = File.OpenRead(pathToAssembly))
+            using (peFile = new PEReader(stream))
+            {
 
-				metaReader = peFile.GetMetadataReader ();
+                metaReader = peFile.GetMetadataReader();
 
-				ParseEnums ();
-				ParseComponents ();
-			}
+                ParseEnums();
+                ParseComponents();
+            }
 
-		}
+        }
 
-		void ParseComponents ()
-		{
+        void ParseComponents()
+        {
 
-			foreach (var handle in metaReader.TypeDefinitions) {
+            foreach (var handle in metaReader.TypeDefinitions)
+            {
 
-				var typeDef = metaReader.GetTypeDefinition (handle);
+                var typeDef = metaReader.GetTypeDefinition(handle);
 
-				var baseTypeHandle = typeDef.BaseType;
+                var parentName = metaReader.GetString(typeDef.Name);
 
-				if (baseTypeHandle.Kind == HandleKind.TypeReference) {
+                var baseTypeHandle = typeDef.BaseType;
 
-					var typeRef = metaReader.GetTypeReference ((TypeReferenceHandle)baseTypeHandle);
+                // Work up to base reference (ie defined outside this assembly)
+                while (baseTypeHandle.Kind == HandleKind.TypeDefinition)
+                {
+                    var baseTypeDef = metaReader.GetTypeDefinition((TypeDefinitionHandle)baseTypeHandle);
+                    // No way to predetermine if .BaseType is valid
+                    try
+                    {
+                        baseTypeHandle = baseTypeDef.BaseType;
+                    }
+                    catch (Exception) { break; }
+                }
 
-                    var name = metaReader.GetString (typeRef.Name); 
+                if (baseTypeHandle.Kind == HandleKind.TypeReference)
+                {
 
-					if (name != "CSComponent")
-						continue;
+                    var typeRef = metaReader.GetTypeReference((TypeReferenceHandle)baseTypeHandle);
 
-					var inspector = new CSComponentInspector (typeDef, peFile, metaReader);
+                    var name = metaReader.GetString(typeRef.Name);
 
-					var icomponent = inspector.Inspect ();
+                    if (name != "CSComponent")
+                        continue;
 
-					if (icomponent != null)
-						InspectorComponents [icomponent.Name] = icomponent;
-				}
-			}
-		}
+                    var inspector = new CSComponentInspector(typeDef, peFile, metaReader);
 
+                    var icomponent = inspector.Inspect();
 
-		void ParseEnums ()
-		{
-			foreach (var handle in metaReader.TypeDefinitions) {
+                    if (icomponent != null)
+                        InspectorComponents[icomponent.Name] = icomponent;
+                }
+            }
+        }
 
-				var typeDef = metaReader.GetTypeDefinition (handle);
 
-				var baseTypeHandle = typeDef.BaseType;
+        void ParseEnums()
+        {
+            foreach (var handle in metaReader.TypeDefinitions)
+            {
 
-				if (baseTypeHandle.Kind == HandleKind.TypeReference) {
-					var typeRef = metaReader.GetTypeReference ((TypeReferenceHandle)baseTypeHandle);
+                var typeDef = metaReader.GetTypeDefinition(handle);
 
-					if (metaReader.GetString (typeRef.Name) == "Enum") {
-						ParseEnum (typeDef);
-					}
-				}
-			}
-		}
+                var baseTypeHandle = typeDef.BaseType;
 
-		void ParseEnum (TypeDefinition enumTypeDef)
-		{
+                if (baseTypeHandle.Kind == HandleKind.TypeReference)
+                {
+                    var typeRef = metaReader.GetTypeReference((TypeReferenceHandle)baseTypeHandle);
 
-			// TODO: verify that int32 is the enums storage type for constant read below
+                    if (metaReader.GetString(typeRef.Name) == "Enum")
+                    {
+                        ParseEnum(typeDef);
+                    }
+                }
+            }
+        }
 
-			InspectorEnum ienum = new InspectorEnum ();
+        void ParseEnum(TypeDefinition enumTypeDef)
+        {
 
-			ienum.Name = metaReader.GetString (enumTypeDef.Name);
+            // TODO: verify that int32 is the enums storage type for constant read below
 
-			InspectorEnums [ienum.Name] = ienum;
+            InspectorEnum ienum = new InspectorEnum();
 
-			var fields = enumTypeDef.GetFields ();
+            ienum.Name = metaReader.GetString(enumTypeDef.Name);
 
-			foreach (var fieldHandle in fields) {
+            InspectorEnums[ienum.Name] = ienum;
 
-				var inspectorField = new InspectorField ();
+            var fields = enumTypeDef.GetFields();
 
-				var fieldDef = metaReader.GetFieldDefinition (fieldHandle);
+            foreach (var fieldHandle in fields)
+            {
 
-				if ((fieldDef.Attributes & FieldAttributes.HasDefault) != 0) {
+                var inspectorField = new InspectorField();
 
-					var constantHandle = fieldDef.GetDefaultValue ();
-					var constant = metaReader.GetConstant (constantHandle);
+                var fieldDef = metaReader.GetFieldDefinition(fieldHandle);
 
-					BlobReader constantReader = metaReader.GetBlobReader (constant.Value);
+                if ((fieldDef.Attributes & FieldAttributes.HasDefault) != 0)
+                {
 
-					ienum.Values [metaReader.GetString (fieldDef.Name)] = constantReader.ReadInt32 ();
+                    var constantHandle = fieldDef.GetDefaultValue();
+                    var constant = metaReader.GetConstant(constantHandle);
 
-				}
-			}
+                    BlobReader constantReader = metaReader.GetBlobReader(constant.Value);
 
-			return;
+                    ienum.Values[metaReader.GetString(fieldDef.Name)] = constantReader.ReadInt32();
 
-		}
-	}
+                }
+            }
 
-	internal class InspectorEnum
-	{
-		public String Name;
-		public Dictionary<string, int> Values = new Dictionary<string, int> ();
+            return;
 
-		public Dictionary<string, object> GetJSONDict ()
-		{
-			var dict = new Dictionary<string,object> ();
-			dict ["name"] = Name;
-			dict ["values"] = Values;
-			return dict;
-		}
-	}
+        }
+    }
 
-	internal class InspectorComponent
-	{
-		public String Name;
-		public String Namespace;
-		public Dictionary<string, InspectorField> Fields = new Dictionary<string, InspectorField> ();
+    internal class InspectorEnum
+    {
+        public String Name;
+        public Dictionary<string, int> Values = new Dictionary<string, int>();
 
-		public Dictionary<string, object> GetJSONDict ()
-		{
-			var dict = new Dictionary<string,object> ();
+        public Dictionary<string, object> GetJSONDict()
+        {
+            var dict = new Dictionary<string, object>();
+            dict["name"] = Name;
+            dict["values"] = Values;
+            return dict;
+        }
+    }
 
-			dict ["name"] = Name;
-			dict ["namespace"] = Namespace;
+    internal class InspectorComponent
+    {
+        public String Name;
+        public String Namespace;
+        public Dictionary<string, InspectorField> Fields = new Dictionary<string, InspectorField>();
 
-			var fieldList = new List<object> ();
+        public Dictionary<string, object> GetJSONDict()
+        {
+            var dict = new Dictionary<string, object>();
 
-			foreach (var entry in Fields) {
-				fieldList.Add (entry.Value.GetJSONDict ());
-			}
+            dict["name"] = Name;
+            dict["namespace"] = Namespace;
 
-			dict ["fields"] = fieldList;
+            var fieldList = new List<object>();
 
-			return dict;
-		}
-	}
+            foreach (var entry in Fields)
+            {
+                fieldList.Add(entry.Value.GetJSONDict());
+            }
 
-	internal class InspectorField
-	{
+            dict["fields"] = fieldList;
 
-		public Dictionary<string, object> GetJSONDict ()
-		{
+            return dict;
+        }
+    }
 
-			var dict = new Dictionary<string,object> ();
+    internal class InspectorField
+    {
 
-			dict ["isEnum"] = IsEnum;
-			dict ["typeName"] = TypeName;
-			dict ["name"] = Name;
-			dict ["defaultValue"] = DefaultValue;
+        public Dictionary<string, object> GetJSONDict()
+        {
 
-			dict ["caPos"] = CustomAttrPositionalArgs;
-			dict ["caNamed"] = CustomAttrNamedArgs;
+            var dict = new Dictionary<string, object>();
 
-			return dict;
+            dict["isEnum"] = IsEnum;
+            dict["typeName"] = TypeName;
+            dict["name"] = Name;
+            dict["defaultValue"] = DefaultValue;
 
-		}
+            dict["caPos"] = CustomAttrPositionalArgs;
+            dict["caNamed"] = CustomAttrNamedArgs;
 
-		public bool IsEnum = false;
+            return dict;
 
-		public string TypeName;
+        }
 
-		// the Name of the InspectorField
-		public string Name;
-		// The DefaultValue if supplied
-		public string DefaultValue;
+        public bool IsEnum = false;
 
-		// custom attributes, positional and named
-		public List<string> CustomAttrPositionalArgs = new List<string> ();
-		public Dictionary<string, string> CustomAttrNamedArgs = new Dictionary<string, string> ();
-	}
+        public string TypeName;
+
+        // the Name of the InspectorField
+        public string Name;
+        // The DefaultValue if supplied
+        public string DefaultValue;
+
+        // custom attributes, positional and named
+        public List<string> CustomAttrPositionalArgs = new List<string>();
+        public Dictionary<string, string> CustomAttrNamedArgs = new Dictionary<string, string>();
+    }
 
 }

@@ -32,19 +32,22 @@ namespace AtomicEngine
 
         static internal void SubscribeToEvent(AObject receiver, uint eventType)
         {
-            List<WeakReference<AObject>> eventReceivers;
+            SubscribeToEvent(receiver, null, eventType);
+        }
+
+        static internal void SubscribeToEvent(AObject receiver, AObject sender, uint eventType)
+        {
+            List<EventSubscription> eventReceivers;
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
-                eventReceivers = eventReceiverLookup[eventType] = new List<WeakReference<AObject>>();
+                eventReceivers = eventReceiverLookup[eventType] = new List<EventSubscription>();
             }
 
             AObject obj;
-
-            foreach (WeakReference<AObject> wr in eventReceivers)
+            foreach (EventSubscription er in eventReceivers)
             {
-
-                if (!wr.TryGetTarget(out obj))
+                if (!er.Receiver.TryGetTarget(out obj))
                     continue; // GC'd
 
                 // already on list?
@@ -53,20 +56,59 @@ namespace AtomicEngine
             }
 
             WeakReference<RefCounted> w = null;
-
             if (!nativeLookup.TryGetValue(receiver.nativeInstance, out w))
             {
-                throw new System.InvalidOperationException("NativeCore.SubscribeToEvent - unable to find native instance");
+                throw new InvalidOperationException("NativeCore.SubscribeToEvent - unable to find native receiver instance");
             }
 
             RefCounted refcounted;
-
             if (!w.TryGetTarget(out refcounted))
             {
-                throw new System.InvalidOperationException("NativeCore.SubscribeToEvent - attempting to subscribe a GC'd AObject");
+                throw new InvalidOperationException("NativeCore.SubscribeToEvent - attempting to subscribe a GC'd AObject");
             }
 
-            eventReceivers.Add(new WeakReference<AObject>(receiver));
+            IntPtr nativeSender = IntPtr.Zero;
+            if (sender != null)
+            {
+                nativeSender = sender.nativeInstance;
+                if (!nativeLookup.TryGetValue(sender.nativeInstance, out w))
+                {
+                    throw new InvalidOperationException("NativeCore.SubscribeToEvent - unable to find native sender instance");
+                }
+
+                if (!w.TryGetTarget(out refcounted))
+                {
+                    throw new InvalidOperationException("NativeCore.SubscribeToEvent - attempting to subscribe to a GC'd AObject");
+                }
+            }
+
+            eventReceivers.Add(new EventSubscription(receiver, nativeSender));
+        }
+
+        static internal void UnsubscribeFromEvent(AObject receiver, uint eventType)
+        {
+            UnsubscribeFromEvent(receiver, null, eventType);
+        }
+
+        static internal void UnsubscribeFromEvent(AObject receiver, RefCounted sender, uint eventType)
+        {
+            List<EventSubscription> eventReceivers;
+            if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
+                return;
+
+            AObject obj;
+            foreach (EventSubscription er in eventReceivers)
+            {
+                if (!er.Receiver.TryGetTarget(out obj))
+                    continue; // GC'd
+
+                if (obj == receiver &&
+                    (sender == null || er.Sender == sender.nativeInstance))
+                {
+                    eventReceivers.Remove(er);
+                    return;
+                }
+            }
         }
 
         static ScriptVariantMap[] svm;
@@ -81,39 +123,57 @@ namespace AtomicEngine
                 svm[i] = new ScriptVariantMap();
         }
 
-        public static void EventDispatch(uint eventType, IntPtr eventData)
+        public static void EventDispatch(IntPtr sender, uint eventType, IntPtr eventData)
         {
-            List<WeakReference<AObject>> eventReceivers;
+            List<EventSubscription> eventReceivers;
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
                 // This should not happen, as event NET objects are subscribed to are filtered 
-                throw new System.InvalidOperationException("NativeCore.EventDispatch - received unregistered event type");
+                throw new InvalidOperationException("NativeCore.EventDispatch - received unregistered event type");
 
             }
 
-            ScriptVariantMap scriptMap = null;
-            AObject receiver;
+            AObject managedSender = null;
+            WeakReference<RefCounted> wr;
+            if (sender != IntPtr.Zero &&
+                nativeLookup.TryGetValue(sender, out wr))
+            {
+                RefCounted refCounted;
+                if (wr.TryGetTarget(out refCounted))
+                {
+                    managedSender = refCounted as AObject;
+                }
+            }
 
             // iterate over copy of list so we can modify it while running
-            foreach (var w in eventReceivers.ToList())
+            ScriptVariantMap scriptMap = null;
+            AObject receiver;
+            foreach (EventSubscription er in eventReceivers.ToList())
             {
                 // GC'd?
-                if (!w.TryGetTarget(out receiver))
+                if (!er.Receiver.TryGetTarget(out receiver))
                     continue;
 
                 if (scriptMap == null)
                 {
                     if (svmDepth == svmMax)
                     {
-                        throw new System.InvalidOperationException("NativeCore.EventDispatch - exceeded max svm");
+                        throw new InvalidOperationException("NativeCore.EventDispatch - exceeded max svm");
                     }
 
                     scriptMap = svm[svmDepth++];
                     scriptMap.CopyVariantMap(eventData);
                 }
 
-                receiver.HandleEvent(eventType, scriptMap);
+                if (managedSender != null && er.Sender == sender)
+                {
+                    receiver.HandleEvent(managedSender, eventType, scriptMap);
+                }
+                else
+                {
+                    receiver.HandleEvent(eventType, scriptMap);
+                }
             }
 
             if (scriptMap != null)
@@ -128,19 +188,19 @@ namespace AtomicEngine
 
             // expire event listeners
 
-            int eventListenersRemoved = 0;
-            int nativesRemoved = 0;
+            //int eventListenersRemoved = 0;
+            //int nativesRemoved = 0;
 
             AObject obj;
 
-            foreach (List<WeakReference<AObject>> receiverList in eventReceiverLookup.Values)
+            foreach (List<EventSubscription> receiverList in eventReceiverLookup.Values)
             {
-                foreach (WeakReference<AObject> receiver in receiverList.ToList())
+                foreach (EventSubscription er in receiverList.ToList())
                 {
-                    if (!receiver.TryGetTarget(out obj))
+                    if (!er.Receiver.TryGetTarget(out obj))
                     {
-                        receiverList.Remove(receiver);
-                        eventListenersRemoved++;
+                        receiverList.Remove(er);
+                        //eventListenersRemoved++;
                     }
 
                     if (watch.ElapsedMilliseconds > 16)
@@ -163,7 +223,7 @@ namespace AtomicEngine
                     // expired
                     csi_AtomicEngine_ReleaseRef(native);
                     nativeLookup.Remove(native);
-                    nativesRemoved++;
+                    //nativesRemoved++;
                 }
 
                 if (watch.ElapsedMilliseconds > 16)
@@ -197,7 +257,7 @@ namespace AtomicEngine
         {
             if (nativeLookup.ContainsKey(native))
             {
-                throw new System.InvalidOperationException("NativeCore.RegisterNative - Duplicate IntPtr key");
+                throw new InvalidOperationException("NativeCore.RegisterNative - Duplicate IntPtr key");
             }
 
             r.nativeInstance = native;
@@ -253,7 +313,7 @@ namespace AtomicEngine
 
             if (!nativeClassIDToNativeType.TryGetValue(classID, out nativeType))
             {
-                throw new System.InvalidOperationException("NativeCore.WrapNative - Attempting to wrap unknown native class id");
+                throw new InvalidOperationException("NativeCore.WrapNative - Attempting to wrap unknown native class id");
             }
 
             r = nativeType.managedConstructor(native);
@@ -277,11 +337,11 @@ namespace AtomicEngine
         {
             if (nativeClassIDToNativeType.ContainsKey(nativeType.nativeClassID))
             {
-                throw new System.InvalidOperationException("NativeCore.RegisterNativeType - Duplicate NativeType class id registered");
+                throw new InvalidOperationException("NativeCore.RegisterNativeType - Duplicate NativeType class id registered");
             }
             if (typeToNativeType.ContainsKey(nativeType.type))
             {
-                throw new System.InvalidOperationException("NativeCore.RegisterNativeType - Duplicate NativeType type registered");
+                throw new InvalidOperationException("NativeCore.RegisterNativeType - Duplicate NativeType type registered");
             }
 
             nativeClassIDToNativeType[nativeType.nativeClassID] = nativeType;
@@ -297,6 +357,17 @@ namespace AtomicEngine
             return false;
         }
 
+        public static Type GetNativeAncestorType(Type type)
+        {
+            Type ancestorType = type;
+            do
+            {
+                ancestorType = ancestorType.BaseType;
+            } while (ancestorType != null && !IsNativeType(ancestorType));
+
+            return ancestorType;
+        }
+
         static public IntPtr NativeContructorOverride
         {
             get
@@ -310,7 +381,7 @@ namespace AtomicEngine
             {
                 if (nativeContructorOverride != IntPtr.Zero)
                 {
-                    throw new System.InvalidOperationException("NativeCore.NativeContructorOverride - Previous nativeContructorOverride not consumed");
+                    throw new InvalidOperationException("NativeCore.NativeContructorOverride - Previous nativeContructorOverride not consumed");
                 }
 
                 nativeContructorOverride = value;
@@ -321,7 +392,7 @@ namespace AtomicEngine
         {
             if (nativeContructorOverride != IntPtr.Zero)
             {
-                throw new System.InvalidOperationException("NativeCore.VerifyNativeContructorOverrideConsumed -  NativeContructorOverride not consumed");
+                throw new InvalidOperationException("NativeCore.VerifyNativeContructorOverrideConsumed -  NativeContructorOverride not consumed");
             }
         }
 
@@ -332,7 +403,7 @@ namespace AtomicEngine
         internal static Dictionary<IntPtr, WeakReference<RefCounted>> nativeLookup = new Dictionary<IntPtr, WeakReference<RefCounted>>();
 
         // weak references here, hold a ref native side
-        internal static Dictionary<uint, List<WeakReference<AObject>>> eventReceiverLookup = new Dictionary<uint, List<WeakReference<AObject>>>();
+        internal static Dictionary<uint, List<EventSubscription>> eventReceiverLookup = new Dictionary<uint, List<EventSubscription>>();
 
 
         // Native ClassID to NativeType lookup
@@ -344,6 +415,18 @@ namespace AtomicEngine
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern void csi_AtomicEngine_ReleaseRef(IntPtr refCounted);
+
+        internal struct EventSubscription
+        {
+            public WeakReference<AObject> Receiver;
+            public IntPtr Sender;
+
+            public EventSubscription(AObject obj, IntPtr source)
+            {
+                Receiver = new WeakReference<AObject>(obj);
+                Sender = source;
+            }
+        }
 
     }
 

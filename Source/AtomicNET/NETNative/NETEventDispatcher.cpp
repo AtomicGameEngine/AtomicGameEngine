@@ -63,13 +63,13 @@ namespace Atomic
 
             ncEventData[eventType] = ncEventData;
 
-            NETCore::DispatchEvent(eventType.Value(), &ncEventData);
+            NETCore::DispatchEvent(sender, eventType.Value(), &ncEventData);
 
             return;
 
         }
 
-        NETCore::DispatchEvent(eventType.Value(), &eventData);
+        NETCore::DispatchEvent(sender, eventType.Value(), &eventData);
 
     }
 
