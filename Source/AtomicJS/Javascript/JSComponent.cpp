@@ -162,7 +162,7 @@ void JSComponent::ApplyAttributes()
 }
 
 bool JSComponent::IsInstanceInitialized() {
-	return instanceInitialized_;
+    return instanceInitialized_;
 }
 
 void JSComponent::InitInstance(bool hasArgs, int argIdx)
