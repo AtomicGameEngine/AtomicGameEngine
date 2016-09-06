@@ -95,6 +95,8 @@ static int Node_GetJSComponent(duk_context* ctx)
     {
         JSComponent* component = components[i];
         if (component->MatchScriptName(path)) {
+            if(!component->IsInstanceInitialized())
+                component->InitInstance();
 
             js_push_class_object_instance(ctx, component, "Component");
             return 1;

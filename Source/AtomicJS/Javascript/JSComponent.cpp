@@ -161,6 +161,10 @@ void JSComponent::ApplyAttributes()
 {
 }
 
+bool JSComponent::IsInstanceInitialized() {
+    return instanceInitialized_;
+}
+
 void JSComponent::InitInstance(bool hasArgs, int argIdx)
 {
     if (context_->GetEditorContext() || componentFile_.Null())

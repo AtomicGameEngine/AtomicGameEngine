@@ -78,6 +78,7 @@ public:
 
     void SetDestroyed() { destroyed_ = true; }
 
+    bool IsInstanceInitialized();	
     void InitInstance(bool hasArgs = false, int argIdx = 0);
 
     /// Get script attribute
