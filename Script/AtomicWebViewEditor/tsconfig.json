@@ -34,7 +34,6 @@
         "./editor/editorCommands.ts",
         "./interop.ts",
         "./modules/typescript.d.ts",
-        "./typings/ace.d.ts",
         "./typings/monaco.d.ts",
         "./typings/systemjs.d.ts",
         "./typings/webworkers.d.ts",
