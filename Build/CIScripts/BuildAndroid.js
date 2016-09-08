@@ -20,7 +20,9 @@ namespace('build', function() {
 
     var cmds = [
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ ANDROID",
-      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ ANDROID"
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ ANDROID",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNETNative/ ANDROID",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNETScript/ ANDROID"  
     ];
 
     cmds.push("cmake -G \"Unix Makefiles\" -DCMAKE_TOOLCHAIN_FILE=" + bcommon.atomicRoot + "Build//CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../../");
