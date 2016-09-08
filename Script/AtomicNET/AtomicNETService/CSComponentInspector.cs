@@ -212,7 +212,7 @@ namespace AtomicTools
             // check whether we have an InspectorAttribute
             if (metaReader.GetString(parentTypeRef.Name) != "InspectorAttribute")
             {
-                Console.WriteLine("parentTypeRef != InspectorAttribute");
+                //Console.WriteLine("parentTypeRef != InspectorAttribute");
                 return false;
             }
 

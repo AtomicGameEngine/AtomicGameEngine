@@ -51,6 +51,7 @@ namespace Atomic
     {
         typeMap_["Boolean"] = VAR_BOOL;
         typeMap_["Int32"] = VAR_INT;
+        typeMap_["UInt32"] = VAR_INT;
         typeMap_["Single"] = VAR_FLOAT;
         typeMap_["Double"] = VAR_DOUBLE;
         typeMap_["String"] = VAR_STRING;
@@ -58,6 +59,7 @@ namespace Atomic
         typeMap_["Vector3"] = VAR_VECTOR3;
         typeMap_["Vector4"] = VAR_VECTOR4;
         typeMap_["Quaternion"] = VAR_QUATERNION;
+        typeMap_["IntVector2"] = VAR_INTVECTOR2;
 
     }
 

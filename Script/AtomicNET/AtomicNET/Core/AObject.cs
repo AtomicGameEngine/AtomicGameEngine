@@ -130,6 +130,7 @@ namespace AtomicEngine
 
             public int GetHashCode(SenderEventKey key)
             {
+                // Based on http://stackoverflow.com/a/263416/156328
                 unchecked
                 {
                     int hash = 17;

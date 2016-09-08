@@ -37,6 +37,31 @@ public:
         refVector_.Push(SharedPtr<RefCounted>(refCounted));
     }
 
+    void SetAt(unsigned index, RefCounted* refCounted)
+    {
+        refVector_[index] = refCounted;
+    }
+
+    void Insert(unsigned index, RefCounted* refCounted)
+    {
+        refVector_.Insert(index, SharedPtr<RefCounted>(refCounted));
+    }
+
+    void Erase(unsigned index)
+    {
+        refVector_.Erase(index);
+    }
+
+    bool Remove(RefCounted* refCounted)
+    {
+        return refVector_.Remove(SharedPtr<RefCounted>(refCounted));
+    }
+
+    void Clear()
+    {
+        refVector_.Clear();
+    }
+
     unsigned GetSize() const
     {
         return refVector_.Size();

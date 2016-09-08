@@ -13,9 +13,18 @@ namespace AtomicEngine
             this.Type = type;
 
             // Fields
+            List<FieldInfo> fields = new List<FieldInfo>();
+            fields.AddRange(type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(field => field.IsDefined(typeof(InspectorAttribute), true)));
 
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-            .Where(field => field.IsDefined(typeof(InspectorAttribute), true));
+            // Inspector fields may be private. BindingFlags.NonPublic does not report private fields in superclasses
+            var baseType = type.BaseType;
+            while (baseType != typeof(CSComponent))
+            {
+                fields.AddRange(baseType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(field => field.IsDefined(typeof(InspectorAttribute), true)));
+                baseType = baseType.BaseType;
+            }
 
             InspectorFields = fields.ToArray<FieldInfo>();
 
@@ -184,12 +193,15 @@ namespace AtomicEngine
 
                     var node = instance.Node;
 
-                    if (node != null && node.IsEnabled())
+                    // TODO: Ideally we want to remove disabled instances,
+                    // and re-add them when re-enabled
+                    if (node != null /*&& node.IsEnabled()*/)
                     {
 
                         if (node.Scene != null)
                         {
-                            UpdateMethod.Invoke(instance, args);
+                            if (node.IsEnabled())
+                                UpdateMethod.Invoke(instance, args);
                         }
                         else
                         {
