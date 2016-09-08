@@ -78,6 +78,11 @@ namespace AtomicTools
 
                 var typeDef = metaReader.GetTypeDefinition(handle);
 
+                // Is this a generic type?
+                var genericParams = typeDef.GetGenericParameters();
+                if (genericParams.Count != 0)
+                    continue;
+
                 var parentName = metaReader.GetString(typeDef.Name);
 
                 var baseTypeHandle = typeDef.BaseType;
