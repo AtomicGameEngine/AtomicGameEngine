@@ -219,20 +219,25 @@ namespace ToolCore
 			{
 				if (GetIsPCL())
 				{
+					ref = "AtomicNET";
 					platform = "Portable";
 				}
 				else if (SupportsDesktop())
 				{
+					ref = "AtomicNET";
 					platform = "Desktop";
 				}
 				else if (SupportsPlatform("android"))
 				{
+					if (ref != "AtomicNET.Android.SDL")
+						ref = "AtomicNET";
+
 					platform = "Android";
 				}
 
 				if (platform.Length())
 				{					
-					String atomicNETAssembly = tenv->GetAtomicNETCoreAssemblyDir() + ToString("%s/AtomicNET.dll", platform.CString(), ref.CString());
+					String atomicNETAssembly = tenv->GetAtomicNETCoreAssemblyDir() + ToString("%s/%s.dll", platform.CString(), ref.CString());
 					xref = igroup.CreateChild("Reference");
 					xref.SetAttribute("Include", atomicNETAssembly);
 				}
@@ -617,7 +622,7 @@ namespace ToolCore
 #endif
 
 			// TODO: more than armeabi-v7a (which this is)
-			String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Android/Native/libAtomicNETNative.so";
+			String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/Android/libAtomicNETNative.so";
 
 			XMLElement nativeLibrary =  projectRoot.CreateChild("ItemGroup").CreateChild("AndroidNativeLibrary"); 
 			nativeLibrary.SetAttribute("Include", nativePath);

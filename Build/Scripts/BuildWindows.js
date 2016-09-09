@@ -11,7 +11,9 @@ namespace('build', function() {
   // Builds a standalone Atomic Editor, which can be distributed out of build tree
   task('atomiceditor', {
     async: true
-  }, function() {
+}, function(android) {
+
+    android = android == "android" ? true : false;
 
     // Clean build
     var cleanBuild = true;
@@ -27,6 +29,17 @@ namespace('build', function() {
 
     // Build the AtomicEditor
     cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditor.bat");
+    cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + (android ? "ANDROID" : "WINDOWS") + " Release");
+
+    function copyAtomicNET() {
+
+        fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
+          editorAppFolder + "Resources/ToolData/AtomicNET/Release");
+
+        fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
+          editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
+
+    }
 
     jake.exec(cmds, function() {
 
@@ -56,17 +69,24 @@ namespace('build', function() {
       fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/D3DCompiler_47.dll",
         editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
 
-      // AtomicNET
+      if (android) {
 
-      fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
-        editorAppFolder + "Resources/ToolData/AtomicNET/Release");
+          var androidNativeTask = jake.Task['build:android_native'];
 
-      fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
-        editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
+          androidNativeTask.addListener('complete', function () {
+              copyAtomicNET();
+              console.log("\nAtomic Editor build to ", editorAppFolder);
+              complete();
+          });
 
-      console.log("Atomic Editor build to ", editorAppFolder);
+          androidNativeTask.invoke();
 
-      complete();
+      }
+      else {
+          copyAtomicNET();
+          console.log("\nAtomic Editor build to ", editorAppFolder);
+          complete();
+      }
 
     }, {
       printStdout: true

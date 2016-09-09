@@ -63,6 +63,7 @@ namespace ToolCore
         void OpenSourceFile(const String& sourceFilePath);
 
         bool GenerateSolution();
+		bool GenerateResourcePak();
 
     private:
 

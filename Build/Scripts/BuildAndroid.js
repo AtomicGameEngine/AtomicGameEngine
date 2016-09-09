@@ -8,7 +8,7 @@ var buildDir = host.artifactsRoot + "Build/Android/";
 
 namespace('build', function() {
 
-  task('android_player', ["build:atomiceditor"], {
+  task('android_native', {
     async: true
   }, function() {
 

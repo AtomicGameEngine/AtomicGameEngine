@@ -81,6 +81,9 @@ public:
 	bool GetResourcesOnly() const { return resourcesOnly_; }
 	void SetResourcesOnly(bool resourcesOnly = true) { resourcesOnly_ = resourcesOnly;  }
 
+	bool GetBuildFailed() const { return buildFailed_; }
+	const Vector<String>& GetBuildErrors() const { return buildErrors_; }
+
 protected:
 
     bool BuildClean(const String& path);
