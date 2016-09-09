@@ -32,6 +32,7 @@ namespace ToolCore
 
 class ProjectUserPrefs;
 class ProjectBuildSettings;
+class ProjectSettings;
 
 class Project : public Object
 {
@@ -66,15 +67,14 @@ public:
     bool IsScriptsDirOrFile(const String& fullPath);
     bool IsModulesDirOrFile(const String& fullPath);
 
-    void AddPlatform(PlatformID platformID);
-    bool ContainsPlatform(PlatformID platformID);
-    void RemovePlatform(PlatformID platformID);
+	bool GetSupportsPlatform(const String& platform) const;
 
     bool IsDirty() { return dirty_; }
     void SetDirty() { if (!loading_) dirty_ = true; }
 
     ProjectBuildSettings* GetBuildSettings() { return buildSettings_; }
     ProjectUserPrefs* GetUserPrefs() { return userPrefs_; }
+	ProjectSettings* GetProjectSettings() { return projectSettings_; }
 
     const String& GetProjectPath() const { return projectPath_; }
     const String& GetProjectFilePath() { return projectFilePath_; }
@@ -86,6 +86,7 @@ public:
 
     void SaveBuildSettings();
     bool LoadBuildSettings();
+	bool LoadProjectSettings();
 
     void SaveUserPrefs();
     bool LoadUserPrefs();
@@ -108,8 +109,7 @@ private:
 
     SharedPtr<ProjectUserPrefs> userPrefs_;
     SharedPtr<ProjectBuildSettings> buildSettings_;
-
-    List<PlatformID> platforms_;
+	SharedPtr<ProjectSettings> projectSettings_;
 
 };
 

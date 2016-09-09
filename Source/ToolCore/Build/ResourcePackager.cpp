@@ -24,6 +24,7 @@
 //
 
 #include "Atomic/Core/StringUtils.h"
+#include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Container/ArrayPtr.h>
 

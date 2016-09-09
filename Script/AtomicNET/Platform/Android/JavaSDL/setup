@@ -1,0 +1,30 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+brew update
+
+# TODO: Ensure both Brew and Caskroom are set up.
+if [ "$(which java)" == "" ]; then
+  echo "ERROR: Install JDK first.  Maybe use 'brew cask install java'.  Leaving this to you in case you want to handle this differently."
+  exit 1
+fi
+
+if [ "$(which ant)" == "" ]; then brew install ant; fi
+if [ "$(which mvn)" == "" ]; then brew install maven; fi
+if [ "$(which android)" == "" ]; then
+  if [ ! -e "$(brew --prefix android-sdk)" ]; then
+    brew install android-sdk
+  else
+    brew link android-sdk
+  fi
+fi
+
+ANDROID_HOME=$(brew --prefix android-sdk)
+export ANDROID_HOME
+
+echo y | android update sdk --all --no-ui --filter 'tools,platform-tools'
+echo y | android update sdk --all --no-ui --filter 'android-23'
+echo y | android update sdk --all --no-ui --filter 'build-tools-23.0.2'
+echo y | android update sdk --all --no-ui --filter 'extra-google-m2repository'
+echo y | android update sdk --all --no-ui --filter 'extra-android-m2repository'

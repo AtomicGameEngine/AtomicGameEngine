@@ -23,7 +23,6 @@
 #include "CommandParser.h"
 
 #include "NewProjectCmd.h"
-#include "PlatformAddCmd.h"
 #include "BuildCmd.h"
 #include "ImportCmd.h"
 #include "PlayCmd.h"
@@ -61,10 +60,6 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             else if (argument == "build")
             {
                 cmd = new BuildCmd(context_);
-            }
-            else if (argument == "platform-add")
-            {
-                cmd = new PlatformAddCmd(context_);
             }
             else if (argument == "import")
             {

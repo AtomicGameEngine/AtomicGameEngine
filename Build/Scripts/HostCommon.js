@@ -9,7 +9,7 @@ process.env.NODE_PATH = atomicRoot + "Build/node_modules/";
 require('module').Module._initPaths();
 var fs = require('fs-extra');
 
-/// Returns a list of all script packages, regardless of platform
+/// Returns a list of all script packages
 function getScriptPackages() {
 
   var srcpath = atomicRoot + "Script/Packages/";
@@ -21,7 +21,7 @@ function getScriptPackages() {
 }
 
 // return an object with package name keys and module name lists as values
-function getScriptModules(platform) {
+function getScriptModules() {
 
   modules = {};
 
@@ -31,16 +31,9 @@ function getScriptModules(platform) {
 
     var pkg = JSON.parse(fs.readFileSync(atomicRoot + "Script/Packages/" + packages[i] + "/Package.json"));
 
-    if (pkg.platforms && pkg.platforms.indexOf(platform) == -1)
-      continue;
-
     for (var j in pkg.modules) {
 
       var moduleName = pkg.modules[j];
-
-      if (pkg.moduleExclude && pkg.moduleExclude[platform])
-      if (pkg.moduleExclude[platform].indexOf(moduleName) != -1)
-        continue;
 
       if (!modules[pkg.name]) {
         modules[pkg.name] = {
@@ -58,20 +51,20 @@ function getScriptModules(platform) {
 
 }
 
-function getGenScriptRootDir(platform) {
+function getGenScriptRootDir() {
 
-  return atomicRoot + "Artifacts/Build/Source/Generated/" + platform + "/";
+  return atomicRoot + "Artifacts/Build/Source/Generated/";
 
 }
 
-// Get a list of script source filenames for a given platform
-function getGenScriptFilenames(platform) {
+// Get a list of script source filenames
+function getGenScriptFilenames() {
 
   var filenames = [];
 
-  var scriptGenRoot = getGenScriptRootDir(platform);
+  var scriptGenRoot = getGenScriptRootDir();
 
-  var modules = getScriptModules(platform);
+  var modules = getScriptModules();
 
   for (var pkgName in modules) {
 
@@ -113,9 +106,9 @@ function getGenScriptFilenames(platform) {
 
 }
 
-function createGenScriptFiles(platform) {
+function createGenScriptFiles() {
 
-  var scriptFiles = getGenScriptFilenames(platform);
+  var scriptFiles = getGenScriptFilenames();
 
   for (var i in scriptFiles) {
 

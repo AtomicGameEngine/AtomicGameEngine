@@ -12,14 +12,18 @@ endif()
 add_subdirectory(AtomicPlayer)
 add_subdirectory(AtomicPlayerJS)
 
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
+if (NOT IOS AND NOT EMSCRIPTEN)
     add_subdirectory(AtomicApp)
+    add_subdirectory(AtomicNET)
+endif()
+
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(ToolCore)
     add_subdirectory(ToolCoreJS)
     add_subdirectory(AtomicEditor)
     add_subdirectory(AtomicTool)
     add_subdirectory(Tools)
-    add_subdirectory(AtomicNET)
 endif()
+
 
 include(AtomicDocList)

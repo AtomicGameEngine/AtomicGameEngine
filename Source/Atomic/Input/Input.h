@@ -76,8 +76,13 @@ struct TouchState
 };
 
 /// %Input state for a joystick.
-struct JoystickState
+// ATOMIC BEGIN
+class JoystickState : public RefCounted
 {
+	ATOMIC_REFCOUNTED(JoystickState)
+// ATOMIC END
+
+public:
     /// Construct with defaults.
     JoystickState() :
         joystick_(0), joystickID_(0), controller_(0),
@@ -329,6 +334,13 @@ public:
     void JoystickSimulateMouseMove(int xpos, int ypos); /// moves the on screen cursor
     void JoystickSimulateMouseButton(int button); /// simulated mouse press down & up
 
+	int GetTouchID(unsigned index) { if (index >= touches_.Size()) return 0; return touches_[index].touchID_; }
+	const IntVector2& GetTouchPosition(unsigned index) { if (index >= touches_.Size()) return IntVector2::ZERO; return touches_[index].position_; }
+	const IntVector2& GetTouchLastPosition(unsigned index) { if (index >= touches_.Size()) return IntVector2::ZERO; return touches_[index].lastPosition_; }
+	const IntVector2& GetTouchDelta(unsigned index) { if (index >= touches_.Size()) return IntVector2::ZERO; return touches_[index].delta_; }
+	const float GetTouchPressure(unsigned index) { if (index >= touches_.Size()) return 0.0f; return touches_[index].pressure_; }
+	UIWidget* GetTouchWidget(unsigned index) { if (index >= touches_.Size()) return 0; return touches_[index].touchedWidget_; }	
+
 // ATOMIC END
 
 private:
@@ -413,8 +425,12 @@ private:
     HashMap<int, int> touchIDMap_;
     /// String for text input.
     String textInput_;
+
+// ATOMIC BEGIN
     /// Opened joysticks.
-    HashMap<SDL_JoystickID, JoystickState> joysticks_;
+    HashMap<SDL_JoystickID, SharedPtr<JoystickState>> joysticks_;
+// ATOMIC END
+
     /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state.

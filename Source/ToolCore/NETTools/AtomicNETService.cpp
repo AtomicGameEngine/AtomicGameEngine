@@ -52,26 +52,33 @@ namespace ToolCore
 
     bool AtomicNETService::GetServiceExecutable(String& execPath, Vector<String>& args) const
     {
-        // TODO: Needs to handle deployed tooling, release builds
 
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
         execPath = String::EMPTY;
         args.Clear();
 
+#ifdef ATOMIC_DEBUG
+		String config = "Debug";
+#else
+		String config = "Release";
+#endif
+
+		String netServiceFilename = tenv->GetAtomicNETRootDir() + config + "/AtomicNETService/AtomicNETService.exe";
+
 #ifdef ATOMIC_PLATFORM_WINDOWS        
 
-        execPath = tenv->GetAtomicNETCoreAssemblyDir() + "/AtomicNETService.exe";
+		execPath = netServiceFilename;
 
 #elif defined ATOMIC_PLATFORM_OSX
 
         execPath = tenv->GetMonoExecutableDir() + "mono64";
-        args.Push(tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNETService.exe");
+        args.Push(netServiceFilename);
 
 #elif defined ATOMIC_PLATFORM_LINUX
 
         execPath = "/usr/bin/mono";
-        args.Push(tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNETService.exe");
+        args.Push(netServiceFilename);
 #endif
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();

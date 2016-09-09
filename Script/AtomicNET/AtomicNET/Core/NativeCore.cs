@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Linq;
+using static System.Reflection.IntrospectionExtensions;
 
 namespace AtomicEngine
 {
@@ -129,7 +130,7 @@ namespace AtomicEngine
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
-                // This should not happen, as event NET objects are subscribed to are filtered 
+                // This should not happen, as event NET objects are subscribed to are filtered
                 throw new InvalidOperationException("NativeCore.EventDispatch - received unregistered event type");
 
             }
@@ -170,7 +171,7 @@ namespace AtomicEngine
                 {
                     receiver.HandleEvent(managedSender, eventType, scriptMap);
                 }
-                else
+                else if (er.Sender == IntPtr.Zero)
                 {
                     receiver.HandleEvent(eventType, scriptMap);
                 }
@@ -362,7 +363,7 @@ namespace AtomicEngine
             Type ancestorType = type;
             do
             {
-                ancestorType = ancestorType.BaseType;
+                ancestorType = ancestorType.GetTypeInfo().BaseType;
             } while (ancestorType != null && !IsNativeType(ancestorType));
 
             return ancestorType;

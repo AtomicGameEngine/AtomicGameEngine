@@ -13,9 +13,6 @@ namespace AtomicEngine
             Min.Y = top;
             Max.X = right;
             Max.Y = bottom;
-
-            // for native
-            Defined = true;
         }
 
         public float Left
@@ -73,10 +70,7 @@ namespace AtomicEngine
         public Vector2 Min;
         
         /// Maximum vector.
-         public Vector2 Max;
-
-        /// Defined flag.
-        bool Defined;
+        public Vector2 Max;
 
     }
 

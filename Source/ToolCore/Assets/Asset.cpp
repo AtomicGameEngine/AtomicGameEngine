@@ -183,7 +183,6 @@ bool Asset::Load()
     dirty_ = false;
     if (!CheckCacheFile())
     {
-        ATOMIC_LOGINFOF("CheckCacheFile:false - %s", path_.CString());
         dirty_ = true;
     }
 

@@ -51,18 +51,18 @@ namespace('build', function() {
     // precreate script bindgs so they can be picked up by CMake
     task('precreateScriptBindings', {
         async: true
-    }, function(platform, clean) {
+    }, function(clean) {
 
         if (clean === undefined) {
             clean = true;
         }
-        console.log("Precreating script bindings for platorm: " + platform);
+        console.log("Precreating script bindings");
 
         if (clean) {
-            common.cleanCreateDir(common.getGenScriptRootDir(platform))
+            common.cleanCreateDir(common.getGenScriptRootDir())
         }
 
-        common.createGenScriptFiles(platform);
+        common.createGenScriptFiles();
 
         complete();
     });
@@ -103,7 +103,7 @@ namespace('build', function() {
 
     task('genscripts', {
         async: true
-    }, function(platform, force) {
+    }, function(force) {
 
         // default to true
         if (force != "true" && force != "false") {
@@ -113,7 +113,7 @@ namespace('build', function() {
         var anyZero = false;
         if (force != "true") {
 
-            var filenames = common.getGenScriptFilenames(platform);
+            var filenames = common.getGenScriptFilenames();
             for (var i in filenames) {
 
                 if (!fileExists(filenames[i]))
@@ -138,7 +138,7 @@ namespace('build', function() {
 
         process.chdir(atomicRoot);
 
-        var modules = host.getScriptModules(platform);
+        var modules = host.getScriptModules();
         var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
         var node;
         var tsc = "./Build/node_modules/typescript/lib/tsc";
@@ -159,7 +159,7 @@ namespace('build', function() {
 
         var cmds = [];
         for (var pkgName in modules) {
-            cmds.push(bindCmd + "Script/Packages/" + pkgName + "/ " + platform);
+            cmds.push(bindCmd + "Script/Packages/" + pkgName + "/");
         }
 
         if (node) {

@@ -1,0 +1,59 @@
+import com.android.builder.core.BuilderConstants
+
+import java.util.regex.Pattern
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.2'
+    }
+}
+
+apply plugin: 'com.android.library'
+
+repositories {
+    mavenCentral()
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
+def getVersionName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags', '--always'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+android {
+    // IMPORTANT: Changing versions?  Update `setup` as well!
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultPublishConfig ""
+    publishNonDefault true
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 2
+        versionName getVersionName()
+        consumerProguardFiles 'proguard.txt'
+        archivesBaseName = 'atomicjavasdl'
+    }
+
+    productFlavors {
+    }
+}
+
+dependencies {
+}

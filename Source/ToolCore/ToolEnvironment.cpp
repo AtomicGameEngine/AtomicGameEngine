@@ -80,8 +80,6 @@ bool ToolEnvironment::InitFromPackage()
 
     atomicNETRootDir_ = resourcesDir + "ToolData/AtomicNET/";
     atomicNETCoreAssemblyDir_ = atomicNETRootDir_ + "Release/";
-    atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
-    atomicNETManagedIPCPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicIPCPlayer.exe";
 
 #ifdef ATOMIC_PLATFORM_OSX
     monoExecutableDir_ = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/";
@@ -180,12 +178,8 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
     String config = "Release";
 #endif
 
-
-
     atomicNETRootDir_ = rootSourceDir_ + "Artifacts/AtomicNET/";
     atomicNETCoreAssemblyDir_ = rootSourceDir_ + "Artifacts/AtomicNET/" + config + "/";
-    atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
-    atomicNETManagedIPCPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicIPCPlayer.exe";
 
 #if defined ATOMIC_PLATFORM_WINDOWS || defined ATOMIC_PLATFORM_LINUX
     atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());

@@ -1259,12 +1259,23 @@ bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath)
 String GetSanitizedPath(const String& path)
 {
     String sanitized = GetInternalPath(path);
-
     StringVector parts = sanitized.Split('/');
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
+
+    bool absolute = IsAbsolutePath(path);
+    sanitized = String::Joined(parts, "/");
+    if (absolute)
+        sanitized = "/" + sanitized;
+
+#else
 
     sanitized = String::Joined(parts, "/");
 
+#endif
+
     return sanitized;
+
 }
 
 bool GetRelativePath(const String& fromPath, const String& toPath, String& output)

@@ -66,8 +66,12 @@ namespace('build', function() {
             // AtomicNET
 
             if (buildAtomicNET) {
+
               fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
                  editorAppFolder + "Resources/ToolData/AtomicNET/Release");
+
+              fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
+                 editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
             }
 
             var binaryFiles = ["chrome-sandbox", "libcef.so", "natives_blob.bin", "snapshot_blob.bin"];

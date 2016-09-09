@@ -54,6 +54,7 @@ void JSBEnum::Preprocess()
 
     JSBind* jsbind = GetSubsystem<JSBind>();
 
+	// FIXME: This is going to need to be hand rolled with unified script bindings
     if (name_ == "TextureUnit")
     {
         values_.Clear();
@@ -66,9 +67,9 @@ void JSBEnum::Preprocess()
         values_["TU_EMISSIVE"] = "3";
         values_["TU_ENVIRONMENT"] = "4";
 
-        String platform = jsbind->GetPlatform();
+        // String platform = jsbind->GetPlatform();
 
-        bool mobile = platform == "WEB" || platform == "ANDROID" || platform == "IOS";
+		bool mobile = true; //  platform == "WEB" || platform == "ANDROID" || platform == "IOS";
 
         if (mobile)
         {

@@ -1,7 +1,8 @@
 {
 	"name" : "Input",
 	"sources" : ["Source/Atomic/Input"],
-	"classes" : ["Input"],
+	"includes" : ["<Atomic/UI/UIWidget.h>"],
+	"classes" : ["Input", "JoystickState"],
 	"overloads" : {
 		"Input" : {
 			"BindButton" : ["UIButton", "int"]
@@ -12,7 +13,7 @@
 		     "getTouch(index:number):any;"
         ]
 	},
-    
+
    	"haxe_decl" : {
 		"Input" : [
 		     "getTouch(index:number):Dynamic;"

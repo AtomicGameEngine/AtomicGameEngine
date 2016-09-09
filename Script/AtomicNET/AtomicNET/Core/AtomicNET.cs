@@ -64,7 +64,11 @@ namespace AtomicEngine
             PhysicsModule.Initialize();
             EnvironmentModule.Initialize();
             UIModule.Initialize();
+
+#if ATOMIC_DESKTOP
             IPCModule.Initialize();
+#endif
+
             AtomicAppModule.Initialize();
             ScriptModule.Initialize();
 
@@ -89,9 +93,11 @@ namespace AtomicEngine
             NativeCore.Initialize();
             CSComponentCore.Initialize();
 
+#if ATOMIC_DESKTOP
             string[] arguments = Environment.GetCommandLineArgs();
             foreach (string arg in arguments)
                 AppBase.AddArgument(arg);
+#endif
 
         }
 

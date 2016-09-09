@@ -76,6 +76,11 @@ public:
     /// in the build. If no tag is specified, then all resources are included.
     void SetAssetBuildTag(const String assetBuildTag) { assetBuildTag_ = assetBuildTag; }
 
+	void SetVerbose(bool verbose = true) { verbose_ = verbose; }
+
+	bool GetResourcesOnly() const { return resourcesOnly_; }
+	void SetResourcesOnly(bool resourcesOnly = true) { resourcesOnly_ = resourcesOnly;  }
+
 protected:
 
     bool BuildClean(const String& path);
@@ -108,6 +113,8 @@ protected:
     /// Pointer to a file used to capture the resources included in the build
     File *fileIncludedResourcesLog_;
 
+	bool resourcesOnly_;
+	bool verbose_;
 
 private:
     void BuildFilteredProjectResourceEntries();

@@ -19,7 +19,7 @@ add_custom_target( AtomicToolCheckScripts
                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                    COMMAND "${CMAKE_COMMAND}" -E make_directory \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool\"
                    COMMAND "${CMAKE_COMMAND}" -E copy_if_different \"$<TARGET_FILE:AtomicTool>\" \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\"
-                   COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},false] )
+                   COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[false] )
 
 add_dependencies (AtomicToolCheckScripts AtomicTool)
 
@@ -46,7 +46,7 @@ endif(MSVC)
 
 add_custom_target ( GenerateScriptBindings
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},true];--trace
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[true];--trace
                     DEPENDS AtomicTool )
 
 add_custom_target ( GenerateAtomicNET

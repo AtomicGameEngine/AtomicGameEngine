@@ -46,7 +46,6 @@ public:
 
 private:
 
-    String bindPlatform_;
     String sourceRootFolder_;
     String packageFolder_;
 

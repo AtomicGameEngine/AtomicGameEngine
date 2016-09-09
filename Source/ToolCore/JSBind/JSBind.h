@@ -41,17 +41,16 @@ public:
     JSBind(Context* context);
     virtual ~JSBind();
 
-    bool LoadPackage(const String& sourceRootFolder, const String& packageFolder, const String& platform);
+    bool LoadPackage(const String& sourceRootFolder, const String& packageFolder);
 
     bool GenerateJavaScriptBindings();
     bool GenerateCSharpBindings();
 
-    const String& GetSourceRootFolder() { return sourceRootFolder_; }
-    const String& GetPackageFolder() { return packageFolder_; }
-    const String& GetPlatform() { return platform_; }
+    const String& GetSourceRootFolder() const { return sourceRootFolder_; }
+    const String& GetPackageFolder() const { return packageFolder_; }
 
-    const String& GetDestScriptFolder() { return destScriptFolder_; }
-    const String& GetDestNativeFolder() { return destNativeFolder_; }
+    const String& GetDestScriptFolder() const { return destScriptFolder_; }
+    const String& GetDestNativeFolder() const { return destNativeFolder_; }
 
 private:
 
@@ -59,7 +58,6 @@ private:
 
     String sourceRootFolder_;
     String packageFolder_;
-    String platform_;
 
     String destScriptFolder_;
     String destNativeFolder_;

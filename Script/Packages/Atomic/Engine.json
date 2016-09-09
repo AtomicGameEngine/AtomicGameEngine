@@ -2,5 +2,10 @@
 	"name" : "Engine",
 	"sources" : ["Source/Atomic/Engine"],
 	"includes" : [],
-	"classes" : ["Engine", "Application"]
+	"classes" : ["Engine", "Application"],
+	"excludes" : {
+		"Application" : {
+			"Run" : []
+		}
+	}
 }

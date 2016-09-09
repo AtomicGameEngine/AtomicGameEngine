@@ -47,16 +47,16 @@ public:
     virtual ~Billboard();
 
     const Vector3& GetPosition() const { return position_; }
-    void SetPosition(Vector3 &position) { position_ = position; }
+    void SetPosition(const Vector3 &position) { position_ = position; }
 
     const Vector2 GetSize() const { return size_; }
-    void SetSize(Vector2 &size) { size_ = size; }
+    void SetSize(const Vector2 &size) { size_ = size; }
 
     const Rect& GetUV() const { return uv_; }
-    void SetUV(Rect &uv) { uv_ = uv; }
+    void SetUV(const Rect &uv) { uv_ = uv; }
 
     const Color& GetColor() const { return color_; }
-    void SetColor(Color &color) { color_ = color; }
+    void SetColor(const Color &color) { color_ = color; }
 
     float GetRotation() const { return rotation_; }
     void SetRotation(float rotation) { rotation_ = rotation; }

@@ -50,7 +50,7 @@ protected:
 private:
 
     void BuildNative(const String& buildPath);
-    void BuildManaged(const String& buildPath);
+    bool BuildManaged(const String& buildPath);
 
 };
 

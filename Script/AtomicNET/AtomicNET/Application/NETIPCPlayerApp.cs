@@ -1,3 +1,8 @@
+using System;
+using System.Reflection;
+
+#if ATOMIC_DESKTOP
+
 namespace AtomicEngine
 {
     public partial class NETIPCPlayerApp : IPCPlayerApp
@@ -18,8 +23,6 @@ namespace AtomicEngine
             app.Initialize();
 
             RegisterSubsystems();
-            
-            ExecuteAtomicMain(args);
 
             return app;
         }
@@ -28,3 +31,5 @@ namespace AtomicEngine
     }
 
 }
+
+#endif

@@ -1,0 +1,10 @@
+build/
+docs/
+.DS_Store
+*.iml
+*/*.iml
+local.properties
+.gradle/
+.idea/
+infer-out/
+example/

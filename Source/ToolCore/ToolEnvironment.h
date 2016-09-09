@@ -84,12 +84,7 @@ public:
     const String& GetAtomicNETRootDir() { return atomicNETRootDir_; }
     const String& GetAtomicNETCoreAssemblyDir() { return atomicNETCoreAssemblyDir_; }
     const String& GetAtomicNETNuGetBinary() { return atomicNETNuGetBinary_; }
-    const String& GetAtomicNETManagedPlayerBinary() { return atomicNETManagedPlayerBinary_; }
-    const String& GetAtomicNETManagedIPCPlayerBinary() { return atomicNETManagedIPCPlayerBinary_; }
-
     const String& GetMonoExecutableDir() { return monoExecutableDir_; }
-
-
 
     // OSX
     const String& GetPlayerAppFolder() { return playerAppFolder_; }
@@ -148,8 +143,6 @@ private:
     String atomicNETRootDir_;
     String atomicNETCoreAssemblyDir_;
     String atomicNETNuGetBinary_;
-    String atomicNETManagedPlayerBinary_;
-    String atomicNETManagedIPCPlayerBinary_;
     String monoExecutableDir_;
 
     SharedPtr<ToolPrefs> toolPrefs_;

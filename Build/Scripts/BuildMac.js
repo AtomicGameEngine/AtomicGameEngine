@@ -63,9 +63,14 @@ task('atomiceditor', {
       resourceDest + "ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
 
     // AtomicNET
-    if (buildAtomicNET)
+    if (buildAtomicNET) {
+        
       fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
         resourceDest + "ToolData/AtomicNET/Release");
+
+      fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
+        resourceDest + "ToolData/AtomicNET/Build/Projects/AtomicProject.json");
+    }
 
     console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
 

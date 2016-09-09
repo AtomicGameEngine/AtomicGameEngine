@@ -50,7 +50,6 @@ bool BindCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String
     String argument = arguments[startIndex].ToLower();
     sourceRootFolder_ = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;
     packageFolder_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
-    bindPlatform_ = startIndex + 3 < arguments.Size() ? arguments[startIndex + 3] : String::EMPTY;
 
     if (argument != "bind")
     {
@@ -71,13 +70,6 @@ bool BindCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String
         return false;
     }
 
-    if (!bindPlatform_.Length())
-    {
-        errorMsg = "Unable to parse bind command";
-        return false;
-    }
-
-
     return true;
 }
 
@@ -88,7 +80,7 @@ void BindCmd::Run()
     context_->RegisterSubsystem(jsbind);
 
     ATOMIC_LOGINFOF("Loading Package");
-    jsbind->LoadPackage(sourceRootFolder_, packageFolder_, bindPlatform_);
+    jsbind->LoadPackage(sourceRootFolder_, packageFolder_);
 
     jsbind->GenerateJavaScriptBindings();
 

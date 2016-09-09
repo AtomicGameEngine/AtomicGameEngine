@@ -33,6 +33,7 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/Project/Project.h>
+#include <ToolCore/Project/ProjectSettings.h>
 
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
@@ -140,12 +141,36 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     String playerBinary = env->GetEditorBinary();
 
+	ProjectSettings* settings = project->GetProjectSettings();
+
+	String projectAssembly = settings->GetName() + ".dll";
+	String projectExe = settings->GetName() + ".exe";
+
     // TODO: We need to configure project as managed
     bool managed = false;
-    if (fileSystem->FileExists(project->GetResourcePath() + "AtomicProject.dll"))
+    if (fileSystem->FileExists(project->GetResourcePath() + projectAssembly))
     {
         managed = true;
-        playerBinary = env->GetAtomicNETManagedIPCPlayerBinary();
+
+#ifdef ATOMIC_DEV_BUILD
+
+#ifdef ATOMIC_DEBUG		
+		playerBinary = project->GetProjectPath() + "AtomicNET/Debug/Bin/Desktop/" + projectExe;
+#else
+		playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
+#endif
+
+#else
+		// TODO: We are using the release build of the managed project here, how and when to use debug?
+		playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
+#endif
+
+        
+		if (!fileSystem->FileExists(playerBinary))
+		{
+			ATOMIC_LOGERRORF("Managed player: %s does not exist", playerBinary.CString());
+		}
+
     }
 
 

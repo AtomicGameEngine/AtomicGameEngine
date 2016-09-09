@@ -111,7 +111,7 @@ void CSComponent::SendLoadEvent()
 
     VariantMap eventData;
 
-    eventData[P_ASSEMBLYPATH] = assemblyFile_->GetFullPath();
+    eventData[P_ASSEMBLYPATH] = GetFileName(assemblyFile_->GetFullPath());
     eventData[P_CLASSNAME] = componentClassName_;
     eventData[P_NATIVEINSTANCE] = (void*) this;
 

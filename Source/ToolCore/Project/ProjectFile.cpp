@@ -56,10 +56,6 @@ void ProjectFile::WriteNewProject(const String& fullpath)
     jproject.Set("version", "1.0.0");
     root.Set("project", jproject);
 
-    // platforms
-    JSONValue platforms(JSONValue::emptyArray);
-    root.Set("platforms", platforms);
-
     SharedPtr<File> file(new File(context_, fullpath, FILE_WRITE));
     jsonFile->Save(*file, String("   "));
     file->Close();
@@ -83,20 +79,6 @@ void ProjectFile::Save(Project* project)
     JSONValue jproject;
     jproject.Set("version", project_->GetVersion());
     root.Set("project", jproject);
-
-    // platforms
-    JSONArray platforms;
-
-    for (List<PlatformID>::ConstIterator i = project_->platforms_.Begin(); i != project_->platforms_.End(); ++i)
-    {
-        Platform* platform = tsystem->GetPlatformByID(*i);
-        if (platform)
-        {
-            platforms.Push(JSONValue(platform->GetName().ToLower()));
-        }
-    }
-
-    root.Set("platforms", platforms);
 
     // Save to file
     SharedPtr<File> file(new File(context_, fullpath, FILE_WRITE));
@@ -138,28 +120,7 @@ bool ProjectFile::Load(Project* project)
             project_->SetVersion(pversion);
         }
 
-        JSONValue platforms = root.Get("platforms");
-        if (!platforms.IsArray())
-            return false;
     }
-
-    // for now, every project gets all platforms
-
-    project_->AddPlatform(PLATFORMID_WINDOWS);
-    project_->AddPlatform(PLATFORMID_MAC);
-    project_->AddPlatform(PLATFORMID_ANDROID);
-    project_->AddPlatform(PLATFORMID_IOS);
-    project_->AddPlatform(PLATFORMID_WEB);
-
-    /*
-    for (unsigned i = 0; i < platforms.GetSize(); i++)
-    {
-        String jplatform = platforms.GetString(i);
-        Platform* platform = tsystem->GetPlatformByName(jplatform);
-        if (platform)
-            project_->AddPlatform(platform->GetPlatformID());
-    }
-    */
 
     return true;
 

@@ -22,7 +22,6 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
-
 #include <Atomic/Resource/JSONFile.h>
 
 #include "ProjectBuildSettings.h"

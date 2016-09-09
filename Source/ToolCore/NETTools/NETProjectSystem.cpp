@@ -32,6 +32,7 @@
 #include "../Assets/AssetEvents.h"
 #include "../Assets/AssetDatabase.h"
 #include "../Project/Project.h"
+#include "../Project/ProjectSettings.h"
 #include "../Project/ProjectEvents.h"
 
 #include "../Subprocess/SubprocessSystem.h"
@@ -211,9 +212,7 @@ namespace ToolCore
 
         SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 
-        gen->SetScriptPlatform("WINDOWS");
-
-        if (!gen->LoadProject(project))
+        if (!gen->LoadAtomicProject(project->GetProjectPath()))
         {
             ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Load Project");
             return false;
@@ -265,12 +264,15 @@ namespace ToolCore
         using namespace ProjectLoaded;
 
         String projectPath = eventData[P_PROJECTPATH].GetString();
+		Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());		
         
         if (GetExtension(projectPath) == ".atomic")
             projectPath = GetParentPath(projectPath);
 
-        solutionPath_ = AddTrailingSlash(projectPath) + "AtomicNET/Solution/AtomicProject.sln";
-        projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resources/AtomicProject.dll";
+		String projectName = project->GetProjectSettings()->GetName();
+
+        solutionPath_ = AddTrailingSlash(projectPath) + "AtomicNET/Solution/" + projectName + ".sln";
+        projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resources/" + projectName + ".dll";
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
