@@ -688,6 +688,12 @@ void AnimatedModel::ResetMorphWeights()
     MarkNetworkUpdate();
 }
 
+Node* AnimatedModel::GetSkeletonBoneNode(const String & boneName)
+{
+    Bone* bone = skeleton_.GetBone(boneName);
+    return (bone) ? bone->node_ : NULL;
+}
+
 float AnimatedModel::GetMorphWeight(unsigned index) const
 {
     return index < morphs_.Size() ? morphs_[index].weight_ : 0.0f;

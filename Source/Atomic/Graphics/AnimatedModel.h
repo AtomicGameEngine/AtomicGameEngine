@@ -99,6 +99,8 @@ public:
 
     /// Return skeleton.
     Skeleton& GetSkeleton() { return skeleton_; }
+    /// Return the node of a skeleton bone (for script access)
+    Node* GetSkeletonBoneNode(const String& boneName);
 
     /// Return all animation states.
     const Vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
