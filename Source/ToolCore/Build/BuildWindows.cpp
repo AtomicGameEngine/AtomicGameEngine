@@ -173,13 +173,16 @@ void BuildWindows::Build(const String& buildPath)
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     Project* project = tsystem->GetProject();
 
-    buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
+	buildPath_ = AddTrailingSlash(buildPath);
 
+	if (!resourcesOnly_)
+		buildPath_ += GetBuildSubfolder();
+		
     BuildLog("Starting Windows Deployment");
 
     Initialize();
 
-    if (!BuildClean(buildPath_))
+    if (!resourcesOnly_ && !BuildClean(buildPath_))
         return;
 
     String rootSourceDir = tenv->GetRootSourceDir();        
@@ -187,11 +190,18 @@ void BuildWindows::Build(const String& buildPath)
     if (!BuildCreateDirectory(buildPath_))
         return;
 
-    if (!BuildCreateDirectory(buildPath_ + "/AtomicPlayer_Resources"))
+    if (!resourcesOnly_ && !BuildCreateDirectory(buildPath_ + "/AtomicPlayer_Resources"))
         return;
 
     String resourcePackagePath = buildPath_ + "/AtomicPlayer_Resources/AtomicResources" + PAK_EXTENSION;
+
+	if (resourcesOnly_)
+	{
+		resourcePackagePath = buildPath_ + "/AtomicResources" + PAK_EXTENSION;
+	}
+
     GenerateResourcePackage(resourcePackagePath);
+
     if (buildFailed_)
         return;
 

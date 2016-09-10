@@ -35,6 +35,8 @@
 #include "../Project/ProjectSettings.h"
 #include "../Project/ProjectEvents.h"
 
+#include "../Build/BuildSystem.h"
+
 #include "../Subprocess/SubprocessSystem.h"
 
 #include "NETProjectGen.h"
@@ -199,6 +201,34 @@ namespace ToolCore
         }
     }
 
+	bool NETProjectSystem::GenerateResourcePak()
+	{
+		ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+		Project* project = tsystem->GetProject();
+		BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+
+		// TODO: We just use WINDOWS platform for PAK generation for now
+		Platform* platform = tsystem->GetPlatformByName("WINDOWS");
+
+		buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
+
+		SharedPtr<BuildBase> buildBase(platform->NewBuild(project));
+		buildBase->SetResourcesOnly(true);
+		buildBase->SetVerbose(true);
+		buildSystem->QueueBuild(buildBase);
+		buildSystem->StartNextBuild();
+
+		if (buildBase->GetBuildFailed())
+		{
+			const StringVector& errors = buildBase->GetBuildErrors();
+			ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Build Resources.pak: %s", errors.Size() ? errors[0].CString() : "Unknown Error");
+			return false;
+		}
+
+		return true;
+
+	}
+
     bool NETProjectSystem::GenerateSolution()
     {
         ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -209,6 +239,20 @@ namespace ToolCore
             ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - No Project Loaded");
             return false;
         }
+
+		// TODO: Generalize and move me
+		if (project->GetSupportsPlatform("android"))
+		{
+			FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+			if (!fileSystem->FileExists(project->GetProjectPath() + "AtomicNET/Resources/AtomicResources.pak"))
+			{
+				if (!GenerateResourcePak())
+					return false;
+
+			}
+
+		}
 
         SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 

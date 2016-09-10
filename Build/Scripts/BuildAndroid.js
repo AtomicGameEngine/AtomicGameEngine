@@ -8,40 +8,40 @@ var buildDir = host.artifactsRoot + "Build/Android/";
 
 namespace('build', function() {
 
-  task('android_player', ["build:atomiceditor"], {
-    async: true
-  }, function() {
+    task('android_native', {
+        async: true
+    }, function() {
 
-    // Clean build
-    common.cleanCreateDir(buildDir);
+        // Clean build
+        common.cleanCreateDir(buildDir);
 
-    process.chdir(buildDir);
+        process.chdir(buildDir);
 
-    var cmds = [];
+        var cmds = [];
 
-    if (os.platform() == "win32") {
-      cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAndroid.bat");
-    }
-    else {
-      cmds.push("cmake -G \"Unix Makefiles\" -DCMAKE_TOOLCHAIN_FILE=../../../Build/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../");
-      cmds.push("make -j4");
-    }
+        if (os.platform() == "win32") {
+            cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAndroid.bat");
+        }
+        else {
+            cmds.push("cmake -G \"Unix Makefiles\" -DCMAKE_TOOLCHAIN_FILE=../../../Build/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../");
+            cmds.push("make -j4");
+        }
 
-    jake.exec(cmds, function() {
+        jake.exec(cmds, function() {
 
-      var editorAppFolder = host.artifactsRoot + (os.platform() == "win32" ? "AtomicEditor/" : "AtomicEditor/AtomicEditor.app/");
+            var editorAppFolder = host.artifactsRoot + (os.platform() == "win32" ? "AtomicEditor/" : "AtomicEditor/AtomicEditor.app/");
 
-      // Install Deployment
-      fs.copySync(buildDir + "Source/AtomicPlayer/Application/libAtomicPlayer.so",
-        editorAppFolder + "Resources/ToolData/Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so");
+            // Install Deployment
+            fs.copySync(buildDir + "Source/AtomicPlayer/Application/libAtomicPlayer.so",
+            editorAppFolder + "Contents/Resources/ToolData/Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so");
 
-      complete();
+            complete();
 
-    }, {
-      printStdout: true,
-      breakOnError : false
+        }, {
+            printStdout: true,
+            breakOnError : false
+        });
+
     });
-
-  });
 
 }); // end of build namespace

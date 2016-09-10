@@ -67,6 +67,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             menu.addItem(new Atomic.UIMenuItem("Open Solution", `${this.name}.opensolution`));
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
             menu.addItem(new Atomic.UIMenuItem("Generate Solution", `${this.name}.generatesolution`));
+            menu.addItem(new Atomic.UIMenuItem("Package Resources", `${this.name}.packageresources`));
 
             this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
             menu.addItem(this.compileOnSaveMenuItem);
@@ -201,6 +202,9 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
                 case "generatesolution":
                     this.generateSolution();
                     return true;
+                case "packageresources":
+                    this.packageResources();
+                    return true;
                 case "compileonsave":
                     let isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
                     // Toggle
@@ -243,5 +247,15 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
 
     }
 
+    /**
+    * Generate Solution
+    */
+    packageResources() {
+
+        if (ToolCore.netProjectSystem) {
+            ToolCore.netProjectSystem.generateResourcePak();
+        }
+
+    }
 
 }

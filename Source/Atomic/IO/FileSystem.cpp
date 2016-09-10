@@ -439,7 +439,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
     {
         // ATOMIC BEGIN
         // allow opening of http and file urls
-        if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://") && !fileName.StartsWith("file://"))        
+        if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://") && !fileName.StartsWith("file://"))
             if (!FileExists(fileName) && !DirExists(fileName))
             {
                 ATOMIC_LOGERROR("File or directory " + fileName + " not found");
@@ -1261,6 +1261,8 @@ String GetSanitizedPath(const String& path)
     String sanitized = GetInternalPath(path);
     StringVector parts = sanitized.Split('/');
 
+    bool hasTrailingSlash = path.EndsWith("/") || path.EndsWith("\\");
+
 #ifndef ATOMIC_PLATFORM_WINDOWS
 
     bool absolute = IsAbsolutePath(path);
@@ -1273,6 +1275,9 @@ String GetSanitizedPath(const String& path)
     sanitized = String::Joined(parts, "/");
 
 #endif
+
+    if (hasTrailingSlash)
+        sanitized += "/";
 
     return sanitized;
 
@@ -1305,7 +1310,7 @@ bool GetRelativePath(const String& fromPath, const String& toPath, String& outpu
     for (startIdx = 0; startIdx < toParts.Size(); startIdx++)
     {
         if (startIdx >= fromParts.Size() || fromParts[startIdx] != toParts[startIdx])
-            break;       
+            break;
     }
 
     if (startIdx == toParts.Size())

@@ -8,99 +8,120 @@ var editorAppFolder = host.artifactsRoot + "AtomicEditor/";
 
 namespace('build', function() {
 
-  // Builds a standalone Atomic Editor, which can be distributed out of build tree
-  task('atomiceditor', {
-    async: true
-  }, function() {
+    // Builds a standalone Atomic Editor, which can be distributed out of build tree
+    task('atomiceditor', {
+        async: true
+    }, function(android) {
 
-    // Clean build
-    var cleanBuild = true;
-    if (cleanBuild) {
-      common.cleanCreateDir(buildDir);
-      common.cleanCreateDir(editorAppFolder);
-      common.cleanCreateDir(host.getGenScriptRootDir("WINDOWS"));
-    }
+        android = android == "android" ? true : false;
 
-    process.chdir(buildDir);
+        // Clean build
+        var cleanBuild = true;
+        if (cleanBuild) {
+            common.cleanCreateDir(host.artifactsRoot + "AtomicNET/");
+            common.cleanCreateDir(buildDir);
+            common.cleanCreateDir(editorAppFolder);
+            common.cleanCreateDir(host.getGenScriptRootDir());
+        }
 
-    var cmds = [];
+        process.chdir(buildDir);
 
-    // Build the AtomicEditor
-    cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditor.bat");
+        var cmds = [];
 
-    jake.exec(cmds, function() {
+        // Build the AtomicEditor
+        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditor.bat");
+        cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + (android ? "ANDROID" : "WINDOWS") + " Release");
 
-      // Copy the Editor binaries
-      fs.copySync(buildDir + "Source/AtomicEditor/Release",
-        host.artifactsRoot + "AtomicEditor");
+        function copyAtomicNET() {
 
-      // We need some resources to run
-      fs.copySync(atomicRoot + "Resources/CoreData",
-        editorAppFolder + "Resources/CoreData");
+            fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
+            editorAppFolder + "Resources/ToolData/AtomicNET/Release");
 
-      fs.copySync(atomicRoot + "Resources/PlayerData",
-        editorAppFolder + "Resources/PlayerData");
+            fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
+            editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
 
-      fs.copySync(atomicRoot + "Data/AtomicEditor",
-        editorAppFolder + "Resources/ToolData");
+        }
 
-      fs.copySync(atomicRoot + "Resources/EditorData",
-        editorAppFolder + "Resources/EditorData");
+        jake.exec(cmds, function() {
 
-      fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
-        editorAppFolder + "Resources/EditorData/AtomicEditor/EditorScripts");
+            // Copy the Editor binaries
+            fs.copySync(buildDir + "Source/AtomicEditor/Release",
+            host.artifactsRoot + "AtomicEditor");
 
-      fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe",
-        editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/AtomicPlayer.exe");
+            // We need some resources to run
+            fs.copySync(atomicRoot + "Resources/CoreData",
+            editorAppFolder + "Resources/CoreData");
 
-      fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/D3DCompiler_47.dll",
-        editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
+            fs.copySync(atomicRoot + "Resources/PlayerData",
+            editorAppFolder + "Resources/PlayerData");
 
-      // AtomicNET
+            fs.copySync(atomicRoot + "Data/AtomicEditor",
+            editorAppFolder + "Resources/ToolData");
 
-      fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
-        editorAppFolder + "Resources/ToolData/AtomicNET/Release");
+            fs.copySync(atomicRoot + "Resources/EditorData",
+            editorAppFolder + "Resources/EditorData");
 
-      fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
-        editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
+            fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
+            editorAppFolder + "Resources/EditorData/AtomicEditor/EditorScripts");
 
-      console.log("Atomic Editor build to ", editorAppFolder);
+            fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe",
+            editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/AtomicPlayer.exe");
 
-      complete();
+            fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/D3DCompiler_47.dll",
+            editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
 
-    }, {
-      printStdout: true
+            if (android) {
+
+                var androidNativeTask = jake.Task['build:android_native'];
+
+                androidNativeTask.addListener('complete', function () {
+                    copyAtomicNET();
+                    console.log("\nAtomic Editor build to ", editorAppFolder);
+                    complete();
+                });
+
+                androidNativeTask.invoke();
+
+            }
+            else {
+                copyAtomicNET();
+                console.log("\nAtomic Editor build to ", editorAppFolder);
+                complete();
+            }
+
+        }, {
+            printStdout: true
+        });
+
     });
 
-  });
+    // Generate a Visual Studio 2015 solution
+    task('genvs2015', {
+        async: true
+    }, function(devBuild) {
+        if (devBuild === undefined)
+        devBuild = 1;
 
-  // Generate a Visual Studio 2015 solution
-  task('genvs2015', {
-    async: true
-  }, function(devBuild) {
-    if (devBuild === undefined)
-      devBuild = 1;
+        var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
 
-    var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
+        if (!fs.existsSync(slnRoot)) {
+            jake.mkdirP(slnRoot);
+        }
 
-    if (!fs.existsSync(slnRoot)) {
-        jake.mkdirP(slnRoot);
-    }
+        process.chdir(slnRoot);
 
-    process.chdir(slnRoot);
+        var cmds = [];
 
-    var cmds = [];
+        cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild);
 
-    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild);
+        jake.exec(cmds, function() {
 
-    jake.exec(cmds, function() {
+            complete();
 
-      complete();
+        }, {
+            printStdout: true
+        });
 
-    }, {
-      printStdout: true
     });
-
-  });
 
 }); // end of build namespace
