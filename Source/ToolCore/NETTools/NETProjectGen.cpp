@@ -60,6 +60,9 @@ namespace ToolCore
 
 		String atomicProjectPath = projectGen_->GetAtomicProjectPath();
 
+		// TODO: This is the cause of a bunch of "GetSanitizedPath" calls,
+		// It should be removed, and the few places in csproj/sln that need backslash
+		// adjusted there
 		atomicProjectPath.Replace("/", "\\");
 
 		if (atomicProjectPath.Length())
@@ -236,7 +239,7 @@ namespace ToolCore
 				}
 
 				if (platform.Length())
-				{					
+				{
 					String atomicNETAssembly = tenv->GetAtomicNETCoreAssemblyDir() + ToString("%s/%s.dll", platform.CString(), ref.CString());
 					xref = igroup.CreateChild("Reference");
 					xref.SetAttribute("Include", atomicNETAssembly);
@@ -526,7 +529,7 @@ namespace ToolCore
 
 		if (SupportsDesktop())
 		{
-			// AtomicNETNative 
+			// AtomicNETNative
 
 			XMLElement atomicNETNativeDLL = itemGroup.CreateChild("None");
 
@@ -548,7 +551,7 @@ namespace ToolCore
 #endif
 
 #ifdef ATOMIC_DEV_BUILD
-			
+
 			String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/" + platform + "/" + filename;
 #else
 			String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/" + platform + "/" + filename;
@@ -624,7 +627,7 @@ namespace ToolCore
 			// TODO: more than armeabi-v7a (which this is)
 			String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/Android/libAtomicNETNative.so";
 
-			XMLElement nativeLibrary =  projectRoot.CreateChild("ItemGroup").CreateChild("AndroidNativeLibrary"); 
+			XMLElement nativeLibrary =  projectRoot.CreateChild("ItemGroup").CreateChild("AndroidNativeLibrary");
 			nativeLibrary.SetAttribute("Include", nativePath);
 
 			nativeLibrary.CreateChild("Link").SetValue("Libs\\armeabi-v7a\\libAtomicNETNative.so");
@@ -695,8 +698,8 @@ namespace ToolCore
 	bool NETCSProject::GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output)
 	{
 		String path = fromPath;
-
 		ReplacePathStrings(path);
+		path = GetSanitizedPath(path);
 
 		String relativePath;
 
@@ -772,7 +775,7 @@ namespace ToolCore
 				{
 					pgroup.CreateChild("ProjectTypeGuids").SetValue("{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
 				}
-				
+
 				pgroup.CreateChild("AndroidUseLatestPlatformSdk").SetValue("True");
 
 				if (!androidApplication_)
@@ -795,14 +798,15 @@ namespace ToolCore
 
 					String manifestSourceFile = "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/Android/Properties/AndroidManifest.xml";
 					ReplacePathStrings(manifestSourceFile);
+					manifestSourceFile = GetSanitizedPath(manifestSourceFile);
 
 					if (fileSystem->FileExists(manifestSourceFile))
 					{
-						String manifestDest = projectPath_ + "Properties/";
+						String manifestDest = GetSanitizedPath(projectPath_ + "Properties/");
 
 						if (!fileSystem->DirExists(manifestDest))
 						{
-							fileSystem->CreateDirs(projectGen_->GetAtomicProjectPath(), ToString("AtomicNET/Solution/%s/Properties/", name_.CString()));
+							fileSystem->CreateDirs(GetSanitizedPath(projectGen_->GetAtomicProjectPath()), ToString("/AtomicNET/Solution/%s/Properties/", name_.CString()));
 						}
 
 						if (fileSystem->DirExists(manifestDest))
@@ -816,11 +820,11 @@ namespace ToolCore
 						{
 							ATOMIC_LOGERRORF("Unable to create folder %s for AndroidManifest.xml", manifestDest.CString());
 						}
-						
+
 					}
 					else
 					{
-						ATOMIC_LOGERROR("No AndroidManifest.xml, project will not deploy");
+						ATOMIC_LOGERRORF("No AndroidManifest.xml, project will not deploy (%s)", manifestSourceFile.CString());
 					}
 
 					String relativePath;
@@ -833,7 +837,7 @@ namespace ToolCore
 					{
 						ATOMIC_LOGERROR("Unabled to get relative path for AndroidResgenFile");
 					}
-					
+
 					pgroup.CreateChild("GenerateSerializationAssemblies").SetValue("Off");
 				}
 
@@ -1111,10 +1115,11 @@ namespace ToolCore
 		assemblyName_ = root["assemblyName"].GetString();
 		assemblyOutputPath_ = root["assemblyOutputPath"].GetString();
 		ReplacePathStrings(assemblyOutputPath_);
+		assemblyOutputPath_ = GetSanitizedPath(assemblyOutputPath_);
 
 		assemblySearchPaths_ = root["assemblySearchPaths"].GetString();
-
 		ReplacePathStrings(assemblySearchPaths_);
+		assemblySearchPaths_ = GetSanitizedPath(assemblySearchPaths_);
 
 		const JSONArray& platforms = root["platforms"].GetArray();
 
@@ -1311,7 +1316,7 @@ namespace ToolCore
 							source += ToString("        %s\\%s.projitems*{%s}*SharedItemsImports = 4\n", p->name_.CString(), p->name_.CString(), p2->projectGuid_.CString());
 						}
 					}
-						
+
 				}
 
 
@@ -1574,7 +1579,7 @@ namespace ToolCore
 			atomicProjectPath_ = AddTrailingSlash(atomicProjectPath);
 		}
 
-		// Do we have a loaded project?  
+		// Do we have a loaded project?
 		if (Project* project = tsystem->GetProject())
 		{
 			// If so, use loaded project settings
@@ -1645,7 +1650,7 @@ namespace ToolCore
 #else
 		return LoadProject(jvalue);
 #endif
-		
+
 	}
 
 	void NETProjectGen::SetSupportedPlatforms(const StringVector& platforms)

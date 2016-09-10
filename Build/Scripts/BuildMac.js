@@ -6,108 +6,128 @@ var atomicRoot = host.atomicRoot;
 
 var buildDir = host.artifactsRoot + "Build/Mac/";
 var editorAppFolder = host.artifactsRoot + "/AtomicEditor/AtomicEditor.app/";
+var resourceDest = editorAppFolder + "/Contents/Resources/"
 
 namespace('build', function() {
 
-// Builds a standalone Atomic Editor, which can be distributed out of build tree
-task('atomiceditor', {
-  async: true
-}, function() {
+    // Builds a standalone Atomic Editor, which can be distributed out of build tree
+    task('atomiceditor', {
+        async: true
+    }, function(android) {
 
-  // Clean build
-  var cleanBuild = true;
-  if (cleanBuild) {
-    common.cleanCreateDir(buildDir);
-    common.cleanCreateDir(editorAppFolder);
-    common.cleanCreateDir(host.getGenScriptRootDir("MACOSX"));
-  }
+        android = android == "android" ? true : false;
 
-  var buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
+        // Clean build
+        var cleanBuild = true;
+        if (cleanBuild) {
+            common.cleanCreateDir(host.artifactsRoot + "AtomicNET/");
+            common.cleanCreateDir(buildDir);
+            common.cleanCreateDir(editorAppFolder);
+            common.cleanCreateDir(host.getGenScriptRootDir());
+        }
 
-  process.chdir(buildDir);
+        var buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
 
-  var cmds = [];
+        process.chdir(buildDir);
 
-  cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -G Xcode");
-  cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -target AtomicNETNative -configuration Release -parallelizeTargets -jobs 4")
+        var cmds = [];
 
-  if (buildAtomicNET)
-    cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json MACOSX Release");
+        cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -G Xcode");
+        cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -target AtomicNETNative -configuration Release -parallelizeTargets -jobs 4")
 
-  jake.exec(cmds, function() {
+        if (buildAtomicNET)
+            cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + (android ? "ANDROID" : "WINDOWS") + " Release");
 
-    fs.copySync(buildDir + "Source/AtomicEditor/Release/AtomicEditor.app", editorAppFolder);
+        function copyAtomicNET() {
 
-    var resourceDest = editorAppFolder + "/Contents/Resources/"
+            if (!buildAtomicNET)
+                return;
 
-    // We need some resources to run
-    fs.copySync(atomicRoot + "Resources/CoreData",
-      resourceDest + "CoreData");
+            fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
+            resourceDest + "ToolData/AtomicNET/Release");
 
-    fs.copySync(atomicRoot + "Resources/PlayerData",
-      resourceDest + "PlayerData");
+            fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
+            resourceDest + "ToolData/AtomicNET/Build/Projects/AtomicProject.json");
 
-    fs.copySync(atomicRoot + "Data/AtomicEditor",
-      resourceDest + "ToolData");
+        }
 
-    fs.copySync(atomicRoot + "Resources/EditorData",
-      resourceDest + "EditorData");
 
-    fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
-      resourceDest + "EditorData/AtomicEditor/EditorScripts");
+        jake.exec(cmds, function() {
 
-    // copy the mac player binary to deployment
-    var playerBinary =  buildDir +  "Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
+            fs.copySync(buildDir + "Source/AtomicEditor/Release/AtomicEditor.app", editorAppFolder);
 
-    fs.copySync(playerBinary,
-      resourceDest + "ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
+            // We need some resources to run
+            fs.copySync(atomicRoot + "Resources/CoreData",
+            resourceDest + "CoreData");
 
-    // AtomicNET
-    if (buildAtomicNET) {
-        
-      fs.copySync(atomicRoot + "Artifacts/AtomicNET/Release",
-        resourceDest + "ToolData/AtomicNET/Release");
+            fs.copySync(atomicRoot + "Resources/PlayerData",
+            resourceDest + "PlayerData");
 
-      fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
-        resourceDest + "ToolData/AtomicNET/Build/Projects/AtomicProject.json");
-    }
+            fs.copySync(atomicRoot + "Data/AtomicEditor",
+            resourceDest + "ToolData");
 
-    console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
+            fs.copySync(atomicRoot + "Resources/EditorData",
+            resourceDest + "EditorData");
 
-    complete();
+            fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
+            resourceDest + "EditorData/AtomicEditor/EditorScripts");
 
-  }, {
-    printStdout: true
-  });
+            // copy the mac player binary to deployment
+            var playerBinary =  buildDir +  "Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
 
-});
+            fs.copySync(playerBinary, resourceDest + "ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
 
-// Generate a XCode Workspace
-task('genxcode', {
-  async: true
-}, function() {
+            if (android) {
 
-  var xcodeRoot = path.resolve(atomicRoot, "") + "-XCode";
+                var androidNativeTask = jake.Task['build:android_native'];
 
-  if (!fs.existsSync(xcodeRoot)) {
-      jake.mkdirP(xcodeRoot);
-  }
+                androidNativeTask.addListener('complete', function () {
+                    copyAtomicNET();
+                    console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
+                    complete();
+                });
 
-  process.chdir(xcodeRoot);
+                androidNativeTask.invoke();
 
-  var cmds = [];
+            }
+            else {
+                copyAtomicNET();
+                console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
+                complete();
+            }
 
-  cmds.push("cmake ../AtomicGameEngine -DATOMIC_DEV_BUILD=1 -G Xcode");
+        }, {
+            printStdout: true
+        });
 
-  jake.exec(cmds, function() {
+    });
 
-    complete();
+    // Generate a XCode Workspace
+    task('genxcode', {
+        async: true
+    }, function() {
 
-  }, {
-    printStdout: true
-  });
+        var xcodeRoot = path.resolve(atomicRoot, "") + "-XCode";
 
-});
+        if (!fs.existsSync(xcodeRoot)) {
+            jake.mkdirP(xcodeRoot);
+        }
+
+        process.chdir(xcodeRoot);
+
+        var cmds = [];
+
+        cmds.push("cmake ../AtomicGameEngine -DATOMIC_DEV_BUILD=1 -G Xcode");
+
+        jake.exec(cmds, function() {
+
+            complete();
+
+        }, {
+            printStdout: true
+        });
+
+    });
 
 
 });// end of build namespace

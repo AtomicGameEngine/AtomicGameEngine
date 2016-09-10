@@ -20,7 +20,7 @@ if "%ATOMICEDITOR_ANDROID%" == "YES" (
     @echo:
     echo Building Atomic Editor with Android support
     @echo:
-    set ATOMICEDITOR_BUILD_CMD=!ATOMICEDITOR_BUILD_CMD!["android"]
+    set ATOMICEDITOR_BUILD_CMD=!ATOMICEDITOR_BUILD_CMD![android]
 )
 
 @echo:
