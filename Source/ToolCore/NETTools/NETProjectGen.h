@@ -76,6 +76,10 @@ namespace ToolCore
 
 		bool GetIsPCL() const { return projectTypeGuids_.Contains("{786C830F-07A1-408B-BD7F-6EE04809D6DB}"); }
 
+        bool GetIsPlayerApp() const { return playerApplication_; }
+        bool SupportsDesktop() const;
+        bool SupportsPlatform(const String& platform, bool explicitCheck = true) const;
+
         bool Generate();
 
     private:
@@ -99,12 +103,13 @@ namespace ToolCore
 
 		void CreateApplicationItems(XMLElement &projectRoot);
 		void CreateAndroidItems(XMLElement &projectRoot);
+        void CreateIOSItems(XMLElement &projectRoot);
 
         void CreateAssemblyInfo();
         void GetAssemblySearchPaths(String& paths);
 
-		bool SupportsDesktop() const;
-		bool SupportsPlatform(const String& platform, bool explicitCheck = true) const;
+        void ProcessDefineConstants(StringVector& constants);
+
 
         String name_;
         String projectGuid_;
@@ -138,6 +143,12 @@ namespace ToolCore
 
 		// Android
 		bool androidApplication_;
+
+        // iOS
+        String objcBindingApiDefinition_;
+        String codesignEntitlements_;
+        String infoPList_;
+
 		
     };
 

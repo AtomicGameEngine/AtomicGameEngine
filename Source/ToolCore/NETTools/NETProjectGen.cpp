@@ -237,6 +237,12 @@ namespace ToolCore
 
 					platform = "Android";
 				}
+                else if (SupportsPlatform("ios"))
+                {
+                    ref = "AtomicNET";
+                    platform = "iOS";
+                }
+
 
 				if (platform.Length())
 				{
@@ -374,10 +380,23 @@ namespace ToolCore
 		paths.Join(searchPaths, ";");
 	}
 
+    void NETCSProject::ProcessDefineConstants(StringVector& constants)
+    {
+        const Vector<String>& globalConstants = projectGen_->GetGlobalDefineConstants();
+        constants += globalConstants;
+
+        if (constants.Contains("ATOMIC_IOS") || constants.Contains("ATOMIC_ANDROID"))
+            constants.Push("ATOMIC_MOBILE");
+    }
+
 	void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
 	{
 		XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
-		pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ");
+
+        if (playerApplication_ && SupportsPlatform("ios"))
+            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|iPhone' ");
+        else
+            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ");
 
 		pgroup.CreateChild("Optimize").SetValue("true");
 
@@ -391,8 +410,7 @@ namespace ToolCore
 
 		constants += defineConstants_;
 
-		const Vector<String>& globalConstants = projectGen_->GetGlobalDefineConstants();
-		constants += globalConstants;
+        ProcessDefineConstants(constants);
 
 		pgroup.CreateChild("DefineConstants").SetValue(String::Joined(constants, ";").CString());
 		pgroup.CreateChild("ErrorReport").SetValue("prompt");
@@ -429,16 +447,27 @@ namespace ToolCore
 		}
 		else
 		{
-			pgroup.CreateChild("DebugType").SetValue("pdbonly");
-
 			if (SupportsPlatform("android"))
 			{
+                pgroup.CreateChild("DebugType").SetValue("pdbonly");
+
 				if (outputType_.ToLower() != "library")
 				{
 					pgroup.CreateChild("AndroidUseSharedRuntime").SetValue("False");
 					pgroup.CreateChild("AndroidLinkMode").SetValue("SdkOnly");
 				}
 			}
+            else if (playerApplication_ && SupportsPlatform("ios"))
+            {
+                pgroup.CreateChild("DebugType").SetValue("none");
+
+                pgroup.CreateChild("MtouchArch").SetValue("ARMv7, ARM64");
+                pgroup.CreateChild("CodesignEntitlements").SetValue(GetSanitizedPath(codesignEntitlements_));
+                pgroup.CreateChild("CodesignKey").SetValue("iPhone Developer");
+                pgroup.CreateChild("MtouchDebug").SetValue("true");
+                pgroup.CreateChild("MtouchOptimizePNGs").SetValue("False");
+            }
+
 		}
 
 	}
@@ -446,7 +475,12 @@ namespace ToolCore
 	void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
 	{
 		XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
-		pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ");
+
+        if (playerApplication_ && SupportsPlatform("ios"))
+            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|iPhone' ");
+        else
+            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ");
+
 
 		pgroup.CreateChild("Optimize").SetValue("false");
 
@@ -460,9 +494,7 @@ namespace ToolCore
 		constants.Push("TRACE");
 
 		constants += defineConstants_;
-
-		const Vector<String>& globalConstants = projectGen_->GetGlobalDefineConstants();
-		constants += globalConstants;
+        ProcessDefineConstants(constants);
 
 		pgroup.CreateChild("DefineConstants").SetValue(String::Joined(constants, ";").CString());
 
@@ -516,6 +548,17 @@ namespace ToolCore
 				pgroup.CreateChild("AndroidEnableMultiDex").SetValue("False");
 				pgroup.CreateChild("AndroidSupportedAbis").SetValue("armeabi-v7a");
 			}
+            else if (playerApplication_ && SupportsPlatform("ios"))
+            {
+                pgroup.CreateChild("MtouchArch").SetValue("ARMv7, ARM64");
+                pgroup.CreateChild("CodesignEntitlements").SetValue(GetSanitizedPath(codesignEntitlements_));
+                pgroup.CreateChild("CodesignKey").SetValue("iPhone Developer");
+                pgroup.CreateChild("MtouchDebug").SetValue("true");
+                pgroup.CreateChild("MtouchFastDev").SetValue("true");
+                pgroup.CreateChild("IpaPackageName").SetValue("");
+                pgroup.CreateChild("OptimizePNGs").SetValue("false");
+                pgroup.CreateChild("MtouchOptimizePNGs").SetValue("False");
+            }
 		}
 
 
@@ -570,16 +613,68 @@ namespace ToolCore
 		}
 		else
 		{
-			const String& projectPath = projectGen_->GetAtomicProjectPath();
+			const String& projectPath = projectGen_->GetAtomicProjectPath();            
 			if (!playerApplication_ || !projectPath.Length())
 				return;
 
-			XMLElement androidAsset = itemGroup.CreateChild("AndroidAsset");
-			androidAsset.SetAttribute("Include", projectPath + "AtomicNET/Resources/AtomicResources.pak");
-			androidAsset.CreateChild("Link").SetValue("Assets\\AtomicResources.pak");
+            if (androidApplication_)
+            {
+                XMLElement androidAsset = itemGroup.CreateChild("AndroidAsset");
+                androidAsset.SetAttribute("Include", projectPath + "AtomicNET/Resources/AtomicResources.pak");
+                androidAsset.CreateChild("Link").SetValue("Assets\\AtomicResources.pak");
+            }
+            else
+            {
+                XMLElement bundleResource = itemGroup.CreateChild("BundleResource");
+                bundleResource.SetAttribute("Include", projectPath + "AtomicNET/Resources/AtomicResources.pak");
+                bundleResource.CreateChild("Link").SetValue("Resources\\AtomicResources.pak");
+                bundleResource.CreateChild("CopyToOutputDirectory").SetValue("PreserveNewest");
+            }
 		}
 
 	}
+
+    void NETCSProject::CreateIOSItems(XMLElement &projectRoot)
+    {
+        XMLElement iosGroup = projectRoot.CreateChild("ItemGroup");
+
+        if (objcBindingApiDefinition_.Length())
+        {
+            iosGroup.CreateChild("ObjcBindingApiDefinition").SetAttribute("Include", GetSanitizedPath(objcBindingApiDefinition_));
+        }
+
+        if (name_ == "AtomicNET.iOS")
+        {
+            ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
+#ifdef ATOMIC_DEBUG
+            String config = "Debug";
+#else
+            String config = "Release";
+#endif
+
+            String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/iOS/AtomicNETNative.framework";
+            iosGroup.CreateChild("ObjcBindingNativeFramework").SetAttribute("Include", GetSanitizedPath(nativePath));
+
+            // framework copy
+            XMLElement none = iosGroup.CreateChild("None");
+            none.SetAttribute("Include", nativePath + ".zip");
+            none.CreateChild("Link").SetValue("AtomicNETNative.framework.zip");
+            none.CreateChild("CopyToOutputDirectory").SetValue("Always");
+
+        }
+        else if (playerApplication_)
+        {
+            XMLElement plist = iosGroup.CreateChild("None");
+            plist.SetAttribute("Include", GetSanitizedPath(infoPList_));
+            plist.CreateChild("Link").SetValue("Info.plist");
+
+            XMLElement entitlements = iosGroup.CreateChild("Content");
+            entitlements.SetAttribute("Include", GetSanitizedPath(codesignEntitlements_));
+            entitlements.CreateChild("Link").SetValue("Entitlements.plist");
+        }
+
+    }
 
 	void NETCSProject::CreateAndroidItems(XMLElement &projectRoot)
 	{
@@ -729,8 +824,11 @@ namespace ToolCore
 
 		// Platform
 		XMLElement platform = pgroup.CreateChild("Platform");
-		platform.SetAttribute("Condition", " '$(Platform)' == '' ");
-		platform.SetValue("AnyCPU");
+        platform.SetAttribute("Condition", " '$(Platform)' == '' ");
+        if (playerApplication_ && SupportsPlatform("ios"))
+            platform.SetValue("iPhone");
+        else
+            platform.SetValue("AnyCPU");
 
 		// ProjectGuid
 		XMLElement guid = pgroup.CreateChild("ProjectGuid");
@@ -766,7 +864,14 @@ namespace ToolCore
 			pgroup.CreateChild("ProductVersion").SetValue("8.0.30703");
 			pgroup.CreateChild("SchemaVersion").SetValue("2.0");
 
-			pgroup.CreateChild("TargetFrameworkVersion").SetValue("v6.0");
+            if (SupportsPlatform("ios"))
+            {
+                pgroup.CreateChild("IPhoneResourcePrefix").SetValue("Resources");
+            }
+            else
+            {
+                pgroup.CreateChild("TargetFrameworkVersion").SetValue("v6.0");
+            }
 
 			if (SupportsPlatform("android"))
 			{
@@ -944,6 +1049,12 @@ namespace ToolCore
 		{
 			CreateAndroidItems(project);
 		}
+
+        if (SupportsPlatform("ios"))
+        {
+            CreateIOSItems(project);
+        }
+
 
 		if (SupportsDesktop() && !GetIsPCL())
 			project.CreateChild("Import").SetAttribute("Project", "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
@@ -1213,6 +1324,16 @@ namespace ToolCore
 
 		targetFrameworkProfile_ = root["targetFrameworkProfile"].GetString();
 
+        // iOS
+        objcBindingApiDefinition_ = root["objcBindingApiDefinition"].GetString();
+        ReplacePathStrings(objcBindingApiDefinition_);
+
+        codesignEntitlements_ = root["codesignEntitlements"].GetString();
+        ReplacePathStrings(codesignEntitlements_);
+
+        infoPList_ = root["infoPList"].GetString();
+        ReplacePathStrings(infoPList_);
+
 		return true;
 	}
 
@@ -1327,7 +1448,9 @@ namespace ToolCore
 
 		source += "    GlobalSection(SolutionConfigurationPlatforms) = preSolution\n";
 		source += "        Debug|Any CPU = Debug|Any CPU\n";
-		source += "        Release|Any CPU = Release|Any CPU\n";
+		source += "        Release|Any CPU = Release|Any CPU\n";        
+        source += "        Debug|iPhone = Debug|iPhone\n";
+        source += "        Release|iPhone = Release|iPhone\n";
 		source += "    EndGlobalSection\n";
 		source += "    GlobalSection(ProjectConfigurationPlatforms) = postSolution\n";
 
@@ -1338,10 +1461,22 @@ namespace ToolCore
 			if (p->outputType_ == "Shared")
 				continue;
 
-			source += ToString("        {%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n", p->GetProjectGUID().CString());
-			source += ToString("        {%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\n", p->GetProjectGUID().CString());
-			source += ToString("        {%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\n", p->GetProjectGUID().CString());
-			source += ToString("        {%s}.Release|Any CPU.Build.0 = Release|Any CPU\n", p->GetProjectGUID().CString());
+            String cpu = "Any CPU";
+            if (p->GetIsPlayerApp() && p->SupportsPlatform("ios"))
+                cpu = "iPhone";
+
+            source += ToString("        {%s}.Debug|%s.ActiveCfg = Debug|%s\n", p->GetProjectGUID().CString(), cpu.CString(), cpu.CString());
+            source += ToString("        {%s}.Debug|%s.Build.0 = Debug|%s\n", p->GetProjectGUID().CString(), cpu.CString(), cpu.CString());
+            source += ToString("        {%s}.Release|%s.ActiveCfg = Release|%s\n", p->GetProjectGUID().CString(), cpu.CString(), cpu.CString());
+            source += ToString("        {%s}.Release|%s.Build.0 = Release|%s\n", p->GetProjectGUID().CString(), cpu.CString(), cpu.CString());
+
+            if (cpu != "iPhone" && (p->SupportsPlatform("ios", false)))
+            {                               
+                source += ToString("        {%s}.Debug|iPhone.ActiveCfg = Debug|Any CPU\n", p->GetProjectGUID().CString());
+                source += ToString("        {%s}.Debug|iPhone.Build.0 = Debug|Any CPU\n", p->GetProjectGUID().CString());
+                source += ToString("        {%s}.Release|iPhone.ActiveCfg = Release|Any CPU\n", p->GetProjectGUID().CString());
+                source += ToString("        {%s}.Release|iPhone.Build.0 = Release|Any CPU\n", p->GetProjectGUID().CString());
+            }
 		}
 
 		source += "    EndGlobalSection\n";
@@ -1563,7 +1698,6 @@ namespace ToolCore
 
 	bool NETProjectGen::LoadAtomicProject(const String& atomicProjectPath)
 	{
-		FileSystem* fileSystem = GetSubsystem<FileSystem>();
 		ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 		ToolSystem* tsystem = GetSubsystem<ToolSystem>();
 
@@ -1589,7 +1723,7 @@ namespace ToolCore
 		{
 			// Nope, load them up
 			projectSettings_ = SharedPtr<ProjectSettings>(new ProjectSettings(context_));
-			projectSettings_->Load(atomicProjectPath_ + "Settings/Platforms.json");
+            projectSettings_->Load(atomicProjectPath_ + "Settings/Project.json");
 		}
 
 #ifdef ATOMIC_DEV_BUILD

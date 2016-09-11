@@ -89,6 +89,7 @@ namespace ToolCore
 
 		if (!fileSystem->FileExists(path))
 		{
+            ATOMIC_LOGERRORF("No platform settings specified, using default: %s", path.CString());
 			SetDefault();
 			return true;
 		}
@@ -144,7 +145,7 @@ namespace ToolCore
 
 		if (!platforms_.Size())
 		{
-			ATOMIC_LOGERRORF("No valif platforms defined in platform settings: %s, using default", path.CString());
+            ATOMIC_LOGERRORF("No valid platforms defined in platform settings: %s, using default", path.CString());
 			SetDefault();
 		}
 

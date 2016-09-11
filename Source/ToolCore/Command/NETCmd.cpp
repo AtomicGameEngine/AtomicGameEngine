@@ -67,11 +67,34 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
         return false;
     }
 
+    if (command_ == "compile" || command_ == "genresources")
+    {
+        for (unsigned i = startIndex + 3; i < arguments.Size(); i++)
+        {
+            if (arguments[i].Length() > 1 && arguments[i][0] == '-')
+            {
+                String argument = arguments[i].Substring(1).ToLower();
+                String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+                if (argument == "platform" && !value.Empty())
+                {
+                    platforms_.Push(value);
+                    i++;
+                }
+                else if (argument == "config" && !value.Empty())
+                {
+                    configurations_.Push(value);
+                    i++;
+                }
+            }
+        }
+    }
+
     if (command_ == "compile")
     {
+        // solution
         solutionPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
-        platform_ = startIndex + 3 < arguments.Size() ? arguments[startIndex + 3] : String::EMPTY;
-        configuration_ = startIndex + 4 < arguments.Size() ? arguments[startIndex + 4] : "Release";
+
 
         bool exists = false;
 
@@ -87,19 +110,32 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
             return false;
         }
 
-        if (!platform_.Length())
+        if (!platforms_.Size())
         {
             errorMsg = "Platform not specified";
             return false;
         }
+
+        if (!configurations_.Size())
+        {
+            errorMsg = "configuration not specified";
+            return false;
+        }
+
 
         return true;
     }
 	else if (command_ == "genresources")
 	{
 		projectPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
-		platform_ = startIndex + 3 < arguments.Size() ? arguments[startIndex + 3] : String::EMPTY;
 		requiresProjectLoad_ = true;
+
+        if (!platforms_.Size())
+        {
+            errorMsg = "Platform not specified";
+            return false;
+        }
+
 	}
     else
     {
@@ -136,8 +172,6 @@ void NETCmd::Run()
     if (command_ == "compile")
     {
 		
-		FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
         NETBuildSystem* buildSystem = new NETBuildSystem(context_);
         context_->RegisterSubsystem(buildSystem);
 
@@ -173,7 +207,7 @@ void NETCmd::Run()
 		}
 
 		// json project file
-		build = buildSystem->Build(solutionPath_, platform_, configuration_);
+        build = buildSystem->Build(solutionPath_, platforms_, configurations_);
 
         if (!build)
         {
@@ -200,11 +234,11 @@ void NETCmd::Run()
 
 		buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
 
-		Platform* platform = toolSystem->GetPlatformByName(platform_);
+        Platform* platform = toolSystem->GetPlatformByName(platforms_[0]);
 
 		if (!platform)
 		{
-			Error(ToString("Unknown platform %s", platform_.CString()));
+            Error(ToString("Unknown platform %s", platforms_[0].CString()));
 			Finished();
 			return;
 		}

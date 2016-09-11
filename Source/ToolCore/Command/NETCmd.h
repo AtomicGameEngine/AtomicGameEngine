@@ -64,8 +64,8 @@ private:
 
     // compile
     String solutionPath_;
-    String platform_;
-    String configuration_;
+    StringVector platforms_;
+    StringVector configurations_;
 
 	bool requiresProjectLoad_;
 
