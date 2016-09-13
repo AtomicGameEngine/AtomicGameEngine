@@ -332,6 +332,21 @@ namespace AtomicEngine
 
         }
 
+        void HandleComponentAssemblyReference(uint eventType, ScriptVariantMap eventData)
+        {
+#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+            string assemblyPath = eventData["AssemblyPath"];
+
+            string assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
+            if (componentCache.ContainsKey(assemblyName))
+                return;
+
+            Assembly assembly = Assembly.LoadFrom(assemblyPath);
+
+            ParseAssembly(assembly);
+#endif
+        }
+
         void ParseComponents()
         {
 #if ATOMIC_DESKTOP || ATOMIC_ANDROID
@@ -340,27 +355,33 @@ namespace AtomicEngine
 
             foreach (Assembly assembly in assemblies)
             {
-                String assemblyPath = assembly.GetName().Name;
+                ParseAssembly(assembly);
+            }
+#endif
+        }
 
-                Dictionary<string, CSComponentInfo> assemblyTypes = null;
+        void ParseAssembly(Assembly assembly)
+        {
+#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+            String assemblyPath = assembly.GetName().Name;
 
-                if (!componentCache.TryGetValue(assemblyPath, out assemblyTypes))
+            Dictionary<string, CSComponentInfo> assemblyTypes = null;
+
+            if (!componentCache.TryGetValue(assemblyPath, out assemblyTypes))
+            {
+                componentCache[assemblyPath] = assemblyTypes = new Dictionary<string, CSComponentInfo>();
+            }
+
+            Type[] types = assembly.GetTypes();
+
+            foreach (var type in types)
+            {
+                if (type.IsSubclassOf(typeof(CSComponent)))
                 {
-                    componentCache[assemblyPath] = assemblyTypes = new Dictionary<string, CSComponentInfo>();
+                    var csinfo = new CSComponentInfo(type);
+                    csinfoLookup[csinfo.Type] = csinfo;
+                    assemblyTypes[type.Name] = csinfo;
                 }
-
-                Type[] types = assembly.GetTypes();
-
-                foreach (var type in types)
-                {
-                    if (type.IsSubclassOf(typeof(CSComponent)))
-                    {
-                        var csinfo = new CSComponentInfo(type);
-                        csinfoLookup[csinfo.Type] = csinfo;
-                        assemblyTypes[type.Name] = csinfo;
-                    }
-                }
-
             }
 #endif
         }
@@ -370,7 +391,8 @@ namespace AtomicEngine
 
             instance = new CSComponentCore();
             instance.ParseComponents();
-            
+
+            instance.SubscribeToEvent("CSComponentAssemblyReference", instance.HandleComponentAssemblyReference);
             instance.SubscribeToEvent("CSComponentLoad", instance.HandleComponentLoad);
             instance.SubscribeToEvent("Update", instance.HandleUpdate);
 
