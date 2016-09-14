@@ -16,3 +16,4 @@ require("./BuildAndroid");
 require("./BuildIOS");
 require("./BuildWeb");
 require("./BuildAtomicNET");
+require("./BuildLint");

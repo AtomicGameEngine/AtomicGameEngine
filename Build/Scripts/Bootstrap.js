@@ -1,15 +1,17 @@
 
-var os = require('os');
-
-// Parse args
-var options = require('./Minimist')(process.argv.slice(2));
-var cmd = options._[0];
-
 // Load `jake` global
 require('../node_modules/jake/lib/jake');
 
-// Load jake tasks, etc
+// Load jake tasks, patch in our node modules, etc
 var host = require('./Host');
+
+var os = require('os');
+
+// Parse args
+var options = require('minimist')(process.argv.slice(2));
+var cmd = options._[0];
+
+
 
 // Make options availabe to host
 host.options = options;
@@ -31,6 +33,11 @@ function printHelp() {
 
 if (options["help"]) {
     printHelp();
+}
+
+if (options["lint"]) {
+    var lintTask = jake.Task['build:lint'];
+    lintTask.invoke();
 }
 
 // Atomic Editor Build
