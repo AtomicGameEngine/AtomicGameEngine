@@ -46,6 +46,10 @@ namespace AtomicEngine
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern uint csi_Atomic_AtomicNET_StringToStringHash(string name);
 
+        // static members so they don't get GC'd
+        private static EventDispatchDelegate eventDispatchDelegate = NativeCore.EventDispatch;
+        private static UpdateDispatchDelegate updateDispatchDelegate = NativeCore.UpdateDispatch;
+
         public static void Initialize()
         {
             // Atomic Modules
@@ -77,7 +81,7 @@ namespace AtomicEngine
 
             PlayerModule.Initialize();
 
-            IntPtr coreptr = csi_Atomic_NETCore_Initialize(NativeCore.EventDispatch, NativeCore.UpdateDispatch);
+            IntPtr coreptr = csi_Atomic_NETCore_Initialize(eventDispatchDelegate, updateDispatchDelegate);
 
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
