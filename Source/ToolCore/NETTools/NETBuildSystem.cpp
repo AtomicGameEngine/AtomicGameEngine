@@ -183,7 +183,7 @@ namespace ToolCore
             if (ext == ".sln")
             {
                 // TODO: handle projects that require nuget
-				requiresNuGet = false;
+                requiresNuGet = false;
 
                 if (!fileSystem->FileExists(solutionPath))
                 {
@@ -197,7 +197,7 @@ namespace ToolCore
                 SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 
                 gen->SetSupportedPlatforms(curBuild_->platforms_);
-				gen->SetRewriteSolution(true);
+                gen->SetRewriteSolution(true);
 
                 if (!gen->LoadJSONProject(solutionPath))
                 {
@@ -397,7 +397,7 @@ namespace ToolCore
         configurations.Push("Release");
 #endif
 
-		String solutionPath = project->GetProjectPath() + "AtomicNET/Solution/" + project->GetProjectSettings()->GetName() + ".sln";
+        String solutionPath = project->GetProjectPath() + "AtomicNET/Solution/" + project->GetProjectSettings()->GetName() + ".sln";
 
         NETBuild* build = Build(solutionPath, platforms, configurations);
 

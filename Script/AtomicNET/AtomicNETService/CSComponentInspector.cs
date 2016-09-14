@@ -824,23 +824,23 @@ namespace AtomicTools
         public void Dump()
         {
             /*
-				foreach (var entry in InspectorFields) {
-					var field = entry.Value;
+                foreach (var entry in InspectorFields) {
+                    var field = entry.Value;
 
-					Console.WriteLine ("Inspector Field: {0}", field.Name);
+                    Console.WriteLine ("Inspector Field: {0}", field.Name);
 
-					Console.WriteLine ("   Type Name: {0}", field.TypeName);
-					Console.WriteLine ("   Default Value: {0}", field.DefaultValue);
+                    Console.WriteLine ("   Type Name: {0}", field.TypeName);
+                    Console.WriteLine ("   Default Value: {0}", field.DefaultValue);
 
-					Console.WriteLine ("   Positional Custom Attr:");
-					foreach (var p in field.CustomAttrPositionalArgs)
-					if (p.Length != 0)
-					Console.WriteLine ("      {0}", p);
-					Console.WriteLine ("   Named Custom Attr:");
-					foreach (var nentry in field.CustomAttrNamedArgs)
-					Console.WriteLine ("      {0}:{1}", nentry.Key, nentry.Value);
-				}
-				*/
+                    Console.WriteLine ("   Positional Custom Attr:");
+                    foreach (var p in field.CustomAttrPositionalArgs)
+                    if (p.Length != 0)
+                    Console.WriteLine ("      {0}", p);
+                    Console.WriteLine ("   Named Custom Attr:");
+                    foreach (var nentry in field.CustomAttrNamedArgs)
+                    Console.WriteLine ("      {0}:{1}", nentry.Key, nentry.Value);
+                }
+                */
         }
 
     }

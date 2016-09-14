@@ -46,7 +46,7 @@ namespace ToolCore
 {
 
 NETCmd::NETCmd(Context* context) : Command(context),
-	requiresProjectLoad_(false)
+    requiresProjectLoad_(false)
 {
 
 }
@@ -125,10 +125,10 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
 
         return true;
     }
-	else if (command_ == "genresources")
-	{
-		projectPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
-		requiresProjectLoad_ = true;
+    else if (command_ == "genresources")
+    {
+        projectPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
+        requiresProjectLoad_ = true;
 
         if (!platforms_.Size())
         {
@@ -136,7 +136,7 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
             return false;
         }
 
-	}
+    }
     else
     {
         errorMsg = "Unknown net command";
@@ -171,42 +171,42 @@ void NETCmd::Run()
 {
     if (command_ == "compile")
     {
-		
+        
         NETBuildSystem* buildSystem = new NETBuildSystem(context_);
         context_->RegisterSubsystem(buildSystem);
 
-		NETBuild* build = 0;
+        NETBuild* build = 0;
 
-		String solutionPath;
-		String fileName;
-		String ext;
+        String solutionPath;
+        String fileName;
+        String ext;
 
-		// detect project        
-		SplitPath(solutionPath_, solutionPath, fileName, ext);
+        // detect project        
+        SplitPath(solutionPath_, solutionPath, fileName, ext);
 
-		if (ext == ".atomic")
-		{
-			SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
+        if (ext == ".atomic")
+        {
+            SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 
-			if (!gen->LoadAtomicProject(solutionPath_))
-			{
-				Error(ToString("NETProjectGen: Error loading project (%s)", solutionPath.CString()));
-				Finished();
-				return;
-			}
+            if (!gen->LoadAtomicProject(solutionPath_))
+            {
+                Error(ToString("NETProjectGen: Error loading project (%s)", solutionPath.CString()));
+                Finished();
+                return;
+            }
 
-			if (!gen->Generate())
-			{
-				Error(ToString("NETProjectGen: Error generating project (%s)", solutionPath.CString()));
-				Finished();
-				return;
-			}
+            if (!gen->Generate())
+            {
+                Error(ToString("NETProjectGen: Error generating project (%s)", solutionPath.CString()));
+                Finished();
+                return;
+            }
 
-			solutionPath_ = solutionPath + "/AtomicNET/Solution/" + gen->GetProjectSettings()->GetName() + ".sln";
+            solutionPath_ = solutionPath + "/AtomicNET/Solution/" + gen->GetProjectSettings()->GetName() + ".sln";
 
-		}
+        }
 
-		// json project file
+        // json project file
         build = buildSystem->Build(solutionPath_, platforms_, configurations_);
 
         if (!build)
@@ -219,39 +219,39 @@ void NETCmd::Run()
         build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETCmd, HandleNETBuildResult));
 
     }
-	else if (command_ == "genresources")
-	{
-		BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-		ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
-		Project* project = toolSystem->GetProject();
+    else if (command_ == "genresources")
+    {
+        BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+        ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
+        Project* project = toolSystem->GetProject();
 
-		if (!project)
-		{
-			Error("Unable to get project");
-			Finished();
-			return;
-		}
+        if (!project)
+        {
+            Error("Unable to get project");
+            Finished();
+            return;
+        }
 
-		buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
+        buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
 
         Platform* platform = toolSystem->GetPlatformByName(platforms_[0]);
 
-		if (!platform)
-		{
+        if (!platform)
+        {
             Error(ToString("Unknown platform %s", platforms_[0].CString()));
-			Finished();
-			return;
-		}
+            Finished();
+            return;
+        }
 
-		BuildBase* buildBase = platform->NewBuild(project);
-		buildBase->SetResourcesOnly(true);
-		buildBase->SetVerbose(true);
-		buildSystem->QueueBuild(buildBase);
-		buildSystem->StartNextBuild();
+        BuildBase* buildBase = platform->NewBuild(project);
+        buildBase->SetResourcesOnly(true);
+        buildBase->SetVerbose(true);
+        buildSystem->QueueBuild(buildBase);
+        buildSystem->StartNextBuild();
 
-		Finished();
-		return;
-	}
+        Finished();
+        return;
+    }
 
 }
 

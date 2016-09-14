@@ -37,10 +37,10 @@ namespace Atomic
 static MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
 {
     MODIFIER_KEYS code = TB_MODIFIER_NONE;
-    if (qualifiers & QUAL_ALT)	code |= TB_ALT;
-    if (qualifiers & QUAL_CTRL)	code |= TB_CTRL;
-    if (qualifiers & QUAL_SHIFT)	code |= TB_SHIFT;
-    if (superKey)	code |= TB_SUPER;
+    if (qualifiers & QUAL_ALT)    code |= TB_ALT;
+    if (qualifiers & QUAL_CTRL)    code |= TB_CTRL;
+    if (qualifiers & QUAL_SHIFT)    code |= TB_SHIFT;
+    if (superKey)    code |= TB_SUPER;
     return code;
 }
 

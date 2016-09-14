@@ -269,11 +269,11 @@ void AtomicTool::Start()
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-		String projectDirectory = cmd->GetProjectPath();
-			
-		// default to current directly if command doesn't provide the path
-		if (!projectDirectory.Length())
-			projectDirectory = fileSystem->GetCurrentDir();
+        String projectDirectory = cmd->GetProjectPath();
+            
+        // default to current directly if command doesn't provide the path
+        if (!projectDirectory.Length())
+            projectDirectory = fileSystem->GetCurrentDir();
 
         Vector<String> projectFiles;
         fileSystem->ScanDir(projectFiles, projectDirectory, "*.atomic", SCAN_FILES, false);

@@ -73,10 +73,10 @@ namespace AtomicEngine
         public bool LimitFps { get; set; } = true;
 
 #if XFORMS
-		/// <summary>
-		/// iOS only
-		/// </summary>
-		public OrientationType Orientation { get; set; } = OrientationType.Portrait;
+        /// <summary>
+        /// iOS only
+        /// </summary>
+        public OrientationType Orientation { get; set; } = OrientationType.Portrait;
 #else
         /// <summary>
         /// iOS only
@@ -94,7 +94,7 @@ namespace AtomicEngine
         public string[] ResourcePackagesPaths { get; set; } = null;
 
 #if WINDOWS_UWP
-		public bool TouchEmulation { get { return true; } set {} }
+        public bool TouchEmulation { get { return true; } set {} }
 #else
         /// <summary>
         /// Touch emulation on desktop platform

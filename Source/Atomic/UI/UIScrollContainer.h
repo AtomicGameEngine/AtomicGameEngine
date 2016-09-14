@@ -30,15 +30,15 @@ namespace Atomic
 {
 
 enum UI_SCROLL_MODE {
-    ///< X and Y always			scroll-mode: xy
+    ///< X and Y always            scroll-mode: xy
     UI_SCROLL_MODE_X_Y = tb::SCROLL_MODE_X_Y,
-    ///< Y always (X never)		scroll-mode: y
+    ///< Y always (X never)        scroll-mode: y
     UI_SCROLL_MODE_Y = tb::SCROLL_MODE_Y,
-    ///< Y auto (X never)		scroll-mode: y-auto
+    ///< Y auto (X never)        scroll-mode: y-auto
     UI_SCROLL_MODE_Y_AUTO = tb::SCROLL_MODE_Y_AUTO,
-    ///< X auto, Y auto			scroll-mode: auto
+    ///< X auto, Y auto            scroll-mode: auto
     UI_SCROLL_MODE_X_AUTO_Y_AUTO = tb::SCROLL_MODE_X_AUTO_Y_AUTO,
-    ///< X any Y never			scroll-mode: off
+    ///< X any Y never            scroll-mode: off
     UI_SCROLL_MODE_OFF = tb::SCROLL_MODE_OFF
 };
 

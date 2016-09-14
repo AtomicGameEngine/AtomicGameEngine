@@ -30,74 +30,74 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-	class DesktopProjectSettings : public RefCounted
-	{
-		ATOMIC_REFCOUNTED(DesktopProjectSettings)
+    class DesktopProjectSettings : public RefCounted
+    {
+        ATOMIC_REFCOUNTED(DesktopProjectSettings)
 
-	public:
+    public:
 
-		DesktopProjectSettings() {}
+        DesktopProjectSettings() {}
 
-		void Write(JSONValue& parent) {}
-		void Read(JSONValue& parent) {}
+        void Write(JSONValue& parent) {}
+        void Read(JSONValue& parent) {}
 
-	private:
+    private:
 
-	};
+    };
 
-	class AndroidProjectSettings : public RefCounted
-	{
-		ATOMIC_REFCOUNTED(AndroidProjectSettings)
+    class AndroidProjectSettings : public RefCounted
+    {
+        ATOMIC_REFCOUNTED(AndroidProjectSettings)
 
-	public:
+    public:
 
-		AndroidProjectSettings() {}
+        AndroidProjectSettings() {}
 
-		void Write(JSONValue& parent) {}
-		void Read(JSONValue& parent) {}
+        void Write(JSONValue& parent) {}
+        void Read(JSONValue& parent) {}
 
-	private:
+    private:
 
-	};
+    };
 
-	class ProjectSettings : public Object
-	{
-		ATOMIC_OBJECT(ProjectSettings, Object)
+    class ProjectSettings : public Object
+    {
+        ATOMIC_OBJECT(ProjectSettings, Object)
 
-	public:
-		/// Construct.
-		ProjectSettings(Context* context);
-		/// Destruct.
-		virtual ~ProjectSettings();
+    public:
+        /// Construct.
+        ProjectSettings(Context* context);
+        /// Destruct.
+        virtual ~ProjectSettings();
 
-		DesktopProjectSettings* GetDesktopSettings() { return desktopSettings_; }
-		AndroidProjectSettings* GetAndroidPlatformSettings() { return androidSettings_; }
+        DesktopProjectSettings* GetDesktopSettings() { return desktopSettings_; }
+        AndroidProjectSettings* GetAndroidPlatformSettings() { return androidSettings_; }
 
-		bool Load(const String& path);
-		void Save(const String& path);
+        bool Load(const String& path);
+        void Save(const String& path);
 
-		const String& GetName() const { return name_;  }
+        const String& GetName() const { return name_;  }
 
-		bool ValidPlatform(const String& platform) const;
+        bool ValidPlatform(const String& platform) const;
 
-		bool GetSupportsPlatform(const String& platform) const;
-		bool GetSupportsDesktop() const;
-		bool GetSupportsAndroid() const;
-		bool GetSupportsIOS() const;
-		bool GetSupportsWeb() const;
+        bool GetSupportsPlatform(const String& platform) const;
+        bool GetSupportsDesktop() const;
+        bool GetSupportsAndroid() const;
+        bool GetSupportsIOS() const;
+        bool GetSupportsWeb() const;
 
-		void AddSupportedPlatform(const String& platform);
+        void AddSupportedPlatform(const String& platform);
 
-	private:
+    private:
 
-		void SetDefault();
+        void SetDefault();
 
-		String name_;
-		List<String> platforms_;
+        String name_;
+        List<String> platforms_;
 
-		SharedPtr<DesktopProjectSettings> desktopSettings_;
-		SharedPtr<AndroidProjectSettings> androidSettings_;
+        SharedPtr<DesktopProjectSettings> desktopSettings_;
+        SharedPtr<AndroidProjectSettings> androidSettings_;
 
-	};
+    };
 
 }

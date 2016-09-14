@@ -41,8 +41,8 @@ public:
     Resource* GetResource(const String& typeName = String::EMPTY);
     Node* InstantiateNode(Node* parent, const String& name);
 
-	void SetCompressedImageSize(unsigned int compressedSize) { compressedSize_ = compressedSize; }
-	unsigned int GetCompressedImageSize() { return compressedSize_; }
+    void SetCompressedImageSize(unsigned int compressedSize) { compressedSize_ = compressedSize; }
+    unsigned int GetCompressedImageSize() { return compressedSize_; }
 
 protected:
 
@@ -54,7 +54,7 @@ protected:
 
     bool compressTextures_;
 
-	unsigned int compressedSize_;
+    unsigned int compressedSize_;
 };
 
 }

@@ -45,10 +45,10 @@ namespace Atomic
         /// Cleanup after the main loop. 
         virtual void Stop();
 
-		/// Run a single frame, return's true if engine is exiting
-		bool RunFrame();
+        /// Run a single frame, return's true if engine is exiting
+        bool RunFrame();
 
-		virtual void Shutdown() { Stop(); }
+        virtual void Shutdown() { Stop(); }
 
         static void AddArgument(const String& argument) { arguments_.Push(argument); }
 

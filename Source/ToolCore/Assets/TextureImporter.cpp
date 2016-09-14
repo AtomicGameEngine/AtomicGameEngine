@@ -36,8 +36,8 @@
 namespace ToolCore
 {
 
-	TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
-		compressTextures_(false), compressedSize_(0)
+    TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
+        compressTextures_(false), compressedSize_(0)
 {
     ApplyProjectImportConfig();
 }
@@ -51,7 +51,7 @@ void TextureImporter::SetDefaults()
 {
     AssetImporter::SetDefaults();
 
-	compressedSize_ = 0;
+    compressedSize_ = 0;
 
 }
 
@@ -76,29 +76,29 @@ bool TextureImporter::Import()
     {
         fileSystem->CreateDirs(cachePath, "DDS/" + Atomic::GetPath(asset_->GetRelativePath()));
 
-		float resizefactor;
-		float width = image->GetWidth();
-		float height = image->GetHeight();
+        float resizefactor;
+        float width = image->GetWidth();
+        float height = image->GetHeight();
 
-		if (width > compressedSize_ || height > compressedSize_)
-		{
-			if (width >= height)
-			{
-				resizefactor = compressedSize_ / width;
-			}
-			else
-			{
-				resizefactor = compressedSize_ / height;
-			}
+        if (width > compressedSize_ || height > compressedSize_)
+        {
+            if (width >= height)
+            {
+                resizefactor = compressedSize_ / width;
+            }
+            else
+            {
+                resizefactor = compressedSize_ / height;
+            }
 
-			image->Resize(width*resizefactor, height*resizefactor);
-		}
+            image->Resize(width*resizefactor, height*resizefactor);
+        }
 
-		if (image->SaveDDS(compressedPath))
-		{			
-			Renderer * renderer = GetSubsystem<Renderer>();
-			renderer->ReloadTextures();
-		}
+        if (image->SaveDDS(compressedPath))
+        {            
+            Renderer * renderer = GetSubsystem<Renderer>();
+            renderer->ReloadTextures();
+        }
     }
 
     // todo, proper proportions
@@ -137,10 +137,10 @@ bool TextureImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 
     JSONValue import = jsonRoot.Get("TextureImporter");
 
-	SetDefaults();
+    SetDefaults();
 
-	if (import.Get("compressionSize").IsNumber())
-		compressedSize_ = (CompressedFormat)import.Get("compressionSize").GetInt();
+    if (import.Get("compressionSize").IsNumber())
+        compressedSize_ = (CompressedFormat)import.Get("compressionSize").GetInt();
 
     return true;
 }
@@ -151,7 +151,7 @@ bool TextureImporter::SaveSettingsInternal(JSONValue& jsonRoot)
         return false;
 
     JSONValue import(JSONValue::emptyObject);
-	import.Set("compressionSize", compressedSize_);
+    import.Set("compressionSize", compressedSize_);
 
     jsonRoot.Set("TextureImporter", import);
 

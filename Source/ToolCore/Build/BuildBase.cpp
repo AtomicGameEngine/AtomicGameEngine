@@ -47,8 +47,8 @@ BuildBase::BuildBase(Context * context, Project* project, PlatformID platform) :
     buildFailed_(false),
     assetBuildTag_(String::EMPTY),
     fileIncludedResourcesLog_(nullptr),
-	resourcesOnly_(false),
-	verbose_(false)
+    resourcesOnly_(false),
+    verbose_(false)
 {
     if (UseResourcePackager())
         resourcePackager_ = new ResourcePackager(context, this);
@@ -336,10 +336,10 @@ void BuildBase::BuildDefaultResourceEntries()
             const String& filename = fileNames[i];
             AddToResourcePackager(filename, resourceDir);
 
-			if (verbose_)
-			{
-				ATOMIC_LOGINFO(ToString("Default Resource Added: %s%s", resourceDir.CString(), filename.CString()));
-			}
+            if (verbose_)
+            {
+                ATOMIC_LOGINFO(ToString("Default Resource Added: %s%s", resourceDir.CString(), filename.CString()));
+            }
         }
     }
 }
@@ -383,10 +383,10 @@ void BuildBase::BuildAllProjectResourceEntries()
         {
             AddToResourcePackager(fileNamesInProject[i], projectResourceDir);
 
-			if (verbose_)
-			{
-				ATOMIC_LOGINFO(ToString("Project Resource Added: %s%s", projectResourceDir.CString(), fileNamesInProject[i].CString()));
-			}
+            if (verbose_)
+            {
+                ATOMIC_LOGINFO(ToString("Project Resource Added: %s%s", projectResourceDir.CString(), fileNamesInProject[i].CString()));
+            }
 
         }
     }

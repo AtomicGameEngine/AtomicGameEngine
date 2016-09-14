@@ -98,17 +98,17 @@ bool BuildWindows::BuildManaged(const String& buildPath)
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     Project* project = toolSystem->GetProject();
-	ProjectSettings* settings = project->GetProjectSettings();
+    ProjectSettings* settings = project->GetProjectSettings();
 
-	String projectPath = project->GetProjectPath();
-	String releaseBins = projectPath + "AtomicNET/Release/Bin/Desktop/";
-	String releaseExe = releaseBins + settings->GetName() + ".exe";
+    String projectPath = project->GetProjectPath();
+    String releaseBins = projectPath + "AtomicNET/Release/Bin/Desktop/";
+    String releaseExe = releaseBins + settings->GetName() + ".exe";
 
-	if (!fileSystem->FileExists(releaseExe))
-	{
-		BuildError(ToString("Error building managed project, please compile the release binary %s before building", releaseExe.CString()));
-		return false;
-	}
+    if (!fileSystem->FileExists(releaseExe))
+    {
+        BuildError(ToString("Error building managed project, please compile the release binary %s before building", releaseExe.CString()));
+        return false;
+    }
     
     StringVector results;
     StringVector filtered;
@@ -142,7 +142,7 @@ bool BuildWindows::BuildManaged(const String& buildPath)
 
     }
 
-	return true;
+    return true;
   
 }
 
@@ -173,11 +173,11 @@ void BuildWindows::Build(const String& buildPath)
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     Project* project = tsystem->GetProject();
 
-	buildPath_ = AddTrailingSlash(buildPath);
+    buildPath_ = AddTrailingSlash(buildPath);
 
-	if (!resourcesOnly_)
-		buildPath_ += GetBuildSubfolder();
-		
+    if (!resourcesOnly_)
+        buildPath_ += GetBuildSubfolder();
+        
     BuildLog("Starting Windows Deployment");
 
     Initialize();
@@ -195,18 +195,18 @@ void BuildWindows::Build(const String& buildPath)
 
     String resourcePackagePath = buildPath_ + "/AtomicPlayer_Resources/AtomicResources" + PAK_EXTENSION;
 
-	if (resourcesOnly_)
-	{
-		resourcePackagePath = buildPath_ + "/AtomicResources" + PAK_EXTENSION;
-	}
+    if (resourcesOnly_)
+    {
+        resourcePackagePath = buildPath_ + "/AtomicResources" + PAK_EXTENSION;
+    }
 
     GenerateResourcePackage(resourcePackagePath);
 
     if (buildFailed_)
         return;
 
-	if (resourcesOnly_)
-		return;
+    if (resourcesOnly_)
+        return;
 
     if (!BuildCreateDirectory(buildPath_ + "/Settings"))
         return;
@@ -223,8 +223,8 @@ void BuildWindows::Build(const String& buildPath)
 
     if (fileSystem->FileExists(project->GetResourcePath() + project->GetProjectSettings()->GetName() + ".dll"))
     {
-		if (!BuildManaged(buildPath))
-			return;
+        if (!BuildManaged(buildPath))
+            return;
     }
     else
     {

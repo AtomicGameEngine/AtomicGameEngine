@@ -87,11 +87,11 @@ public:
 
     void GenerateSource(JSBPackageWriter& packageWriter);
 
-	/// Define guard for the package as a whole
-	String GetPlatformDefineGuard() const;
+    /// Define guard for the package as a whole
+    String GetPlatformDefineGuard() const;
 
-	const Vector<String>& GetPlatforms() const { return platforms_; }
-	const HashMap<String, Vector<String>>& GetModuleExcludes() const { return moduleExcludes_; }
+    const Vector<String>& GetPlatforms() const { return platforms_; }
+    const HashMap<String, Vector<String>>& GetModuleExcludes() const { return moduleExcludes_; }
 
 private:
 
@@ -103,7 +103,7 @@ private:
 
     Vector<SharedPtr<JSBPackage> > dependencies_;
 
-	Vector<String> platforms_;
+    Vector<String> platforms_;
     HashMap<String, Vector<String>> moduleExcludes_;
 
     Vector<SharedPtr<JSBModule> > modules_;

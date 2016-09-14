@@ -32,7 +32,7 @@ namespace ToolCore
 ATOMIC_EVENT(E_PROJECTLOADED, ProjectLoaded)
 {
     ATOMIC_PARAM(P_PROJECTPATH, ProjectPath);    // string
-	ATOMIC_PARAM(P_PROJECT, Project);    // Project *
+    ATOMIC_PARAM(P_PROJECT, Project);    // Project *
 }
 
 ATOMIC_EVENT(E_PROJECTUNLOADED, ProjectUnloaded)
