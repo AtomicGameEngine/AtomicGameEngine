@@ -48,6 +48,10 @@ endif()
 
 if (ATOMIC_WEBVIEW)
 
+  if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows)
+    message( FATAL_ERROR "\nBUILD ERROR:\nSubmodules not initialized.  When cloning repository, please use:\ngit clone --recursive https://github.com/AtomicGameEngine/AtomicGameEngine\n" )
+  endif()
+
   if(APPLE)
     if(POLICY CMP0037)
       # new cmake doesn't like creating framework whose name has spaces

@@ -1,11 +1,11 @@
+var os = require('os');
+var fs = require('fs-extra');
 
 // Load `jake` global
 require('../node_modules/jake/lib/jake');
 
 // Load jake tasks, patch in our node modules, etc
 var host = require('./Host');
-
-var os = require('os');
 
 // Parse args
 var options = require('minimist')(process.argv.slice(2));
@@ -42,6 +42,14 @@ if (options["lint"]) {
 
 // Atomic Editor Build
 if (cmd == "buildeditor") {
+
+    // simple build check for submodules not being initialized
+
+    if (!fs.existsSync(host.atomicRoot + "Submodules/CEF/Windows")) {
+
+        console.log("\nBUILD ERROR:\n\nSubmodules not initialized.  When cloning repository, please use:\ngit clone --recursive https://github.com/AtomicGameEngine/AtomicGameEngine\n")
+        process.exit(1);
+    }
 
     console.log("\n\nBuilding Atomic Editor, this process will take a few minutes\n");
 
