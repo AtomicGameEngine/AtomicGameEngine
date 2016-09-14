@@ -90,10 +90,8 @@ add_custom_command( TARGET AtomicNETNative POST_BUILD
 
 else()
 
-    # iOS: We need to copy/zip the framework on iOS, the framework must also be code signed and POST_BUILD is triggered before this occurs,
-    # so handled in BuildIOS.js
-    add_custom_command( TARGET AtomicNETNative POST_BUILD
-                        COMMAND install_name_tool -id @rpath/AtomicNETNative.framework/AtomicNETNative \"$<TARGET_FILE:AtomicNETNative>\")
+    # See BuildIOS.js for handling of the AtomicNETNative framework, including install_name_tool modification, etc
+    # Handling it here was causing issues with certain builds of XCode and where it thought the TARGET_FILE was...
 
 endif()
 

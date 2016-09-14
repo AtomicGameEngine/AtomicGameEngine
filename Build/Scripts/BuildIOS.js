@@ -27,7 +27,7 @@ namespace('build', function() {
 
         cmds.push("cmake -DIOS=1 -DATOMIC_DEV_BUILD=0 -G Xcode ../../../");
         cmds.push("xcodebuild -configuration " + (debug ? "Debug" : "Release") + " -parallelizeTargets -jobs 4");
-        //cmds.push("cd \"" + NETNativeSrcDir + "\" && install_name_tool -id @rpath/AtomicNETNative.framework/AtomicNETNative AtomicNETNative.framework/AtomicNETNative");
+        cmds.push("cd \"" + NETNativeSrcDir + "\" && install_name_tool -id @rpath/AtomicNETNative.framework/AtomicNETNative AtomicNETNative.framework/AtomicNETNative");
         //cmds.push("cd \"" + NETNativeSrcDir + "\" && codesign --deep --force --verify --sign \"iPhone Developer\" ./AtomicNETNative.framework/");
         cmds.push("cd \"" + NETNativeSrcDir + "\" && zip -r AtomicNETNative.framework.zip AtomicNETNative.framework");
 
