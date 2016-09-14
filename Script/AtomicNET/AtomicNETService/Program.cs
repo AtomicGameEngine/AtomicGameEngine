@@ -1,11 +1,6 @@
 using System;
 using AtomicEngine;
 
-// net genproject C:\Dev\atomic\AtomicGameEngine\Script\AtomicNET\AtomicNETProject.json WINDOWS
-// net parse C:\Dev\atomic\AtomicGameEngine\Artifacts\AtomicNET\Build\AtomicNETService\bin\Debug\AtomicNETService.exe
-// net compile C:\Dev\atomic\AtomicGameEngine\Artifacts\AtomicNET\Build\AtomicNET.sln
-
-
 namespace AtomicTools
 {
 
@@ -68,5 +63,3 @@ namespace AtomicTools
         }
     }
 }
-
-

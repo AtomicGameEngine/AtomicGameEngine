@@ -141,10 +141,10 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     String playerBinary = env->GetEditorBinary();
 
-	ProjectSettings* settings = project->GetProjectSettings();
+    ProjectSettings* settings = project->GetProjectSettings();
 
-	String projectAssembly = settings->GetName() + ".dll";
-	String projectExe = settings->GetName() + ".exe";
+    String projectAssembly = settings->GetName() + ".dll";
+    String projectExe = settings->GetName() + ".exe";
 
     // TODO: We need to configure project as managed
     bool managed = false;
@@ -154,22 +154,22 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
 #ifdef ATOMIC_DEV_BUILD
 
-#ifdef ATOMIC_DEBUG		
-		playerBinary = project->GetProjectPath() + "AtomicNET/Debug/Bin/Desktop/" + projectExe;
+#ifdef ATOMIC_DEBUG        
+        playerBinary = project->GetProjectPath() + "AtomicNET/Debug/Bin/Desktop/" + projectExe;
 #else
-		playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
+        playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
 #endif
 
 #else
-		// TODO: We are using the release build of the managed project here, how and when to use debug?
-		playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
+        // TODO: We are using the release build of the managed project here, how and when to use debug?
+        playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
 #endif
 
         
-		if (!fileSystem->FileExists(playerBinary))
-		{
-			ATOMIC_LOGERRORF("Managed player: %s does not exist", playerBinary.CString());
-		}
+        if (!fileSystem->FileExists(playerBinary))
+        {
+            ATOMIC_LOGERRORF("Managed player: %s does not exist", playerBinary.CString());
+        }
 
     }
 

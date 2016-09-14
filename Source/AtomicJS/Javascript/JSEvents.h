@@ -28,11 +28,11 @@ namespace Atomic
 {
 
 /*
-name	standard	Name of error, e.g. TypeError, inherited
-message	standard	Optional message of error, own property, empty message inherited if absent
-fileName	Rhino	Filename related to error source, inherited accessor
-lineNumber	Rhino	Linenumber related to error source, inherited accessor
-stack	V8	Traceback as a multi-line human redable string, inherited accessor
+name    standard    Name of error, e.g. TypeError, inherited
+message    standard    Optional message of error, own property, empty message inherited if absent
+fileName    Rhino    Filename related to error source, inherited accessor
+lineNumber    Rhino    Linenumber related to error source, inherited accessor
+stack    V8    Traceback as a multi-line human redable string, inherited accessor
 */
 
 ATOMIC_EVENT(E_JSOBJECTADDED, ObjectAdded)

@@ -41,14 +41,23 @@
 namespace ToolCore
 {
 
-    NETBuild::NETBuild(Context* context, const String& solutionPath, const String& platform, const String& configuration) :
+    NETBuild::NETBuild(Context* context, const String& solutionPath, const StringVector& platforms, const StringVector& configurations) :
         Object(context),
         solutionPath_(solutionPath),
-        platform_(platform),
-        configuration_(configuration),
         status_(NETBUILD_PENDING)
     {
+        for (unsigned i = 0; i < platforms.Size() ; i++)
+        {
+            platforms_.Push(platforms[i].ToLower());
+        }
 
+        for (unsigned i = 0; i < configurations.Size() ; i++)
+        {
+            String config = configurations[i];
+            config.Replace("release", "Release");
+            config.Replace("debug", "Debug");
+            configurations_.Push(config);
+        }
     }
 
     NETBuildSystem::NETBuildSystem(Context* context) :
@@ -174,7 +183,7 @@ namespace ToolCore
             if (ext == ".sln")
             {
                 // TODO: handle projects that require nuget
-				requiresNuGet = false;
+                requiresNuGet = false;
 
                 if (!fileSystem->FileExists(solutionPath))
                 {
@@ -187,15 +196,8 @@ namespace ToolCore
             {
                 SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 
-				StringVector platforms;
-				platforms.Push("desktop");
-
-				if (curBuild_->platform_.ToLower() == "android")
-				{
-					platforms.Push("android");
-				}
-
-				gen->SetSupportedPlatforms(platforms);
+                gen->SetSupportedPlatforms(curBuild_->platforms_);
+                gen->SetRewriteSolution(true);
 
                 if (!gen->LoadJSONProject(solutionPath))
                 {
@@ -229,7 +231,53 @@ namespace ToolCore
                 return;
             }
 
-            const String configuration = curBuild_->configuration_;
+            StringVector stringVector;
+            String platforms;
+            String configs;
+
+            for (unsigned i = 0; i < curBuild_->configurations_.Size(); i++)
+            {
+                stringVector.Push(ToString("/p:Configuration=%s", curBuild_->configurations_[i].CString()));
+            }
+
+            configs = String::Joined(stringVector, " ");
+            stringVector.Clear();
+
+            for (unsigned i = 0; i < curBuild_->platforms_.Size(); i++)
+            {
+                // map platform
+                String platform = curBuild_->platforms_[i];
+
+                if (platform == "desktop" || platform == "android")
+                {
+                    platform = "\"Any CPU\"";
+                }
+                else if (platform == "ios")
+                {
+
+                    platform = "\"Any CPU\"";
+                    // TODO
+                    // platform = "iPhone";
+                }
+                else
+                {
+                    ATOMIC_LOGERRORF("Unknown platform: %s, skipping", platform.CString());
+                    continue;
+                }
+
+                platform = ToString("/p:Platform=%s", platform.CString());
+
+                if (stringVector.Contains(platform))
+                {
+                    // This can happen when specifying Desktop + Android for example
+                    continue;
+                }
+
+                stringVector.Push(platform);
+            }
+
+            platforms = String::Joined(stringVector, " ");
+            stringVector.Clear();
 
             Vector<String> args;
 
@@ -258,7 +306,7 @@ namespace ToolCore
                 compile += ToString("&& \"%s\" restore \"%s\" ", nugetBinary.CString(), solutionPath.CString());
             }
 
-            compile += ToString("&& msbuild \"%s\" /p:Configuration=%s /p:Platform=\"Any CPU\"\"", solutionPath.CString(), configuration.CString());
+            compile += ToString("&& msbuild \"%s\" %s %s\"", solutionPath.CString(), platforms.CString(), configs.CString());
 
             args.Push(compile);
 
@@ -280,7 +328,7 @@ namespace ToolCore
 #endif
             }
 
-            compile += ToString("\"%s\" \"%s\" /p:Configuration=%s /p:Platform=\"Any CPU\"", xbuildBinary.CString(), solutionPath.CString(), configuration.CString());
+            compile += ToString("\"%s\" \"%s\" %s %s", xbuildBinary.CString(), solutionPath.CString(), platforms.CString(), configs.CString());
 
             args.Push(compile);
 
@@ -290,6 +338,8 @@ namespace ToolCore
 
             SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
             Subprocess* subprocess = nullptr;
+
+            ATOMIC_LOGINFOF("%s : %s", cmd.CString(), curBuild_->allArgs_.CString());
 
             try
             {
@@ -316,7 +366,7 @@ namespace ToolCore
     }
 
 
-    NETBuild* NETBuildSystem::GetBuild(const String& solutionPath, const String& platform, const String& configuration)
+    NETBuild* NETBuildSystem::GetBuild(const String& solutionPath, const StringVector& platforms, const StringVector& configurations)
     {
         List<SharedPtr<NETBuild>>::ConstIterator itr = builds_.Begin();
 
@@ -324,7 +374,7 @@ namespace ToolCore
         {
             NETBuild* build = *itr;
 
-            if (build->solutionPath_ == solutionPath && build->platform_ == platform && build->configuration_ == configuration)
+            if (build->solutionPath_ == solutionPath && build->platforms_ == platforms && build->configurations_ == configurations)
                 return build;
 
             itr++;
@@ -336,26 +386,20 @@ namespace ToolCore
 
     NETBuild* NETBuildSystem::BuildAtomicProject(Project* project)
     {
-        String platform;
-        String configuration;
+        StringVector platforms;
+        StringVector configurations;
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-        platform = "WINDOWS";
-#elif ATOMIC_PLATFORM_OSX
-        platform = "MACOSX";
-#else
-        platform = "LINUX";
-#endif
+        platforms.Push("desktop");
 
 #ifdef ATOMIC_DEBUG
-        configuration = "Debug";
+        configurations.Push("Debug");
 #else
-        configuration = "Release";
+        configurations.Push("Release");
 #endif
 
-		String solutionPath = project->GetProjectPath() + "AtomicNET/Solution/" + project->GetProjectSettings()->GetName() + ".sln";
+        String solutionPath = project->GetProjectPath() + "AtomicNET/Solution/" + project->GetProjectSettings()->GetName() + ".sln";
 
-        NETBuild* build = Build(solutionPath, platform, configuration);
+        NETBuild* build = Build(solutionPath, platforms, configurations);
 
         if (build)
         {
@@ -385,7 +429,7 @@ namespace ToolCore
 
     }
 
-    NETBuild* NETBuildSystem::Build(const String& solutionPath, const String& platform, const String& configuration)
+    NETBuild* NETBuildSystem::Build(const String& solutionPath, const StringVector& platforms, const StringVector& configurations)
     {
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
@@ -397,13 +441,13 @@ namespace ToolCore
         }
 
         // Get existing build
-        SharedPtr<NETBuild> build(GetBuild(solutionPath, platform, configuration));
+        SharedPtr<NETBuild> build(GetBuild(solutionPath, platforms, configurations));
 
         if (build.NotNull())
             return build;
 
         // Create a new build
-        build = new NETBuild(context_, solutionPath, platform, configuration);
+        build = new NETBuild(context_, solutionPath, platforms, configurations);
 
         builds_.Push(build);
 

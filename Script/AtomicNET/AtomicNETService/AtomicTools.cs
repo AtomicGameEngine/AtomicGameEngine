@@ -16,26 +16,26 @@ using File = System.IO.File;
 
 namespace AtomicTools
 {
-	public class AtomicTools
-	{
+    public class AtomicTools
+    {
 
-		public static String InspectAssembly (String pathToAssembly)
-		{
+        public static String InspectAssembly (String pathToAssembly)
+        {
 
-			try {
+            try {
 
-				var inspector = new AssemblyInspector ();
-				inspector.Inspect (pathToAssembly);
-				return inspector.DumpToJSON();
+                var inspector = new AssemblyInspector ();
+                inspector.Inspect (pathToAssembly);
+                return inspector.DumpToJSON();
 
-			} catch (Exception ex) {
-				Console.WriteLine (ex.Message);
-			}
+            } catch (Exception ex) {
+                Console.WriteLine (ex.Message);
+            }
 
-			return "";
+            return "";
 
-		}
+        }
 
-	}
+    }
 
 }

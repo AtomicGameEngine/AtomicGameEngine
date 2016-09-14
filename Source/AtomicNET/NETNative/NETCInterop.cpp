@@ -22,6 +22,11 @@
 namespace Atomic
 {
 
+#ifdef ATOMIC_PLATFORM_IOS
+    static const char *sdlResourceDir = 0;
+    static const char *sdlDocumentsDir = 0;
+#endif
+
     extern "C"
     {
 
@@ -60,10 +65,16 @@ namespace Atomic
             obj->SendEvent(eventType, vmap ? vmap->GetVariantMap() : obj->GetEventDataMap());
         }
 
-        ATOMIC_EXPORT_API ClassID csi_Atomic_NETCore_Initialize(NETCoreDelegates* delegates)
+        ATOMIC_EXPORT_API ClassID csi_Atomic_NETCore_Initialize(NETCoreEventDispatchFunction eventDispatch, NETCoreUpdateDispatchFunction updateDispatch)
         {
             Context* context = new Context();
-            NETCore* netCore = new NETCore(context, delegates);
+
+            // NOTE: We don't simply marshal the NETCoreDelegates structure due to iOS "reverse callback" limitation
+            NETCoreDelegates delegates;
+            delegates.eventDispatch = eventDispatch;
+            delegates.updateDispatch = updateDispatch;
+
+            NETCore* netCore = new NETCore(context, &delegates);
             context->RegisterSubsystem(netCore);
             return netCore;
         }
@@ -123,6 +134,20 @@ namespace Atomic
 
         }
 
+        // Graphics
+
+        ATOMIC_EXPORT_API void* csi_Atomic_Graphics_GetSDLWindow()
+        {
+            if (!NETCore::GetContext())
+                return 0;
+
+            if (!NETCore::GetContext()->GetSubsystem<Graphics>())
+                return 0;
+
+            return NETCore::GetContext()->GetSubsystem<Graphics>()->GetSDLWindow();
+
+        }
+
         ATOMIC_EXPORT_API void* csi_Atomic_VertexBuffer_Lock(VertexBuffer* vb , unsigned start, unsigned count, bool discard)
         {
             if (!vb)
@@ -140,9 +165,35 @@ namespace Atomic
             graphics->SetShaderParameter(param, *matrix);
         }
 
+#ifdef ATOMIC_PLATFORM_IOS
+        ATOMIC_EXPORT_API void SDL_IOS_Init(const char *resourceDir, const char *documentsDir)
+        {
+            sdlResourceDir = resourceDir;
+            sdlDocumentsDir = documentsDir;
+        }
+#endif
+
 
     }
 }
+
+#ifdef ATOMIC_PLATFORM_IOS
+
+//FileSystem.cpp uses these functions as external.
+const char* SDL_IOS_GetResourceDir()
+{
+    return Atomic::sdlResourceDir;
+}
+
+const char* SDL_IOS_GetDocumentsDir()
+{
+    return Atomic::sdlDocumentsDir;
+}
+
+#endif
+
+
+
 
 
 

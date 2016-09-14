@@ -30,8 +30,8 @@ namespace Atomic
 {
 
 /// Specifies which height widgets in a AXIS_X layout should have,
-///	or which width widgets in a AXIS_Y layout should have.
-///	No matter what, it will still prioritize minimum and maximum for each widget.
+///    or which width widgets in a AXIS_Y layout should have.
+///    No matter what, it will still prioritize minimum and maximum for each widget.
 enum UI_LAYOUT_SIZE
 {
     /// Sizes depend on the gravity for each widget. (If the widget pulls
@@ -60,7 +60,7 @@ enum UI_LAYOUT_DISTRIBUTION
 };
 
 /// Specifies which y position widgets in a AXIS_X layout should have,
-///	or which x position widgets in a AXIS_Y layout should have. */
+///    or which x position widgets in a AXIS_Y layout should have. */
 enum UI_LAYOUT_POSITION
 {
     ///< Position is centered

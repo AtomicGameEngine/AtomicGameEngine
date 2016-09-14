@@ -5,8 +5,18 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using static System.Reflection.IntrospectionExtensions;
 
+#if ATOMIC_IOS
+using ObjCRuntime;
+#endif
+
 namespace AtomicEngine
 {
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void EventDispatchDelegate(IntPtr sender, uint eventType, IntPtr eventData);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void UpdateDispatchDelegate(float timeStep);
 
     public class NativeType
     {
@@ -124,6 +134,26 @@ namespace AtomicEngine
                 svm[i] = new ScriptVariantMap();
         }
 
+
+        static float expireDelta = 0.0f;
+
+        // called ahead of E_UPDATE event
+#if ATOMIC_IOS
+        [MonoPInvokeCallback(typeof(UpdateDispatchDelegate))]
+#endif
+        public static void UpdateDispatch(float timeStep)
+        {
+            expireDelta += timeStep;
+            if (expireDelta > 2.0f)
+            {
+                expireDelta = 0.0f;
+                ExpireNatives();
+            }
+        }
+
+        #if ATOMIC_IOS
+        [MonoPInvokeCallback(typeof(EventDispatchDelegate))]
+        #endif
         public static void EventDispatch(IntPtr sender, uint eventType, IntPtr eventData)
         {
             List<EventSubscription> eventReceivers;
@@ -238,19 +268,6 @@ namespace AtomicEngine
             }
             */
 
-        }
-
-        static float expireDelta = 0.0f;
-
-        // called ahead of E_UPDATE event
-        public static void UpdateDispatch(float timeStep)
-        {
-            expireDelta += timeStep;
-            if (expireDelta > 2.0f)
-            {
-                expireDelta = 0.0f;
-                ExpireNatives();
-            }
         }
 
         // register a newly created native

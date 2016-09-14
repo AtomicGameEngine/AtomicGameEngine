@@ -84,6 +84,37 @@
                 "$ATOMIC_ROOT$/Script/AtomicNET/AtomicPlayer/AtomicPlayer.Common",
                 "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/Android"
             ]
+        },
+        {
+            "name": "$ATOMIC_PROJECT_NAME$.iOS",
+            "platforms" : ["ios"],
+            "outputType" : "Exe",
+            "defineConstants" : ["ATOMIC_IOS"],
+            "rootNamespace" : "",
+            "assemblyName" : "$ATOMIC_PROJECT_NAME$",
+            "projectGuid" : "071BD84E-7518-11E6-C78E-005056C00008",
+            "projectTypeGuids" : ["FEACFBD2-3405-455C-9665-78FE426C6842", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"],
+            "assemblyOutputPath" : "$ATOMIC_PROJECT_ROOT$\\AtomicNET\\$ATOMIC_CONFIG$\\Bin\\iOS",
+            "playerApplication" : true,
+            "codesignEntitlements" : "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/iOS/Entitlements.plist",
+            "infoPList" : "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/iOS/Info.plist",
+            "references" : [
+                "Xamarin.iOS",
+                "System",
+                "System.Core",
+                "System.Xml.Linq",
+                "System.Xml",
+                "AtomicNET.iOS"
+            ],
+            "sharedReferences" : [
+                "$ATOMIC_PROJECT_NAME$.Shared"
+            ],
+            "sources" : [
+                "$ATOMIC_ROOT$/Script/AtomicNET/AtomicPlayer/AtomicPlayer.Common",
+                "$ATOMIC_PROJECT_ROOT$/Project/AtomicNET/Platforms/iOS"
+            ],
+            "importProjects" : ["$(MSBuildExtensionsPath)\\Xamarin\\iOS\\Xamarin.iOS.CSharp.targets"]
         }
+
     ]
 }

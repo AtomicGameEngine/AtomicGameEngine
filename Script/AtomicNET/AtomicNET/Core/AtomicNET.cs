@@ -46,6 +46,10 @@ namespace AtomicEngine
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern uint csi_Atomic_AtomicNET_StringToStringHash(string name);
 
+        // static members so they don't get GC'd
+        private static EventDispatchDelegate eventDispatchDelegate = NativeCore.EventDispatch;
+        private static UpdateDispatchDelegate updateDispatchDelegate = NativeCore.UpdateDispatch;
+
         public static void Initialize()
         {
             // Atomic Modules
@@ -77,11 +81,7 @@ namespace AtomicEngine
 
             PlayerModule.Initialize();
 
-            coreDelegates = new CoreDelegates();
-            coreDelegates.eventDispatch = NativeCore.EventDispatch;
-            coreDelegates.updateDispatch = NativeCore.UpdateDispatch;
-
-            IntPtr coreptr = csi_Atomic_NETCore_Initialize(ref coreDelegates);
+            IntPtr coreptr = csi_Atomic_NETCore_Initialize(eventDispatchDelegate, updateDispatchDelegate);
 
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
@@ -102,10 +102,9 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csi_Atomic_NETCore_Initialize(ref CoreDelegates delegates);
+        private static extern IntPtr csi_Atomic_NETCore_Initialize(EventDispatchDelegate eventDispatch, UpdateDispatchDelegate updateDispatch);
 
         private static Context context;
-        private static CoreDelegates coreDelegates;
         private static Dictionary<Type, AObject> subSystems = new Dictionary<Type, AObject>();
 
     }

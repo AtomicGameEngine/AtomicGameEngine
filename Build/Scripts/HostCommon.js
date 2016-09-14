@@ -138,6 +138,29 @@ function testCreateDir(directory) {
   }
 }
 
+function setupDirs(clean, createDirs, removeDirs) {
+
+    if (createDirs) {
+        for (var i = 0; i < createDirs.length; i++) {
+
+            var path = createDirs[i];
+            if (!fs.existsSync(path) || clean) {
+                cleanCreateDir(path);
+            }
+        }
+    }
+
+    if (removeDirs) {
+        for (var i = 0; i < removeDirs.length; i++) {
+
+            var path = removeDirs[i];
+            if (fs.existsSync(path) && clean) {
+                testRemoveDir(path);
+            }
+        }
+    }
+
+}
 
 function testRemoveDir(path) {
 
@@ -160,3 +183,4 @@ exports.getScriptModules = getScriptModules;
 exports.getGenScriptFilenames = getGenScriptFilenames;
 exports.createGenScriptFiles = createGenScriptFiles;
 exports.getGenScriptRootDir = getGenScriptRootDir;
+exports.setupDirs = setupDirs;

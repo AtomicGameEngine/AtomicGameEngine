@@ -89,7 +89,7 @@ namespace('build', function() {
       // Compile AtomicNET assemblies
       var cmds = [];
 
-      cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platform + " " + configuration);
+      cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json -platform " + platform + " -config " + configuration);
 
       jake.exec(cmds, function() {
 

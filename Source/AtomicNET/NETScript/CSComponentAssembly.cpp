@@ -231,7 +231,7 @@ namespace Atomic
 
     bool CSComponentAssembly::BeginLoad(Deserializer& source)
     {
-		fullAssemblyPath_ = source.GetName();
+        fullAssemblyPath_ = source.GetName();
 
         VariantMap eventData;
 

@@ -46,7 +46,7 @@ namespace ToolCore
 {
 
 NETCmd::NETCmd(Context* context) : Command(context),
-	requiresProjectLoad_(false)
+    requiresProjectLoad_(false)
 {
 
 }
@@ -67,11 +67,34 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
         return false;
     }
 
+    if (command_ == "compile" || command_ == "genresources")
+    {
+        for (unsigned i = startIndex + 3; i < arguments.Size(); i++)
+        {
+            if (arguments[i].Length() > 1 && arguments[i][0] == '-')
+            {
+                String argument = arguments[i].Substring(1).ToLower();
+                String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+                if (argument == "platform" && !value.Empty())
+                {
+                    platforms_.Push(value);
+                    i++;
+                }
+                else if (argument == "config" && !value.Empty())
+                {
+                    configurations_.Push(value);
+                    i++;
+                }
+            }
+        }
+    }
+
     if (command_ == "compile")
     {
+        // solution
         solutionPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
-        platform_ = startIndex + 3 < arguments.Size() ? arguments[startIndex + 3] : String::EMPTY;
-        configuration_ = startIndex + 4 < arguments.Size() ? arguments[startIndex + 4] : "Release";
+
 
         bool exists = false;
 
@@ -87,20 +110,33 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
             return false;
         }
 
-        if (!platform_.Length())
+        if (!platforms_.Size())
         {
             errorMsg = "Platform not specified";
             return false;
         }
 
+        if (!configurations_.Size())
+        {
+            errorMsg = "configuration not specified";
+            return false;
+        }
+
+
         return true;
     }
-	else if (command_ == "genresources")
-	{
-		projectPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
-		platform_ = startIndex + 3 < arguments.Size() ? arguments[startIndex + 3] : String::EMPTY;
-		requiresProjectLoad_ = true;
-	}
+    else if (command_ == "genresources")
+    {
+        projectPath_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
+        requiresProjectLoad_ = true;
+
+        if (!platforms_.Size())
+        {
+            errorMsg = "Platform not specified";
+            return false;
+        }
+
+    }
     else
     {
         errorMsg = "Unknown net command";
@@ -135,45 +171,43 @@ void NETCmd::Run()
 {
     if (command_ == "compile")
     {
-		
-		FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
+        
         NETBuildSystem* buildSystem = new NETBuildSystem(context_);
         context_->RegisterSubsystem(buildSystem);
 
-		NETBuild* build = 0;
+        NETBuild* build = 0;
 
-		String solutionPath;
-		String fileName;
-		String ext;
+        String solutionPath;
+        String fileName;
+        String ext;
 
-		// detect project        
-		SplitPath(solutionPath_, solutionPath, fileName, ext);
+        // detect project        
+        SplitPath(solutionPath_, solutionPath, fileName, ext);
 
-		if (ext == ".atomic")
-		{
-			SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
+        if (ext == ".atomic")
+        {
+            SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 
-			if (!gen->LoadAtomicProject(solutionPath_))
-			{
-				Error(ToString("NETProjectGen: Error loading project (%s)", solutionPath.CString()));
-				Finished();
-				return;
-			}
+            if (!gen->LoadAtomicProject(solutionPath_))
+            {
+                Error(ToString("NETProjectGen: Error loading project (%s)", solutionPath.CString()));
+                Finished();
+                return;
+            }
 
-			if (!gen->Generate())
-			{
-				Error(ToString("NETProjectGen: Error generating project (%s)", solutionPath.CString()));
-				Finished();
-				return;
-			}
+            if (!gen->Generate())
+            {
+                Error(ToString("NETProjectGen: Error generating project (%s)", solutionPath.CString()));
+                Finished();
+                return;
+            }
 
-			solutionPath_ = solutionPath + "/AtomicNET/Solution/" + gen->GetProjectSettings()->GetName() + ".sln";
+            solutionPath_ = solutionPath + "/AtomicNET/Solution/" + gen->GetProjectSettings()->GetName() + ".sln";
 
-		}
+        }
 
-		// json project file
-		build = buildSystem->Build(solutionPath_, platform_, configuration_);
+        // json project file
+        build = buildSystem->Build(solutionPath_, platforms_, configurations_);
 
         if (!build)
         {
@@ -185,39 +219,39 @@ void NETCmd::Run()
         build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETCmd, HandleNETBuildResult));
 
     }
-	else if (command_ == "genresources")
-	{
-		BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-		ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
-		Project* project = toolSystem->GetProject();
+    else if (command_ == "genresources")
+    {
+        BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+        ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
+        Project* project = toolSystem->GetProject();
 
-		if (!project)
-		{
-			Error("Unable to get project");
-			Finished();
-			return;
-		}
+        if (!project)
+        {
+            Error("Unable to get project");
+            Finished();
+            return;
+        }
 
-		buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
+        buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
 
-		Platform* platform = toolSystem->GetPlatformByName(platform_);
+        Platform* platform = toolSystem->GetPlatformByName(platforms_[0]);
 
-		if (!platform)
-		{
-			Error(ToString("Unknown platform %s", platform_.CString()));
-			Finished();
-			return;
-		}
+        if (!platform)
+        {
+            Error(ToString("Unknown platform %s", platforms_[0].CString()));
+            Finished();
+            return;
+        }
 
-		BuildBase* buildBase = platform->NewBuild(project);
-		buildBase->SetResourcesOnly(true);
-		buildBase->SetVerbose(true);
-		buildSystem->QueueBuild(buildBase);
-		buildSystem->StartNextBuild();
+        BuildBase* buildBase = platform->NewBuild(project);
+        buildBase->SetResourcesOnly(true);
+        buildBase->SetVerbose(true);
+        buildSystem->QueueBuild(buildBase);
+        buildSystem->StartNextBuild();
 
-		Finished();
-		return;
-	}
+        Finished();
+        return;
+    }
 
 }
 

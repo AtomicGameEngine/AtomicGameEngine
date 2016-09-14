@@ -55,7 +55,7 @@ bool ToolEnvironment::InitFromPackage()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-	editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
+    editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
     String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
 #elif ATOMIC_PLATFORM_LINUX
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";

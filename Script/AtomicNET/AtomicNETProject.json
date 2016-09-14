@@ -102,6 +102,32 @@
             ]
         },
         {
+            "name": "AtomicNET.iOS",
+            "platforms" : ["ios"],
+            "outputType" : "Library",
+            "projectTypeGuids" :[ "8FFB629D-F513-41CE-95D2-7ECE97B6EEEC", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC" ],
+            "defineConstants" : ["ATOMIC_IOS"],
+            "rootNamespace" : "AtomicGameEngine",
+            "assemblyName" : "AtomicNET",
+            "assemblyOutputPath" : "..\\..\\$ATOMIC_CONFIG$\\iOS\\",
+            "projectGuid" : "C74AB5E8-7517-11E6-AE3F-005056C00008",
+            "objcBindingApiDefinition" : "$ATOMIC_ROOT$/Script/AtomicNET/Platform/iOS/ApiDefinition/ApiDefinition.cs",
+            "references" : [
+                "Xamarin.iOS",
+                "System",
+                "System.Core",
+                "System.Xml.Linq",
+                "System.Xml"
+            ],
+            "sharedReferences" : [
+                "AtomicNET.Shared"
+            ],
+            "sources" : [
+                "$ATOMIC_ROOT$/Script/AtomicNET/Platform/iOS/AtomicNET"
+            ],
+            "importProjects" : ["$(MSBuildExtensionsPath)\\Xamarin\\iOS\\Xamarin.iOS.ObjCBinding.CSharp.targets"]
+        },
+        {
             "name": "AtomicNETService",
             "platforms" : ["desktop"],
             "outputType" : "Exe",

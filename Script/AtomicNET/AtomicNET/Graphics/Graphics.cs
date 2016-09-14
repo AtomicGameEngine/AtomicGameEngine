@@ -8,6 +8,14 @@ namespace AtomicEngine
     public partial class Graphics : AObject
     {
 
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
+        static extern IntPtr csi_Atomic_Graphics_GetSDLWindow();
+
+        /// <summary>
+        /// Pointer to SDL window
+        /// </summary>
+        public IntPtr SDLWindow => csi_Atomic_Graphics_GetSDLWindow();
+
         // Shader Parameters
 
         public void SetShaderParameter(string param, Matrix3x4 matrix)

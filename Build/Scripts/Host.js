@@ -13,4 +13,7 @@ if (os.platform() == "win32") {
 
 require("./BuildCommon");
 require("./BuildAndroid");
+require("./BuildIOS");
 require("./BuildWeb");
+require("./BuildAtomicNET");
+require("./BuildLint");

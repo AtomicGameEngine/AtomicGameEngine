@@ -55,10 +55,10 @@ enum UI_GRAVITY {
     UI_GRAVITY_TOP = tb::WIDGET_GRAVITY_TOP,
     UI_GRAVITY_BOTTOM = tb::WIDGET_GRAVITY_BOTTOM,
 
-    UI_GRAVITY_LEFT_RIGHT	= tb::WIDGET_GRAVITY_LEFT_RIGHT,
-    UI_GRAVITY_TOP_BOTTOM	= tb::WIDGET_GRAVITY_TOP_BOTTOM,
-    UI_GRAVITY_ALL			= tb::WIDGET_GRAVITY_ALL,
-    UI_GRAVITY_DEFAULT		= tb::WIDGET_GRAVITY_DEFAULT
+    UI_GRAVITY_LEFT_RIGHT    = tb::WIDGET_GRAVITY_LEFT_RIGHT,
+    UI_GRAVITY_TOP_BOTTOM    = tb::WIDGET_GRAVITY_TOP_BOTTOM,
+    UI_GRAVITY_ALL            = tb::WIDGET_GRAVITY_ALL,
+    UI_GRAVITY_DEFAULT        = tb::WIDGET_GRAVITY_DEFAULT
 };
 
 enum UI_EVENT_TYPE {
@@ -119,8 +119,8 @@ enum UI_EVENT_TYPE {
 
 /** Defines widget z level relative to another widget, used with TBWidget::AddChildRelative. */
 enum UI_WIDGET_Z_REL {
-    UI_WIDGET_Z_REL_BEFORE = tb::WIDGET_Z_REL_BEFORE,		///< Before the reference widget (visually behind reference).
-    UI_WIDGET_Z_REL_AFTER = tb::WIDGET_Z_REL_AFTER			///< After the reference widget (visually above reference).
+    UI_WIDGET_Z_REL_BEFORE = tb::WIDGET_Z_REL_BEFORE,        ///< Before the reference widget (visually behind reference).
+    UI_WIDGET_Z_REL_AFTER = tb::WIDGET_Z_REL_AFTER            ///< After the reference widget (visually above reference).
 };
 
 /// TB_TEXT_ALIGN specifies horizontal text alignment

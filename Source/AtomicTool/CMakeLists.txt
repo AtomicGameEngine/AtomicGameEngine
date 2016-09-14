@@ -51,5 +51,5 @@ add_custom_target ( GenerateScriptBindings
 
 add_custom_target ( GenerateAtomicNET
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                    COMMAND ${ATOMIC_NODE_JAKE};build:genAtomicNET[${JAVASCRIPT_BINDINGS_PLATFORM},$<$<CONFIG:debug>:"Debug">$<$<CONFIG:release>:"Release">];--trace
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genAtomicNET[desktop,$<$<CONFIG:debug>:"Debug">$<$<CONFIG:release>:"Release">];--trace
                     DEPENDS AtomicTool )

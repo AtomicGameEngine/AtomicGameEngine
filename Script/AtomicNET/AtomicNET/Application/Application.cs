@@ -28,7 +28,14 @@ namespace AtomicEngine
             app = NETIPCPlayerApp.Create(args);
 #endif
 
-#if ATOMIC_ANDROID
+#if ATOMIC_IOS
+            // On iOS, we need to set main ready as main() isn't being called
+            SDLEvents.SetMainReady();
+#endif
+
+
+#if ATOMIC_ANDROID || ATOMIC_IOS
+
             app = NETAtomicPlayer.Create(args);
             
             var renderer = AtomicNET.GetSubsystem<Renderer>();

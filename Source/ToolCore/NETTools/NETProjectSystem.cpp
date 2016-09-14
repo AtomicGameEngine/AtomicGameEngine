@@ -201,33 +201,33 @@ namespace ToolCore
         }
     }
 
-	bool NETProjectSystem::GenerateResourcePak()
-	{
-		ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-		Project* project = tsystem->GetProject();
-		BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+    bool NETProjectSystem::GenerateResourcePak()
+    {
+        ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+        Project* project = tsystem->GetProject();
+        BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
-		// TODO: We just use WINDOWS platform for PAK generation for now
-		Platform* platform = tsystem->GetPlatformByName("WINDOWS");
+        // TODO: We just use WINDOWS platform for PAK generation for now
+        Platform* platform = tsystem->GetPlatformByName("WINDOWS");
 
-		buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
+        buildSystem->SetBuildPath(project->GetProjectPath() + "AtomicNET/Resources/");
 
-		SharedPtr<BuildBase> buildBase(platform->NewBuild(project));
-		buildBase->SetResourcesOnly(true);
-		buildBase->SetVerbose(true);
-		buildSystem->QueueBuild(buildBase);
-		buildSystem->StartNextBuild();
+        SharedPtr<BuildBase> buildBase(platform->NewBuild(project));
+        buildBase->SetResourcesOnly(true);
+        buildBase->SetVerbose(true);
+        buildSystem->QueueBuild(buildBase);
+        buildSystem->StartNextBuild();
 
-		if (buildBase->GetBuildFailed())
-		{
-			const StringVector& errors = buildBase->GetBuildErrors();
-			ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Build Resources.pak: %s", errors.Size() ? errors[0].CString() : "Unknown Error");
-			return false;
-		}
+        if (buildBase->GetBuildFailed())
+        {
+            const StringVector& errors = buildBase->GetBuildErrors();
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Build Resources.pak: %s", errors.Size() ? errors[0].CString() : "Unknown Error");
+            return false;
+        }
 
-		return true;
+        return true;
 
-	}
+    }
 
     bool NETProjectSystem::GenerateSolution()
     {
@@ -240,19 +240,19 @@ namespace ToolCore
             return false;
         }
 
-		// TODO: Generalize and move me
-		if (project->GetSupportsPlatform("android"))
-		{
-			FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        // TODO: Generalize and move me
+        if (project->GetSupportsPlatform("android"))
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-			if (!fileSystem->FileExists(project->GetProjectPath() + "AtomicNET/Resources/AtomicResources.pak"))
-			{
-				if (!GenerateResourcePak())
-					return false;
+            if (!fileSystem->FileExists(project->GetProjectPath() + "AtomicNET/Resources/AtomicResources.pak"))
+            {
+                if (!GenerateResourcePak())
+                    return false;
 
-			}
+            }
 
-		}
+        }
 
         SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
 
@@ -308,12 +308,12 @@ namespace ToolCore
         using namespace ProjectLoaded;
 
         String projectPath = eventData[P_PROJECTPATH].GetString();
-		Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());		
+        Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());        
         
         if (GetExtension(projectPath) == ".atomic")
             projectPath = GetParentPath(projectPath);
 
-		String projectName = project->GetProjectSettings()->GetName();
+        String projectName = project->GetProjectSettings()->GetName();
 
         solutionPath_ = AddTrailingSlash(projectPath) + "AtomicNET/Solution/" + projectName + ".sln";
         projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resources/" + projectName + ".dll";
