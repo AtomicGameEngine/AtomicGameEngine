@@ -6,7 +6,7 @@ ECHO Generating Visual Studio Solution (64 bit)
 @echo:
 call "%VS140COMNTOOLS%..\..\VC\bin\amd64\vcvars64.bat"
 :: remove any generated sources
-if exist "%~p0Artifacts\Build\Source\Generated\WINDOWS\" rd /q /s "%~p0Artifacts\Build\Source\Generated\WINDOWS"
+if exist "%~p0Artifacts\Build\Source\Generated\" rd /q /s "%~p0Artifacts\Build\Source\Generated\"
 :: get current foldername
 set "cdir=%~dp0"
 :: for loop requires removing trailing backslash from %~dp0 output
