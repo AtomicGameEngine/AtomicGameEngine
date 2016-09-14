@@ -3,6 +3,8 @@ var path = require("path");
 var host = require("./Host");
 var os = require('os');
 
+var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1;
+
 var atomicRoot = host.atomicRoot;
 var buildDir = host.artifactsRoot + "Build/IOS/";
 
@@ -26,6 +28,13 @@ namespace('build', function() {
         var cmds = [];
 
         cmds.push("cmake -DIOS=1 -DATOMIC_DEV_BUILD=0 -G Xcode ../../../");
+
+
+        if (jenkinsBuild) {
+            cmds.push("security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain");
+            cmds.push("security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain");
+        }
+
         cmds.push("xcodebuild -configuration " + (debug ? "Debug" : "Release") + " -parallelizeTargets -jobs 4");
         cmds.push("cd \"" + NETNativeSrcDir + "\" && install_name_tool -id @rpath/AtomicNETNative.framework/AtomicNETNative AtomicNETNative.framework/AtomicNETNative");
         //cmds.push("cd \"" + NETNativeSrcDir + "\" && codesign --deep --force --verify --sign \"iPhone Developer\" ./AtomicNETNative.framework/");
