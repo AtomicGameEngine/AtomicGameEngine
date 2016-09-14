@@ -38,7 +38,7 @@
 #include <stdio.h>
 #endif
 
-// Android or iOS: use SDL_main
+// Android: uses SDL_main, defined for IOS only to satifsy linker
 #if defined(__ANDROID__) || defined(IOS)
 
 typedef int(*sdl_entry_callback)();
@@ -47,18 +47,20 @@ static sdl_entry_callback sdlEntryCallback = 0;
 
 extern "C" void RegisterSDLEntryCallback(sdl_entry_callback callback)
 {
-	sdlEntryCallback = callback;
+    sdlEntryCallback = callback;
 }
 
-extern "C" int SDL_main(int argc, char** argv); 
-int SDL_main(int argc, char** argv) 
-{ 
-    Atomic::ParseArguments(argc, argv); 
-	if (sdlEntryCallback != 0)
-	{
-		return sdlEntryCallback();
-	}
-	return 0;
+extern "C" int SDL_main(int argc, char** argv);
+int SDL_main(int argc, char** argv)
+{
+#if defined(__ANDROID__)
+    Atomic::ParseArguments(argc, argv);
+    if (sdlEntryCallback != 0)
+    {
+        return sdlEntryCallback();
+    }
+#endif    
+    return 0;
 }
 #endif
 
@@ -75,7 +77,7 @@ namespace Atomic
     {
         PlayerApp::Setup();
 
-		engineParameters_["ResourcePaths"] = "AtomicResources"; 
+        engineParameters_["ResourcePaths"] = "AtomicResources";
     }
 
     int NETAtomicPlayer::Initialize()

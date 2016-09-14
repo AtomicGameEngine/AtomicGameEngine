@@ -48,7 +48,7 @@ public:
 
     bool RequiresProjectLoad() { return requiresProjectLoad_; }
 
-	const String& GetProjectPath() const { return projectPath_; }
+    const String& GetProjectPath() const { return projectPath_; }
 
 private:
 
@@ -64,10 +64,10 @@ private:
 
     // compile
     String solutionPath_;
-    String platform_;
-    String configuration_;
+    StringVector platforms_;
+    StringVector configurations_;
 
-	bool requiresProjectLoad_;
+    bool requiresProjectLoad_;
 
     WeakPtr<AtomicNETService> netService_;
 

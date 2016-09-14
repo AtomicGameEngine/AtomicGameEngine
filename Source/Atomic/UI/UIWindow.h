@@ -32,15 +32,15 @@ namespace Atomic
 
 enum UI_WINDOW_SETTINGS {
     ///< Chrome less window without any other settings.
-    UI_WINDOW_SETTINGS_NONE			= tb::WINDOW_SETTINGS_NONE,
+    UI_WINDOW_SETTINGS_NONE            = tb::WINDOW_SETTINGS_NONE,
     ///< Show a title bar that can also move the window.
-    UI_WINDOW_SETTINGS_TITLEBAR		= tb::WINDOW_SETTINGS_TITLEBAR,
+    UI_WINDOW_SETTINGS_TITLEBAR        = tb::WINDOW_SETTINGS_TITLEBAR,
     ///< Show a widget for resizing the window.
-    UI_WINDOW_SETTINGS_RESIZABLE	= tb::WINDOW_SETTINGS_RESIZABLE,
+    UI_WINDOW_SETTINGS_RESIZABLE    = tb::WINDOW_SETTINGS_RESIZABLE,
     ///< Show a widget for closing the window.
-    UI_WINDOW_SETTINGS_CLOSE_BUTTON	= tb::WINDOW_SETTINGS_CLOSE_BUTTON,
+    UI_WINDOW_SETTINGS_CLOSE_BUTTON    = tb::WINDOW_SETTINGS_CLOSE_BUTTON,
     ///< Can be activated and deactivate other windows.
-    UI_WINDOW_SETTINGS_CAN_ACTIVATE	= tb::WINDOW_SETTINGS_CAN_ACTIVATE,
+    UI_WINDOW_SETTINGS_CAN_ACTIVATE    = tb::WINDOW_SETTINGS_CAN_ACTIVATE,
 
     UI_WINDOW_SETTINGS_DEFAULT = tb::WINDOW_SETTINGS_DEFAULT
 };

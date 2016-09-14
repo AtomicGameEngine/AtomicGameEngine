@@ -60,8 +60,8 @@ namespace Atomic
     public:
         // IUnknown implementation
         HRESULT __stdcall QueryInterface(REFIID iid, void ** ppvObject);
-        ULONG	__stdcall AddRef(void);
-        ULONG	__stdcall Release(void);
+        ULONG    __stdcall AddRef(void);
+        ULONG    __stdcall Release(void);
 
         void UpdateMousePos();
 
@@ -84,8 +84,8 @@ namespace Atomic
         bool  QueryDataObject(IDataObject *pDataObject);
 
         // Private member variables
-        LONG	m_lRefCount;
-        HWND	m_hWnd;
+        LONG    m_lRefCount;
+        HWND    m_hWnd;
         bool    m_fAllowDrop;
 
         IDataObject *m_pDataObject;

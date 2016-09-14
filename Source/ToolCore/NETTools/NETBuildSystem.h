@@ -58,14 +58,15 @@ namespace ToolCore
     
     public:
 
-        NETBuild(Context* context, const String& solutionPath, const String& platform, const String& configuration);
+        NETBuild(Context* context, const String& solutionPath, const StringVector& platforms, const StringVector& configurations);
         virtual ~NETBuild() {}
 
     private:
         /// .sln or .json configuration file
         String solutionPath_;
-        String configuration_;
-        String platform_;
+        StringVector configurations_;
+        StringVector platforms_;
+
         NETBuildStatus status_;
         String allArgs_;
         String output_;
@@ -85,7 +86,7 @@ namespace ToolCore
         virtual ~NETBuildSystem();
 
         /// Build either a .sln or .json configuration file
-        NETBuild* Build(const String& solutionPath, const String& platform, const String& configuration = "Release");
+        NETBuild* Build(const String& solutionPath, const StringVector &platforms, const StringVector &configurations);
 
         NETBuild* BuildAtomicProject(Project* project);
 
@@ -93,7 +94,7 @@ namespace ToolCore
 
         void CurrentBuildError(String errorText);
 
-        NETBuild* GetBuild(const String& solutionPath, const String& platform, const String& configuration);
+        NETBuild* GetBuild(const String& solutionPath, const StringVector& platforms, const StringVector& configurations);
 
         void HandleBuildAtomicProject(StringHash eventType, VariantMap& eventData);
         void HandleToolUpdate(StringHash eventType, VariantMap& eventData);

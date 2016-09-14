@@ -59,16 +59,16 @@ namespace ToolCore
         args.Clear();
 
 #ifdef ATOMIC_DEBUG
-		String config = "Debug";
+        String config = "Debug";
 #else
-		String config = "Release";
+        String config = "Release";
 #endif
 
-		String netServiceFilename = tenv->GetAtomicNETRootDir() + config + "/AtomicNETService/AtomicNETService.exe";
+        String netServiceFilename = tenv->GetAtomicNETRootDir() + config + "/AtomicNETService/AtomicNETService.exe";
 
 #ifdef ATOMIC_PLATFORM_WINDOWS        
 
-		execPath = netServiceFilename;
+        execPath = netServiceFilename;
 
 #elif defined ATOMIC_PLATFORM_OSX
 

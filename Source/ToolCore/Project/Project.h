@@ -67,14 +67,14 @@ public:
     bool IsScriptsDirOrFile(const String& fullPath);
     bool IsModulesDirOrFile(const String& fullPath);
 
-	bool GetSupportsPlatform(const String& platform) const;
+    bool GetSupportsPlatform(const String& platform) const;
 
     bool IsDirty() { return dirty_; }
     void SetDirty() { if (!loading_) dirty_ = true; }
 
     ProjectBuildSettings* GetBuildSettings() { return buildSettings_; }
     ProjectUserPrefs* GetUserPrefs() { return userPrefs_; }
-	ProjectSettings* GetProjectSettings() { return projectSettings_; }
+    ProjectSettings* GetProjectSettings() { return projectSettings_; }
 
     const String& GetProjectPath() const { return projectPath_; }
     const String& GetProjectFilePath() { return projectFilePath_; }
@@ -86,7 +86,7 @@ public:
 
     void SaveBuildSettings();
     bool LoadBuildSettings();
-	bool LoadProjectSettings();
+    bool LoadProjectSettings();
 
     void SaveUserPrefs();
     bool LoadUserPrefs();
@@ -109,7 +109,7 @@ private:
 
     SharedPtr<ProjectUserPrefs> userPrefs_;
     SharedPtr<ProjectBuildSettings> buildSettings_;
-	SharedPtr<ProjectSettings> projectSettings_;
+    SharedPtr<ProjectSettings> projectSettings_;
 
 };
 

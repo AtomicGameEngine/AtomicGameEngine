@@ -50,14 +50,14 @@ namespace Atomic
     {
         IPCPlayerApp::Setup();
 
-		// TODO: we should always have a --project for IPCPlayer, however it is doing 
-		// double duty right now as managed player
-		StringVector args = GetArguments();
-		if (!args.Contains("--project"))
-		{
-			engineParameters_["ResourcePrefixPaths"] = "AtomicPlayer_Resources";
-			engineParameters_["ResourcePaths"] = "AtomicResources";
-		}
+        // TODO: we should always have a --project for IPCPlayer, however it is doing 
+        // double duty right now as managed player
+        StringVector args = GetArguments();
+        if (!args.Contains("--project"))
+        {
+            engineParameters_["ResourcePrefixPaths"] = "AtomicPlayer_Resources";
+            engineParameters_["ResourcePaths"] = "AtomicResources";
+        }
     }
 
     int NETIPCPlayerApp::Initialize()

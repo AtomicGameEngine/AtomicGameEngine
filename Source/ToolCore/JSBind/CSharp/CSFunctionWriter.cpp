@@ -471,7 +471,7 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
     {
         for (unsigned int i = 0; i < parameters.Size(); i++)
         {
-			bool isStruct = false;
+            bool isStruct = false;
             JSBFunctionType* ptype = parameters.At(i);
 
             // ignore "Context" parameters
@@ -485,23 +485,23 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
                     continue;
                 }
 
-				// TODO: we should have a better system for struct type in general
-				// This number array is really for JS
-				if (klass->IsNumberArray())
-				{
-					isStruct = true;
-				}
+                // TODO: we should have a better system for struct type in general
+                // This number array is really for JS
+                if (klass->IsNumberArray())
+                {
+                    isStruct = true;
+                }
             }
 
-			String managedTypeString = CSTypeHelper::GetManagedTypeString(ptype);
+            String managedTypeString = CSTypeHelper::GetManagedTypeString(ptype);
 
-			if (!ptype->isConst_ && (ptype->isReference_ && isStruct))
-			{
-				// pass by reference
-				managedTypeString = "ref " + managedTypeString;
-			}
+            if (!ptype->isConst_ && (ptype->isReference_ && isStruct))
+            {
+                // pass by reference
+                managedTypeString = "ref " + managedTypeString;
+            }
 
-			sig += managedTypeString;
+            sig += managedTypeString;
 
             String init = ptype->initializer_;
 
@@ -560,7 +560,7 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
 
     Indent();
 
-	source += IndentLine(ToString("var classType = typeof(%s);\n", klass->GetName().CString()));
+    source += IndentLine(ToString("var classType = typeof(%s);\n", klass->GetName().CString()));
     source += IndentLine("var thisType = this.GetType();\n");
     source += IndentLine("var thisTypeIsNative = NativeCore.IsNativeType(thisType);\n");    
     source += IndentLine("var nativeAncsestorType = NativeCore.GetNativeAncestorType(thisType);\n");

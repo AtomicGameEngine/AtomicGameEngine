@@ -52,9 +52,9 @@ Project::Project(Context* context) :
 {
     version_ = "1.0.0";
 
-	projectSettings_ = new ProjectSettings(context_);
+    projectSettings_ = new ProjectSettings(context_);
     userPrefs_ = new ProjectUserPrefs(context_);
-    buildSettings_ = new ProjectBuildSettings(context_);	
+    buildSettings_ = new ProjectBuildSettings(context_);    
 }
 
 Project::~Project()
@@ -101,13 +101,13 @@ bool Project::LoadBuildSettings()
 
 bool Project::LoadProjectSettings()
 {
-	projectSettings_->Load(GetProjectPath() + "Settings/Project.json");
-	return true;
+    projectSettings_->Load(GetProjectPath() + "Settings/Project.json");
+    return true;
 }
 
 bool Project::GetSupportsPlatform(const String& platform) const
 {
-	return projectSettings_->GetSupportsPlatform(platform);
+    return projectSettings_->GetSupportsPlatform(platform);
 }
 
 bool Project::Load(const String& fullpath)
@@ -133,14 +133,14 @@ bool Project::Load(const String& fullpath)
 
     loading_ = false;
 
-	LoadProjectSettings();
+    LoadProjectSettings();
     LoadBuildSettings();
     LoadUserPrefs();
 
     if ( true /*result*/) {
         VariantMap data;
         data[ProjectLoaded::P_PROJECTPATH] = projectFilePath_;
-		data[ProjectLoaded::P_PROJECT] = this;
+        data[ProjectLoaded::P_PROJECT] = this;
         SendEvent(E_PROJECTLOADED, data);
     }
 
