@@ -36,6 +36,7 @@ namespace('build', function() {
         }
 
         cmds.push("xcodebuild -configuration " + (debug ? "Debug" : "Release") + " -parallelizeTargets -jobs 4");
+        // Note that this install_name_tool invocation invalidates the code signing, Xamarin/Visual Studio should resign the binary on deploy to device
         cmds.push("cd \"" + NETNativeSrcDir + "\" && install_name_tool -id @rpath/AtomicNETNative.framework/AtomicNETNative AtomicNETNative.framework/AtomicNETNative");
         //cmds.push("cd \"" + NETNativeSrcDir + "\" && codesign --deep --force --verify --sign \"iPhone Developer\" ./AtomicNETNative.framework/");
         cmds.push("cd \"" + NETNativeSrcDir + "\" && zip -r AtomicNETNative.framework.zip AtomicNETNative.framework");
