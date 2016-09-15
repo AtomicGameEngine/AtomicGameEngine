@@ -132,49 +132,69 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach_time.h>
 #include <assert.h>
 
-/* clock_gettime is not implemented on OSX */
+// ATOMIC BEGIN
+/* Determine if the current OSX version supports clock_gettime */
+#ifdef __APPLE__
+#include <AvailabilityMacros.h>
+#ifndef MAC_OS_X_VERSION_10_12
+#define MAC_OS_X_VERSION_10_12 101200
+#endif
+#endif
+
+// TODO: Once we get to the point 10.12 is required, make sure civetweb itself has been updated!
+// Instead of using MAC_OS_X_VERSION_MIN_REQUIRED, which it doesn't appear time.h is guarded by, use MAC_OS_X_VERSION_MAX_ALLOWED
+#define CIVETWEB_APPLE_HAVE_CLOCK_GETTIME defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+#if !(CIVETWEB_APPLE_HAVE_CLOCK_GETTIME)
+// ATOMIC END
+
+/* clock_gettime is not implemented on OSX prior to 10.12 */
 int clock_gettime(int clk_id, struct timespec *t);
 
-int clock_gettime(int clk_id, struct timespec *t)
+int
+clock_gettime(int clk_id, struct timespec *t)
 {
-	if (clk_id == CLOCK_REALTIME) {
-		struct timeval now;
-		int rv = gettimeofday(&now, NULL);
-		if (rv) {
-			return rv;
-		}
-		t->tv_sec = now.tv_sec;
-		t->tv_nsec = now.tv_usec * 1000;
-		return 0;
+    memset(t, 0, sizeof(*t));
+    if (clk_id == CLOCK_REALTIME) {
+        struct timeval now;
+        int rv = gettimeofday(&now, NULL);
+        if (rv) {
+            return rv;
+        }
+        t->tv_sec = now.tv_sec;
+        t->tv_nsec = now.tv_usec * 1000;
+        return 0;
 
-	} else if (clk_id == CLOCK_MONOTONIC) {
-		static uint64_t start_time = 0;
-		static mach_timebase_info_data_t timebase_ifo = {0, 0};
+    } else if (clk_id == CLOCK_MONOTONIC) {
+        static uint64_t clock_start_time = 0;
+        static mach_timebase_info_data_t timebase_ifo = {0, 0};
 
-		uint64_t now = mach_absolute_time();
+        uint64_t now = mach_absolute_time();
 
-		if (start_time == 0) {
-			kern_return_t mach_status = mach_timebase_info(&timebase_ifo);
+        if (clock_start_time == 0) {
+            kern_return_t mach_status = mach_timebase_info(&timebase_ifo);
 #if defined(DEBUG)
-			assert(mach_status == KERN_SUCCESS);
+            assert(mach_status == KERN_SUCCESS);
 #else
-			/* appease "unused variable" warning for release builds */
-			(void)mach_status;
+            /* appease "unused variable" warning for release builds */
+            (void)mach_status;
 #endif
-			start_time = now;
-		}
+            clock_start_time = now;
+        }
 
-		now =
-		    (uint64_t)((double)(now - start_time) * (double)timebase_ifo.numer /
-		               (double)timebase_ifo.denom);
+        now = (uint64_t)((double)(now - clock_start_time)
+                         * (double)timebase_ifo.numer
+                         / (double)timebase_ifo.denom);
 
-		t->tv_sec = now / 1000000000;
-		t->tv_nsec = now % 1000000000;
-		return 0;
-	}
-	return -1; /* EINVAL - Clock ID is unknown */
+        t->tv_sec = now / 1000000000;
+        t->tv_nsec = now % 1000000000;
+        return 0;
+    }
+    return -1; /* EINVAL - Clock ID is unknown */
 }
 #endif
+#endif
+
+// ATOMIC END
 
 #include <time.h>
 #include <stdlib.h>

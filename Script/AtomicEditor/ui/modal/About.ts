@@ -85,9 +85,19 @@ class About extends ModalWindow {
 
         var text = "";
 
+        var buildName = Atomic.AtomicBuildInfo.getBuildName();
+        var buildDate = Atomic.AtomicBuildInfo.getBuildDate();
+        var buildTime = Atomic.AtomicBuildInfo.getBuildTime();
+        var buildSHA = Atomic.AtomicBuildInfo.getGitSHA();
+
+        var buildString = `<color #FFFFFF>'${buildName}' - ${buildDate} ${buildTime}\nGit: ${buildSHA} </color>`;
+
         text += "<widget TBImageWidget: filename: 'AtomicEditor/editor/images/atomic_logo.png'>\n\n";
-        text += "<color #D4FB79>Git SHA: " + Atomic.getGitRevision() + "</color>\n\n";
-        text += "(c) 2014-2016 THUNDERBEAST GAMES LLC\n\n\n";
+        text += "(c) 2014-2016 THUNDERBEAST GAMES LLC\n\n";
+
+        text += "<color #76D6FF>Build Information:</color>\n";
+
+        text += "<color #D4FB79>" + buildString + "</color>\n\n";
 
         text += "<color #D4FB79>Installed platforms and modules:</color>\n\n";
 

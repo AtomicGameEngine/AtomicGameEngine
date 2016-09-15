@@ -93,6 +93,13 @@ GroupSources("UI")
 GroupSources("Web")
 GroupSources("Script")
 
+# Handle Git Revision
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo/AtomicGitSHA.cpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo/AtomicGitSHA.cpp" @ONLY)
+
+set (SOURCE_FILES ${SOURCE_FILES} BuildInfo/AtomicBuildInfo.cpp BuildInfo/AtomicBuildInfo.h BuildInfo/AtomicGitSHA.cpp BuildInfo/AtomicGitSHA.h)
+
 add_library(Atomic ${SOURCE_FILES})
 
 include(AtomicDoc)

@@ -5,9 +5,6 @@ set (ATOMIC_NODE_JAKE Build/Mac/node/node Build/node_modules/jake/bin/cli.js  -f
 include (BundleUtilities)
 include(AtomicDesktop)
 
-# only have 32 bit mono installed, fix this
-# set (CMAKE_OSX_ARCHITECTURES i386)
-
 # for CEF3
 set(PROJECT_ARCH "x86_64")
 

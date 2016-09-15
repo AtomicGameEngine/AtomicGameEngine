@@ -24,10 +24,35 @@
 
 #pragma once
 
+#include <Atomic/Container/RefCounted.h>
+
 namespace Atomic
 {
 
-/// Get the Git SHA of the Build, currently only valid for a binary release off CI
-const char* GetGitSHA();
+class AtomicBuildInfo : public RefCounted
+{
+    ATOMIC_REFCOUNTED(AtomicBuildInfo)
+
+    public:
+
+    AtomicBuildInfo() {}
+
+    /// Get the Git SHA of the build
+    static String GetGitSHA();
+
+    /// Get the Date of the build
+    static String GetBuildDate();
+
+    /// Get the Time of the build
+    static String GetBuildTime();
+
+    /// Get the build release name
+    static String GetBuildName();
+
+    /// Get the build string in form (BuildName): BuildDate BuildTime Git:SHA
+    static String GetBuildString();
+
+};
+
 
 }
