@@ -1,0 +1,8 @@
+
+namespace Atomic
+{
+
+#define GIT_SHA1 "@GIT_SHA1@"
+const char* ATOMIC_BUILDINFO_GITSHA = GIT_SHA1;
+
+}

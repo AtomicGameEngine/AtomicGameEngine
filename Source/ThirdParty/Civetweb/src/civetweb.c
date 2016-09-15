@@ -132,6 +132,10 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach_time.h>
 #include <assert.h>
 
+// ATOMIC BEGIN
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_12
+// ATOMIC END
+
 /* clock_gettime is not implemented on OSX */
 int clock_gettime(int clk_id, struct timespec *t);
 
@@ -174,6 +178,9 @@ int clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
+
+#endif
+
 #endif
 
 #include <time.h>

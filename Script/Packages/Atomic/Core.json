@@ -1,7 +1,7 @@
 {
 	"name" : "Core",
-	"sources" : ["Source/Atomic/Core"],
-	"classes" : ["Context", "Object"],
+	"sources" : ["Source/Atomic/Core", "Source/Atomic/BuildInfo"],
+	"classes" : ["Context", "Object", "AtomicBuildInfo"],
 	"classes_rename" : {
 		"Object" : "AObject"
 	},

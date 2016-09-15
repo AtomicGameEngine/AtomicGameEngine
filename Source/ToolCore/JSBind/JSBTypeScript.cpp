@@ -228,14 +228,24 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
             JSBFunctionType* ftype = NULL;
 
+            bool isStatic = false;
+
             if (prop->getter_ && !prop->getter_->Skip(BINDINGLANGUAGE_JAVASCRIPT))
             {
                 ftype = prop->getter_->GetReturnType();
+                isStatic = prop->getter_->IsStatic();
             }
             else if (prop->setter_ && !prop->setter_->Skip(BINDINGLANGUAGE_JAVASCRIPT))
+            {
                 ftype = prop->setter_->GetParameters()[0];
+                isStatic = prop->setter_->IsStatic();
+            }
 
             if (!ftype)
+                continue;
+
+            // TODO: static properies not currently working with generated TS
+            if (isStatic)
                 continue;
 
             String scriptType = GetScriptType(ftype);
