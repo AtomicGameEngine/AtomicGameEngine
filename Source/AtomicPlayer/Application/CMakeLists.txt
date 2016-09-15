@@ -28,10 +28,16 @@ if (ANDROID)
 	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
 	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 else()
+
+# iOS AtomicPlayer currently disabled
+if (NOT IOS)
 	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_PLAYER_ICON})
 endif()
+endif()
 
+if (NOT IOS)
 target_link_libraries(AtomicPlayer AtomicJS AtomicPlayerLib AtomicPlayerJS ${ATOMIC_LINK_LIBRARIES})
+endif()
 
 if (MSVC)
   # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
@@ -50,17 +56,17 @@ if (APPLE)
 
   else()
 
-    set_target_properties(AtomicPlayer PROPERTIES
-      MACOSX_BUNDLE_GUI_IDENTIFIER "com.atomicgameengine.atomicplayer"
-      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
-      XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym"
-      XCODE_ATTRIBUTE_INFOPLIST_PREPROCESS YES
-      XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 9.3
-      XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2" # iPhone/iPad
-      XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES NO
-    )
+#    set_target_properties(AtomicPlayer PROPERTIES
+#      MACOSX_BUNDLE_GUI_IDENTIFIER "com.atomicgameengine.atomicplayer"
+#      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+#      XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym"
+#      XCODE_ATTRIBUTE_INFOPLIST_PREPROCESS YES
+#      XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 9.3
+#      XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2" # iPhone/iPad
+#      XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES NO
+#    )
 
-    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/iOSBundleInfo.plist.template)
+#    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/iOSBundleInfo.plist.template)
 
   endif()
 
@@ -68,5 +74,7 @@ endif(APPLE)
 
 
 if (TARGET_PROPERTIES)
+if (NOT IOS)
     set_target_properties (AtomicPlayer PROPERTIES ${TARGET_PROPERTIES})
+endif()
 endif ()
