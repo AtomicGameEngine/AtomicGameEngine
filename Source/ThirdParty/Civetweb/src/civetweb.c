@@ -142,8 +142,9 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #endif
 
 // TODO: Once we get to the point 10.12 is required, make sure civetweb itself has been updated!
-#if defined(__APPLE__) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12)
-
+// Instead of using MAC_OS_X_VERSION_MIN_REQUIRED, which it doesn't appear time.h is guarded by, use MAC_OS_X_VERSION_MAX_ALLOWED
+#define CIVETWEB_APPLE_HAVE_CLOCK_GETTIME defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+#if !(CIVETWEB_APPLE_HAVE_CLOCK_GETTIME)
 // ATOMIC END
 
 /* clock_gettime is not implemented on OSX prior to 10.12 */
