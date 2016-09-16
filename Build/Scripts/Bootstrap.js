@@ -26,7 +26,6 @@ function printHelp() {
     console.log("--debug         : Build debug version of the editor and associated platform runtimes")
     console.log("--noclean       : Do not clean before building, useful during development")
     console.log("--nonet         : Build without AtomicNET C# scripting support")
-    console.log("--with-docs     : Build and install API documents into the editor")
     console.log("--with-examples : Install examples into the editor")
     console.log("--------------------------")
 
