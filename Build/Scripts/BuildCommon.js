@@ -252,10 +252,11 @@ namespace('build', function() {
     common.cleanCreateDir( toolDataFolder + "AtomicExamples");
 
     cmds = [
-      "git clone https://github.com/AtomicGameEngine/AtomicExamples " + toolDataFolder + "AtomicExamples && rm -rf " + toolDataFolder + "AtomicExamples/.git",
+      "git clone https://github.com/AtomicGameEngine/AtomicExamples " + toolDataFolder + "AtomicExamples",
     ];
 
     jake.exec(cmds, function() {
+      fs.removeSync( toolDataFolder + "AtomicExamples/.git" );
 
       complete();
       console.log( "completed installing example programs" )
