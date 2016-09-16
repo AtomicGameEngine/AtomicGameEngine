@@ -20,12 +20,14 @@ function printHelp() {
 
     console.log("\nAtomic Editor Build Script")
     console.log("--------------------------")
-    console.log("--help         : This help text")
-    console.log("--with-android : Build with Android platform support");
-    console.log("--with-ios     : Build with iOS platform support");
-    console.log("--debug        : Build debug version of the editor and associated platform runtimes")
-    console.log("--noclean      : Do not clean before building, useful during development")
-    console.log("--nonet        : Build without AtomicNET C# scripting support")
+    console.log("--help          : This help text")
+    console.log("--with-android  : Build with Android platform support");
+    console.log("--with-ios      : Build with iOS platform support");
+    console.log("--debug         : Build debug version of the editor and associated platform runtimes")
+    console.log("--noclean       : Do not clean before building, useful during development")
+    console.log("--nonet         : Build without AtomicNET C# scripting support")
+    console.log("--with-docs     : Build and install API documents into the editor")
+    console.log("--with-examples : Install examples into the editor")
     console.log("--------------------------")
 
     process.exit(0);
