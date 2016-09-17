@@ -1,45 +1,62 @@
 var os = require('os');
+var path = require('path');
+
+// get the root folder
+var atomicRoot = path.resolve(__dirname, "../..") + "/";
+
+// patch in our local node_modules
+process.env.NODE_PATH = atomicRoot + "Build/node_modules/";
+require('module').Module._initPaths();
+
 var fs = require('fs-extra');
 
 // Load `jake` global
 require('../node_modules/jake/lib/jake');
 
-// Load jake tasks, patch in our node modules, etc
+var config = require('./BuildConfig');
 var host = require('./Host');
+require('./BuildCommon');
 
-// Parse args
-var options = require('minimist')(process.argv.slice(2));
-var cmd = options._[0];
-
-
-
-// Make options availabe to host
-host.options = options;
+var cmd = config._[0];
 
 function printHelp() {
 
-    console.log("\nAtomic Editor Build Script")
-    console.log("--------------------------")
-    console.log("--help          : This help text")
+    console.log("\nAtomic Editor Build Script");
+    console.log("--------------------------");
+    console.log("--help          : This help text");
     console.log("--with-android  : Build with Android platform support");
     console.log("--with-ios      : Build with iOS platform support");
-    console.log("--debug         : Build debug version of the editor and associated platform runtimes")
-    console.log("--noclean       : Do not clean before building, useful during development")
-    console.log("--nonet         : Build without AtomicNET C# scripting support")
-    console.log("--with-docs     : Build and install API documents into the editor")
-    console.log("--with-examples : Install examples into the editor")
+    console.log("--debug         : Build debug version of the editor and associated platform runtimes");
+    console.log("--noclean       : Do not clean before building, useful during development");
+    console.log("--nonet         : Build without AtomicNET C# scripting support");
+    console.log("--with-docs     : Build and install API documents into the editor (requires npm on path)");
+    console.log("--with-examples : Install examples into the editor (require git on path)");
+    console.log("--task=name     : Build the specified task (for development)");
     console.log("--------------------------")
 
     process.exit(0);
 }
 
-if (options["help"]) {
+if (config["help"]) {
     printHelp();
 }
 
-if (options["lint"]) {
+if (config["lint"]) {
     var lintTask = jake.Task['build:lint'];
     lintTask.invoke();
+}
+
+if (config["task"]) {
+
+    var task = jake.Task[config["task"]];
+
+    if (!task) {
+        console.log("\nBUILD ERROR:\n\nUnknown task: " + config["task"] + "\n");
+        process.exit(1);
+    }
+
+    cmd = "";
+    task.invoke();
 }
 
 // Atomic Editor Build
@@ -47,7 +64,7 @@ if (cmd == "buildeditor") {
 
     // simple build check for submodules not being initialized
 
-    if (!fs.existsSync(host.atomicRoot + "Submodules/CEF/Windows")) {
+    if (!fs.existsSync(config.atomicRoot + "Submodules/CEF/Windows")) {
 
         console.log("\nBUILD ERROR:\n\nSubmodules not initialized.  When cloning repository, please use:\ngit clone --recursive https://github.com/AtomicGameEngine/AtomicGameEngine\n")
         process.exit(1);
@@ -57,7 +74,7 @@ if (cmd == "buildeditor") {
 
     var buildTask = jake.Task['build:atomiceditor'];
 
-    if (options["with-android"]) {
+    if (config["with-android"]) {
 
         if (!process.env.ANDROID_NDK) {
             console.log("\nANDROID_NDK environment variable not set, exiting\n");
@@ -65,7 +82,7 @@ if (cmd == "buildeditor") {
         }
     }
 
-    if (options["with-ios"]) {
+    if (config["with-ios"]) {
 
         if (os.platform() != "darwin") {
             console.log("\niOS platform requires macOS, exiting\n");

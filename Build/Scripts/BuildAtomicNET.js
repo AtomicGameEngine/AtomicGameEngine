@@ -2,7 +2,9 @@ var fs = require('fs-extra');
 var path = require("path");
 var host = require("./Host");
 var os = require('os');
-var atomicRoot = host.atomicRoot;
+var config = require('./BuildConfig');
+
+var atomicRoot = config.atomicRoot;
 
 namespace('build', function() {
 
@@ -10,24 +12,21 @@ namespace('build', function() {
         async: true
     }, function() {
 
-        var options = host.options;
 
-        var android = options["with-android"] ? true : false;
-        var ios = options["with-ios"] ? true : false;
-        var debug = options["debug"] ? true : false;
+        platforms = "-platform desktop";
+
+        if (config["with-android"])
+            platforms += " -platform android";
+
+        if (config["with-ios"])
+            platforms += " -platform ios";
 
         var cmds = [];
 
-        platforms = "-platform desktop";
-        if (android)
-            platforms += " -platform android";
-        if (ios)
-            platforms += " -platform ios";
-
-        var netCmd = host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platforms + " -config " + (debug ? "Debug" : "Release");
+        var netCmd = host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platforms + " -config " + config["config"];
 
         console.log(netCmd);
-        
+
         cmds.push(netCmd);
 
         jake.exec(cmds, function() {
