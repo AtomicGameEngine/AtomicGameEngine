@@ -7,6 +7,12 @@ var glob = require('glob');
 
 var Tslint = require("tslint");
 
+var fso = require('fs');
+var buildInfoDir = atomicRoot + "Source/AtomicBuildInfo/";
+var editorAppFolder = host.artifactsRoot + "AtomicEditor/";
+var toolDataFolder = editorAppFolder + "Resources/ToolData/";
+var jsDocFolder = host.artifactsRoot + "Build/JSDoc/";
+
 namespace('build', function() {
 
     // Linting task
@@ -206,6 +212,66 @@ namespace('build', function() {
 
 
     });
+
+ 
+  task('gendocs', {
+    async: true
+    }, function() {
+
+    fs.copySync(atomicRoot + "Build/Docs/Readme.md", jsDocFolder + "Readme.md");
+    fs.copySync(atomicRoot + "Build/Docs/atomic-theme", jsDocFolder + "atomic-theme");
+
+    cmds = [
+      "cd " + jsDocFolder + " && echo {} > package.json", // newer versions of npm require package.json to be in the folder or else it searches up the heirarchy
+      "cd " + jsDocFolder + " && npm install typedoc",
+      "cd " + jsDocFolder + " && ./node_modules/.bin/typedoc --out out " + toolDataFolder + "TypeScriptSupport/Atomic.d.ts --module commonjs --includeDeclarations --mode file --theme atomic-theme --name 'Atomic Game Engine' --readme ./Readme.md",
+    ];
+
+    jake.exec(cmds, function() {
+        
+      common.cleanCreateDir( toolDataFolder + "Docs");
+
+      fs.copySync(jsDocFolder + "out", toolDataFolder + "Docs/JSDocs");
+    
+      complete();
+
+      console.log( "completed installing API documentation" );
+
+    }, {
+        
+      printStdout: true
+
+    });
+
+  });
+  
+  
+  task('genexamples', {
+    async: true
+    }, function() {
+    
+    common.cleanCreateDir( toolDataFolder + "AtomicExamples");
+
+    cmds = [
+      "git clone https://github.com/AtomicGameEngine/AtomicExamples " + toolDataFolder + "AtomicExamples",
+    ];
+
+    jake.exec(cmds, function() {
+        
+      fs.removeSync( toolDataFolder + "AtomicExamples/.git" );
+
+      complete();
+      
+      console.log( "completed installing example programs" )
+
+        }, {
+
+      printStdout: true
+
+    });
+
+  });
+
 
 
 }); // end of build namespace
