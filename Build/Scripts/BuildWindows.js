@@ -88,6 +88,7 @@ namespace('build', function() {
 
         var android = options["with-android"] ? true : false;
         var cleanBuild = options["noclean"] ? false : true;
+        var installDocs = options["with-docs"] ? true : false;
         var installExamples = options["with-examples"] ? true : false;
         debug = options["debug"] ? true : false;
         config = debug ? "Debug" : "Release";
@@ -132,6 +133,10 @@ namespace('build', function() {
 
             rootTask.addListener('complete', function () {
                 console.log("\n\nAtomic Editor built to " + editorAppFolder + "\n\n");
+
+                if (installDocs) {
+                    jake.Task['build:gendocs'].invoke();
+                }
 
                 if (installExamples) {
                     jake.Task['build:genexamples'].invoke();
