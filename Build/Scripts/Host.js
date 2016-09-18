@@ -17,3 +17,4 @@ require("./BuildIOS");
 require("./BuildWeb");
 require("./BuildAtomicNET");
 require("./BuildLint");
+require("./BuildTasks");

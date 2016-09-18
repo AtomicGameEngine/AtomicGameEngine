@@ -1,22 +1,20 @@
 var fs = require('fs-extra');
 var path = require("path");
 var host = require("./Host");
+var buildTasks = require("./BuildTasks");
+var config = require("./BuildConfig");
 
-var atomicRoot = host.atomicRoot;
-var buildDir = host.artifactsRoot + "Build/Windows/";
-var editorAppFolder = host.artifactsRoot + "AtomicEditor/";
-
-var buildAtomicNET = true;
-var debug = false;
-var config = "Release";
+var atomicRoot = config.atomicRoot;
+var buildDir = config.artifactsRoot + "Build/Windows/";
+var editorAppFolder = config.editorAppFolder
 
 function copyAtomicNET() {
 
-    if (!buildAtomicNET)
+    if (!config["with-atomicnet"])
         return;
 
-    fs.copySync(atomicRoot + "Artifacts/AtomicNET/" + config,
-    editorAppFolder + "Resources/ToolData/AtomicNET/" + config);
+    fs.copySync(atomicRoot + "Artifacts/AtomicNET/" + config["config"],
+    editorAppFolder + "Resources/ToolData/AtomicNET/" + config["config"]);
 
     fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
     editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
@@ -26,8 +24,8 @@ function copyAtomicNET() {
 function copyAtomicEditor() {
 
     // Copy the Editor binaries
-    fs.copySync(buildDir + "Source/AtomicEditor/" + config,
-    host.artifactsRoot + "AtomicEditor");
+    fs.copySync(buildDir + "Source/AtomicEditor/" + config["config"],
+    config.artifactsRoot + "AtomicEditor");
 
     // We need some resources to run
     fs.copySync(atomicRoot + "Resources/CoreData",
@@ -45,15 +43,13 @@ function copyAtomicEditor() {
     fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
     editorAppFolder + "Resources/EditorData/AtomicEditor/EditorScripts");
 
-    fs.copySync(buildDir +  "Source/AtomicPlayer/Application/" + config +"/AtomicPlayer.exe",
+    fs.copySync(buildDir +  "Source/AtomicPlayer/Application/" + config["config"] +"/AtomicPlayer.exe",
     editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/AtomicPlayer.exe");
 
-    fs.copySync(buildDir +  "Source/AtomicPlayer/Application/" + config + "/D3DCompiler_47.dll",
+    fs.copySync(buildDir +  "Source/AtomicPlayer/Application/" + config["config"] + "/D3DCompiler_47.dll",
     editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
 
-    if (buildAtomicNET) {
-        copyAtomicNET();
-    }
+    copyAtomicNET();
 
 }
 
@@ -66,7 +62,7 @@ namespace('build', function() {
         process.chdir(buildDir);
 
         var cmds = [];
-        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase2.bat " + config);
+        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase2.bat " + config["config"]);
 
         jake.exec(cmds, function() {
 
@@ -84,63 +80,29 @@ namespace('build', function() {
         async: true
     }, function() {
 
-        var options = host.options;
-
-        var android = options["with-android"] ? true : false;
-        var cleanBuild = options["noclean"] ? false : true;
-        var installDocs = options["with-docs"] ? true : false;
-        var installExamples = options["with-examples"] ? true : false;
-        debug = options["debug"] ? true : false;
-        config = debug ? "Debug" : "Release";
-
-        var createDirs = [];
-        var removeDirs = [];
-
         // We clean atomicNET here as otherwise platform binaries would be deleted
-        createDirs.push(host.artifactsRoot + "AtomicNET/");
-        createDirs.push(buildDir);
-        createDirs.push(editorAppFolder);
-        createDirs.push(host.getGenScriptRootDir());
+        var createDirs = [config.artifactsRoot + "AtomicNET/", buildDir, editorAppFolder, host.getGenScriptRootDir()];
 
-        removeDirs.push(host.artifactsRoot + "Build/Android/");
+        var removeDirs = [config.artifactsRoot + "Build/Android/"];
 
-        host.setupDirs(cleanBuild, createDirs, removeDirs);
+        host.setupDirs(!config.noclean, createDirs, removeDirs);
 
         process.chdir(buildDir);
 
         var cmds = [];
 
         // Generate Atomic solution, AtomicTool binary, and script bindings
-        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase1.bat " + config);
+        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase1.bat " + config["config"]);
 
         jake.exec(cmds, function() {
 
             var rootTask = jake.Task['build:atomiceditor_phase2'];
-            var task = rootTask;
 
-            // add optional build components in reverse order
-            if (buildAtomicNET) {
-                var netTask = jake.Task['build:atomicnet'];
-                task.prereqs.push("build:atomicnet")
-                task = netTask;
-            }
-
-            if (android) {
-                var androidTask = jake.Task['build:android_native'];
-                task.prereqs.push("build:android_native")
-                task = androidTask;
-            }
+            buildTasks.installBuildTasks(rootTask);
 
             rootTask.addListener('complete', function () {
+
                 console.log("\n\nAtomic Editor built to " + editorAppFolder + "\n\n");
-
-                if (installDocs) {
-                    jake.Task['build:gendocs'].invoke();
-                }
-
-                if (installExamples) {
-                    jake.Task['build:genexamples'].invoke();
-                }
 
                 complete();
             });

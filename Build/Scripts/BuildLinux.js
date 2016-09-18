@@ -1,23 +1,20 @@
 var fs = require('fs-extra');
 var path = require("path");
 var host = require("./Host");
-var spawnSync = require('child_process').spawnSync
+var config = require("./BuildConfig");
+var buildTasks = require("./BuildTasks");
 
-var atomicRoot = host.atomicRoot;
-var buildDir = host.artifactsRoot + "Build/Linux/";
-var editorAppFolder = host.artifactsRoot + "AtomicEditor/";
-
-var buildAtomicNET = false;
-var debug = false;
-var config = "Release";
+var atomicRoot = config.atomicRoot;
+var buildDir = config.artifactsRoot + "Build/Linux/";
+var editorAppFolder = config.artifactsRoot + "AtomicEditor/";
 
 function copyAtomicNET() {
 
-    if (!buildAtomicNET)
+    if (!config["with-atomicnet"])
         return;
 
-    fs.copySync(atomicRoot + "Artifacts/AtomicNET/" + config,
-    editorAppFolder + "Resources/ToolData/AtomicNET/" + config);
+    fs.copySync(atomicRoot + "Artifacts/AtomicNET/" + config["config"],
+    editorAppFolder + "Resources/ToolData/AtomicNET/" + config["config"]);
 
     fs.copySync(atomicRoot + "Script/AtomicNET/AtomicProject.json",
     editorAppFolder + "Resources/ToolData/AtomicNET/Build/Projects/AtomicProject.json");
@@ -28,7 +25,7 @@ function copyAtomicEditor() {
 
     // Copy the Editor binaries
     fs.copySync(buildDir + "Source/AtomicEditor/AtomicEditor",
-    host.artifactsRoot + "AtomicEditor/AtomicEditor");
+    config.artifactsRoot + "AtomicEditor/AtomicEditor");
 
     // We need some resources to run
     fs.copySync(atomicRoot + "Resources/CoreData",
@@ -68,9 +65,7 @@ function copyAtomicEditor() {
     }
 
 
-    if (buildAtomicNET) {
-        copyAtomicNET();
-    }
+    copyAtomicNET();
 
 }
 
@@ -82,8 +77,7 @@ namespace('build', function() {
 
         process.chdir(buildDir);
 
-        var cmds = [];
-        cmds.push("make AtomicEditor AtomicPlayer -j2")
+        var cmds = ["make AtomicEditor AtomicPlayer -j2"];
 
         jake.exec(cmds, function() {
 
@@ -101,70 +95,31 @@ namespace('build', function() {
         async: true
     }, function() {
 
-        var options = host.options;
-
-        var android = options["with-android"] ? true : false;
-        var cleanBuild = options["noclean"] ? false : true;
-        var installDocs = options["with-docs"] ? true : false;
-        var installExamples = options["with-examples"] ? true : false;
-        debug = options["debug"] ? true : false;
-        config = debug ? "Debug" : "Release";
-
-        var createDirs = [];
-        var removeDirs = [];
-
         // We clean atomicNET here as otherwise platform binaries would be deleted
-        createDirs.push(host.artifactsRoot + "AtomicNET/");
-        createDirs.push(buildDir);
-        createDirs.push(editorAppFolder);
-        createDirs.push(host.getGenScriptRootDir());
+        var createDirs = [config.artifactsRoot + "AtomicNET/", buildDir, editorAppFolder, host.getGenScriptRootDir()];
 
-        removeDirs.push(host.artifactsRoot + "Build/Android/");
+        var removeDirs = [config.artifactsRoot + "Build/Android/"];
 
-        host.setupDirs(cleanBuild, createDirs, removeDirs);
-
-        // TODO: build box has old node
-        if (spawnSync)
-            buildAtomicNET = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
+        host.setupDirs(!config.noclean, createDirs, removeDirs);
 
         process.chdir(buildDir);
 
         var cmds = [];
 
         // Generate Atomic solution, AtomicTool binary, and script bindings
-        cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=" + config);
+        cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=" + config["config"]);
         cmds.push("make AtomicNETNative -j2")
 
         jake.exec(cmds, function() {
 
             var rootTask = jake.Task['build:atomiceditor_phase2'];
-            var task = rootTask;
 
-            // add optional build components in reverse order
-            if (buildAtomicNET) {
-                var netTask = jake.Task['build:atomicnet'];
-                task.prereqs.push("build:atomicnet")
-                task = netTask;
-            }
-
-            if (android) {
-                var androidTask = jake.Task['build:android_native'];
-                task.prereqs.push("build:android_native")
-                task = androidTask;
-            }
+            buildTasks.installBuildTasks(rootTask);
 
             rootTask.addListener('complete', function () {
-                console.log("\n\nAtomic Editor built to " + editorAppFolder + "\n\n");
-
-                if (installDocs) {
-                    jake.Task['build:gendocs'].invoke();
-                }
-
-                if (installExamples) {
-                    jake.Task['build:genexamples'].invoke();
-                }
 
                complete();
+
             });
 
             rootTask.invoke();

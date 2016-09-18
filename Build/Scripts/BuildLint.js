@@ -1,12 +1,12 @@
 var fs = require('fs-extra');
 var path = require("path");
-var host = require("./Host");
 var os = require('os');
 var glob = require("glob");
+var config = require("./BuildConfig");
 
 var fixTabs = false;
 
-var atomicRoot = host.atomicRoot;
+var atomicRoot = config.atomicRoot;
 
 // Oh, JavaScript
 atomicRoot = atomicRoot.split("\\");
@@ -21,7 +21,7 @@ function lintFile(filename) {
         console.log(filename + "  contains tab character");
 
         if (fixTabs) {
-            
+
             var fd = fs.openSync(filename, "w");
 
             var tabbed = file.split('\t');

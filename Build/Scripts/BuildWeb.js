@@ -2,9 +2,10 @@ var fs = require('fs-extra');
 var path = require("path");
 var host = require("./Host");
 var os = require('os');
-var atomicRoot = host.atomicRoot;
+var config = require("./BuildConfig")
 
-var buildDir = host.artifactsRoot + "Build/Web/AtomicPlayer";
+var atomicRoot = config.atomicRoot;
+var buildDir = config.artifactsRoot + "Build/Web/AtomicPlayer";
 
 // build command:
 // ./Build/Mac/node/node ./Build/node_modules/jake/bin/cli.js -f ./Build/Scripts/Bootstrap.js build:web_player
@@ -46,7 +47,7 @@ namespace('build', function() {
 
     jake.exec(cmds, function() {
 
-      var editorAppFolder = host.artifactsRoot + (os.platform() == "win32" ? "AtomicEditor/" : "AtomicEditor/AtomicEditor.app/");
+      var editorAppFolder = config.artifactsRoot + (os.platform() == "win32" ? "AtomicEditor/" : "AtomicEditor/AtomicEditor.app/");
 
       var webPlayerBinary = buildDir + "/Source/AtomicPlayer/Application/AtomicPlayer.js";
       var webPlayerMemFile = buildDir + "/Source/AtomicPlayer/Application/AtomicPlayer.html.mem";
