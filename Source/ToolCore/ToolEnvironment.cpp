@@ -78,8 +78,14 @@ bool ToolEnvironment::InitFromPackage()
 
     // atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());       
 
+#ifdef ATOMIC_DEBUG
+	String config = "Debug";
+#else
+	String config = "Release";
+#endif
+
     atomicNETRootDir_ = resourcesDir + "ToolData/AtomicNET/";
-    atomicNETCoreAssemblyDir_ = atomicNETRootDir_ + "Release/";
+    atomicNETCoreAssemblyDir_ = atomicNETRootDir_ + config + "/";
 
 #ifdef ATOMIC_PLATFORM_OSX
     monoExecutableDir_ = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/";

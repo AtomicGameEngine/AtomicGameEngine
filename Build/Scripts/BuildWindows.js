@@ -68,6 +68,12 @@ namespace('build', function() {
 
             copyAtomicEditor();
 
+            if (config.package) {
+
+                jake.Task['package:windows_editor'].invoke();
+
+            }
+
             complete();
 
         }, {

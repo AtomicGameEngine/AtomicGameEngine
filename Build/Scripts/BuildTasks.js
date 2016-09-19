@@ -1,6 +1,8 @@
 
+var os = require('os');
 var host = require("./Host");
 var config = require("./BuildConfig");
+require("./PackageEditor");
 
 // return an object with package name keys and module name lists as values
 function installBuildTasks(rootTask) {
