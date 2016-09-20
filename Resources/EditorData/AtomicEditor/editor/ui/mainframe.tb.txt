@@ -66,15 +66,3 @@ TBLayout: distribution: gravity, axis: y
                                     lp: height: 28, width:28
                         TBLayout: gravity: left right
                             TBWidget
-                        TBButton
-                            @include definitions>menubutton
-                            text Errors
-                            id menu errors
-                        TBButton
-                            @include definitions>menubutton
-                            text Issues
-                            id menu issues
-                        TBButton
-                            @include definitions>menubutton
-                            text Console
-                            id menu console

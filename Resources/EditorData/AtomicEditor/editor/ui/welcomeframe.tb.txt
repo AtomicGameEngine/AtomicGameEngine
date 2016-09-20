@@ -17,7 +17,7 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
             TBEditField: multiline: 1, styling: 1, gravity: all, id: welcome_text, readonly: 1, adapt-to-content: 0
                 font: size: 14
                 lp: max-width: 420, min-width: 420
-                text: "Welcome to the Atomic Game Engine Early Access\n\n" \
+                text: "Welcome to the Atomic Game Engine\n\n" \
                 "<color #D4FB79>First Steps</color>\n\n" \
                 "• Try out some of the example projects!\n\n" \
                 "• Create a new project based on a 2D or 3D template.\n\n" \

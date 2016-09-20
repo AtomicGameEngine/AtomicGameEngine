@@ -120,12 +120,29 @@ public:
 
 
     // ATOMIC BEGIN
+    /// Set whether the engine is paused.
+    void SetPaused(bool paused);
+    /// Set whether to run the next frame even if paused (for stepping frame by frame)
+    void SetRunNextPausedFrame(bool run);
+     /// Return whether the engine is paused.
+    bool IsPaused() const { return paused_; }
+    /// Return whether to run the next frame even if paused (for stepping frame by frame)
+    bool GetRunNextPausedFrame() const { return runNextPausedFrame_; }
+   
+    
     bool GetDebugBuild() const;
     // ATOMIC END
 
 private:
     /// Handle exit requested event. Auto-exit if enabled.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
+    // ATOMIC BEGIN
+    /// Handle Pause or Resume requested event.
+    void HandlePauseResumeRequested(StringHash eventType, VariantMap& eventData);
+    /// Handle Single Step requested event.
+    void HandlePauseStepRequested(StringHash eventType, VariantMap& eventData);
+    // ATOMIC END
+
     /// Actually perform the exit actions.
     void DoExit();
 
@@ -159,6 +176,14 @@ private:
     bool headless_;
     /// Audio paused flag.
     bool audioPaused_;
+    
+    // ATOMIC BEGIN
+    /// Engine paused flag
+    bool paused_;
+    /// Whether to run the next frame even if paused (for stepping frame by frame)
+    bool runNextPausedFrame_;
+    // ATOMIC END
+   
 };
 
 }

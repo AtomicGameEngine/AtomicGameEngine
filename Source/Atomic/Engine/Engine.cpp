@@ -111,7 +111,11 @@ Engine::Engine(Context* context) :
     initialized_(false),
     exiting_(false),
     headless_(false),
-    audioPaused_(false)
+    audioPaused_(false),
+    // ATOMIC BEGIN    
+    paused_(false),
+    runNextPausedFrame_(false)
+    // ATOMIC END
 {
     // Register self as a subsystem
     context_->RegisterSubsystem(this);
@@ -150,6 +154,10 @@ Engine::Engine(Context* context) :
 #endif
 
     SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(Engine, HandleExitRequested));
+    // ATOMIC BEGIN    
+    SubscribeToEvent(E_PAUSERESUMEREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseResumeRequested));
+    SubscribeToEvent(E_PAUSESTEPREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseStepRequested));
+    // ATOMIC END
 }
 
 Engine::~Engine()
@@ -469,8 +477,10 @@ void Engine::RunFrame()
 
     time->BeginFrame(timeStep_);
 
-    // If pause when minimized -mode is in use, stop updates and audio as necessary
-    if (pauseMinimized_ && input->IsMinimized())
+// ATOMIC BEGIN
+    // If paused, or pause when minimized -mode is in use, stop updates and audio as necessary
+    if ((paused_ && !runNextPausedFrame_) ||
+        (pauseMinimized_ && input->IsMinimized()))
     {
         if (audio->IsPlaying())
         {
@@ -486,9 +496,15 @@ void Engine::RunFrame()
             audio->Play();
             audioPaused_ = false;
         }
+        
+        // Only run one frame when stepping
+        runNextPausedFrame_ = false;
 
         Update();
+
     }
+// ATOMIC END
+
 
     Render();
     ApplyFrameLimit();
@@ -981,6 +997,36 @@ void Engine::DoExit()
 }
 
 // ATOMIC BEGIN
+
+void Engine::SetPaused(bool paused)
+{
+    paused_ = paused;
+
+    using namespace UpdatesPaused;
+
+    // Updates paused event
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_PAUSED] = paused_;
+    SendEvent(E_UPDATESPAUSEDRESUMED, eventData);
+}
+
+void Engine::SetRunNextPausedFrame(bool run)
+{
+    runNextPausedFrame_ = run;
+}
+
+void Engine::HandlePauseResumeRequested(StringHash eventType, VariantMap& eventData)
+{
+    SetPaused(!IsPaused());
+}
+
+void Engine::HandlePauseStepRequested(StringHash eventType, VariantMap& eventData)
+{
+    if (IsPaused())
+    {
+        SetRunNextPausedFrame(true);
+    }
+}
 
 bool Engine::GetDebugBuild() const
 {
