@@ -25,6 +25,10 @@
 #include "../Scene/Component.h"
 #include "../Atomic2D/TileMapDefs2D.h"
 
+#ifdef GetObject
+#undef GetObject
+#endif
+
 namespace Atomic
 {
 
