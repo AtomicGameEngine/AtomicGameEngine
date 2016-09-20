@@ -1,6 +1,0 @@
-{
-	"name" : "NETCore",
-	"sources" : ["Source/AtomicNET/NETCore"],
-	"classes" : ["NETCore", "NETVariantMap"]
-
-}
