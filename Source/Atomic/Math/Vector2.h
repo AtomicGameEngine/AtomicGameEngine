@@ -323,6 +323,9 @@ public:
     /// Return as string.
     String ToString() const;
 
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
+
     /// X coordinate.
     int x_;
     /// Y coordinate.
@@ -330,9 +333,6 @@ public:
 
     /// Zero vector.
     static const IntVector2 ZERO;
-
-    // ATOMIC BEGIN
-
 };
 
 /// Multiply IntVector2 with a scalar.
