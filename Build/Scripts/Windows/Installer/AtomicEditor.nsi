@@ -16,7 +16,7 @@
 
 !define prodname "Atomic Editor"
 !define coname "THUNDERBEAST GAMES LLC"
-!define outfile "${ATOMIC_ROOT}\Artifacts\Build\WindowsInstaller\${INSTALLER_NAME}"
+!define outfile "${ATOMIC_ROOT}\Artifacts\Dist\${INSTALLER_NAME}"
 !define appexe "AtomicEditor.exe"
 !define produrl "http://www.atomicgameengine.com/"
 
@@ -63,7 +63,7 @@ InstallDirRegKey HKLM "Software\${coname}\InstallDir" "${prodname}"
 !insertmacro MUI_PAGE_INSTFILES
 	; These indented statements modify settings for MUI_PAGE_FINISH
 	!define MUI_FINISHPAGE_NOAUTOCLOSE
-	!define MUI_FINISHPAGE_RUN "$INSTDIR\AtomicEditor\${appexe}"
+	!define MUI_FINISHPAGE_RUN "$INSTDIR\${appexe}"
 	!define MUI_FINISHPAGE_RUN_CHECKED
 	!define MUI_FINISHPAGE_RUN_TEXT "Launch the Atomic Editor"
 !insertmacro MUI_PAGE_FINISH
@@ -87,21 +87,21 @@ Section "${prodname}" SecMain
 
 	SetOutPath "$INSTDIR"
 
-  File /r "${ATOMIC_ROOT}\Artifacts\Build\WindowsEditor\*.*"
+  File /r "${ATOMIC_ROOT}\Artifacts\AtomicEditor\*.*"
 
 	;Store installation folder
 	WriteRegStr HKLM "Software\${coname}\InstallDir" "${prodname}" $INSTDIR
 
 	; Create shortcut
-	CreateShortCut "$DESKTOP\${prodname}.lnk" "$INSTDIR\AtomicEditor\${appexe}"
-	CreateShortCut "$SMPROGRAMS\${prodname}.lnk" "$INSTDIR\AtomicEditor\${appexe}"
+	CreateShortCut "$DESKTOP\${prodname}.lnk" "$INSTDIR\${appexe}"
+	CreateShortCut "$SMPROGRAMS\${prodname}.lnk" "$INSTDIR\${appexe}"
 
 	; Update Add/Remove Programs
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "DisplayName" "${prodname}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "UninstallString" "$INSTDIR\Uninstall.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "InstallLocation" "$INSTDIR"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "DisplayIcon" "$INSTDIR\AtomicEditor\${appexe},0"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "DisplayIcon" "$INSTDIR\${appexe},0"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "Publisher" "${coname}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "URLInfoAbout" "${produrl}"
 	WriteRegDWord HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "NoRepair" 1

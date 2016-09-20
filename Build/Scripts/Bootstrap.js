@@ -32,6 +32,7 @@ function printHelp() {
     console.log("--with-docs     : Build and install API documents into the editor (requires npm on path)");
     console.log("--with-examples : Install examples into the editor (require git on path)");
     console.log("--task=name     : Build the specified task (for development)");
+    console.log("--package       : packages the editor to Artifacts/Dist");
     console.log("--------------------------")
 
     process.exit(0);

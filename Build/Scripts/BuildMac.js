@@ -65,6 +65,12 @@ namespace('build', function() {
 
             copyAtomicEditor();
 
+            if (config.package) {
+
+                jake.Task['package:mac_editor'].invoke();
+
+            }
+
             complete();
 
         }, {
