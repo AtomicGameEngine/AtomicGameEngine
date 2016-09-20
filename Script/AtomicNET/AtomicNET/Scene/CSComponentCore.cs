@@ -11,7 +11,7 @@ namespace AtomicEngine
         public CSComponentInfo(Type type)
         {
 
-#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+#if ATOMIC_DESKTOP || ATOMIC_MOBILE
 
             this.Type = type;
 
@@ -56,7 +56,7 @@ namespace AtomicEngine
         {
             // FIXME: This will need to be optimized, specifically to use uint key hashes for value lookup
 
-#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+#if ATOMIC_DESKTOP || ATOMIC_MOBILE
 
             fieldMap.CopyVariantMap(fieldValuePtr);
 
@@ -334,7 +334,7 @@ namespace AtomicEngine
 
         void HandleComponentAssemblyReference(uint eventType, ScriptVariantMap eventData)
         {
-#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+#if ATOMIC_DESKTOP || ATOMIC_MOBILE
             string assemblyPath = eventData["AssemblyPath"];
 
             string assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
@@ -349,7 +349,7 @@ namespace AtomicEngine
 
         void ParseComponents()
         {
-#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+#if ATOMIC_DESKTOP || ATOMIC_MOBILE
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
 
@@ -362,7 +362,7 @@ namespace AtomicEngine
 
         void ParseAssembly(Assembly assembly)
         {
-#if ATOMIC_DESKTOP || ATOMIC_ANDROID
+#if ATOMIC_DESKTOP || ATOMIC_MOBILE
             String assemblyPath = assembly.GetName().Name;
 
             Dictionary<string, CSComponentInfo> assemblyTypes = null;
