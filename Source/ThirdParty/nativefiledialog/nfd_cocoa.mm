@@ -131,6 +131,7 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
+    NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
     NSOpenPanel *dialog = [NSOpenPanel openPanel];
     [dialog setAllowsMultipleSelection:NO];
 
@@ -158,6 +159,8 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
         memcpy( *outPath, utf8Path, len+1 ); /* copy null term */
         nfdResult = NFD_OKAY;
     }
+
+    [keyWindow makeKeyAndOrderFront:nil];
     [pool release];
 
     return nfdResult;
@@ -170,6 +173,7 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
+    NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
     NSOpenPanel *dialog = [NSOpenPanel openPanel];
     [dialog setAllowsMultipleSelection:YES];    
 
@@ -198,6 +202,8 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
 
         nfdResult = NFD_OKAY;
     }
+
+    [keyWindow makeKeyAndOrderFront:nil];
     [pool release];
 
     return nfdResult;
@@ -211,6 +217,7 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
+    NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
     NSSavePanel *dialog = [NSSavePanel savePanel];
     [dialog setExtensionHidden:NO];
     [dialog setCanCreateDirectories:YES];
@@ -239,6 +246,7 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
         nfdResult = NFD_OKAY;
     }
 
+    [keyWindow makeKeyAndOrderFront:nil];
     [pool release];
 
     return nfdResult;
@@ -249,6 +257,7 @@ nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaul
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
+    NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
     NSOpenPanel *dialog = [NSOpenPanel openPanel];
     [dialog setAllowsMultipleSelection:NO];
     [dialog setCanChooseDirectories:YES];
@@ -277,6 +286,8 @@ nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaul
         memcpy( *outPath, utf8Path, len+1 ); /* copy null term */
         nfdResult = NFD_OKAY;
     }
+
+    [keyWindow makeKeyAndOrderFront:nil];
     [pool release];
 
     return nfdResult;
