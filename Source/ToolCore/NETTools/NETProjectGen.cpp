@@ -836,7 +836,23 @@ namespace ToolCore
 
         // OutputType
         XMLElement outputType = pgroup.CreateChild("OutputType");
-        outputType.SetValue(outputType_);
+
+		String oType = outputType_;
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#ifndef ATOMIC_DEBUG
+
+		if (oType.ToLower() == "exe") 
+		{
+			// use windows subsystem for release builds
+			// TODO: make this an option in the json?
+			oType = "WinExe";
+		}
+
+#endif
+#endif
+
+        outputType.SetValue(oType);
 
         pgroup.CreateChild("AppDesignerFolder").SetValue("Properties");
 
