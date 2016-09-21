@@ -20,13 +20,20 @@ function processOptions(config) {
         }
     }
 
-
     // paths
     config.atomicRoot = path.resolve(__dirname, "../..") + "/";
-    config.artifactsRoot = config.atomicRoot + "/Artifacts/";
+    config.artifactsRoot = config.atomicRoot + "Artifacts/";
 
     config.editorAppFolder = (os.platform() == "darwin") ? config.artifactsRoot + "/AtomicEditor/AtomicEditor.app/" : config.artifactsRoot + "AtomicEditor/";
     config.toolDataFolder = config.editorAppFolder + (os.platform() == "darwin" ? "Contents/Resources/ToolData/" : "Resources/ToolData/");
+
+    // jenkins, TODO: abstract anything that requires jenkins
+    config.jenkins = process.env.ATOMIC_JENKINS_BUILD == 1;
+    config.buildSHA =  process.env.ATOMIC_BUILD_SHA ? process.env.ATOMIC_BUILD_SHA : "UNKNOWN_BUILD_SHA";
+    config.devIDApp = process.env.ATOMIC_DEV_ID_APP ? process.env.ATOMIC_DEV_ID_APP : "";
+
+    config.pfxFile = process.env.ATOMIC_PFX_FILE ? process.env.ATOMIC_PFX_FILE : "";
+    config.pfxPW = process.env.ATOMIC_PFX_PW ? process.env.ATOMIC_PFX_PW : "";
 
     return config;
 }
@@ -39,6 +46,7 @@ exports = module.exports = processOptions(require('minimist')(process.argv.slice
         "with-android" : false,
         "with-ios" : false,
         "with-docs" : false,
-        "with-examples" : false
+        "with-examples" : false,
+        "package" : false
     }
 }));

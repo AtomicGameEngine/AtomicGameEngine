@@ -180,10 +180,10 @@ public:
     /// Return compressed format.
     CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
 
-    /// Return number of compressed mip levels.
+    /// Return number of compressed mip levels. Returns 0 if the image is has not been loaded from a source file containing multiple mip levels.
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
 
-    /// Return next mip level by bilinear filtering.
+    /// Return next mip level by bilinear filtering. Note that if the image is already 1x1x1, will keep returning an image of that size.
     SharedPtr<Image> GetNextLevel() const;
     /// Return the next sibling image of an array or cubemap.
     SharedPtr<Image> GetNextSibling() const { return nextSibling_;  }
@@ -205,6 +205,12 @@ public:
     /// Copy contents of the image into the defined rect, scaling if necessary. This image should already be large enough to include the rect. Compressed and 3D images are not supported.
     bool SetSubimage(const Image* image, const IntRect& rect);
     // ATOMIC END
+    /// Clean up the mip levels.
+    void CleanupLevels();
+    /// Get all stored mip levels starting from this.
+    void GetLevels(PODVector<Image*>& levels);
+    /// Get all stored mip levels starting from this.
+    void GetLevels(PODVector<const Image*>& levels) const;
 
 private:
     /// Decode an image using stb_image.

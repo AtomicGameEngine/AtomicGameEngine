@@ -286,7 +286,7 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
 
 void Context::BeginSendEvent(Object* sender, StringHash eventType)
 {
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     if (EventProfiler::IsActive())
     {
         EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
@@ -302,7 +302,7 @@ void Context::EndSendEvent()
 {
     eventSenders_.Pop();
 
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     if (EventProfiler::IsActive())
     {
         EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();

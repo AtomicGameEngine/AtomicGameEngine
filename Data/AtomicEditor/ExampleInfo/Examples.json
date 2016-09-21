@@ -1,8 +1,103 @@
 {
 	"examples" : [
 			{
-				"name": "Physics Platformer 2D",
+				"name": "C# Basic2D",
+				"desc" : "The C# Basic2D example project",
+				"screenshot" : "Basic2D.png",
+				"templates" : [
+					{
+						"language" : "C#",
+						"folder" : "AtomicNET/Basic2D"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "C# Basic3D",
+				"desc" : "The C# Basic3D example project",
+				"screenshot" : "Basic3D.png",
+				"templates" : [
+					{
+						"language" : "C#",
+						"folder" : "AtomicNET/Basic3D"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "C# Physics2D",
 				"desc" : "Moving platforms, vines, and neat 2D lighting",
+				"screenshot" : "PhysicsPlatformer2D.png",
+				"templates" : [
+					{
+						"language" : "C#",
+						"folder" : "AtomicNET/Physics2D"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "C# Butterflies",
+				"desc" : "An example of particles driven by C#",
+				"screenshot" : "Butterflies.png",
+				"templates" : [
+					{
+						"language" : "C#",
+						"folder" : "AtomicNET/Butterflies"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "C# Atomic Mutant",
+				"desc" : "A 3D physics example featuring a terrifying mutant",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "C#",
+						"folder" : "AtomicNET/AtomicMutant"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "C# Atomic Blaster",
+				"desc" : "An example of a ported XNA C# program",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "C#",
+						"folder" : "AtomicNET/AtomicBlaster"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "Javascript Basic 2D",
+				"desc" : "A Javascript example of a 2D sprite in a scene",
+				"screenshot" : "Basic2D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Basic2D"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "Javascript Basic 3D",
+				"desc" : "A Javascript example of a 3D object in a scene",
+				"screenshot" : "Basic3D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Basic3D"
+					}
+				],
+				"module" : "3D"
+			},			{
+				"name": "Physics Platformer 2D",
+				"desc" : "Moving platforms, vines, and neat 2D lighting in Javascript",
 				"screenshot" : "PhysicsPlatformer2D.png",
 				"templates" : [
 					{
@@ -14,7 +109,7 @@
 			},
 			{
 				"name": "ToonTown",
-				"desc" : "Town, Terrain, Day/Night Cycles",
+				"desc" : "Town, Terrain, Day/Night Cycles in Javascript",
 				"screenshot" : "ToonTown.png",
 				"templates" : [
 					{
@@ -26,7 +121,7 @@
 			},
 			{
 				"name": "SpaceGame",
-				"desc" : "A 2D Arcade Space Game",
+				"desc" : "A 2D Arcade Space Game in Javascript",
 				"screenshot" : "SpaceGame.png",
 				"templates" : [
 					{
@@ -241,30 +336,6 @@
 				"module" : "2D"
 			},
 			{
-				"name": "Basic 2D",
-				"desc" : "An example of a 2D sprite in a scene",
-				"screenshot" : "Basic2D.png",
-				"templates" : [
-					{
-						"language" : "JavaScript",
-						"folder" : "Basic2D"
-					}
-				],
-				"module" : "2D"
-			},
-			{
-				"name": "Basic 3D",
-				"desc" : "An example of a 3D object in a scene",
-				"screenshot" : "Basic3D.png",
-				"templates" : [
-					{
-						"language" : "JavaScript",
-						"folder" : "Basic3D"
-					}
-				],
-				"module" : "3D"
-			},
-			{
 				"name": "Event Loop",
 				"desc" : "An example using the JavaScript event loop",
 				"screenshot" : "EventLoop.png",
@@ -275,6 +346,187 @@
 					}
 				],
 				"module" : "2D"
+			},
+            
+			{
+				"name": "PBR Scene",
+				"desc" : "An example of PBR scene",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "PBRSceneExample"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "Custom Geometry",
+				"desc" : "An example of custom geometry",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "CustomGeometry"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "Editor Plugin",
+				"desc" : "An example of an Editor Plugin",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "Typescript",
+						"folder" : "EditorPluginExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "File Access",
+				"desc" : "An example of using files in Atomic",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "FileExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "Http Request",
+				"desc" : "An example of a HttpRequest",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "HttpRequestExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "MultiScript",
+				"desc" : "An example of a MultiScript program",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "MultiScript"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "Native Plugin",
+				"desc" : "An example of a Native Plugin",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "NativePluginExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "TypeScript Roboman3D",
+				"desc" : "An example of Roboman3D in TypeScript",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "TypeScript",
+						"folder" : "Roboman3DTypeScript"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "Multiplayer SpaceGame",
+				"desc" : "An example of a Multiplayer SpaceGame",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "SpaceGameMultiplayer"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "Test Inspector Fields",
+				"desc" : "A Test of Inspector Fields",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "TestInspectorFields"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "WebRequest Headers",
+				"desc" : "An example of WebRequest Headers",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebRequestHeadersExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "Simple WebRequest",
+				"desc" : "An example of a simple WebRequest",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebRequestSimpleExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "WebSocket",
+				"desc" : "An example of a WebSocket",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebSocketExample"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "Web Texture",
+				"desc" : "An example of a Web Texture",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebTexture"
+					}
+				],
+				"module" : "1D"
+			},
+			{
+				"name": "WebView Properties",
+				"desc" : "An example of WebView Properties",
+				"screenshot" : "Example.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebViewProperties"
+					}
+				],
+				"module" : "1D"
 			}
 	]
 }

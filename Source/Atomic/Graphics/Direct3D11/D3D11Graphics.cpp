@@ -229,6 +229,7 @@ Graphics::Graphics(Context* context) :
     numBatches_(0),
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
+    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -1323,11 +1324,13 @@ void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
     }
 }
 
-void Graphics::SetTextureAnisotropy(unsigned level)
+void Graphics::SetDefaultTextureAnisotropy(unsigned level)
 {
-    if (level != textureAnisotropy_)
+    level = Max(level, 1U);
+
+    if (level != defaultTextureAnisotropy_)
     {
-        textureAnisotropy_ = level;
+        defaultTextureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
 }
@@ -1451,11 +1454,12 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode)
+void Graphics::SetBlendMode(BlendMode mode, bool alphaToCoverage)
 {
-    if (mode != blendMode_)
+    if (mode != blendMode_ || alphaToCoverage != alphaToCoverage_)
     {
         blendMode_ = mode;
+        alphaToCoverage_ = alphaToCoverage;
         impl_->blendStateDirty_ = true;
     }
 }
@@ -2321,7 +2325,7 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
-    textureAnisotropy_ = 1;
+    alphaToCoverage_ = false;
     colorWrite_ = true;
     cullMode_ = CULL_CCW;
     constantDepthBias_ = 0.0f;
@@ -2440,7 +2444,7 @@ void Graphics::PrepareDraw()
 
     if (impl_->blendStateDirty_)
     {
-        unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (blendMode_ << 1));
+        unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (alphaToCoverage_ ? 2 : 0) | (blendMode_ << 2));
         if (newBlendStateHash != impl_->blendStateHash_)
         {
             HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Find(newBlendStateHash);
@@ -2450,7 +2454,7 @@ void Graphics::PrepareDraw()
 
                 D3D11_BLEND_DESC stateDesc;
                 memset(&stateDesc, 0, sizeof stateDesc);
-                stateDesc.AlphaToCoverageEnable = false;
+                stateDesc.AlphaToCoverageEnable = alphaToCoverage_ ? TRUE : FALSE;
                 stateDesc.IndependentBlendEnable = false;
                 stateDesc.RenderTarget[0].BlendEnable = d3dBlendEnable[blendMode_];
                 stateDesc.RenderTarget[0].SrcBlend = d3dSrcBlend[blendMode_];
@@ -2537,7 +2541,7 @@ void Graphics::PrepareDraw()
 
         unsigned newRasterizerStateHash =
             (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) | ((scaledDepthBias & 0x1fff) << 5) |
-            ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
+            (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 18);
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);

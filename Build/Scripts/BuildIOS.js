@@ -4,8 +4,6 @@ var path = require("path");
 var host = require("./Host");
 var config = require("./BuildConfig");
 
-var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1;
-
 var atomicRoot = config.atomicRoot;
 var buildDir = config.artifactsRoot + "Build/IOS/";
 
@@ -26,7 +24,7 @@ namespace('build', function() {
 
         cmds.push("cmake -DIOS=1 -DATOMIC_DEV_BUILD=0 -G Xcode ../../../");
 
-        if (jenkinsBuild) {
+        if (config.jenkins) {
             cmds.push("security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain");
             cmds.push("security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain");
         }

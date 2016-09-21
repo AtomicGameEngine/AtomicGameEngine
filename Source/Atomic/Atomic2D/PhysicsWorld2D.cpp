@@ -95,7 +95,12 @@ void PhysicsWorld2D::RegisterObject(Context* context)
     ATOMIC_ACCESSOR_ATTRIBUTE("Draw CenterOfMass", GetDrawCenterOfMass, SetDrawCenterOfMass, bool, false, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Allow Sleeping", GetAllowSleeping, SetAllowSleeping, bool, false, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
+
+    // ATOMIC BEGIN
+    // default false
     ATOMIC_ACCESSOR_ATTRIBUTE("Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
+    // ATOMIC END
+
     ATOMIC_ACCESSOR_ATTRIBUTE("Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
@@ -232,17 +237,12 @@ void PhysicsWorld2D::Update(float timeStep)
 {
     ATOMIC_PROFILE(UpdatePhysics2D);
 
-// ATOMIC BEGIN
-
-    using namespace PhysicsPreStep2D;
-
+    using namespace PhysicsPreStep;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = this;
     eventData[P_TIMESTEP] = timeStep;
-    SendEvent(E_PHYSICSPRESTEP2D, eventData);
-
-// ATOMIC END
+    SendEvent(E_PHYSICSPRESTEP, eventData);
 
     physicsStepping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
@@ -285,10 +285,8 @@ void PhysicsWorld2D::Update(float timeStep)
     SendBeginContactEvents();
     SendEndContactEvents();
 
-// ATOMIC BEGIN
-    using namespace PhysicsPostStep2D;
-    SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
-// ATOMIC END
+    using namespace PhysicsPostStep;
+    SendEvent(E_PHYSICSPOSTSTEP, eventData);
 }
 
 void PhysicsWorld2D::DrawDebugGeometry()
@@ -686,6 +684,7 @@ void PhysicsWorld2D::SendBeginContactEvents()
 
     using namespace PhysicsBeginContact2D;
     VariantMap& eventData = GetEventDataMap();
+    VariantMap nodeEventData;
     eventData[P_WORLD] = this;
 
     for (unsigned i = 0; i < beginContactInfos_.Size(); ++i)
@@ -698,6 +697,26 @@ void PhysicsWorld2D::SendBeginContactEvents()
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
 
         SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
+
+        nodeEventData[NodeBeginContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+
+        if (contactInfo.nodeA_)
+        {
+            nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+
+            contactInfo.nodeA_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
+        }
+
+        if (contactInfo.nodeB_)
+        {
+            nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+
+            contactInfo.nodeB_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
+        }
     }
 
     beginContactInfos_.Clear();
@@ -710,6 +729,7 @@ void PhysicsWorld2D::SendEndContactEvents()
 
     using namespace PhysicsEndContact2D;
     VariantMap& eventData = GetEventDataMap();
+    VariantMap nodeEventData;
     eventData[P_WORLD] = this;
 
     for (unsigned i = 0; i < endContactInfos_.Size(); ++i)
@@ -722,6 +742,26 @@ void PhysicsWorld2D::SendEndContactEvents()
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
 
         SendEvent(E_PHYSICSENDCONTACT2D, eventData);
+
+        nodeEventData[NodeEndContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+
+        if (contactInfo.nodeA_)
+        {
+            nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+
+            contactInfo.nodeA_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
+        }
+
+        if (contactInfo.nodeB_)
+        {
+            nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+
+            contactInfo.nodeB_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
+        }
     }
 
     endContactInfos_.Clear();

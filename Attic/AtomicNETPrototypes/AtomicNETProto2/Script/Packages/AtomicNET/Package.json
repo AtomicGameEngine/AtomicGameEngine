@@ -1,8 +1,0 @@
-
-{
-  "name" : "AtomicNET",
-  "namespace" : "Atomic",
-  "dependencies" : ["Script/Packages/Atomic"],
-  "modules" : ["NETCore", "NETScript"],
-  "platforms" : ["WINDOWS", "MACOSX","LINUX"]
-}
