@@ -43,16 +43,16 @@ class EditorLicense extends Atomic.ScriptObject {
 
     handleLicenseEulaAccepted(eventData) {
 
-        // Disabled for now
-        /*
-        var sha = Atomic.getGitRevision();
+        if (!Atomic.AtomicBuildInfo.getDistBuild())
+            return;
+
+        var sha = Atomic.AtomicBuildInfo.getGitSHA();
 
         if (sha == "Unversioned Build" || Preferences.getInstance().editorBuildData.lastEditorBuildSHA == sha)
             return;
 
         var ops = EditorUI.getModelOps();
         ops.showNewBuildWindow();
-        */
 
     }
 

@@ -34,7 +34,7 @@ namespace AtomicEngine
 #endif
 
 
-#if ATOMIC_ANDROID || ATOMIC_IOS
+#if ATOMIC_MOBILE
 
             app = NETAtomicPlayer.Create(args);
             

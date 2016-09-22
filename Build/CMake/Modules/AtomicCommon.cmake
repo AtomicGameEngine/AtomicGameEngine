@@ -22,6 +22,10 @@
 
 include (CMakeParseArguments)
 
+if ($ENV{ATOMIC_BUILD_DIST})
+  add_definitions(-DATOMIC_BUILD_DIST=1)
+endif()
+
 # Urho compatibility
 add_definitions(-DATOMIC_CXX11=1)
 

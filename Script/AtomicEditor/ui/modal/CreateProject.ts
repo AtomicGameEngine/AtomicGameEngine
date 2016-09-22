@@ -108,6 +108,16 @@ class CreateProject extends ModalWindow {
             let templateDetail: ProjectTemplates.ProjectTemplateDetail;
             let selectedLanguage = this.projectLanguageField.text;
 
+            // Check whether we have a required IDE installed for C# projects
+            if (selectedLanguage == "CSharp" || selectedLanguage == "C#") {
+
+                if (!ToolCore.netProjectSystem.getIDEAvailable()) {
+                    this.hide();
+                    EditorUI.getModelOps().showAtomicNETWindow();
+                    return false;
+                }
+            }
+
             for (let i = 0; i < this.projectTemplate.templates.length; i++) {
                 if (this.projectTemplate.templates[i].language === selectedLanguage) {
                     templateDetail = this.projectTemplate.templates[i];

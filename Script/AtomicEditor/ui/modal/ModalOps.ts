@@ -27,7 +27,6 @@ import NewProject = require("./NewProject");
 import CreateProject = require("./CreateProject");
 
 import EULAWindow = require("./license/EULAWindow");
-import NewBuildWindow = require("./license/NewBuildWindow");
 
 import BuildWindow = require("./build/BuildWindow");
 import BuildOutput = require("./build/BuildOutput");
@@ -43,6 +42,8 @@ import ExtensionWindow = require("./ExtensionWindow");
 
 import ProjectTemplates = require("../../resources/ProjectTemplates");
 
+import NewBuildWindow = require("./info/NewBuildWindow");
+import AtomicNETWindow = require("./info/AtomicNETWindow");
 
 class ModalOps extends Atomic.ScriptObject {
 
@@ -231,6 +232,16 @@ class ModalOps extends Atomic.ScriptObject {
         if (this.show()) {
 
             this.opWindow = new SnapSettingsWindow();
+
+        }
+
+    }
+
+    showAtomicNETWindow() {
+
+        if (this.show()) {
+
+            this.opWindow = new AtomicNETWindow();
 
         }
 

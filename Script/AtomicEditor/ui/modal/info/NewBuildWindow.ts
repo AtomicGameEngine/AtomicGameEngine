@@ -35,7 +35,7 @@ class NewBuildWindow extends ModalWindow {
         // we're not calling this.init here as it calls resizeToFitContent
         // and center, which screw up the generated About text being resized
 
-        this.text = "New Atomic Editor Build Detected";
+        this.text = "New Build Detected";
         this.load("AtomicEditor/editor/ui/newbuildwindow.tb.txt");
 
         this.newbuild_text = <Atomic.UIEditField>this.getWidget("newbuild_text");
@@ -65,7 +65,7 @@ class NewBuildWindow extends ModalWindow {
 
                 if (this.newBuildCheck.value) {
 
-                    Preferences.getInstance().editorBuildData.lastEditorBuildSHA = Atomic.getGitRevision();
+                    Preferences.getInstance().editorBuildData.lastEditorBuildSHA = Atomic.AtomicBuildInfo.getGitSHA();
                     Preferences.getInstance().write();
 
                 }
@@ -79,17 +79,28 @@ class NewBuildWindow extends ModalWindow {
 
         var text = "";
 
-        text += `<widget TBImageWidget: filename: 'AtomicEditor/editor/images/atomic_logo.png'>
-
+        // TODO: this needs to be externally generated
+        text += `
 <color #D4FB79>Hello and thanks for installing a new build of the Atomic Editor!</color>
+<color #AAAAAA>(Git SHA: ${Atomic.AtomicBuildInfo.getGitSHA()})</color>
 
-A cross platform game engine targeting 6 platforms is a lot of work! We need to raise funds in order to continue developing features such as integrated debugging, C# scripting, editor workflow improvements, platform updates, and to address a growing list of issues. There are also other project expenses such as CI hardware, web site updates, hosting costs, etc.
+<color #76D6FF>Latest Updates:</color>
 
-In addition to monetary funding, we need help reviewing pull requests, addressing open issues, providing support in chat, etc.
+• Support for <color #D4FB79>Atomic C#</color> scripting on Windows, macOS, Linux, Android, and iOS
 
-<color #D4FB79>Thanks for your support!</color>
+• <color #D4FB79>Visual Studio</color> and <color #D4FB79>Xamarin Studio</color> integration (with VSCode support coming soon!)
 
-<widget TBImageWidget: filename: 'AtomicEditor/editor/images/josh.jpg'> - Josh Engebretson on behalf of the Atomic Community
+• Physically Based Rendering (PBR) - Thanks to @dragonCASTjosh
+
+• New examples and project templates
+
+• Revamped build targeting JavaScript, TypeScript, C#, and native C++
+
+• Updated to Urho3D 1.6 and SDL 2.0.4 with a great number of platform improvements
+
+• Updated to to Monaco VSCode editor 0.6
+
+• Bug fixed, improvements, and optimization
 `;
 
         return text;
