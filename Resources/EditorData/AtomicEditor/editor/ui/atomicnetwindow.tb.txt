@@ -1,0 +1,14 @@
+TBLayout: axis: y, distribution: gravity
+    TBImageWidget: filename: "AtomicEditor/editor/images/atomicnet_info_header.png"
+        lp: width: 500, height: 167, min-width: 500, min-height: 167
+    TBEditField: multiline: 1, styling: 1, gravity: all, id: atomicnet_text, readonly: 1, adapt-to-content: 0
+        font: size: 13
+        lp: min-width: 480, min-height: 140
+        text: "..."
+    TBSeparator: gravity: left right, skin: AESeparator
+    TBLayout:
+        TBButton: text: "...", id: download_button, skin: TBButton.greentext
+            font: size: 16
+            lp: min-width: 128, min-height: 64
+        TBButton: text: Ok, id: ok
+            lp: min-width: 64, min-height: 64

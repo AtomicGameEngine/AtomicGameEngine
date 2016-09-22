@@ -43,6 +43,7 @@ import ExtensionWindow = require("./ExtensionWindow");
 
 import ProjectTemplates = require("../../resources/ProjectTemplates");
 
+import AtomicNETWindow = require("./info/AtomicNETWindow");
 
 class ModalOps extends Atomic.ScriptObject {
 
@@ -231,6 +232,16 @@ class ModalOps extends Atomic.ScriptObject {
         if (this.show()) {
 
             this.opWindow = new SnapSettingsWindow();
+
+        }
+
+    }
+
+    showAtomicNETWindow() {
+
+        if (this.show()) {
+
+            this.opWindow = new AtomicNETWindow();
 
         }
 
