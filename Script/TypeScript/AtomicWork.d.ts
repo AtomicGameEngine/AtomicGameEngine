@@ -6,7 +6,6 @@
 declare module Atomic {
 
     export function print(...args: any[]);
-    export function getGitRevision():string;
 
     export var platform: string;
 
