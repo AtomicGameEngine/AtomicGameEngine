@@ -7,7 +7,8 @@
         "removeComments": true,
         "noLib": false,
         "outDir": "../../Data/AtomicEditor/CodeEditor/source/editorCore",
-        "sourceMap": true
+        "sourceMap": true,
+        "forceConsistentCasingInFileNames": true
     },
     "filesGlob": [
         "./**/*.ts",
