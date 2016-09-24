@@ -9,7 +9,8 @@
         "outDir": "../Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
         "moduleResolution": "classic",
         "sourceMap": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true
     },
     "filesGlob": [
         "./ToolCore/**/*.ts",

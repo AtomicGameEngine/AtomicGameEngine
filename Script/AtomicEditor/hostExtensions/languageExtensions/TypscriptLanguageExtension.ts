@@ -36,9 +36,11 @@ const defaultCompilerOptions = {
     declaration: false,
     inlineSourceMap: false,
     removeComments: false,
-    noLib: true,
+    noLib: false,
     allowNonTsExtensions: true,
-    allowJs: true
+    forceConsistentCasingInFileNames: true,
+    allowJs: true,
+    lib: ["es5"]
 };
 
 /**
@@ -78,11 +80,22 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     private buildTsConfig(): any {
         // only build out a tsconfig.atomic if we actually have typescript files in the project
         let projectFiles: Array<string> = [];
-
+        const slashedProjectPath = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath);
 
         //scan all the files in the project for any typescript files and add them to the project
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
-            projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
+            // Don't grab d.ts files yet.  We'll do that in a separate pass
+            if (filename.search(/d.ts$/i) == -1) {
+                projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
+                if (!this.isTypescriptProject) {
+                    this.isTypescriptProject = true;
+                }
+            }
+        });
+
+        //Scan for any d.ts files in the root
+        Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.projectPath, "*.d.ts", Atomic.SCAN_FILES, true).forEach(filename => {
+            projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + filename);
             if (!this.isTypescriptProject) {
                 this.isTypescriptProject = true;
             }
@@ -94,10 +107,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
         });
 
-        // First we need to load in a copy of the lib.core.d.ts that is necessary for the hosted typescript compiler
-        projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.core.d.ts");
+        // First we need to load in a copy of the lib.es6.d.ts that is necessary for the hosted typescript compiler
+        projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.es5.d.ts");
 
-        const slashedProjectPath = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath);
 
         const tsconfigFn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + "tsconfig.json";
         // Let's look for a tsconfig.json file in the project root and add any additional files
@@ -354,7 +366,6 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
       Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
 
       // Generate a tsconfig.json file
-      defaultCompilerOptions.noLib = false;
       var tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
       let tsconfig = {
         compilerOptions: defaultCompilerOptions

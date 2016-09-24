@@ -179,7 +179,7 @@ namespace('build', function() {
 
                     // copy lib.core.d.ts into the tool data directory
                     fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
-                    fs.copySync("./Build/node_modules/typescript/lib/lib.core.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.core.d.ts")
+                    fs.copySync("./Build/node_modules/typescript/lib/lib.es5.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.es5.d.ts");
 
                     // copy the combined Atomic.d.ts to the tool data directory
                     fs.copySync("./Script/TypeScript/dist/Atomic.d.ts","./Data/AtomicEditor/TypeScriptSupport/Atomic.d.ts")
