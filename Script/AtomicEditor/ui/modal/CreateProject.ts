@@ -88,8 +88,8 @@ class CreateProject extends ModalWindow {
         var size = 92;
 
         var button = new Atomic.UIButton();
-        button.id = id;     
-        button.toggleMode = true;   
+        button.id = id;
+        button.toggleMode = true;
 
         button.onClick = () => {
 
@@ -117,8 +117,8 @@ class CreateProject extends ModalWindow {
             greenplus.visibility = Atomic.UI_WIDGET_VISIBILITY_INVISIBLE;
             button.addChild(greenplus);
             button["greenPlus"] = greenplus;
-        }   
-        
+        }
+
         platformcontainer.addChild(button);
 
         return button;
@@ -224,7 +224,7 @@ class CreateProject extends ModalWindow {
                 if (this.androidButton.value == 1) {
                     platforms.push("android");
                 }
-                
+
                 if (this.iosButton.value == 1) {
                     platforms.push("ios");
                 }
@@ -245,6 +245,7 @@ class CreateProject extends ModalWindow {
                 if (atomicNET) {
                     if (!ProjectTemplates.generateAtomicNETProject({
                         name: name,
+                        appID : this.appIDField.text,
                         platforms : platforms,
                         projectFolder : folder
                     })) {
@@ -288,8 +289,8 @@ class CreateProject extends ModalWindow {
             this.html5Button.enable();
             this.html5Button["greenPlus"].visibility = this.html5Button.value == 1 ? Atomic.UI_WIDGET_VISIBILITY_VISIBLE : Atomic.UI_WIDGET_VISIBILITY_INVISIBLE;
 
-        }                
-        
+        }
+
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -326,7 +327,7 @@ class CreateProject extends ModalWindow {
             }
 
             if (ev.target.id == "desktop") {
-                
+
                 // desktop is always selected
                 this.desktopButton.value = 1;
 
@@ -352,7 +353,7 @@ class CreateProject extends ModalWindow {
         this.projectLanguageField.source = this.projectLanguageFieldSource;
         this.projectLanguageField.value = 0;
     }
-    
+
     projectPathField: Atomic.UIEditField;
     projectNameField: Atomic.UIEditField;
     appIDField: Atomic.UIEditField;

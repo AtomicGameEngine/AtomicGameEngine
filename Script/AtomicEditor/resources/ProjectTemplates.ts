@@ -117,6 +117,7 @@ export function GetNewFileTemplateDefinitions(fileTemplateType: string) : Editor
 
 export interface AtomicNETProjectInfo {
     name: string;
+    appID: string;
     platforms: string[];
     projectFolder: string;
 }
@@ -141,6 +142,7 @@ function processAtomicNETTemplate(filename:string, templateFilename:string) : bo
     let text = file.readText();
 
     text = text.split("$$APPLICATION_NAME$$").join(atomicNETProjectInfo.name);
+    text = text.split("$$APPLICATION_ID$$").join(atomicNETProjectInfo.appID);
 
     let fileOut = new Atomic.File(filename, Atomic.FILE_WRITE);
 
@@ -152,7 +154,7 @@ function processAtomicNETTemplate(filename:string, templateFilename:string) : bo
     fileOut.writeString(text);
 
     file.close();
-    
+
     return true;
 }
 
@@ -161,7 +163,7 @@ function processAtomicNETTemplate(filename:string, templateFilename:string) : bo
  * @return {boolean}
  */
 function generateAtomicNETAndroidProject():boolean {
-    
+
     let env = ToolCore.toolEnvironment;
     let utils = new Editor.FileUtils();
     let templateFolder = env.toolDataDir + "AtomicNET/ProjectTemplate/";
@@ -179,7 +181,7 @@ function generateAtomicNETAndroidProject():boolean {
 
             if (!utils.createDirs(folder))
                 return false;
-        }        
+        }
 
     }
 
@@ -210,16 +212,75 @@ function generateAtomicNETAndroidProject():boolean {
         }
 
     }
-                 
+
     return true;
 }
+
+/**
+ * Generates the iOS portion of an AtomicNET project
+ * @return {boolean}
+ */
+function generateAtomicNETIOSProject():boolean {
+
+    let env = ToolCore.toolEnvironment;
+    let utils = new Editor.FileUtils();
+    let templateFolder = env.toolDataDir + "AtomicNET/ProjectTemplate/";
+    let iosFolder = Atomic.addTrailingSlash(atomicNETProjectInfo.projectFolder) + "Project/AtomicNET/Platforms/iOS/";
+
+    let fileSystem = Atomic.fileSystem;
+
+    // Create necessary folders
+    let folders = ["Properties", "Resources"];
+    for (var i = 0; i < folders.length; i++) {
+
+        let folder = iosFolder + folders[i];
+
+        if (!fileSystem.dirExists(folder)) {
+
+            if (!utils.createDirs(folder))
+                return false;
+        }
+
+    }
+
+    let textFiles = [".cs", ".plist"];
+
+    let files = ["Main.cs", "AppUIDelegate.cs", "Entitlements.plist", "Info.plist",
+                 "Properties/AssemblyInfo.cs"];
+
+    for (var i = 0; i < files.length; i++) {
+
+        let templateName = templateFolder + "Platforms/iOS/" + files[i];
+        let filename = iosFolder + files[i];
+
+        if (textFiles.indexOf(Atomic.getExtension(templateName)) == -1) {
+
+            if (!fileSystem.copy(templateName, filename)) {
+
+                console.log("Failed to copy: ", templateName, " to ",  filename);
+                return false;
+            }
+
+        } else {
+
+            if (!processAtomicNETTemplate(filename, templateName)) {
+                return false;
+            }
+
+        }
+
+    }
+
+    return true;
+}
+
 
 /**
  * Generates the Desktop portion of an AtomicNET project
  * @return {boolean}
  */
 function generateAtomicNETDesktopProject():boolean {
-    
+
     let env = ToolCore.toolEnvironment;
     let utils = new Editor.FileUtils();
     let templateFolder = env.toolDataDir + "AtomicNET/ProjectTemplate/";
@@ -274,6 +335,15 @@ export function generateAtomicNETProject(projectInfo:AtomicNETProjectInfo):boole
         }
 
     }
+
+    if (projectInfo.platforms.indexOf("ios") != -1) {
+
+        if (!generateAtomicNETIOSProject()) {
+            return false;
+        }
+
+    }
+
 
     return true;
 }
