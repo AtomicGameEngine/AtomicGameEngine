@@ -837,17 +837,17 @@ namespace ToolCore
         // OutputType
         XMLElement outputType = pgroup.CreateChild("OutputType");
 
-		String oType = outputType_;
+        String oType = outputType_;
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #ifndef ATOMIC_DEBUG
 
-		if (oType.ToLower() == "exe") 
-		{
-			// use windows subsystem for release builds
-			// TODO: make this an option in the json?
-			oType = "WinExe";
-		}
+        if (oType.ToLower() == "exe") 
+        {
+            // use windows subsystem for release builds
+            // TODO: make this an option in the json?
+            oType = "WinExe";
+        }
 
 #endif
 #endif
@@ -1114,8 +1114,15 @@ namespace ToolCore
                     String startArguments;
 
 #ifndef ATOMIC_DEV_BUILD
+
+#ifdef ATOMIC_PLATFORM_OSX
+                    startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "../Resources/").CString());
+#else
                     startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "Resources/").CString());
 #endif
+
+#endif
+
 
                     propertyGroup.CreateChild("StartAction").SetValue("Project");
 

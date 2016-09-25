@@ -1,27 +1,37 @@
 TBLayout: axis: y, distribution: gravity, position: left
-	TBLayout: distribution: gravity
-		TBLayout: distribution: gravity
-			TBTextField: text: "Project Name:"
-			TBLayout: gravity: left right, distribution-position: right bottom
-				TBEditField: id: project_name, text: "MyGame"
-					lp: min-width: 240
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBImageWidget: id: project_image
-				lp: width: 128, height: 96
-	TBSeparator: gravity: left right, skin: AESeparator
-	TBTextField: text: "Project Directory:"
-	TBLayout: axis: y, distribution: gravity, position: left
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: project_path
-				lp: min-width: 380
-			TBButton: text: "Choose" id: choose_path
-	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout: distribution: gravity
-		TBTextField: text: "Project Language:"
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBSelectDropdown: id: project_language
-				lp: min-width: 240
-	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout:
-		TBButton: text: Create, id: create
-		TBButton: text: Cancel, id: cancel
+    TBLayout: distribution: gravity, axis: y
+        TBLayout: distribution: gravity
+            TBLayout: distribution: gravity, axis: y
+                TBLayout: distribution: gravity
+                    TBTextField: text: "Project Name:"
+                    TBLayout: gravity: left right, distribution-position: right bottom
+                        TBEditField: id: project_name, text: "MyGame"
+                            lp: min-width: 240
+                TBLayout: distribution: gravity
+                    TBTextField: text: "App ID:"
+                    TBLayout: gravity: left right, distribution-position: right bottom
+                        TBEditField: id: app_id, text: "com.companyname.mygame"
+                            lp: min-width: 240
+            TBLayout: gravity: left right, distribution-position: right bottom
+                TBImageWidget: id: project_image
+                    lp: width: 128, height: 96
+    TBSeparator: gravity: left right, skin: AESeparator
+    TBTextField: text: "Platforms:"
+    TBLayout: id: platformcontainer
+    TBSeparator: gravity: left right, skin: AESeparator
+    TBTextField: text: "Project Directory:"
+    TBLayout: axis: y, distribution: gravity, position: left
+        TBLayout: gravity: left right, distribution-position: right bottom
+            TBEditField: id: project_path
+                lp: min-width: 380
+            TBButton: text: "Choose" id: choose_path
+    TBSeparator: gravity: left right, skin: AESeparator
+    TBLayout: distribution: gravity
+        TBTextField: text: "Project Language:"
+        TBLayout: gravity: left right, distribution-position: right bottom
+            TBSelectDropdown: id: project_language
+                lp: min-width: 240
+    TBSeparator: gravity: left right, skin: AESeparator
+    TBLayout:
+        TBButton: text: Create, id: create
+        TBButton: text: Cancel, id: cancel

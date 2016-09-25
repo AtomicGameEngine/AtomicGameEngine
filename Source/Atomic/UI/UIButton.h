@@ -50,6 +50,10 @@ public:
     /// for example a http:// link will open the default browser
     void SetURLEnabled(bool enabled) { urlEnabled_ = enabled; }
 
+    ///Set to true if the button should toggle on and off    
+    void SetToggleMode(bool toggle);
+    bool GetToggleMode() const;
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
