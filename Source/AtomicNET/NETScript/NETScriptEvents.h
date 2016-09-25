@@ -47,5 +47,10 @@ namespace Atomic
         ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
     }
 
+    ATOMIC_EVENT(E_CSCOMPONENTCLASSCHANGED, CSComponentClassChanged)
+    {
+        ATOMIC_PARAM(P_CSCOMPONENT, Component); // CSComponent*
+        ATOMIC_PARAM(P_CLASSNAME, Classname); // String
+    }
 
 }

@@ -27,6 +27,7 @@
 #include <Atomic/Core/Profiler.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/Serializer.h>
+#include <Atomic/Script/ScriptSystem.h>
 
 #include "NETScriptEvents.h"
 #include "CSComponentAssembly.h"
@@ -231,7 +232,10 @@ namespace Atomic
 
     bool CSComponentAssembly::BeginLoad(Deserializer& source)
     {
-        fullAssemblyPath_ = source.GetName();
+        // TODO: Assemblies in packages?
+        File* sourceFile = (File*) &source;
+
+        fullAssemblyPath_ = sourceFile->GetFullPath();
 
         VariantMap eventData;
 
@@ -246,6 +250,99 @@ namespace Atomic
     bool CSComponentAssembly::Save(Serializer& dest) const
     {
         return true;
+    }
+
+    CSComponentAssembly* CSComponentAssembly::ResolveClassAssembly(const String& fullClassName)
+    {
+        Context* context = ScriptSystem::GetContext();
+        assert(context);
+
+        String classname = fullClassName;
+        String csnamespace;
+
+        // Handle namespaces
+        if (fullClassName.Contains('.'))
+        {
+
+            StringVector elements = fullClassName.Split('.');
+
+            if (elements.Size() <= 1)
+                return 0;
+
+            classname = elements.Back();
+            elements.Pop();
+
+            csnamespace = String::Joined(elements, ".");
+        }
+
+        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+
+        PODVector<CSComponentAssembly*> assemblies;
+
+        cache->GetResources<CSComponentAssembly>(assemblies);
+
+        for (unsigned i = 0; i < assemblies.Size(); i++)
+        {
+            CSComponentAssembly* assembly = assemblies[i];
+
+            // TODO: support namespaces
+            const StringVector& classNames = assembly->GetClassNames();
+            if (classNames.Contains(classname))
+            {
+                return assembly;
+            }
+
+        }
+
+        return 0;
+
+    }
+
+    bool CSComponentAssembly::PreloadClassAssemblies()
+    {
+        // TEMPORARY SOLUTION, Desktop only
+
+        ATOMIC_LOGINFO("Preloading Class Assemblies");
+
+        Context* context = ScriptSystem::GetContext();
+        assert(context);
+
+        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+        FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
+
+        const StringVector& resourceDirs = cache->GetResourceDirs();
+
+        for (unsigned i = 0; i < resourceDirs.Size(); i++)
+        {
+            const String& resourceDir = resourceDirs[i];
+
+            ATOMIC_LOGINFOF("Scanning: %s", resourceDir.CString());
+
+            StringVector results;
+            fileSystem->ScanDir(results, resourceDir, "*.dll", SCAN_FILES, true);
+
+            for (unsigned j = 0; j < results.Size(); j++)
+            {
+                // FIXME: This filtering is necessary as we're loading setting project root folder as a resource dir
+                // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1037
+
+                String filter = results[j].ToLower();
+
+                if (filter.StartsWith("atomicnet/") || filter.StartsWith("resources/"))
+                {
+                    ATOMIC_LOGINFOF("Skipping Assembly: %s (https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1037)", results[j].CString());
+                    continue;
+                }
+
+                ATOMIC_LOGINFOF("Loading Assembly: %s", results[j].CString());
+
+                cache->GetResource<CSComponentAssembly>(results[j]);
+            }
+
+        }
+
+        return true;
+
     }
 
 }

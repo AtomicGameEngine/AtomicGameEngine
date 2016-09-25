@@ -60,13 +60,7 @@ public:
     void SetComponentClassName(const String& name);
     const String& GetComponentClassName() const { return componentClassName_; }
 
-    virtual ScriptComponentFile* GetComponentFile() { return assemblyFile_; }
-
-    CSComponentAssembly* GetAssemblyFile() { return assemblyFile_; }
-    void SetAssemblyFile(CSComponentAssembly* assemblyFile);
-
-    ResourceRef GetAssemblyFileAttr() const;
-    void SetAssemblyFileAttr(const ResourceRef& value);
+    virtual ScriptComponentFile* GetComponentFile();
 
 protected:
 
@@ -80,7 +74,6 @@ private:
     void SendLoadEvent();
 
     String componentClassName_;
-    SharedPtr<CSComponentAssembly> assemblyFile_;
 
 };
 

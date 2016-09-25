@@ -56,8 +56,6 @@ void CSComponent::RegisterObject(Context* context)
 
     ATOMIC_ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
 
-    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(CSComponentAssembly::GetTypeStatic()), AM_DEFAULT);
-
     ATOMIC_ACCESSOR_ATTRIBUTE("Class", GetComponentClassName, SetComponentClassName, String, String::EMPTY, AM_DEFAULT);
 
 }
@@ -78,17 +76,18 @@ void CSComponent::ApplyFieldValues()
 
 void CSComponent::SetComponentClassName(const String& name)
 {
+    if (componentClassName_ == name)
+        return;
+
     componentClassName_ = name;
 
-    if (assemblyFile_ && assemblyFile_->GetClassNames().Contains(name))
+    if (context_->GetEditorContext())
     {
-        /*
         using namespace CSComponentClassChanged;
         VariantMap eventData;
         eventData[P_CSCOMPONENT] = this;
         eventData[P_CLASSNAME] = name;
         SendEvent(E_CSCOMPONENTCLASSCHANGED, eventData);
-        */
     }
 }
 
@@ -104,14 +103,22 @@ void CSComponent::OnSceneSet(Scene* scene)
 
 void CSComponent::SendLoadEvent()
 {
-    if (!assemblyFile_ || !componentClassName_.Length())
+    if (!componentClassName_.Length())
         return;
+
+    // TODO: We need to factor out runtime loading of CSComponent assemblies
+    CSComponentAssembly*  assemblyFile = 0;
+
+#ifdef ATOMIC_PLATFORM_DESKTOP
+    assemblyFile = CSComponentAssembly::ResolveClassAssembly(componentClassName_);
+#endif
 
     using namespace CSComponentLoad;
 
     VariantMap eventData;
 
-    eventData[P_ASSEMBLYPATH] = GetFileName(assemblyFile_->GetFullPath());
+    eventData[P_ASSEMBLYPATH] = assemblyFile ? GetFileName(assemblyFile->GetFullPath()) : String::EMPTY;
+
     eventData[P_CLASSNAME] = componentClassName_;
     eventData[P_NATIVEINSTANCE] = (void*) this;
 
@@ -142,20 +149,13 @@ bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
-void CSComponent::SetAssemblyFile(CSComponentAssembly* assemblyFile)
+ScriptComponentFile* CSComponent::GetComponentFile()
 {
-    assemblyFile_ = assemblyFile;
-}
+    if (!componentClassName_.Length())
+        return 0;
 
-ResourceRef CSComponent::GetAssemblyFileAttr() const
-{
-    return GetResourceRef(assemblyFile_, CSComponentAssembly::GetTypeStatic());
-}
+    return CSComponentAssembly::ResolveClassAssembly(componentClassName_);
 
-void CSComponent::SetAssemblyFileAttr(const ResourceRef& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetAssemblyFile(cache->GetResource<CSComponentAssembly>(value.name_));
 }
 
 

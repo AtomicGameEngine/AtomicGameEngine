@@ -28,7 +28,7 @@ class CSComponentClassSelector extends Atomic.UIWindow {
 
         super();
 
-        var assemblyFile = component.assemblyFile;
+        var assemblyFile = component.componentFile;
 
         this.text = "Select Class: " + assemblyFile.name;
 

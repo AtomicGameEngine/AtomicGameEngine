@@ -298,25 +298,17 @@ namespace AtomicEngine
 
         void HandleComponentLoad(uint eventType, ScriptVariantMap eventData)
         {
-            var assemblyPath = eventData["AssemblyPath"];
-
             var className = eventData["ClassName"];
+
             IntPtr csnative = eventData.GetVoidPtr("NativeInstance");
             IntPtr fieldValues = IntPtr.Zero;
 
             if (eventData.Contains("FieldValues"))
                 fieldValues = eventData.GetVoidPtr("FieldValues");
 
-            Dictionary<string, CSComponentInfo> assemblyTypes = null;
-
-            if (!componentCache.TryGetValue(assemblyPath, out assemblyTypes))
-            {
-                return;
-            }
-
             CSComponentInfo csinfo;
 
-            if (!assemblyTypes.TryGetValue(className, out csinfo))
+            if (!componentCache.TryGetValue(className, out csinfo))
             {
                 return;
             }
@@ -332,14 +324,12 @@ namespace AtomicEngine
 
         }
 
+        [Obsolete("Method HandleComponentAssemblyReference is deprecated (loading component assemblies at runtime, will be changed to preload them)")]
         void HandleComponentAssemblyReference(uint eventType, ScriptVariantMap eventData)
         {
 #if ATOMIC_DESKTOP || ATOMIC_MOBILE
             string assemblyPath = eventData["AssemblyPath"];
-
             string assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-            if (componentCache.ContainsKey(assemblyName))
-                return;
 
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
 
@@ -363,14 +353,13 @@ namespace AtomicEngine
         void ParseAssembly(Assembly assembly)
         {
 #if ATOMIC_DESKTOP || ATOMIC_MOBILE
-            String assemblyPath = assembly.GetName().Name;
 
-            Dictionary<string, CSComponentInfo> assemblyTypes = null;
-
-            if (!componentCache.TryGetValue(assemblyPath, out assemblyTypes))
+            if (parsedAssemblies.ContainsKey(assembly))
             {
-                componentCache[assemblyPath] = assemblyTypes = new Dictionary<string, CSComponentInfo>();
+                return;
             }
+
+            parsedAssemblies[assembly] = true;
 
             Type[] types = assembly.GetTypes();
 
@@ -380,7 +369,7 @@ namespace AtomicEngine
                 {
                     var csinfo = new CSComponentInfo(type);
                     csinfoLookup[csinfo.Type] = csinfo;
-                    assemblyTypes[type.Name] = csinfo;
+                    componentCache[type.Name] = csinfo;
                 }
             }
 #endif
@@ -403,7 +392,11 @@ namespace AtomicEngine
 
         }
 
-        Dictionary<string, Dictionary<string, CSComponentInfo>> componentCache = new Dictionary<string, Dictionary<string, CSComponentInfo>>();
+        // type name -> CSComponentInfo lookup TODO: store with namespace to solve ambiguities
+        Dictionary<string, CSComponentInfo> componentCache = new Dictionary<string, CSComponentInfo>();
+
+        [Obsolete("Member parsedAssemblies is temporarily required for runtime component assemblies loading")]
+        Dictionary<Assembly, bool> parsedAssemblies = new Dictionary<Assembly, bool>();
 
         Dictionary<Type, CSComponentInfo> csinfoLookup = new Dictionary<Type, CSComponentInfo>();
 
