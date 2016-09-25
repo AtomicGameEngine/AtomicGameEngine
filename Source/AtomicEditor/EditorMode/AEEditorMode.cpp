@@ -180,7 +180,9 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
     paths.Push(project->GetResourcePath());
 
     // fixme: this is for loading from cache
+    // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1037
     paths.Push(project->GetProjectPath());
+
     paths.Push(project->GetProjectPath() + "Cache");
 
     String resourcePaths;

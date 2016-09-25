@@ -64,6 +64,12 @@ namespace Atomic
         /// Only valid in editor, as we don't inspect assembly at runtime
         const Vector<String>& GetClassNames() { return classNames_; }
 
+        // Find assembly by class name or namespace qualified classname
+        static CSComponentAssembly* ResolveClassAssembly(const String& fullClassName);
+
+        // TODO: Proper method to preload class assemblies (which will also work on mobile)
+        static bool PreloadClassAssemblies();
+
     private:
 
         static void InitTypeMap();

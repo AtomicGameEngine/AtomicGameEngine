@@ -23,9 +23,9 @@
 
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/IO/FileSystem.h>
-
 #include "NETCore.h"
 #include <AtomicNET/NETScript/NETScript.h>
+#include <AtomicNET/NETScript/CSComponentAssembly.h>
 
 #include "NETIPCPlayerApp.h"
 
@@ -74,6 +74,9 @@ namespace Atomic
             ErrorExit();
             return exitCode_;
         }
+
+        // TODO: Proper CSComponent assembly preload (this only works on desktop)
+        CSComponentAssembly::PreloadClassAssemblies();
 
         Start();
 
