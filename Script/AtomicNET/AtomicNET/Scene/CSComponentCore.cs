@@ -329,10 +329,7 @@ namespace AtomicEngine
         {
 #if ATOMIC_DESKTOP || ATOMIC_MOBILE
             string assemblyPath = eventData["AssemblyPath"];
-
             string assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-            if (componentCache.ContainsKey(assemblyName))
-                return;
 
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
 
@@ -356,14 +353,13 @@ namespace AtomicEngine
         void ParseAssembly(Assembly assembly)
         {
 #if ATOMIC_DESKTOP || ATOMIC_MOBILE
-            String assemblyPath = assembly.GetName().Name;
 
-            if (parsedAssemblies.ContainsKey(assemblyPath))
+            if (parsedAssemblies.ContainsKey(assembly))
             {
                 return;
             }
 
-            parsedAssemblies[assemblyPath] = true;
+            parsedAssemblies[assembly] = true;
 
             Type[] types = assembly.GetTypes();
 
@@ -400,7 +396,7 @@ namespace AtomicEngine
         Dictionary<string, CSComponentInfo> componentCache = new Dictionary<string, CSComponentInfo>();
 
         [Obsolete("Member parsedAssemblies is temporarily required for runtime component assemblies loading")]
-        Dictionary<string, bool> parsedAssemblies = new Dictionary<string, bool>();
+        Dictionary<Assembly, bool> parsedAssemblies = new Dictionary<Assembly, bool>();
 
         Dictionary<Type, CSComponentInfo> csinfoLookup = new Dictionary<Type, CSComponentInfo>();
 
