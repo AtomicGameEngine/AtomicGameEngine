@@ -91,10 +91,6 @@ class CreateProject extends ModalWindow {
         button.id = id;
         button.toggleMode = true;
 
-        button.onClick = () => {
-
-        };
-
         var lp = new Atomic.UILayoutParams();
         lp.minWidth = size;
         lp.minHeight = size;
