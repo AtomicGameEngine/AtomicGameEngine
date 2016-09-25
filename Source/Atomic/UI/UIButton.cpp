@@ -62,19 +62,19 @@ void UIButton::SetSqueezable(bool value)
 
 void UIButton::SetToggleMode(bool toggle)
 {
-	if (!widget_)
-		return;
+    if (!widget_)
+        return;
 
-	((TBButton*)widget_)->SetToggleMode(toggle);
+    ((TBButton*)widget_)->SetToggleMode(toggle);
 
 }
 
 bool UIButton::GetToggleMode() const
 {
-	if (!widget_)
-		return false;
+    if (!widget_)
+        return false;
 
-	return ((TBButton*)widget_)->GetToggleMode();
+    return ((TBButton*)widget_)->GetToggleMode();
 }
 
 void UIButton::SetEmulationButton(int emulationButton)

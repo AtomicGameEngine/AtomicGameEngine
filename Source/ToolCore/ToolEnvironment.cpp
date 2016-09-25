@@ -79,9 +79,9 @@ bool ToolEnvironment::InitFromPackage()
     // atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());       
 
 #ifdef ATOMIC_DEBUG
-	String config = "Debug";
+    String config = "Debug";
 #else
-	String config = "Release";
+    String config = "Release";
 #endif
 
     atomicNETRootDir_ = resourcesDir + "ToolData/AtomicNET/";
