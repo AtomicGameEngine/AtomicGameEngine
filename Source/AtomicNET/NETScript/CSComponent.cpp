@@ -76,17 +76,18 @@ void CSComponent::ApplyFieldValues()
 
 void CSComponent::SetComponentClassName(const String& name)
 {
+    if (componentClassName_ == name)
+        return;
+
     componentClassName_ = name;
 
-    // if (assemblyFile_ && assemblyFile_->GetClassNames().Contains(name))
+    if (context_->GetEditorContext())
     {
-        /*
         using namespace CSComponentClassChanged;
         VariantMap eventData;
         eventData[P_CSCOMPONENT] = this;
         eventData[P_CLASSNAME] = name;
         SendEvent(E_CSCOMPONENTCLASSCHANGED, eventData);
-        */
     }
 }
 

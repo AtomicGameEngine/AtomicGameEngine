@@ -176,6 +176,8 @@ class CSComponentSection extends ComponentSection {
 
         this.subscribeToEvent("CSComponentAssemblyChanged", (ev) => this.handleCSComponentAssemblyChanged(ev));
 
+        this.subscribeToEvent("CSComponentClassChanged", (ev) => this.handleCSComponentClassChanged(ev));
+
     }
 
     private handleCSComponentAssemblyChanged(ev) {
@@ -185,7 +187,7 @@ class CSComponentSection extends ComponentSection {
         if (!csc)
           return;
 
-        if (csc.assemblyFile == <AtomicNETScript.CSComponentAssembly> ev.resource) {
+        if (csc.componentFile == <Atomic.ScriptComponentFile> ev.resource) {
 
           var attrInfos = csc.getAttributes();
           this.updateDynamicAttrInfos(attrInfos);
@@ -193,6 +195,20 @@ class CSComponentSection extends ComponentSection {
         }
 
     }
+
+    private handleCSComponentClassChanged(ev) {
+
+        var csc = <AtomicNETScript.CSComponent>this.editType.getFirstObject();
+
+        if (!csc)
+          return;
+
+        var attrInfos = csc.getAttributes();
+        this.updateDynamicAttrInfos(attrInfos);
+        this.updateTextFromClassAttr();
+
+    }
+
 
     private handleAttributeEditResourceChanged(ev: AttributeEditResourceChangedEvent) {
 
