@@ -40,6 +40,8 @@ public:
 
     static void RegisterObject(Context* context);
 
+    /// Only valid in editor, as we don't inspect classnames at runtime
+    virtual const Vector<String>& GetClassNames() { return classNames_; }
     const EnumMap& GetEnums(const String& classname = String::EMPTY) const;
     const FieldMap& GetFields(const String& classname = String::EMPTY) const;
     const VariantMap& GetDefaultFieldValues(const String& classname = String::EMPTY) const;
@@ -53,6 +55,9 @@ protected:
     void AddEnum(const String& enumName, const EnumInfo& enumInfo, const String& classname = String::EMPTY);
     void AddField(const String& fieldName, VariantType variantType, const String& classname = String::EMPTY);
     void AddDefaultValue(const String& fieldName, const Variant& value, const String& classname = String::EMPTY);
+
+    // only valid in editor
+    Vector<String> classNames_;
 
 private:
 

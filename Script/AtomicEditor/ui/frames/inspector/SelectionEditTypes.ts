@@ -64,7 +64,7 @@ class CSComponentEditType extends SerializableEditType {
         var csc1 = <AtomicNETScript.CSComponent>(otherType.objects[0]);
         var csc2 = <AtomicNETScript.CSComponent>(this.objects[0]);
 
-        return csc1.assemblyFile == csc2.assemblyFile && csc1.componentClassName == csc2.componentClassName;
+        return csc1.componentFile == csc2.componentFile && csc1.componentClassName == csc2.componentClassName;
 
     }
 

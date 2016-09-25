@@ -78,9 +78,6 @@ namespace Atomic
 
         String fullAssemblyPath_;
 
-        // only valid in editor
-        Vector<String> classNames_;
-
         HashMap<String, Vector<EnumInfo>> assemblyEnums_;
         static HashMap<StringHash, VariantType> typeMap_;
 
