@@ -75,15 +75,13 @@ class AtomicNETWindow extends ModalWindow {
 
     generateAtomicNETText(): string {
 
-        var installText:string;
+        let ideText:string = Atomic.platform == "Windows" ? "Visual Studio" : "Xamarin Studio";
 
-        var ideText:string = Atomic.platform == "Windows" ? "Visual Studio" : "Xamarin Studio";
-
-        var installText = `Please install ${ideText} with <color #D4FB79>Xamarin.Android</color> and <color #D4FB79>Xamarin.iOS</color>`;
+        let installText = `Please install ${ideText} with <color #D4FB79>Xamarin.Android</color> and <color #D4FB79>Xamarin.iOS</color>`;
 
         this.downloadButton.text = `Download ${ideText}`;
 
-        var text = "";
+        let text = "";
 
         text += `
 Atomic C# is integrated with <color #D4FB79>Visual Studio</color> and <color #D4FB79>Xamarin Studio</color> to provide a first class editing, debugging, and deployment experience.
