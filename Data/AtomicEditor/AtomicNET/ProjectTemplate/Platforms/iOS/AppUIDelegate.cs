@@ -6,19 +6,19 @@ using AtomicEngine;
 
 namespace AtomicPlayer
 {
-	[Register("AppUIDelegate")]
-	public partial class AppUIDelegate : UIApplicationDelegate
-	{
-		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
-		{
-			LaunchGame();
-			return true;
-		}
+    [Register("AppUIDelegate")]
+    public partial class AppUIDelegate : UIApplicationDelegate
+    {
+        public override bool FinishedLaunching(UIApplication app, NSDictionary options)
+        {
+            LaunchGame();
+            return true;
+        }
 
-		async void LaunchGame()
-		{
-			await Task.Yield();
-			Application.Run<AtomicMain>(new string[0]);
-		}
-	}
+        async void LaunchGame()
+        {
+            await Task.Yield();
+            Application.Run<AtomicMain>(new string[0]);
+        }
+    }
 }
