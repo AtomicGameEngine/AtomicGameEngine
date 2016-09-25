@@ -1114,8 +1114,15 @@ namespace ToolCore
                     String startArguments;
 
 #ifndef ATOMIC_DEV_BUILD
+
+#ifdef ATOMIC_PLATFORM_OSX
+                    startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "../Resources/").CString());
+#else
                     startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "Resources/").CString());
 #endif
+
+#endif
+
 
                     propertyGroup.CreateChild("StartAction").SetValue("Project");
 
