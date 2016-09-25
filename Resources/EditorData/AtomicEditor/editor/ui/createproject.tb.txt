@@ -1,18 +1,20 @@
 TBLayout: axis: y, distribution: gravity, position: left
     TBLayout: distribution: gravity, axis: y
         TBLayout: distribution: gravity
-            TBTextField: text: "Project Name:"
+            TBLayout: distribution: gravity, axis: y
+                TBLayout: distribution: gravity
+                    TBTextField: text: "Project Name:"
+                    TBLayout: gravity: left right, distribution-position: right bottom
+                        TBEditField: id: project_name, text: "MyGame"
+                            lp: min-width: 240
+                TBLayout: distribution: gravity
+                    TBTextField: text: "App ID:"
+                    TBLayout: gravity: left right, distribution-position: right bottom
+                        TBEditField: id: app_id, text: "com.companyname.mygame"
+                            lp: min-width: 240
             TBLayout: gravity: left right, distribution-position: right bottom
-                TBEditField: id: project_name, text: "MyGame"
-                    lp: min-width: 240
-        TBLayout: distribution: gravity
-            TBTextField: text: "App ID:"
-            TBLayout: gravity: left right, distribution-position: right bottom
-                TBEditField: id: app_id, text: "com.companyname.mygame"
-                    lp: min-width: 240
-        TBLayout: gravity: left right, distribution-position: right bottom
-            TBImageWidget: id: project_image
-                lp: width: 128, height: 96
+                TBImageWidget: id: project_image
+                    lp: width: 128, height: 96
     TBSeparator: gravity: left right, skin: AESeparator
     TBTextField: text: "Platforms:"
     TBLayout: id: platformcontainer

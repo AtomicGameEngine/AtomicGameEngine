@@ -21,3 +21,4 @@ node_modules/*
 Script/TypeScript/**/*.d.ts
 !Script/TypeScript/**/*Work.d.ts
 Script/Haxe/*
+**/.vscode

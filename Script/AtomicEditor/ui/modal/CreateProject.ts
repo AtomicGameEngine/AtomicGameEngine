@@ -163,8 +163,10 @@ class CreateProject extends ModalWindow {
             let selectedLanguage = this.projectLanguageField.text;
 
             // Check whether we have a required IDE installed for C# projects
+            var atomicNET = false;
             if (selectedLanguage == "CSharp" || selectedLanguage == "C#") {
 
+                atomicNET = true;
                 if (!ToolCore.netProjectSystem.getIDEAvailable()) {
                     this.hide();
                     EditorUI.getModelOps().showAtomicNETWindow();
@@ -191,6 +193,7 @@ class CreateProject extends ModalWindow {
                 var utils = new Editor.FileUtils();
 
                 utils.createDirs(folder + "Cache");
+                utils.createDirs(folder + "Settings");
 
                 if (!fileSystem.dirExists(folder)) {
                     var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
@@ -212,6 +215,43 @@ class CreateProject extends ModalWindow {
                 fileResults = fileSystem.scanDir(folder, "*.userprefs", Atomic.SCAN_FILES, false);
                 if (fileResults.length === 1) {
                     fileSystem.rename(folder + fileResults[0], folder + name + ".userprefs");
+                }
+
+                // create project settings
+
+                var platforms = ["desktop"];
+
+                if (this.androidButton.value == 1) {
+                    platforms.push("android");
+                }
+                
+                if (this.iosButton.value == 1) {
+                    platforms.push("ios");
+                }
+
+                var projectSettings = {
+                    name : name,
+                    platforms : platforms
+                }
+
+                var jsonFile = new Atomic.File(folder + "Settings/Project.json", Atomic.FILE_WRITE);
+                if (jsonFile.isOpen()) {
+                    jsonFile.writeString(JSON.stringify(projectSettings, null, 2));
+                    jsonFile.flush();
+                    jsonFile.close();
+                }
+
+                // Generate AtomicNET project if necessary
+                if (atomicNET) {
+                    if (!ProjectTemplates.generateAtomicNETProject({
+                        name: name,
+                        platforms : platforms,
+                        projectFolder : folder
+                    })) {
+                        var message = "Unable to generate AtomicNET project: " + folder;
+                        EditorUI.showModalError("New Project Editor Error", message);
+                        return false;
+                    }
                 }
 
                 this.hide();

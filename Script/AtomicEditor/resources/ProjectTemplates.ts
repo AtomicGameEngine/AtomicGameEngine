@@ -112,3 +112,168 @@ export function GetNewFileTemplateDefinitions(fileTemplateType: string) : Editor
     const templates = JSON.parse(file.readText());
     return templates[fileTemplateType] || [];
 }
+
+// AtomicNET
+
+export interface AtomicNETProjectInfo {
+    name: string;
+    platforms: string[];
+    projectFolder: string;
+}
+
+var atomicNETProjectInfo:AtomicNETProjectInfo;
+
+/**
+ * Processes an AtomicNET template, replacing strings with settings
+ * @param  {string} filename
+ * @param  {string} templateFilename
+ * @return {boolean}
+ */
+function processAtomicNETTemplate(filename:string, templateFilename:string) : boolean {
+
+    let file = new Atomic.File(templateFilename, Atomic.FILE_READ);
+
+    if (!file.isOpen()) {
+        console.log("Failed to open: ", templateFilename);
+        return false;
+    }
+
+    let text = file.readText();
+
+    text = text.split("$$APPLICATION_NAME$$").join(atomicNETProjectInfo.name);
+
+    let fileOut = new Atomic.File(filename, Atomic.FILE_WRITE);
+
+    if (!fileOut.isOpen()) {
+        console.log("Failed to open for write: ", filename);
+        return false;
+    }
+
+    fileOut.writeString(text);
+
+    file.close();
+    
+    return true;
+}
+
+/**
+ * Generates the Android portion of an AtomicNET project
+ * @return {boolean}
+ */
+function generateAtomicNETAndroidProject():boolean {
+    
+    let env = ToolCore.toolEnvironment;
+    let utils = new Editor.FileUtils();
+    let templateFolder = env.toolDataDir + "AtomicNET/ProjectTemplate/";
+    let androidFolder = Atomic.addTrailingSlash(atomicNETProjectInfo.projectFolder) + "Project/AtomicNET/Platforms/Android/";
+
+    let fileSystem = Atomic.fileSystem;
+
+    // Create necessary folders
+    let folders = ["Properties", "Resources/drawable", "Resources/values"];
+    for (var i = 0; i < folders.length; i++) {
+
+        let folder = androidFolder + folders[i];
+
+        if (!fileSystem.dirExists(folder)) {
+
+            if (!utils.createDirs(folder))
+                return false;
+        }        
+
+    }
+
+    let textFiles = [".cs", ".xml"];
+
+    let files = ["MainActivity.cs", "Resources/Resource.Designer.cs", "Resources/drawable/icon.png",
+                 "Resources/values/Strings.xml", "Properties/AndroidManifest.xml", "Properties/AssemblyInfo.cs"];
+
+    for (var i = 0; i < files.length; i++) {
+
+        let templateName = templateFolder + "Platforms/Android/" + files[i];
+        let filename = androidFolder + files[i];
+
+        if (textFiles.indexOf(Atomic.getExtension(templateName)) == -1) {
+
+            if (!fileSystem.copy(templateName, filename)) {
+
+                console.log("Failed to copy: ", templateName, " to ",  filename);
+                return false;
+            }
+
+        } else {
+
+            if (!processAtomicNETTemplate(filename, templateName)) {
+                return false;
+            }
+
+        }
+
+    }
+                 
+    return true;
+}
+
+/**
+ * Generates the Desktop portion of an AtomicNET project
+ * @return {boolean}
+ */
+function generateAtomicNETDesktopProject():boolean {
+    
+    let env = ToolCore.toolEnvironment;
+    let utils = new Editor.FileUtils();
+    let templateFolder = env.toolDataDir + "AtomicNET/ProjectTemplate/";
+    let desktopFolder = Atomic.addTrailingSlash(atomicNETProjectInfo.projectFolder) + "Project/AtomicNET/Platforms/Desktop/";
+
+    let fileSystem = Atomic.fileSystem;
+
+    if (!fileSystem.dirExists(desktopFolder)) {
+
+        if (!utils.createDirs(desktopFolder))
+            return false;
+    }
+
+    if (!fileSystem.copy(templateFolder + "Platforms/Desktop/Program.cs", desktopFolder + "Program.cs")) {
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
+ * Generates an AtomicNET project from templates
+ * @param  {AtomicNETProjectInfo} projectInfo
+ * @return {boolean}
+ */
+export function generateAtomicNETProject(projectInfo:AtomicNETProjectInfo):boolean {
+
+    atomicNETProjectInfo = projectInfo;
+
+    let env = ToolCore.toolEnvironment;
+    let templateFolder = env.toolDataDir + "AtomicNET/ProjectTemplate/";
+    let platformsFolder = Atomic.addTrailingSlash(projectInfo.projectFolder) + "Project/AtomicNET/Platforms/";
+
+    let utils = new Editor.FileUtils();
+    let fileSystem = Atomic.fileSystem;
+
+    if (!fileSystem.dirExists(platformsFolder)) {
+
+        if (!utils.createDirs(platformsFolder))
+            return false;
+    }
+
+    if (!generateAtomicNETDesktopProject()) {
+        return false;
+    }
+
+    if (projectInfo.platforms.indexOf("android") != -1) {
+
+        if (!generateAtomicNETAndroidProject()) {
+            return false;
+        }
+
+    }
+
+    return true;
+}
