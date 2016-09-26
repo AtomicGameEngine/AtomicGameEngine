@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Linq;
 
 using AtomicEngine;
+$$APPLICATION_NAMESPACE$$
 
 namespace AtomicPlayer
 {
@@ -11,7 +12,7 @@ namespace AtomicPlayer
     {
         public static void Main(string[] args)
         {
-            Application.Run<AtomicMain>(args);
+            Application.Run<$$APPLICATION_APPDELEGATECLASS$$>(args);
         }
     }
 }

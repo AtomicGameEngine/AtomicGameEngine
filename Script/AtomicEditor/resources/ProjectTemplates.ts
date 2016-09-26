@@ -30,6 +30,8 @@ export interface ProjectTemplateDefinition {
     screenshot: string;
     folder: string;
     languages: string[];
+    appDelegateClass: string;
+    namespace: string[];
 }
 
 // Supported project languages
@@ -143,6 +145,7 @@ export interface AtomicNETProjectInfo {
     appID: string;
     platforms: string[];
     projectFolder: string;
+    projectTemplate: ProjectTemplateDefinition;
 }
 
 var atomicNETProjectInfo:AtomicNETProjectInfo;
@@ -164,8 +167,20 @@ function processAtomicNETTemplate(filename:string, templateFilename:string) : bo
 
     let text = file.readText();
 
+    let _namespace = "";
+    if (atomicNETProjectInfo.projectTemplate.namespace) {
+        _namespace = "using " + atomicNETProjectInfo.projectTemplate.namespace + ";";
+    }
+
+    let appDelegateClass = "AtomicMain";
+    if (atomicNETProjectInfo.projectTemplate.appDelegateClass) {
+        appDelegateClass = atomicNETProjectInfo.projectTemplate.appDelegateClass;
+    }
+
     text = text.split("$$APPLICATION_NAME$$").join(atomicNETProjectInfo.name);
     text = text.split("$$APPLICATION_ID$$").join(atomicNETProjectInfo.appID);
+    text = text.split("$$APPLICATION_APPDELEGATECLASS$$").join(appDelegateClass);
+    text = text.split("$$APPLICATION_NAMESPACE$$").join(_namespace);
 
     let fileOut = new Atomic.File(filename, Atomic.FILE_WRITE);
 
@@ -317,10 +332,10 @@ function generateAtomicNETDesktopProject():boolean {
             return false;
     }
 
-    if (!fileSystem.copy(templateFolder + "Platforms/Desktop/Program.cs", desktopFolder + "Program.cs")) {
+    if (!processAtomicNETTemplate(desktopFolder + "Program.cs", templateFolder + "Platforms/Desktop/Program.cs")) {
         return false;
     }
-
+    
     return true;
 }
 

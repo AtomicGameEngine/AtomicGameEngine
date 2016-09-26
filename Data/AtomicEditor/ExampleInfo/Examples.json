@@ -29,6 +29,8 @@
             "name": "AtomicBlaster",
             "desc" : "Port of ShapeBlaster for XNA by Michael Hoffman",
             "screenshot" : "Example.png",
+            "namespace" : "AtomicBlaster",
+            "appDelegateClass" : "GameRoot",
             "folder" : "AtomicBlaster"
         },
         {

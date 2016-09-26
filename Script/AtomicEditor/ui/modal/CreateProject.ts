@@ -242,7 +242,8 @@ class CreateProject extends ModalWindow {
                         name: name,
                         appID : this.appIDField.text,
                         platforms : platforms,
-                        projectFolder : folder
+                        projectFolder : folder,
+                        projectTemplate : this.projectTemplate
                     })) {
                         var message = "Unable to generate AtomicNET project: " + folder;
                         EditorUI.showModalError("New Project Editor Error", message);
