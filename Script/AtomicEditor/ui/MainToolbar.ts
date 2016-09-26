@@ -76,10 +76,21 @@ class MainToolbar extends Atomic.UIWidget {
             var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
         });
+
         this.subscribeToEvent(EditorEvents.PlayerResumed, (data) => {
             var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
         });
+
+        // TODO: We need better control over playmode during NET compiles
+        this.subscribeToEvent("NETBuildBegin", (data) => {
+            this.playButton.disable();
+        });
+
+        this.subscribeToEvent("NETBuildResult", (data) => {
+            this.playButton.enable();
+        });
+
     }
 
     handleGizmoAxisModeChanged(ev: Editor.GizmoAxisModeChangedEvent) {
