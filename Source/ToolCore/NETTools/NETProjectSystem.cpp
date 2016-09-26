@@ -241,7 +241,7 @@ namespace ToolCore
         }
 
         // TODO: Generalize and move me
-        if (project->GetSupportsPlatform("android"))
+        if (project->GetSupportsPlatform("android") || project->GetSupportsPlatform("ios"))
         {
             FileSystem* fileSystem = GetSubsystem<FileSystem>();
 

@@ -28,7 +28,7 @@
         {
             "name": "AtomicBlaster",
             "desc" : "Port of ShapeBlaster for XNA by Michael Hoffman",
-            "screenshot" : "Example.png",
+            "screenshot" : "AtomicBlaster.png",
             "namespace" : "AtomicBlaster",
             "appDelegateClass" : "GameRoot",
             "folder" : "AtomicBlaster"
@@ -42,7 +42,7 @@
         {
             "name": "AtomicMutant",
             "desc" : "Character Controller with Physics",
-            "screenshot" : "Example.png",
+            "screenshot" : "AtomicMutant.png",
             "folder" : "AtomicMutant"
         },
         {
