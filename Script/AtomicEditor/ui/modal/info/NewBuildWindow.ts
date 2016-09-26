@@ -90,6 +90,8 @@ class NewBuildWindow extends ModalWindow {
 
 • <color #D4FB79>Visual Studio</color> and <color #D4FB79>Xamarin Studio</color> integration (with VSCode support coming soon!)
 
+• Updated to TypeScript 2.0
+
 • Physically Based Rendering (PBR) - Thanks to @dragonCASTjosh
 
 • New examples and project templates

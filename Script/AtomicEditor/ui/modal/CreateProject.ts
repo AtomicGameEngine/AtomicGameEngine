@@ -150,12 +150,10 @@ class CreateProject extends ModalWindow {
 
         }
 
-
         folder = Atomic.addTrailingSlash(folder);
         if (!fileSystem.dirExists(folder)) {
 
             // Determine if we have a language template for the selected language.
-            let templateDetail: ProjectTemplates.ProjectTemplateDetail;
             let selectedLanguage = this.projectLanguageField.text;
 
             // Check whether we have a required IDE installed for C# projects
@@ -170,18 +168,19 @@ class CreateProject extends ModalWindow {
                 }
             }
 
-            for (let i = 0; i < this.projectTemplate.templates.length; i++) {
-                if (this.projectTemplate.templates[i].language === selectedLanguage) {
-                    templateDetail = this.projectTemplate.templates[i];
+            let templateFolder = "";
+            for (let i = 0; i < this.projectTemplate.languages.length; i++) {
+                if (this.projectTemplate.languages[i] === selectedLanguage) {
+                    templateFolder = this.projectTemplate.folder + selectedLanguage + "/";
                     break;
                 }
             }
 
             // Do the creation!
-            if (templateDetail && fileSystem.dirExists(templateDetail.folder)) {
+            if (templateFolder != "" && fileSystem.dirExists(templateFolder)) {
 
-                if (!fileSystem.copyDir(templateDetail.folder, folder)) {
-                  var message = "Unable to copy folder: " + templateDetail.folder + " to " + folder;
+                if (!fileSystem.copyDir(templateFolder, folder)) {
+                  var message = "Unable to copy folder: " + templateFolder + " to " + folder;
                   EditorUI.showModalError("New Project Editor Error", message);
                   return false;
                 }
@@ -243,7 +242,8 @@ class CreateProject extends ModalWindow {
                         name: name,
                         appID : this.appIDField.text,
                         platforms : platforms,
-                        projectFolder : folder
+                        projectFolder : folder,
+                        projectTemplate : this.projectTemplate
                     })) {
                         var message = "Unable to generate AtomicNET project: " + folder;
                         EditorUI.showModalError("New Project Editor Error", message);
@@ -260,7 +260,7 @@ class CreateProject extends ModalWindow {
                     "Unable to create project for:",
                     "",
                     `language: ${selectedLanguage}`,
-                    `template: ${templateDetail.folder}`,
+                    `template: ${templateFolder}`,
                     "",
                     "Please choose a different language."
                 ].join("\n");
@@ -269,6 +269,7 @@ class CreateProject extends ModalWindow {
                 return false;
             }
         }
+
         return false;
     }
 
@@ -340,10 +341,11 @@ class CreateProject extends ModalWindow {
      * list.
      */
     populateLanguageSelectionList() {
+
         this.projectLanguageFieldSource.clear();
 
-        this.projectTemplate.templates.forEach(templateDetail => {
-            this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(templateDetail.language));
+        this.projectTemplate.languages.forEach(language => {
+            this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(language));
         });
 
         this.projectLanguageField.source = this.projectLanguageFieldSource;

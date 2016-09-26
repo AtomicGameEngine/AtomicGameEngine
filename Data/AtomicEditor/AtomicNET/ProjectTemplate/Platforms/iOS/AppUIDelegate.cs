@@ -3,6 +3,7 @@ using UIKit;
 using System.Threading.Tasks;
 
 using AtomicEngine;
+$$APPLICATION_NAMESPACE$$
 
 namespace AtomicPlayer
 {
@@ -18,7 +19,7 @@ namespace AtomicPlayer
         async void LaunchGame()
         {
             await Task.Yield();
-            Application.Run<AtomicMain>(new string[0]);
+            Application.Run<$$APPLICATION_APPDELEGATECLASS$$>(new string[0]);
         }
     }
 }

@@ -28,18 +28,14 @@ export interface ProjectTemplateDefinition {
     name: string;
     desc: string;
     screenshot: string;
-    templates: [ProjectTemplateDetail];
     folder: string;
-    module: string;
+    languages: string[];
+    appDelegateClass: string;
+    namespace: string[];
 }
 
-/**
- * Inner details of the project template.
- */
-export interface ProjectTemplateDetail {
-    language: string;
-    folder: string;
-}
+// Supported project languages
+var projectLanguages = ["CSharp", "JavaScript", "TypeScript"];
 
 /**
  * Returns the structured template definition for the provided project type.
@@ -48,7 +44,10 @@ export interface ProjectTemplateDetail {
  * @return {ProjectTemplateDefinition}              the template definition for the proved project type
  */
 export function getNewProjectTemplateDefinition(projectType: string): ProjectTemplateDefinition {
+
     var env = ToolCore.toolEnvironment;
+    let fileSystem = Atomic.fileSystem;
+    let exampleInfoDir = env.toolDataDir + "ExampleInfo/";
     var projectTemplateFolder = env.toolDataDir + "ProjectTemplates/";
     var projectTemplateJsonFile = projectTemplateFolder + "ProjectTemplates.json";
     let jsonFile = new Atomic.File(projectTemplateJsonFile, Atomic.FILE_READ);
@@ -59,10 +58,22 @@ export function getNewProjectTemplateDefinition(projectType: string): ProjectTem
     // Update all the paths to a more fully qualified path
     let json = JSON.parse(jsonFile.readText());
     let projectTemplate = <ProjectTemplateDefinition>json[projectType];
+
     if (projectTemplate) {
-        projectTemplate.templates.forEach(template => {
-            template.folder = projectTemplateFolder + template.folder + "/";
-        });
+
+        projectTemplate.screenshot = exampleInfoDir + projectTemplate.screenshot;
+        projectTemplate.folder = projectTemplateFolder + projectTemplate.folder + "/";
+
+        projectTemplate.languages = [];
+
+        for (var i = 0; i < projectLanguages.length; i++) {
+
+            if (fileSystem.dirExists(projectTemplate.folder + projectLanguages[i])) {
+                projectTemplate.languages.push(projectLanguages[i]);
+            }
+
+        }
+
     }
 
     return projectTemplate;
@@ -74,7 +85,9 @@ export function getNewProjectTemplateDefinition(projectType: string): ProjectTem
  * @return {[ProjectTemplateDefinition]} Array of example project definitions.
  */
 export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefinition] {
+
     let env = ToolCore.toolEnvironment;
+    let fileSystem = Atomic.fileSystem;
     let exampleInfoDir = env.toolDataDir + "ExampleInfo/";
     let exampleJsonFile = exampleInfoDir + "Examples.json";
     let jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
@@ -88,11 +101,23 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
 
     // Update all the paths to a more fully qualified path
     examples.forEach(example => {
+
+        example.folder = env.toolDataDir + "AtomicExamples/" + example.folder + "/";
+
+        example.languages = [];
+
+        for (var i = 0; i < projectLanguages.length; i++) {
+
+            if (fileSystem.dirExists(example.folder + projectLanguages[i])) {
+                example.languages.push(projectLanguages[i]);
+            }
+
+        }
+
         example.screenshot = exampleInfoDir + example.screenshot;
-        example.templates.forEach(template => {
-            template.folder = env.toolDataDir + "AtomicExamples/" + template.folder + "/";
-        });
+
     });
+
     return exampleJson.examples;
 }
 
@@ -120,6 +145,7 @@ export interface AtomicNETProjectInfo {
     appID: string;
     platforms: string[];
     projectFolder: string;
+    projectTemplate: ProjectTemplateDefinition;
 }
 
 var atomicNETProjectInfo:AtomicNETProjectInfo;
@@ -141,8 +167,20 @@ function processAtomicNETTemplate(filename:string, templateFilename:string) : bo
 
     let text = file.readText();
 
+    let _namespace = "";
+    if (atomicNETProjectInfo.projectTemplate.namespace) {
+        _namespace = "using " + atomicNETProjectInfo.projectTemplate.namespace + ";";
+    }
+
+    let appDelegateClass = "AtomicMain";
+    if (atomicNETProjectInfo.projectTemplate.appDelegateClass) {
+        appDelegateClass = atomicNETProjectInfo.projectTemplate.appDelegateClass;
+    }
+
     text = text.split("$$APPLICATION_NAME$$").join(atomicNETProjectInfo.name);
     text = text.split("$$APPLICATION_ID$$").join(atomicNETProjectInfo.appID);
+    text = text.split("$$APPLICATION_APPDELEGATECLASS$$").join(appDelegateClass);
+    text = text.split("$$APPLICATION_NAMESPACE$$").join(_namespace);
 
     let fileOut = new Atomic.File(filename, Atomic.FILE_WRITE);
 
@@ -294,10 +332,10 @@ function generateAtomicNETDesktopProject():boolean {
             return false;
     }
 
-    if (!fileSystem.copy(templateFolder + "Platforms/Desktop/Program.cs", desktopFolder + "Program.cs")) {
+    if (!processAtomicNETTemplate(desktopFolder + "Program.cs", templateFolder + "Platforms/Desktop/Program.cs")) {
         return false;
     }
-
+    
     return true;
 }
 

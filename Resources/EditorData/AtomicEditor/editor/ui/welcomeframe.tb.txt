@@ -32,9 +32,19 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
         TBLayout: distribution: gravity, axis: y, spacing: 12
             TBLayout: distribution: gravity, size: available
                 TBContainer: gravity: left right
-                    TBLayout: distribution: gravity
-                        TBEditField: text: "More Examples:", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor2
-                        TBButton: id: 'examples_github' text: "https://github.com/AtomicGameEngine/AtomicExamples", skin: TBButton.link
-                        TBWidget: gravity: left right
-            TBScrollContainer: scroll-mode: auto
+                    TBLayout: axis: y, spacing: 12
+                        TBLayout: distribution: gravity
+                            TBEditField: text: "Filter Examples:", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor2
+                            TBButton: id: 'examples_csharp', text: "CSharp", value: 0, toggle-mode: 1
+                                lp: width: 92
+                            TBButton: id: 'examples_javascript', text: "JavaScript", value: 0, toggle-mode: 1
+                                lp: width: 92
+                            TBButton: id: 'examples_typescript', text: "TypeScript", value: 0, toggle-mode: 1
+                                lp: width: 92
+                            TBWidget: gravity: left right
+                        TBLayout: distribution: gravity
+                            TBEditField: text: "More Examples:", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor2
+                            TBButton: id: 'examples_github' text: "https://github.com/AtomicGameEngine/AtomicExamples", skin: TBButton.link
+                            TBWidget: gravity: left right
+            TBScrollContainer: id: examples_scroll, scroll-mode: auto
                 TBLayout: id: examples_layout, axis: y, spacing: 12

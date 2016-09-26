@@ -356,6 +356,10 @@ namespace ToolCore
                 return;
             }
 
+            VariantMap buildBeginEventData;
+            buildBeginEventData[NETBuildBegin::P_BUILD] = curBuild_;
+            SendEvent(E_NETBUILDBEGIN, buildBeginEventData);
+
             SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(NETBuildSystem, HandleCompileProcessComplete));
             SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(NETBuildSystem, HandleSubprocessOutput));
 

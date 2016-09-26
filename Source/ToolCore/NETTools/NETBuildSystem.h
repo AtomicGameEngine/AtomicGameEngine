@@ -28,6 +28,10 @@ using namespace Atomic;
 
 namespace ToolCore
 {
+    ATOMIC_EVENT(E_NETBUILDBEGIN, NETBuildBegin)
+    {
+        ATOMIC_PARAM(P_BUILD, Build); // NETBuild*
+    }
 
     ATOMIC_EVENT(E_NETBUILDRESULT, NETBuildResult)
     {
