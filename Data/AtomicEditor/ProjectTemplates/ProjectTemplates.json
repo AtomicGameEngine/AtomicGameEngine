@@ -1,62 +1,20 @@
 {
     "project_2d": {
         "desc": "",
-        "module": "2D",
         "name": "2D Project",
-        "screenshot": "",
-        "templates": [
-            {
-                "folder": "Project2D/JavaScript",
-                "language": "JavaScript"
-            },
-            {
-                "folder": "Project2D/TypeScript",
-                "language": "TypeScript"
-            },
-            {
-                "folder": "Project2D/CSharp",
-                "language": "CSharp"
-            }
-        ]
+        "screenshot" : "Basic2D.png",
+        "folder" : "Project2D"
     },
     "project_3d": {
         "desc": "",
-        "module": "3D",
         "name": "3D Project",
-        "screenshot": "",
-        "templates": [
-            {
-                "folder": "Project3D/JavaScript",
-                "language": "JavaScript"
-            },
-            {
-                "folder": "Project3D/TypeScript",
-                "language": "TypeScript"
-            },
-            {
-                "folder": "Project3D/CSharp",
-                "language": "CSharp"
-            }
-        ]
+        "screenshot" : "Basic3D.png",
+        "folder" : "Project3D"
     },
     "project_empty": {
         "desc": "",
-        "module": "",
         "name": "Empty Project",
-        "screenshot": "",
-        "templates": [
-            {
-                "folder": "EmptyProject/JavaScript",
-                "language": "JavaScript"
-            },
-            {
-                "folder": "EmptyProject/TypeScript",
-                "language": "TypeScript"
-            },
-            {
-                "folder": "EmptyProject/CSharp",
-                "language": "CSharp"
-            }
-        ]
+        "screenshot": "Example.png",
+        "folder" : "EmptyProject"
     }
 }

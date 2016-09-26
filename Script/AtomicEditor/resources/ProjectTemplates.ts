@@ -28,18 +28,12 @@ export interface ProjectTemplateDefinition {
     name: string;
     desc: string;
     screenshot: string;
-    templates: [ProjectTemplateDetail];
     folder: string;
-    module: string;
+    languages: string[];
 }
 
-/**
- * Inner details of the project template.
- */
-export interface ProjectTemplateDetail {
-    language: string;
-    folder: string;
-}
+// Supported project languages
+var projectLanguages = ["CSharp", "JavaScript", "TypeScript"];
 
 /**
  * Returns the structured template definition for the provided project type.
@@ -48,7 +42,10 @@ export interface ProjectTemplateDetail {
  * @return {ProjectTemplateDefinition}              the template definition for the proved project type
  */
 export function getNewProjectTemplateDefinition(projectType: string): ProjectTemplateDefinition {
+
     var env = ToolCore.toolEnvironment;
+    let fileSystem = Atomic.fileSystem;
+    let exampleInfoDir = env.toolDataDir + "ExampleInfo/";
     var projectTemplateFolder = env.toolDataDir + "ProjectTemplates/";
     var projectTemplateJsonFile = projectTemplateFolder + "ProjectTemplates.json";
     let jsonFile = new Atomic.File(projectTemplateJsonFile, Atomic.FILE_READ);
@@ -59,10 +56,22 @@ export function getNewProjectTemplateDefinition(projectType: string): ProjectTem
     // Update all the paths to a more fully qualified path
     let json = JSON.parse(jsonFile.readText());
     let projectTemplate = <ProjectTemplateDefinition>json[projectType];
+
     if (projectTemplate) {
-        projectTemplate.templates.forEach(template => {
-            template.folder = projectTemplateFolder + template.folder + "/";
-        });
+
+        projectTemplate.screenshot = exampleInfoDir + projectTemplate.screenshot;
+        projectTemplate.folder = projectTemplateFolder + projectTemplate.folder + "/";
+
+        projectTemplate.languages = [];
+
+        for (var i = 0; i < projectLanguages.length; i++) {
+
+            if (fileSystem.dirExists(projectTemplate.folder + projectLanguages[i])) {
+                projectTemplate.languages.push(projectLanguages[i]);
+            }
+
+        }
+
     }
 
     return projectTemplate;
@@ -74,7 +83,9 @@ export function getNewProjectTemplateDefinition(projectType: string): ProjectTem
  * @return {[ProjectTemplateDefinition]} Array of example project definitions.
  */
 export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefinition] {
+
     let env = ToolCore.toolEnvironment;
+    let fileSystem = Atomic.fileSystem;
     let exampleInfoDir = env.toolDataDir + "ExampleInfo/";
     let exampleJsonFile = exampleInfoDir + "Examples.json";
     let jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
@@ -88,11 +99,23 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
 
     // Update all the paths to a more fully qualified path
     examples.forEach(example => {
+
+        example.folder = env.toolDataDir + "AtomicExamples/" + example.folder + "/";
+
+        example.languages = [];
+
+        for (var i = 0; i < projectLanguages.length; i++) {
+
+            if (fileSystem.dirExists(example.folder + projectLanguages[i])) {
+                example.languages.push(projectLanguages[i]);
+            }
+
+        }
+
         example.screenshot = exampleInfoDir + example.screenshot;
-        example.templates.forEach(template => {
-            template.folder = env.toolDataDir + "AtomicExamples/" + template.folder + "/";
-        });
+
     });
+
     return exampleJson.examples;
 }
 

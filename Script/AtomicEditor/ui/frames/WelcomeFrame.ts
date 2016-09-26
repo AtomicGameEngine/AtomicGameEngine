@@ -35,6 +35,16 @@ class WelcomeFrame extends ScriptWidget {
         this.load("AtomicEditor/editor/ui/welcomeframe.tb.txt");
 
         var recentProjects = <Atomic.UILayout>this.getWidget("recentprojects");
+
+        this.examplesLayout = <Atomic.UILayout>this.getWidget("examples_layout");
+        this.examplesCSharp = <Atomic.UIButton>this.getWidget("examples_csharp");
+        this.examplesJavaScript = <Atomic.UIButton>this.getWidget("examples_javascript");
+        this.examplesTypeScript = <Atomic.UIButton>this.getWidget("examples_typescript");
+
+        this.examplesCSharp.onClick = () => { this.handleExampleFilter(); }
+        this.examplesJavaScript.onClick = () => { this.handleExampleFilter(); }
+        this.examplesTypeScript.onClick = () => { this.handleExampleFilter(); }
+
         this.gravity = Atomic.UI_GRAVITY_ALL;
 
         this.recentList = new Atomic.UIListView();
@@ -67,24 +77,40 @@ class WelcomeFrame extends ScriptWidget {
 
         var fileSystem = Atomic.getFileSystem();
 
-        // Verify that at least one of the projects for this example exists, otherwise bounce out
+        let languages = [];
+        if (this.examplesCSharp.value) {
+            languages.push("CSharp");
+        }
+        if (this.examplesJavaScript.value) {
+            languages.push("JavaScript");
+        }
+        if (this.examplesTypeScript.value) {
+            languages.push("TypeScript");
+        }
+
+        // If user doesn't select any languages, show 'em all'
+        if (!languages.length) {
+            languages = ["CSharp", "JavaScript", "TypeScript"];
+        }
+
         let exists = false;
-        example.templates.forEach(template => {
-            if (fileSystem.dirExists(template.folder)) {
+
+        for (var i = 0; i < languages.length; i++) {
+
+            if (example.languages.indexOf(languages[i]) != -1) {
                 exists = true;
+                break;
             }
-        });
+        }
 
         if (!exists) {
             return;
         }
 
-        var exlayout = <Atomic.UILayout>this.getWidget("examples_layout");
-
         if (!this.currentExampleLayout) {
             this.currentExampleLayout = new Atomic.UILayout();
             this.currentExampleLayout.spacing = 8;
-            exlayout.addChild(this.currentExampleLayout);
+            this.examplesLayout.addChild(this.currentExampleLayout);
         }
 
         // 200x150
@@ -172,7 +198,18 @@ class WelcomeFrame extends ScriptWidget {
 
     }
 
+    handleExampleFilter() {
+
+        this.initExampleBrowser();
+
+    }
+
     initExampleBrowser() {
+
+        this.exampleCount = 0;
+        this.examplesLayout.deleteAllChildren();
+        this.currentExampleLayout = null;
+
         let examples = ProjectTemplates.getExampleProjectTemplateDefinitions();
         for (var i = 0; i < examples.length; i++) {
             this.addExample(examples[i]);
@@ -254,7 +291,13 @@ class WelcomeFrame extends ScriptWidget {
 
     // examples
     exampleCount = 0;
+
     currentExampleLayout: Atomic.UILayout;
+    examplesLayout:Atomic.UILayout;
+
+    examplesCSharp: Atomic.UIButton;
+    examplesJavaScript: Atomic.UIButton;
+    examplesTypeScript: Atomic.UIButton;
 
     recent: string[] = [];
     recentList: Atomic.UIListView;
