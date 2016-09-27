@@ -283,7 +283,7 @@ namespace ToolCore
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
-            String cmdToolsPath = Poco::Environment::get("VS140COMNTOOLS").c_str();
+            String cmdToolsPath = Poco::Environment::get("VS140COMNTOOLS", "").c_str();
 
             if (!cmdToolsPath.Length())
             {
