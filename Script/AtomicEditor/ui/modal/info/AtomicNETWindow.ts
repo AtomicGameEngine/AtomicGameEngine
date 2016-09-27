@@ -65,8 +65,8 @@ class AtomicNETWindow extends ModalWindow {
                 this.hide();
 
                 Atomic.fileSystem.systemOpen(Atomic.platform == "Windows" ?
-                "https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx" :
-                "https://www.xamarin.com/download");
+                "https://www.visualstudio.com/vs/community/" :
+                "https://www.xamarin.com/download/");
 
             }
         }
