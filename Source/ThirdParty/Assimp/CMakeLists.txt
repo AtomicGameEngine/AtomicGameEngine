@@ -371,13 +371,22 @@ ADD_ASSIMP_IMPORTER(OGRE
   code/OgreMaterial.cpp
 )
 
-ADD_ASSIMP_IMPORTER(OPENGEX
-  code/OpenGEXExporter.cpp
-  code/OpenGEXExporter.h
-  code/OpenGEXImporter.cpp
-  code/OpenGEXImporter.h
-  code/OpenGEXStructs.h
-)
+# ATOMIC BEGIN
+# https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1045
+# Disable as it depends on openddl which has problems
+# TODO: update to latest Assimp which includes fixes for openddl
+# Though we still don't use opengex
+#ADD_ASSIMP_IMPORTER(OPENGEX
+#  code/OpenGEXExporter.cpp
+#  code/OpenGEXExporter.h
+#  code/OpenGEXImporter.cpp
+#  code/OpenGEXImporter.h
+#  code/OpenGEXStructs.h
+#)
+
+add_definitions(-DASSIMP_BUILD_NO_OPENGEX_IMPORTER=1)
+
+# ATOMIC END
 
 ADD_ASSIMP_IMPORTER(PLY
   code/PlyLoader.cpp
@@ -674,17 +683,22 @@ SET( zlib_SRCS
 )
 SOURCE_GROUP( zlib FILES ${zlib_SRCS})
 
-SET ( openddl_parser_SRCS
-  contrib/openddlparser/code/OpenDDLParser.cpp
-  contrib/openddlparser/code/DDLNode.cpp
-  contrib/openddlparser/code/Value.cpp
-  contrib/openddlparser/include/openddlparser/OpenDDLParser.h
-  contrib/openddlparser/include/openddlparser/OpenDDLParserUtils.h
-  contrib/openddlparser/include/openddlparser/OpenDDLCommon.h
-  contrib/openddlparser/include/openddlparser/DDLNode.h
-  contrib/openddlparser/include/openddlparser/Value.h
-)
-SOURCE_GROUP( openddl_parser FILES ${openddl_parser_SRCS})
+# ATOMIC BEGIN
+# https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1045
+# Disable openddl which has problems
+# TODO: update to latest Assimp which includes fixes for openddl
+# Though we still don't use opengex
+#SET ( openddl_parser_SRCS
+#  contrib/openddlparser/code/OpenDDLParser.cpp
+#  contrib/openddlparser/code/DDLNode.cpp
+#  contrib/openddlparser/code/Value.cpp
+#  contrib/openddlparser/include/openddlparser/OpenDDLParser.h
+#  contrib/openddlparser/include/openddlparser/OpenDDLParserUtils.h
+#  contrib/openddlparser/include/openddlparser/OpenDDLCommon.h
+#  contrib/openddlparser/include/openddlparser/DDLNode.h
+#  contrib/openddlparser/include/openddlparser/Value.h
+#)
+#SOURCE_GROUP( openddl_parser FILES ${openddl_parser_SRCS})
 
 # VC2010 fixes
 if(MSVC10)
