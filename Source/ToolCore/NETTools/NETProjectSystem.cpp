@@ -425,7 +425,7 @@ namespace ToolCore
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
         // Query for Visual Studio 2015 path
-        idePath_ = Poco::Environment::get("VS140COMNTOOLS").c_str();
+        idePath_ = Poco::Environment::get("VS140COMNTOOLS", "").c_str();
 
         if (idePath_.Length())
         {
