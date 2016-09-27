@@ -1,6 +1,6 @@
 TBLayout: axis: y, distribution: gravity
     TBImageWidget: filename: "AtomicEditor/editor/images/newbuilddetected_header.jpg"
-        lp: width: 500, height: 167, min-width: 500, min-height: 167
+        lp: width: 512, height: 167, min-width: 512, min-height: 167
     TBEditField: multiline: 1, styling: 1, gravity: all, id: newbuild_text, readonly: 1, adapt-to-content: 0
         font: size: 13
         lp: min-width: 480, min-height: 274

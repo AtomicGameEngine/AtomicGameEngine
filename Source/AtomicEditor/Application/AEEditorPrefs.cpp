@@ -77,7 +77,6 @@ namespace AtomicEditor
 
     bool AEEditorPrefs::ReadPreferences(VariantMap& engineParameters)
     {
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
         String path = GetPreferencesPath();
 
         JSONValue prefs;

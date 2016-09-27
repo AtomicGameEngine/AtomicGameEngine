@@ -62,10 +62,13 @@ InstallDirRegKey HKLM "Software\${coname}\InstallDir" "${prodname}"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 	; These indented statements modify settings for MUI_PAGE_FINISH
-	!define MUI_FINISHPAGE_NOAUTOCLOSE
-	!define MUI_FINISHPAGE_RUN "$INSTDIR\${appexe}"
-	!define MUI_FINISHPAGE_RUN_CHECKED
-	!define MUI_FINISHPAGE_RUN_TEXT "Launch the Atomic Editor"
+	; The installer runs in elevated mode, NSIS doesn't have a  way
+	; without plugins to run the installed application in normal user mode
+	; so disabling launch checkbox, look into a MSI replacement
+	;!define MUI_FINISHPAGE_NOAUTOCLOSE
+	;!define MUI_FINISHPAGE_RUN "$INSTDIR\${appexe}"
+	;!define MUI_FINISHPAGE_RUN_CHECKED
+	;!define MUI_FINISHPAGE_RUN_TEXT "Launch the Atomic Editor"
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM

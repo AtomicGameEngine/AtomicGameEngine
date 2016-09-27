@@ -43,19 +43,45 @@ class Shortcuts extends Atomic.ScriptObject {
         if (Atomic.editorMode.isPlayerEnabled()) {
             this.sendEvent("IPCPlayerExitRequest");
         } else {
+
             var playerWindow = Preferences.getInstance().playerWindow;
+
             if (playerWindow) {
+
                 if ((playerWindow.monitor + 1) > Atomic.graphics.getNumMonitors()) {
                     //will use default settings if monitor is not available
                     var args = "--resizable";
                     Atomic.editorMode.playProject(args, debug);
+
                 } else {
+
+                    if (playerWindow.width == 0 || playerWindow.height == 0) {
+
+                        playerWindow.width = Atomic.graphics.width * .75;
+                        // 16:9
+                        playerWindow.height = playerWindow.width * .56;
+
+                        let pos = Atomic.graphics.windowPosition;
+
+                        playerWindow.x = pos[0] + (Atomic.graphics.width/2 - playerWindow.width/2);
+                        playerWindow.y = pos[1] + (Atomic.graphics.height/2 - playerWindow.height/2);
+
+                        // if too small a window, use default (which maximizes)
+                        if (playerWindow.width < 480) {
+                            playerWindow.width = playerWindow.height = playerWindow.x = playerWindow.y = 0;
+                        }
+
+                    }
+
                     var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable" + " --fromEditorPlay";
+
                     if (playerWindow.maximized) {
                         args += " --maximize";
                     }
+
                     Atomic.editorMode.playProject(args, debug);
                 }
+
             } else {
                 Atomic.editorMode.playProject("", debug);
             }
