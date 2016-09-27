@@ -102,7 +102,7 @@ class NewBuildWindow extends ModalWindow {
 
 • Updated to to Monaco VSCode editor 0.6
 
-• Bug fixed, improvements, and optimization
+• Bug fixes, improvements, and optimization
 `;
 
         return text;
