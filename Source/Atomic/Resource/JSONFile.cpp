@@ -186,9 +186,9 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             for (unsigned i = 0; i < jsonArray.Size(); ++i)
             {
 // ATOMIC BEGIN
-				// ATOMIC: Set value before adding to array, see note in JSON_OBJECT case below
+                // ATOMIC: Set value before adding to array, see note in JSON_OBJECT case below
                 rapidjson::Value value;
-				ToRapidjsonValue(value, jsonArray[i], allocator);
+                ToRapidjsonValue(value, jsonArray[i], allocator);
                 rapidjsonValue.PushBack(value, allocator);                
 // ATOMIC END
             }
@@ -203,12 +203,12 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             for (JSONObject::ConstIterator i = jsonObject.Begin(); i != jsonObject.End(); ++i)
             {
 // ATOMIC BEGIN
-				// ATOMIC: Set value before adding member, this fixes a rapidjson crash
-				// when trying to immediately find member (VS2015, release build, difficult to reproduce)
-				// TODO: Submit a PR to upstream
+                // ATOMIC: Set value before adding member, this fixes a rapidjson crash
+                // when trying to immediately find member (VS2015, release build, difficult to reproduce)
+                // TODO: Submit a PR to upstream
                 const char* name = i->first_.CString();
                 rapidjson::Value value;
-				ToRapidjsonValue(value, i->second_, allocator);
+                ToRapidjsonValue(value, i->second_, allocator);
                 rapidjsonValue.AddMember(name, value, allocator);                
 // ATOMIC END
             }
