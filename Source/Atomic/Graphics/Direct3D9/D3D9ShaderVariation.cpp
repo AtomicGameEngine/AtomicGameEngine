@@ -170,6 +170,17 @@ void ShaderVariation::SetDefines(const String& defines)
 
 bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
 {
+    // ATOMIC BEGIN
+
+    // ATOMIC: Disable shader cache until we can bring in configuration updates for writeable paths:
+    // https://github.com/urho3d/Urho3D/commit/a1e2bc9bd3fe0966bb1aae1e911b96b006d155ce
+
+#ifndef ATOMIC_DEV_BUILD
+    return false;
+#endif
+
+    // ATOMIC END
+
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
         return false;
@@ -369,6 +380,18 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 
 void ShaderVariation::SaveByteCode(const String& binaryShaderName)
 {
+
+// ATOMIC BEGIN
+
+    // ATOMIC: Disable shader cache until we can bring in configuration updates for writeable paths:
+    // https://github.com/urho3d/Urho3D/commit/a1e2bc9bd3fe0966bb1aae1e911b96b006d155ce
+    
+#ifndef ATOMIC_DEV_BUILD
+    return;
+#endif
+
+// ATOMIC END
+
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
 
