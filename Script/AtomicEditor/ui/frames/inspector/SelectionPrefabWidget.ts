@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+var breakMode = false;
 
 class SelectionPrefabWidget extends Atomic.UILayout {
 
@@ -44,7 +45,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         var name = new Atomic.UITextField();
         name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        name.skinBg = "InspectorTextAttrName";
+        name.skinBg = "InspectorPrefabTextAttrName";
         name.text = "Prefab";
         name.fontDescription = fd;
 
@@ -70,32 +71,24 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         };
 
         var breakButton = new Atomic.UIButton();
-        breakButton.text = "Break";
+        breakButton.text = "Edit Break";
+        breakButton.toggleMode = true;
+        breakButton.value = breakMode ? 1 : 0;
         breakButton.fontDescription = fd;
+        breakButton.tooltip  = "Remove prefab connection on edit";
 
         breakButton.onClick = () => {
-
-            this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+            breakMode = breakButton.value == 1 ? true : false;
             return true;
         };
 
-        var copyButton = new Atomic.UIButton();
-        copyButton.text = "Copy";
-        copyButton.fontDescription = fd;
+        this.subscribeToEvent("SceneEditEnd", () => {
 
-        copyButton.onClick = () => {
-            this.node.scene.sendEvent("SceneEditPrefabCopy", {node : this.node });
-            return true;
-        };
+            if (breakMode && this.node) {
+                this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+            }
 
-        var pasteButton = new Atomic.UIButton();
-        pasteButton.text = "Paste";
-        pasteButton.fontDescription = fd;
-
-        pasteButton.onClick = () => {
-            this.node.scene.sendEvent("SceneEditPrefabPaste", {node : this.node });
-            return true;
-        };
+        });
 
         var noticeName = new Atomic.UITextField();
         noticeName.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
@@ -116,8 +109,6 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         widgetLayout.addChild(saveButton);
         widgetLayout.addChild(undoButton);
         widgetLayout.addChild(breakButton);
-        widgetLayout.addChild(copyButton);
-        widgetLayout.addChild(pasteButton);
 
         this.addChild(this.widgetLayout);
         this.addChild(this.noticeLayout);
