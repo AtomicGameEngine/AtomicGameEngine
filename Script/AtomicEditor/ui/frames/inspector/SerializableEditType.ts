@@ -87,6 +87,8 @@ class SerializableEditType {
 
     onAttributeInfoEdited(attrInfo: Atomic.AttributeInfo, value: any, index: number = -1, genEdit: boolean = true) {
 
+        let editTypeName = this.objects.length > 0 ? this.objects[0].typeName : "";
+
         for (var i in this.objects) {
 
             var object = this.objects[i];
@@ -125,8 +127,13 @@ class SerializableEditType {
             node = <Atomic.Node>this.objects[0];
         }
 
-        if (node)
+        if (node) {
             node.scene.sendEvent("SceneEditEnd");
+
+            if (editTypeName != "Node") {
+                node.scene.sendEvent("ComponentEditEnd");
+            }
+        }
 
     }
 

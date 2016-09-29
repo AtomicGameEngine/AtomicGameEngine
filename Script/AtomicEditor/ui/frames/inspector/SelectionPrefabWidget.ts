@@ -20,7 +20,9 @@
 // THE SOFTWARE.
 //
 
-var breakMode = false;
+import EditorUI = require("../../EditorUI");
+
+var breakMode = true;
 
 class SelectionPrefabWidget extends Atomic.UILayout {
 
@@ -75,17 +77,19 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         breakButton.toggleMode = true;
         breakButton.value = breakMode ? 1 : 0;
         breakButton.fontDescription = fd;
-        breakButton.tooltip  = "Remove prefab connection on edit";
+        breakButton.tooltip  = "Prompt to remove prefab connection";
 
         breakButton.onClick = () => {
             breakMode = breakButton.value == 1 ? true : false;
             return true;
         };
 
-        this.subscribeToEvent("SceneEditEnd", () => {
+        this.subscribeToEvent("ComponentEditEnd", () => {
 
             if (breakMode && this.node) {
-                this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+
+                var window = new ConfirmPrefabBreak(this.node);
+                window.show();
             }
 
         });
@@ -164,6 +168,81 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
     }
 
+
+}
+
+class ConfirmPrefabBreak extends Atomic.UIWindow {
+
+    constructor(node:Atomic.Node) {
+
+        super();
+
+        this.node = node;
+
+        this.settings = Atomic.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
+
+        this.text = "Break Prefab Connection";
+        this.load("AtomicEditor/editor/ui/breakprefab.tb.txt");
+
+        var message = <Atomic.UIEditField>this.getWidget("message");
+        message.text = "Editing this node will break the prefab connection.\nThis operation cannot be undone, do you want to continue?";
+
+        this.resizeToFitContent();
+        this.center();
+
+        this.dimmer = new Atomic.UIDimmer();
+
+        this.subscribeToEvent("WidgetEvent", (ev) => { this.handleWidgetEvent(ev); });
+
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = ev.target.id;
+
+            if (id == "breakprefab") {
+
+                this.hide();
+
+                this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+
+                return true;
+            }
+
+            if (id == "cancel") {
+
+                this.hide();
+
+                this.node.scene.sendEvent("SceneEditPrefabRevert", {node : this.node});
+
+                return true;
+            }
+
+        }
+    }
+
+    show() {
+
+        var view = EditorUI.getView();
+        view.addChild(this.dimmer);
+        view.addChild(this);
+
+    }
+
+    hide() {
+
+        if (this.dimmer.parent)
+            this.dimmer.parent.removeChild(this.dimmer, false);
+
+        if (this.parent)
+            this.parent.removeChild(this, false);
+
+    }
+
+    node: Atomic.Node;
+    dimmer: Atomic.UIDimmer;
 
 }
 
