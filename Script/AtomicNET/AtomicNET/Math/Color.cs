@@ -25,8 +25,10 @@ namespace AtomicEngine
         }
 
 
-
         public static readonly Color White = new Color(1, 1, 1, 1);
+        public static readonly Color Red = new Color(1, 0, 0, 1);
+        public static readonly Color Blue = new Color(0, 1, 0, 1);
+        public static readonly Color Green = new Color(0, 0, 1, 1);
         public static readonly Color LightBlue = new Color(0.50f, 0.88f, 0.81f);
         public static readonly Color Transparent = new Color(0, 0, 0, 0);
 
