@@ -1,0 +1,8 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBLayout:
+		TBEditField: multiline: 1, readonly: 1, id: message
+			lp: min-width: 640
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: text: Break Prefab Connection, id: breakprefab
+		TBButton: text: Cancel, id: cancel

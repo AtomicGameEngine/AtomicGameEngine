@@ -210,6 +210,12 @@ elements
 		min-width 140
 		max-width 140
 
+	InspectorPrefabTextAttrName
+		padding 4
+		text-color #2c2c2c
+		min-width 110
+		max-width 110
+
 	HierarchyPrefabText
 		text-color #2c2c2c
 	HierarchyPrefabText.selected

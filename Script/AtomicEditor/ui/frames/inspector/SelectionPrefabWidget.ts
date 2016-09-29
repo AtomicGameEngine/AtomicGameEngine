@@ -20,6 +20,9 @@
 // THE SOFTWARE.
 //
 
+import EditorUI = require("../../EditorUI");
+
+var breakMode = true;
 
 class SelectionPrefabWidget extends Atomic.UILayout {
 
@@ -44,7 +47,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         var name = new Atomic.UITextField();
         name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        name.skinBg = "InspectorTextAttrName";
+        name.skinBg = "InspectorPrefabTextAttrName";
         name.text = "Prefab";
         name.fontDescription = fd;
 
@@ -70,32 +73,26 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         };
 
         var breakButton = new Atomic.UIButton();
-        breakButton.text = "Break";
+        breakButton.text = "Edit Break";
+        breakButton.toggleMode = true;
+        breakButton.value = breakMode ? 1 : 0;
         breakButton.fontDescription = fd;
+        breakButton.tooltip  = "Prompt to remove prefab connection";
 
         breakButton.onClick = () => {
-
-            this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+            breakMode = breakButton.value == 1 ? true : false;
             return true;
         };
 
-        var copyButton = new Atomic.UIButton();
-        copyButton.text = "Copy";
-        copyButton.fontDescription = fd;
+        this.subscribeToEvent("ComponentEditEnd", () => {
 
-        copyButton.onClick = () => {
-            this.node.scene.sendEvent("SceneEditPrefabCopy", {node : this.node });
-            return true;
-        };
+            if (breakMode && this.node) {
 
-        var pasteButton = new Atomic.UIButton();
-        pasteButton.text = "Paste";
-        pasteButton.fontDescription = fd;
+                var window = new ConfirmPrefabBreak(this.node);
+                window.show();
+            }
 
-        pasteButton.onClick = () => {
-            this.node.scene.sendEvent("SceneEditPrefabPaste", {node : this.node });
-            return true;
-        };
+        });
 
         var noticeName = new Atomic.UITextField();
         noticeName.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
@@ -116,8 +113,6 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         widgetLayout.addChild(saveButton);
         widgetLayout.addChild(undoButton);
         widgetLayout.addChild(breakButton);
-        widgetLayout.addChild(copyButton);
-        widgetLayout.addChild(pasteButton);
 
         this.addChild(this.widgetLayout);
         this.addChild(this.noticeLayout);
@@ -173,6 +168,81 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
     }
 
+
+}
+
+class ConfirmPrefabBreak extends Atomic.UIWindow {
+
+    constructor(node:Atomic.Node) {
+
+        super();
+
+        this.node = node;
+
+        this.settings = Atomic.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
+
+        this.text = "Break Prefab Connection";
+        this.load("AtomicEditor/editor/ui/breakprefab.tb.txt");
+
+        var message = <Atomic.UIEditField>this.getWidget("message");
+        message.text = "Editing this node will break the prefab connection.\nThis operation cannot be undone, do you want to continue?";
+
+        this.resizeToFitContent();
+        this.center();
+
+        this.dimmer = new Atomic.UIDimmer();
+
+        this.subscribeToEvent("WidgetEvent", (ev) => { this.handleWidgetEvent(ev); });
+
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = ev.target.id;
+
+            if (id == "breakprefab") {
+
+                this.hide();
+
+                this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+
+                return true;
+            }
+
+            if (id == "cancel") {
+
+                this.hide();
+
+                this.node.scene.sendEvent("SceneEditPrefabRevert", {node : this.node});
+
+                return true;
+            }
+
+        }
+    }
+
+    show() {
+
+        var view = EditorUI.getView();
+        view.addChild(this.dimmer);
+        view.addChild(this);
+
+    }
+
+    hide() {
+
+        if (this.dimmer.parent)
+            this.dimmer.parent.removeChild(this.dimmer, false);
+
+        if (this.parent)
+            this.parent.removeChild(this, false);
+
+    }
+
+    node: Atomic.Node;
+    dimmer: Atomic.UIDimmer;
 
 }
 

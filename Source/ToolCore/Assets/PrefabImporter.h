@@ -62,7 +62,10 @@ private:
 
     void HandlePrefabSave(StringHash eventType, VariantMap& eventData);
 
-   SharedPtr<Atomic::Scene> preloadResourceScene_;
+    SharedPtr<Atomic::Scene> preloadResourceScene_;
+
+    /// The last time the file was access, to avoid double loading based on saving prefabs
+    unsigned lastFileStamp_;
 
 };
 
