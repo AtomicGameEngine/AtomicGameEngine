@@ -34,7 +34,8 @@
 namespace ToolCore
 {
 
-PrefabImporter::PrefabImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
+PrefabImporter::PrefabImporter(Context* context, Asset* asset) : AssetImporter(context, asset),
+    lastFileStamp_(0xFFFFFFFF)
 {
     SubscribeToEvent(E_PREFABSAVE, ATOMIC_HANDLER(PrefabImporter, HandlePrefabSave));
 }
@@ -140,12 +141,21 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
     FileSystem* fs = GetSubsystem<FileSystem>();
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());
 
+    asset_->UpdateFileTimestamp();
+    lastFileStamp_ = asset_->GetFileTimestamp();
+
     OnPrefabFileChanged();
 
 }
 
 bool PrefabImporter::Import()
 {
+
+    // The asset database will see the file changed, when the file watcher catches it
+    // though we already loaded/imported in OnPrefabFileChanged
+    if (lastFileStamp_ == asset_->GetFileTimestamp())
+        return true;
+
     FileSystem* fs = GetSubsystem<FileSystem>();
 
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());
@@ -158,7 +168,6 @@ bool PrefabImporter::Import()
 void PrefabImporter::OnPrefabFileChanged()
 {
     // reload it immediately so it is ready for use
-    // TODO: The resource cache is reloading after this reload due to catching the file cache
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* xmlfile = cache->GetResource<XMLFile>(asset_->GetGUID());
     cache->ReloadResource(xmlfile);
