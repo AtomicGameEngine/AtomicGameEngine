@@ -1,14 +1,14 @@
 Package: AtomicGameEngine
 Version: 0.0.8
-Installed-Size: 393064
-Section: graphics
-Maintainer: pincushion <info@atomicgameengine.com>
+Installed-Size: 401932
+Section: devel
+Maintainer: info <info@atomicgameengine.com>
 Homepage: http://atomicgameengine.com
 Priority: optional
 Architecture: amd64
+Depends: libgtk-3-0 (>=3.10.7), libx11-6 (>=2:1.6.2), libglib2.0-0 (>=2.40.2), libgcc1 (>=1:4.9.3), libc6 (>=2.19)
+Recommends: libgl1-mesa-glx (>=10.1.3)
 Description: The Atomic Game Engine is a cross-platform game editor
  The Atomic Game Engine features a cross-platform editor with deployment to Windows, OSX, Linux, WebGL, Android, and iOS. Applications can be built using JavaScript, TypeScript, native C++, and C#. The Atomic Game Engine is a full source solution under the permissive MIT License on GitHub
  (C) 2016 THUNDERBEAST GAMES, LLC
-
-
 
