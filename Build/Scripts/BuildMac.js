@@ -84,8 +84,11 @@ namespace('build', function() {
         async: true
     }, function() {
 
+        // Always cleanly create the editor target folder
+        host.cleanCreateDir(config.editorAppFolder);
+
         // We clean atomicNET here as otherwise platform binaries would be deleted
-        var createDirs = [config.artifactsRoot + "AtomicNET/", buildDir, config.editorAppFolder, host.getGenScriptRootDir()];
+        var createDirs = [config.artifactsRoot + "AtomicNET/", buildDir, host.getGenScriptRootDir()];
         var removeDirs = [config.artifactsRoot + "Build/Android/", config.artifactsRoot + "Build/IOS/"];
 
         host.setupDirs(!config.noclean, createDirs, removeDirs);
