@@ -1,0 +1,6 @@
+#! /bin/bash -e
+ln -fs "/usr/share/AtomicGameEngine/AtomicEditor" "/usr/bin/AtomicEditor"
+ln -fs "/usr/share/AtomicGameEngine/atomic_menu.xpm" "/usr/share/pixmaps/atomic_menu.xpm"
+# hack for some window managers
+mv "/usr/share/applications/Atomic_Game_Engine.desktop" "/tmp/Atomic_Game_Engine.desktop"
+mv "/tmp/Atomic_Game_Engine.desktop" "/usr/share/applications/Atomic_Game_Engine.desktop"

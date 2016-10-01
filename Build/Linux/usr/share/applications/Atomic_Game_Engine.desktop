@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Atomic Game Engine
+Version=1.0
+Exec=AtomicEditor
+Comment=Create cross platform games
+Icon=atomic_menu.xpm
+Type=Application
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=Development;

@@ -23,6 +23,9 @@ function copyAtomicNET() {
 
 function copyAtomicEditor() {
 
+    if ( config["noclean"])
+        host.cleanCreateDir(editorAppFolder);
+
     // Copy the Editor binaries
     fs.copySync(buildDir + "Source/AtomicEditor/AtomicEditor",
     config.artifactsRoot + "AtomicEditor/AtomicEditor");
@@ -83,7 +86,13 @@ namespace('build', function() {
 
             copyAtomicEditor();
 
-            complete();
+             if (config.package) {
+
+                jake.Task['package:linux_editor'].invoke();
+
+            }
+
+           complete();
 
         }, {
             printStdout: true
