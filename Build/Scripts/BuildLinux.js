@@ -23,9 +23,6 @@ function copyAtomicNET() {
 
 function copyAtomicEditor() {
 
-    if ( config["noclean"])
-        host.cleanCreateDir(editorAppFolder);
-
     // Copy the Editor binaries
     fs.copySync(buildDir + "Source/AtomicEditor/AtomicEditor",
     config.artifactsRoot + "AtomicEditor/AtomicEditor");
@@ -104,8 +101,11 @@ namespace('build', function() {
         async: true
     }, function() {
 
+        // Always cleanly create the editor target folder
+        host.cleanCreateDir(editorAppFolder);
+
         // We clean atomicNET here as otherwise platform binaries would be deleted
-        var createDirs = [config.artifactsRoot + "AtomicNET/", buildDir, editorAppFolder, host.getGenScriptRootDir()];
+        var createDirs = [config.artifactsRoot + "AtomicNET/", buildDir, host.getGenScriptRootDir()];
 
         var removeDirs = [config.artifactsRoot + "Build/Android/"];
 
