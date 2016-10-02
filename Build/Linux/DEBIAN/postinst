@@ -1,6 +1,8 @@
 #! /bin/bash -e
-ln -fs "/usr/share/AtomicGameEngine/AtomicEditor" "/usr/bin/AtomicEditor"
-ln -fs "/usr/share/AtomicGameEngine/atomic_menu.xpm" "/usr/share/pixmaps/atomic_menu.xpm"
+ln -fs "/usr/share/atomicgameengine/AtomicEditor" "/usr/bin/AtomicEditor"
+ln -fs "/usr/share/atomicgameengine/atomic_menu.xpm" "/usr/share/pixmaps/atomic_menu.xpm"
 # hack for some window managers
-mv "/usr/share/applications/Atomic_Game_Engine.desktop" "/tmp/Atomic_Game_Engine.desktop"
-mv "/tmp/Atomic_Game_Engine.desktop" "/usr/share/applications/Atomic_Game_Engine.desktop"
+temp_file=$(mktemp)
+mv "/usr/share/applications/Atomic_Game_Engine.desktop" ${temp_file}
+mv ${temp_file} "/usr/share/applications/Atomic_Game_Engine.desktop"
+
