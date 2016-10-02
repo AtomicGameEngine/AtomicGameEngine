@@ -6,6 +6,10 @@
 		"SoundSource" : {
 			"Play" : ["Sound"]
 		}
+	},
+	"typescript_decl" : {
+		"Sound": [
+			"setData(data: Int16Array);"
+		]
 	}
-
- }
+}
