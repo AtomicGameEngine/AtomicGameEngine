@@ -291,7 +291,12 @@ namespace ToolCore
                 return;
             }
 
-            String msbuildcmd = ToString("%s..\\..\\Common7\\Tools\\VsMSBuildCmd.bat", cmdToolsPath.CString());
+            if (!cmdToolsPath.EndsWith("\\"))
+            {
+                cmdToolsPath += "\\";
+            }
+
+            String msbuildcmd = ToString("%sVsMSBuildCmd.bat", cmdToolsPath.CString());
 
             String cmd = "cmd";
 
