@@ -120,6 +120,9 @@ namespace('package', function() {
         //copy in menu pixmap
         fs.copySync(config.atomicRoot + "Build/Linux/atomic_menu.xpm", dstDir + "usr/share/atomicgameengine/atomic_menu.xpm" );
 
+        //copy in copyright
+        fs.copySync(config.atomicRoot + "LICENSE.md", dstDir + "usr/share/doc/atomicgameengine/copyright" );
+
         cmds = [];
         
         // go to staging root directory
