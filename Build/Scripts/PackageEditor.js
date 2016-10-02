@@ -102,13 +102,11 @@ namespace('package', function() {
         async: true
     }, function() {
 
-        // check if all the commands exist : fakeroot, dpkg-deb
-
         var editorAppFolder = config.editorAppFolder;
         var srcDir = config.artifactsRoot + "AtomicEditor/";
         var dstDir = config.artifactsRoot + "Dist/";
-        var dstDeb = config.artifactsRoot + "AtomicGameEngine_0.0.8_amd64.deb";
-        
+        var dstDeb = config.artifactsRoot + "AtomicEditor_LINUX_" + config.buildSHA + ".deb";
+
         host.cleanCreateDir(dstDir);  // create new staging directory
         fs.removeSync(dstDeb);  // remove old one, if there
         
@@ -117,32 +115,29 @@ namespace('package', function() {
         fs.copySync(config.atomicRoot + "Build/Linux/usr", dstDir + "usr" );
 
         // copy in the atomic dir
-        fs.copySync(editorAppFolder, dstDir + "usr/share/AtomicGameEngine" );
+        fs.copySync(editorAppFolder, dstDir + "usr/share/atomicgameengine" );
        
         //copy in menu pixmap
-        fs.copySync(config.atomicRoot + "Build/Linux/atomic_menu.xpm", dstDir + "usr/share/AtomicGameEngine/atomic_menu.xpm" );
-        
-        // get rid of some lintian errors
-        fs.removeSync( dstDir + "usr/share/AtomicGameEngine/Resources/ToolData/.gitignore");
-        fs.removeSync( dstDir + "usr/share/AtomicGameEngine/Resources/ToolData/CodeEditor/.gitignore");
-        fs.removeSync( dstDir + "usr/share/AtomicGameEngine/Resources/ToolData/Deployment/Android/assets/.gitignore");
-        fs.removeSync( dstDir + "usr/share/AtomicGameEngine/Resources/ToolData/ProjectTemplates/.gitignore");
-        fs.removeSync( dstDir + "usr/share/AtomicGameEngine/Resources/ToolData/TypeScriptSupport/.gitignore");
+        fs.copySync(config.atomicRoot + "Build/Linux/atomic_menu.xpm", dstDir + "usr/share/atomicgameengine/atomic_menu.xpm" );
 
         cmds = [];
         
         // go to staging root directory
         cmds.push("cd " + config.artifactsRoot + " ;" );
         
-        // get rid of some more lintian errors
-        cmds.push("/usr/bin/strip --strip-unneeded " + dstDir + "usr/share/AtomicGameEngine/AtomicEditor ;" );
-        cmds.push("/usr/bin/strip --strip-unneeded " + dstDir + "usr/share/AtomicGameEngine/Resources/ToolData/Deployment/Linux/AtomicPlayer ;" );
-        cmds.push("/bin/chmod oug-wx " + dstDir + "usr/share/AtomicGameEngine/libcef.so ;");
+        // get rid of some lintian errors
+        cmds.push("find " + dstDir + "usr/share/atomicgameengine/ -name .gitignore -type f -delete ;");
+        cmds.push("find " + dstDir + "usr/share/atomicgameengine/ -maxdepth 9 -type f -print0 | xargs -0 chmod oug-x ;");
+        cmds.push("/bin/chmod oug+x " + dstDir + "usr/share/atomicgameengine/AtomicEditor ;");
+        cmds.push("/bin/chmod oug+x " + dstDir + "usr/share/atomicgameengine/Resources/ToolData/Deployment/Linux/AtomicPlayer ;" );
+        cmds.push("/usr/bin/strip --strip-unneeded " + dstDir + "usr/share/atomicgameengine/AtomicEditor ;" );
+        cmds.push("/usr/bin/strip --strip-unneeded " + dstDir + "usr/share/atomicgameengine/Resources/ToolData/Deployment/Linux/AtomicPlayer ;" );
 
+        // create the package
         // needs fakeroot for package file ownership issues
         cmds.push("/usr/bin/fakeroot /usr/bin/dpkg-deb --build " + dstDir + ";");
 
-        // fix the deb name
+        // change the deb name, following Atomic standards
         cmds.push("/bin/mv " + config.artifactsRoot + "Dist.deb " + dstDeb + " ;");
 
         // clean up the staging area
