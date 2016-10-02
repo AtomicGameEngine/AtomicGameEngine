@@ -291,7 +291,12 @@ namespace ToolCore
                 return;
             }
 
-            String vcvars64 = ToString("%s..\\..\\VC\\bin\\amd64\\vcvars64.bat", cmdToolsPath.CString());
+            if (!cmdToolsPath.EndsWith("\\"))
+            {
+                cmdToolsPath += "\\";
+            }
+
+            String msbuildcmd = ToString("%sVsMSBuildCmd.bat", cmdToolsPath.CString());
 
             String cmd = "cmd";
 
@@ -299,7 +304,7 @@ namespace ToolCore
             args.Push("/C");
 
             // vcvars bat
-            String compile = ToString("\"\"%s\" ", vcvars64.CString());
+            String compile = ToString("\"\"%s\" ", msbuildcmd.CString());
 
             if (requiresNuGet)
             {
