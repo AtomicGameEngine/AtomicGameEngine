@@ -103,7 +103,7 @@ void AtomicPlayerApp::Setup()
 #elif ATOMIC_PLATFORM_ANDROID
     //engineParameters_.InsertNew("ResourcePrefixPaths"], "assets");
 #elif ATOMIC_PLATFORM_OSX
-    engineParameters_.InsertNew("ResourcePrefixPaths", "../Resources");
+    engineParameters_.InsertNew("ResourcePrefixPaths", filesystem->GetProgramDir() + "../Resources");
 #endif
 
     const Vector<String>& arguments = GetArguments();

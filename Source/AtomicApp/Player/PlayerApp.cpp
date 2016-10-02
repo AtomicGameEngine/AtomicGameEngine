@@ -55,6 +55,8 @@ namespace Atomic
     {
         AppBase::Setup();
 
+        FileSystem *filesystem = GetSubsystem<FileSystem>();
+
         engineParameters_.InsertNew("WindowTitle", "AtomicPlayer");
 
 #if (ATOMIC_PLATFORM_ANDROID)
@@ -83,11 +85,10 @@ namespace Atomic
 #elif ATOMIC_PLATFORM_ANDROID
         //engineParameters_.InsertNew("ResourcePrefixPaths"], "assets");
 #elif ATOMIC_PLATFORM_OSX
-        engineParameters_.InsertNew("ResourcePrefixPaths", "../Resources");
+        engineParameters_.InsertNew("ResourcePrefixPaths", filesystem->GetProgramDir() + "../Resources");
 #endif
 
         // Setup player log
-        FileSystem *filesystem = GetSubsystem<FileSystem>();
         engineParameters_.InsertNew("LogName", filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log");
 
         // Register JS packages

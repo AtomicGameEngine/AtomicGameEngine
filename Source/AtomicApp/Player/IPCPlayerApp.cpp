@@ -121,7 +121,7 @@ namespace Atomic
 #ifdef __APPLE__
                     if (!resourcePrefix.Length())
                     {
-                        engineParameters_["ResourcePrefixPaths"] = "../Resources";
+                        engineParameters_["ResourcePrefixPaths"] = fileSystem->GetProgramDir() + "../Resources";
                     }
 #else
                     if (!resourcePrefix.Length())
