@@ -126,7 +126,7 @@ namespace AtomicEditor
 #else
 
 #ifdef ATOMIC_PLATFORM_OSX
-        engineParameters_["ResourcePrefixPaths"] = "../Resources";
+        engineParameters_["ResourcePrefixPaths"] = filesystem->GetProgramDir() + "../Resources";
 
 #else
         engineParameters_["ResourcePrefixPaths"] = filesystem->GetProgramDir() + "Resources";
