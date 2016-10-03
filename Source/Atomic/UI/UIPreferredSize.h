@@ -36,13 +36,13 @@ namespace Atomic
 /// Defines how the size in one axis depend on the other axis when a widgets size is affected by constraints.
 enum UI_SIZE_DEP {
     /// No dependency (Faster layout).
-    UI_SIZE_DEP_NONE                        = tb::SIZE_DEP_NONE,
+    UI_SIZE_DEP_NONE                    = 0, // tb::SIZE_DEP_NONE,
     /// The width is dependant on the height. Additional layout pass may be required.
-    UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT        = tb::SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT,
+    UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT  = 1, // tb::SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT,
     /// The height is dependant on the width. Additional layout pass may be required.
-    UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH        = tb::SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH,
+    UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH  = 2, // tb::SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH,
     /// Both width and height are dependant on each other. Additional layout pass may be required.
-    UI_SIZE_DEP_BOTH                        =    tb::SIZE_DEP_BOTH
+    UI_SIZE_DEP_BOTH                    = 3 //  tb::SIZE_DEP_BOTH
 };
 
 class UIPreferredSize : public RefCounted

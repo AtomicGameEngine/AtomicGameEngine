@@ -49,6 +49,7 @@ namespace AtomicEngine
         // static members so they don't get GC'd
         private static EventDispatchDelegate eventDispatchDelegate = NativeCore.EventDispatch;
         private static UpdateDispatchDelegate updateDispatchDelegate = NativeCore.UpdateDispatch;
+        private static RefCountedDeletedDelegate refCountedDeletedDelegate = NativeCore.RefCountedDeleted;
 
         public static void Initialize()
         {
@@ -81,7 +82,7 @@ namespace AtomicEngine
 
             PlayerModule.Initialize();
 
-            IntPtr coreptr = csi_Atomic_NETCore_Initialize(eventDispatchDelegate, updateDispatchDelegate);
+            IntPtr coreptr = csi_Atomic_NETCore_Initialize(eventDispatchDelegate, updateDispatchDelegate, refCountedDeletedDelegate);
 
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
@@ -102,7 +103,7 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csi_Atomic_NETCore_Initialize(EventDispatchDelegate eventDispatch, UpdateDispatchDelegate updateDispatch);
+        private static extern IntPtr csi_Atomic_NETCore_Initialize(EventDispatchDelegate eventDispatch, UpdateDispatchDelegate updateDispatch, RefCountedDeletedDelegate refCountedDeleted);
 
         private static Context context;
         private static Dictionary<Type, AObject> subSystems = new Dictionary<Type, AObject>();

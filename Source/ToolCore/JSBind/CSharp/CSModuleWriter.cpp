@@ -29,6 +29,7 @@
 #include "../JSBEnum.h"
 #include "../JSBClass.h"
 #include "../JSBFunction.h"
+#include "../JSBEvent.h"
 
 #include "CSTypeHelper.h"
 #include "CSClassWriter.h"
@@ -252,7 +253,9 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
             // BodyType2D enum order is assigned in RigidBody2D.h in incorrect order
             if (jenum->GetName() == "BodyType2D")
             {                 
-                if (name == "BT_KINEMATIC")
+                if (name == "BT_STATIC")
+                    value = "0";
+                else if (name == "BT_KINEMATIC")
                     value = "1";
                 else if (name == "BT_DYNAMIC")
                     value = "2";
@@ -385,6 +388,125 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
 
 }
 
+void CSModuleWriter::GenerateManagedNativeEvents(String& sourceOut)
+{
+    Indent();
+
+    String source;
+
+    const Vector<SharedPtr<JSBEvent>>& events = module_->GetEvents();
+
+    for (unsigned i = 0; i < events.Size(); i++)
+    {
+        JSBEvent* event = events[i];
+
+        const String& eventID = event->GetEventID();
+
+        String line = ToString("public partial class %s : NativeEventData\n", event->GetScriptEventName().CString());
+
+        source += IndentLine(line);
+
+        source += IndentLine("{\n\n");
+
+        Indent();
+
+        // parameters
+
+        const Vector<JSBEvent::EventParam>& params = event->GetParameters();
+
+        for (unsigned j = 0; j < params.Size(); j++)
+        {
+            const JSBEvent::EventParam& p = params[j];
+
+            JSBClass* cls = JSBPackage::GetClassAllPackages(p.typeInfo_);
+
+            String typeName = p.typeInfo_;
+            String enumTypeName = p.enumTypeName_;
+
+            if (!cls)
+                typeName = typeName.ToLower();
+            else
+                typeName = cls->GetName();
+
+            if (typeName == "int" || typeName == "float" ||
+                typeName == "bool" || typeName == "string" || typeName == "enum" || cls)
+            {
+
+                bool isEnum = false;
+                if (typeName == "enum")
+                {   
+                    isEnum = true;
+                    if (enumTypeName.Length())
+                        typeName = enumTypeName;
+                    else
+                        typeName = "int";
+                }
+
+                line = "public " + typeName + " " + p.paramName_ + "\n";
+                source += IndentLine(line);
+                source += IndentLine("{\n");
+
+                Indent();
+
+                source += IndentLine("get\n");
+                source += IndentLine("{\n");
+
+                Indent();
+
+                line = "return ";
+
+                if (typeName == "int")
+                    line += "scriptMap.GetInt";
+                else if (isEnum)
+                {
+                    line += ToString("(%s) scriptMap.GetInt", typeName.CString());
+                }
+                else if (typeName == "float")
+                    line += "scriptMap.GetFloat";
+                else if (typeName == "bool")
+                    line += "scriptMap.GetBool";
+                else if (typeName == "string")
+                    line += "scriptMap.GetString";
+                else if (cls)
+                {
+                    if (typeName == "Vector3")
+                    {
+                        line += "scriptMap.Get" + typeName;
+                    }
+                    else
+                    {
+                        line += ToString("scriptMap.GetPtr<%s>", cls->GetName().CString());
+                    }
+                    
+                }
+
+                line += ToString("(\"%s\");\n", p.paramName_.CString());
+                source += IndentLine(line);
+
+                Dedent();
+
+                source += IndentLine("}\n");
+
+                Dedent();
+
+                source += IndentLine("}\n\n");
+
+            }
+
+        }
+
+        Dedent();
+
+        source += IndentLine("}\n\n");
+
+    }
+
+
+    sourceOut += source;
+
+    Dedent();
+}
+
 void CSModuleWriter::GenerateManagedModuleClass(String& sourceOut)
 {
     Indent();
@@ -436,6 +558,19 @@ void CSModuleWriter::GenerateManagedModuleClass(String& sourceOut)
 
     }
 
+    source += "\n";
+
+    // Native Events
+    const Vector<SharedPtr<JSBEvent>>& events = module_->GetEvents();
+
+    for (unsigned i = 0; i < events.Size(); i++)
+    {
+        JSBEvent* event = events[i];
+
+        line = ToString("NativeEvents.RegisterEventID<%s>(\"%s\");\n", event->GetScriptEventName().CString(), event->GetEventName().CString());
+        source += IndentLine(line);
+    }
+
     Dedent();
 
     source += IndentLine("}\n");
@@ -471,6 +606,7 @@ void CSModuleWriter::GenerateManagedSource()
     source += "{\n";
 
     GenerateManagedEnumsAndConstants(source);
+    GenerateManagedNativeEvents(source);
     GenerateManagedModuleClass(source);
     GenerateManagedClasses(source);
 

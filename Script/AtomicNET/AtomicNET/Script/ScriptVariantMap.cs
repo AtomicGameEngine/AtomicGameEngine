@@ -1,7 +1,9 @@
 
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
+
 
 namespace AtomicEngine
 {
@@ -26,11 +28,11 @@ namespace AtomicEngine
             if (value == null)
                 return null;
 
-            // TODO: allow derived classes, throw error
-            if (value.GetType().Name != typeof(T).Name)
-                return null;
+            // TODO: warn on mismatch?
+            if (value.GetType() == typeof(T) || value.GetType().GetTypeInfo().IsSubclassOf(typeof(T)))
+                return (T) value;
 
-            return (T) value;            
+            return null;            
         }
 
         public IntPtr GetVoidPtr(string key)
@@ -42,5 +44,6 @@ namespace AtomicEngine
         private static extern IntPtr csi_Atomic_AtomicNET_ScriptVariantMap_GetVoidPtr(IntPtr self, string key);
 
     }
+
 }
 

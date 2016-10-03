@@ -55,6 +55,8 @@ public:
     void Parse() ;
 
     bool parsed_;
+
+    PODVector<BindingLanguage> associatedBindings_;
 };
 
 class JSBProperty

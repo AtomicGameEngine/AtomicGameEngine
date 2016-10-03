@@ -50,14 +50,14 @@ namespace ToolCore
 
         void End();
 
-        void ExportFunction(JSBFunction* function);
+        void ExportFunction(const JSBFunction* function);
 
-        String GetScriptType(JSBFunctionType* ftype);
+        String GetScriptType(const JSBFunctionType* ftype);
         String GetPrimitiveType(JSBPrimitiveType* ptype);
 
         bool checkV(JSBClass* clazz, const String name, const String type);
-        bool IsOverride(JSBFunction* function);
-        JSBFunction* findFunctionInBase(JSBFunction* function);
+        bool IsOverride(const JSBFunction* function);
+        JSBFunction* findFunctionInBase(const JSBFunction* function);
 
         void ExportEnums(JSBModule* moduleName);
         void ExportModuleConstants(JSBModule*  moduleName);

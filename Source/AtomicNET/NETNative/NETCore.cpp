@@ -1,6 +1,7 @@
 
 #include <Atomic/Math/MathDefs.h>
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/IO/Log.h>
 #include <Atomic/Script/ScriptVariantMap.h>
 
 #include "NETCore.h"
@@ -9,10 +10,10 @@
 namespace Atomic
 {
 
-
 SharedPtr<Context> NETCore::csContext_;
 NETCoreEventDispatchFunction NETCore::eventDispatch_ = nullptr;
 NETCoreUpdateDispatchFunction NETCore::updateDispatch_ = nullptr;
+NETCoreRefCountedDeletedFunction NETCore::refCountedDeleted_ = nullptr;
 
 NETCore::NETCore(Context* context, NETCoreDelegates* delegates) :
     Object(context)
@@ -22,15 +23,29 @@ NETCore::NETCore(Context* context, NETCoreDelegates* delegates) :
 
     eventDispatch_ = delegates->eventDispatch;
     updateDispatch_ = delegates->updateDispatch;
+    refCountedDeleted_ = delegates->refCountedDeleted;
 
     NETEventDispatcher* dispatcher = new NETEventDispatcher(context_);
     context_->RegisterSubsystem(dispatcher);
     context_->AddGlobalEventListener(dispatcher);
+
+    RefCounted::AddRefCountedDeletedFunction(OnRefCountedDeleted);
 }
 
 NETCore::~NETCore()
 {
-    assert (!csContext_);
+    RefCounted::RemoveRefCountedDeletedFunction(OnRefCountedDeleted);
+    assert (!csContext_);    
+}
+
+void NETCore::OnRefCountedDeleted(RefCounted* ref)
+{
+    if (csContext_.Null())
+        return;
+
+    if (refCountedDeleted_)
+        refCountedDeleted_(ref);
+
 }
 
 void NETCore::RegisterNETEventType(unsigned eventType)

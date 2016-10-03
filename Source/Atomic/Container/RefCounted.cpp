@@ -53,6 +53,9 @@ RefCounted::~RefCounted()
         delete refCount_;
 
     refCount_ = 0;
+
+    for (unsigned i = 0; i < refCountedDeletedFunctions_.Size(); i++)
+        refCountedDeletedFunctions_[i](this);
 }
 
 void RefCounted::AddRef()
@@ -109,6 +112,7 @@ int RefCounted::WeakRefs() const
 // ATOMIC BEGIN
 
 PODVector<RefCountChangedFunction> RefCounted::refCountChangedFunctions_;
+PODVector<RefCountedDeletedFunction> RefCounted::refCountedDeletedFunctions_;
 
 void RefCounted::AddRefSilent()
 {
@@ -124,6 +128,16 @@ void RefCounted::AddRefCountChangedFunction(RefCountChangedFunction function)
 void RefCounted::RemoveRefCountChangedFunction(RefCountChangedFunction function)
 {
     refCountChangedFunctions_.Remove(function);
+}
+
+void RefCounted::AddRefCountedDeletedFunction(RefCountedDeletedFunction function)
+{
+    refCountedDeletedFunctions_.Push(function);
+}
+
+void RefCounted::RemoveRefCountedDeletedFunction(RefCountedDeletedFunction function)
+{
+    refCountedDeletedFunctions_.Remove(function);
 }
 
 // ATOMIC END

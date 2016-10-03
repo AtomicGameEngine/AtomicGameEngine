@@ -42,7 +42,7 @@ JSFunctionWriter::JSFunctionWriter(JSBFunction *function) : JSBFunctionWriter(fu
 void JSFunctionWriter::WriteParameterMarshal(String& source)
 {
     // generate args
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     int cparam = 0;
     if (parameters.Size())
@@ -278,7 +278,7 @@ void JSFunctionWriter::WriteConstructor(String& source)
         String sparams;
         int cparam = 0;
 
-        Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+        const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
         for (unsigned i = 0; i < parameters.Size(); i++, cparam++)
         {
@@ -411,7 +411,10 @@ void JSFunctionWriter::WriteFunction(String& source)
             else if (klassType->class_->IsNumberArray())
             {
                 returnDeclared = true;
-                source.AppendWithFormat("const %s& retValue = ", klassType->class_->GetName().CString());
+                if (returnType->isReference_)
+                    source.AppendWithFormat("const %s& retValue = ", klassType->class_->GetName().CString());
+                else
+                    source.AppendWithFormat(" %s retValue = ", klassType->class_->GetName().CString());
             }
             else
             {
@@ -443,7 +446,7 @@ void JSFunctionWriter::WriteFunction(String& source)
         source.AppendWithFormat("native->%s(", function_->name_.CString());
     }
 
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     for (unsigned int i = 0; i < parameters.Size(); i++)
     {

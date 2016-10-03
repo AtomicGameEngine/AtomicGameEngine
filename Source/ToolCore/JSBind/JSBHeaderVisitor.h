@@ -324,6 +324,10 @@ public:
                 return NULL;
         }
 
+        // We don't support pointers to Vector2/Vector3/etc which are generally out values 
+        if (isPointer && jtype->asClassType() && jtype->asClassType()->class_->IsNumberArray())
+            return NULL;
+
         JSBFunctionType* ftype = new JSBFunctionType(jtype);
         ftype->isPointer_ = isPointer;
         ftype->isSharedPtr_ = isSharedPtr;

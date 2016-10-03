@@ -30,11 +30,13 @@ namespace Atomic
 
 typedef void (*NETCoreEventDispatchFunction)(Object* refCounted, unsigned eventID, VariantMap* eventData);
 typedef void (*NETCoreUpdateDispatchFunction)(float timeStep);
+typedef void (*NETCoreRefCountedDeletedFunction)(RefCounted* refCounted);
 
 struct NETCoreDelegates
 {
     NETCoreEventDispatchFunction eventDispatch;
     NETCoreUpdateDispatchFunction updateDispatch;
+    NETCoreRefCountedDeletedFunction refCountedDeleted;
 };
 
 class ATOMIC_API NETCore : public Object
@@ -63,10 +65,13 @@ public:
 
 private:
 
+    static void OnRefCountedDeleted(RefCounted* ref);
+
     static SharedPtr<Context> csContext_;
 
     static NETCoreUpdateDispatchFunction updateDispatch_;
     static NETCoreEventDispatchFunction eventDispatch_;
+    static NETCoreRefCountedDeletedFunction refCountedDeleted_;
 
 };
 

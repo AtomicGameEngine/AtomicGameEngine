@@ -31,7 +31,7 @@ void CSTypeHelper::GenNativeFunctionParameterSignature(JSBFunction* function, St
 {
     JSBClass* klass = function->GetClass();
 
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     Vector<String> args;
 
@@ -398,7 +398,7 @@ bool CSTypeHelper::OmitFunction(JSBFunction* function)
         }
     }
 
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     for (unsigned i = 0; i < parameters.Size(); i++)
     {

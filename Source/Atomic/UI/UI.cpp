@@ -141,10 +141,14 @@ UI::~UI()
         
         tb::TBWidgetsAnimationManager::Shutdown();
 
-        widgetWrap_.Clear();
+        // The root widget can acquire a delegate if it is retrieved in script (via getting parent), clear it here
+        rootWidget_->SetDelegate(0);
+        widgetWrap_.Clear();    
         delete rootWidget_;
+        
         // leak
         //delete TBUIRenderer::renderer_;
+
         tb_core_shutdown();
     }
 
@@ -595,6 +599,7 @@ bool UI::UnwrapWidget(tb::TBWidget* widget)
 {
     if (widgetWrap_.Contains(widget))
     {
+        widget->SetDelegate(0);
         widgetWrap_.Erase(widget);
         return true;
     }
@@ -609,29 +614,29 @@ void UI::PruneUnreachableWidgets()
 
     for (itr = widgetWrap_.Begin(); itr != widgetWrap_.End(); )
     {
-        if ((*itr).first_->GetParent() || (*itr).second_->JSGetHeapPtr())
+        if ((*itr).first_->GetParent() || (*itr).second_->Refs() > 1)
         {
             itr++;
             continue;
         }
 
-        tb::TBWidget* toDelete = (*itr).first_;
-
         itr.GotoNext();
 
+        VariantMap eventData;
+        eventData[WidgetDeleted::P_WIDGET] = (UIWidget*) (*itr).second_;
+        (*itr).second_->SendEvent(E_WIDGETDELETED, eventData);
+
+        tb::TBWidget* toDelete = (*itr).first_;
+        UnwrapWidget(toDelete);
         delete toDelete;
 
-        // this will likely be flagged by valgrind as accessing invalid memory
-        assert(!widgetWrap_.Contains(toDelete));
     }
 }
 
 void UI::WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget)
 {
     assert (!widgetWrap_.Contains(tbwidget));
-
     widgetWrap_[tbwidget] = widget;
-    widget->AddRef();
 }
 
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)

@@ -55,7 +55,7 @@ void CSFunctionWriter::GenNativeCallParameters(String& sig)
 {
     JSBClass* klass = function_->GetClass();
 
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     Vector<String> args;
 
@@ -128,7 +128,7 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     // vector marshal
 
     bool hasVectorMarshal = false;
-    Vector<JSBFunctionType*>& fparams = function_->GetParameters();
+    const Vector<JSBFunctionType*>& fparams = function_->GetParameters();
 
     for (unsigned i = 0; i < fparams.Size(); i++)
     {
@@ -380,7 +380,7 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
     if (function_->IsConstructor())
         returnType = "IntPtr";
 
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     Vector<String> args;
 
@@ -465,7 +465,7 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
 {
     // generate args
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     if (parameters.Size())
     {
@@ -595,7 +595,7 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
 void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
 {
     // generate args
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     if (parameters.Size())
     {

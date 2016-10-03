@@ -37,7 +37,7 @@ ATOMIC_EVENT(E_WIDGETEVENT, WidgetEvent)
 {
     ATOMIC_PARAM(P_HANDLER, Handler);           // UIWidget pointer of widget's OnEvent we are in
     ATOMIC_PARAM(P_TARGET, Target);             // UIWidget pointer
-    ATOMIC_PARAM(P_TYPE, Type);                 // EVENT_TYPE enum
+    ATOMIC_PARAM(P_TYPE, Type);                 // enum UI_EVENT_TYPE
     ATOMIC_PARAM(P_X, X);                       // int
     ATOMIC_PARAM(P_Y, Y);                       // int
     ATOMIC_PARAM(P_DELTAX, DeltaX);             // int

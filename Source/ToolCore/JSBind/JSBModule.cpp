@@ -35,6 +35,7 @@
 #include "JSBEnum.h"
 #include "JSBModuleWriter.h"
 #include "JSBType.h"
+#include "JSBEvent.h"
 
 #include "JavaScript/JSModuleWriter.h"
 #include "CSharp/CSModuleWriter.h"
@@ -160,7 +161,7 @@ void JSBModule::ProcessOverloads()
 
                 if (!_sig.IsArray())
                 {
-                    ErrorExit("Bad overload defintion");
+                    ErrorExit("Bad overload definition");
                 }
 
                 JSONArray sig = _sig.GetArray();
@@ -179,6 +180,66 @@ void JSBModule::ProcessOverloads()
     }
 }
 
+void JSBModule::ProcessExcludes(const JSONValue& excludes, BindingLanguage language)
+{
+    Vector<String> childNames = excludes.GetObject().Keys();
+
+    for (unsigned j = 0; j < childNames.Size(); j++)
+    {
+        String classname = childNames.At(j);
+
+        if (classname == "CSharp")
+        {
+            JSONValue sharpexcludes = excludes.Get("CSharp");
+
+            if (sharpexcludes.IsObject())
+            {
+                ProcessExcludes(sharpexcludes, BINDINGLANGUAGE_CSHARP);
+            }
+
+            continue;
+        }
+
+        JSBClass* klass = GetClass(classname);
+
+        if (!klass)
+        {
+            ErrorExit("Bad exclude klass");
+        }
+
+        JSONValue classexcludes = excludes.Get(classname);
+
+        Vector<String> functionNames = classexcludes.GetObject().Keys();
+
+        for (unsigned k = 0; k < functionNames.Size(); k++)
+        {
+            JSONValue _sig = classexcludes.Get(functionNames[k]);
+
+            if (!_sig.IsArray())
+            {
+                ErrorExit("Bad exclude defintion");
+            }
+
+            JSONArray sig = _sig.GetArray();
+
+            Vector<String> values;
+            for (unsigned x = 0; x < sig.Size(); x++)
+            {
+                values.Push(sig[x].GetString());
+            }
+
+            JSBFunctionSignature* fe = new JSBFunctionSignature(functionNames[k], values);
+            
+            if (language != BINDINGLANGUAGE_ANY)
+                fe->associatedBindings_.Push(language);
+            
+            klass->AddFunctionExclude(fe);
+
+        }
+    }
+
+}
+
 void JSBModule::ProcessExcludes()
 {
     // excludes
@@ -189,45 +250,7 @@ void JSBModule::ProcessExcludes()
 
     if (excludes.IsObject())
     {
-        Vector<String> childNames = excludes.GetObject().Keys();
-
-        for (unsigned j = 0; j < childNames.Size(); j++)
-        {
-            String classname = childNames.At(j);
-
-            JSBClass* klass = GetClass(classname);
-
-            if (!klass)
-            {
-                ErrorExit("Bad exclude klass");
-            }
-
-            JSONValue classexcludes = excludes.Get(classname);
-
-            Vector<String> functionNames = classexcludes.GetObject().Keys();
-
-            for (unsigned k = 0; k < functionNames.Size(); k++)
-            {
-                JSONValue _sig = classexcludes.Get(functionNames[k]);
-
-                if (!_sig.IsArray())
-                {
-                    ErrorExit("Bad exclude defintion");
-                }
-
-                JSONArray sig = _sig.GetArray();
-
-                Vector<String> values;
-                for (unsigned x = 0; x < sig.Size(); x++)
-                {
-                    values.Push(sig[x].GetString());
-                }
-
-                JSBFunctionSignature* fe = new JSBFunctionSignature(functionNames[k], values);
-                klass->AddFunctionExclude(fe);
-
-            }
-        }
+        ProcessExcludes(excludes);
     }
 }
 
@@ -394,6 +417,34 @@ void JSBModule::RegisterClass(String name)
 
         package_->RegisterClass(cls);
     }
+}
+
+void JSBModule::RegisterEvent(JSBEvent* event)
+{
+    if (JSBPackage::GetEventAllPackages(event->GetEventID(), event->GetEventName()))
+    {
+        ErrorExit(ToString("Event collision: %s : %s", event->GetEventID().CString(), event->GetEventName().CString()));
+    }
+
+    events_.Push(SharedPtr<JSBEvent>(event));
+}
+
+JSBEvent* JSBModule::GetEvent(const String& eventID, const String& eventName)
+{
+    for (unsigned i = 0; i < events_.Size(); i++)
+    {
+        if (events_[i]->GetEventName() == eventName || events_[i]->GetEventID() == eventID)
+        {
+            return events_[i];
+        }
+    }
+
+    return 0;
+}
+
+const Vector<SharedPtr<JSBEvent>>& JSBModule::GetEvents()
+{    
+    return events_;
 }
 
 void JSBModule::RegisterEnum(JSBEnum* jenum)

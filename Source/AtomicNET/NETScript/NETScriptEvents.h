@@ -43,7 +43,7 @@ namespace Atomic
 
     ATOMIC_EVENT(E_CSCOMPONENTASSEMBLYCHANGED, CSComponentAssemblyChanged)
     {
-        ATOMIC_PARAM(P_RESOURCE, Resource); // resource*
+        ATOMIC_PARAM(P_RESOURCE, Resource); // Resource
         ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
     }
 

@@ -34,7 +34,7 @@
 namespace ToolCore
 {
 
-    String JSBHaxe::GetScriptType(JSBFunctionType* ftype)
+    String JSBHaxe::GetScriptType(const JSBFunctionType* ftype)
     {
         String scriptType = "Dynamic";
 
@@ -114,11 +114,11 @@ namespace ToolCore
         source_ += "\n}\n";
     }
 
-    bool JSBHaxe::IsOverride(JSBFunction* function) {
+    bool JSBHaxe::IsOverride(const JSBFunction* function) {
         return findFunctionInBase(function) != NULL;
     }
 
-    JSBFunction* JSBHaxe::findFunctionInBase(JSBFunction* function) {
+    JSBFunction* JSBHaxe::findFunctionInBase(const JSBFunction* function) {
         PODVector<JSBClass*>& base = function->GetClass()->GetBaseClasses();
         for (unsigned j = 0; j < base.Size(); j++)
         {
@@ -142,7 +142,7 @@ namespace ToolCore
         return NULL;
     }
 
-    void JSBHaxe::ExportFunction(JSBFunction* function)
+    void JSBHaxe::ExportFunction(const JSBFunction* function)
     {
         //probably no need to check
         if (function->Skip())
@@ -165,7 +165,7 @@ namespace ToolCore
             //if (function->IsOverload())
             {
                 source_ += "    @:overload(function(";
-                Vector<JSBFunctionType*>& parameters = function->GetParameters();
+                const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
                 for (unsigned i = 0; i < parameters.Size(); i++)
                 {
@@ -202,7 +202,7 @@ namespace ToolCore
 
         source_ += scriptName + "(";
 
-        Vector<JSBFunctionType*>& parameters = function->GetParameters();
+        Vector<JSBFunctionType*> parameters = function->GetParameters();
 
         if (IsOverride(function))
             parameters = findFunctionInBase(function)->GetParameters();

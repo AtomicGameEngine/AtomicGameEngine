@@ -55,7 +55,7 @@ namespace Atomic
 
         if (eventType == E_NODECOLLISION)
         {
-            VariantMap ncEventData;
+            VariantMap ncEventData = eventData;
 
             SharedPtr<PhysicsNodeCollision> nodeCollison(new PhysicsNodeCollision());
             nodeCollison->SetFromNodeCollisionEvent(eventData);

@@ -59,6 +59,8 @@ public:
     void VisitPreprocess();
     void VisitHeader();
 
+    const char* GetSource() const { return (const char*)data_.Get(); }
+
 private:
 
     CPlusPlus::TranslationUnit* translationUnit_;
