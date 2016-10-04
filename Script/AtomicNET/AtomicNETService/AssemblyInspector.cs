@@ -83,7 +83,7 @@ namespace AtomicTools
                 if (genericParams.Count != 0)
                     continue;
 
-                var parentName = metaReader.GetString(typeDef.Name);
+                var typeName = metaReader.GetString(typeDef.Name);
 
                 var baseTypeHandle = typeDef.BaseType;
 
@@ -104,9 +104,9 @@ namespace AtomicTools
 
                     var typeRef = metaReader.GetTypeReference((TypeReferenceHandle)baseTypeHandle);
 
-                    var name = metaReader.GetString(typeRef.Name);
+                    var baseName = metaReader.GetString(typeRef.Name);
 
-                    if (name != "CSComponent")
+                    if (baseName != "CSComponent")
                         continue;
 
                     var inspector = new CSComponentInspector(typeDef, peFile, metaReader);

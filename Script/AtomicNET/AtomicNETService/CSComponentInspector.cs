@@ -441,21 +441,28 @@ namespace AtomicTools
 
                             var fieldDef = metaReader.GetFieldDefinition(fieldHandle);
 
-                            var fieldName = metaReader.GetString(fieldDef.Name);
-
-                            if (opCode.ToString() == "stfld")
+                            // No way to predetermine if fieldDef.Name is valid
+                            try
                             {
+                                var fieldName = metaReader.GetString(fieldDef.Name);
 
-                                InspectorField inspectorField;
-
-                                if (_inspectorComponent.Fields.TryGetValue(fieldName, out inspectorField))
+                                if (opCode.ToString() == "stfld")
                                 {
-                                    inspectorField.DefaultValue = String.Join(" ", loadedValues.ToArray());
+
+                                    InspectorField inspectorField;
+
+                                    if (_inspectorComponent.Fields.TryGetValue(fieldName, out inspectorField))
+                                    {
+                                        inspectorField.DefaultValue = String.Join(" ", loadedValues.ToArray());
+                                    }
+
                                 }
-
                             }
-
-                            loadedValues.Clear();
+                            catch (Exception) { break; }
+                            finally
+                            {
+                                loadedValues.Clear();
+                            }
 
                             break;
                         case OperandType.InlineMethod:
