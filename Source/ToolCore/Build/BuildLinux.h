@@ -20,62 +20,37 @@
 // THE SOFTWARE.
 //
 
-class BuildSettings {
+#pragma once
 
-  constructor() {
+#include "BuildBase.h"
 
-  }
+namespace ToolCore
+{
+
+class Project;
+
+class BuildLinux : public BuildBase
+{
+    ATOMIC_OBJECT(BuildLinux, BuildBase);
+
+public:
+
+    BuildLinux(Context* context, Project* project);
+    virtual ~BuildLinux();
+
+    String GetBuildSubfolder() { return "Linux-Build"; }
+
+    void Build(const String& buildPath);
+
+protected:
+
+    void Initialize();
+    virtual bool CheckIncludeResourceFile(const String& resourceDir, const String& fileName);
+
+private:
+
+    void BuildNative(const String& buildPath);
+
+};
 
 }
-
-class MacBuildSettings {
-
-    appName:string;
-    package:string;
-    companyName:string;
-    productName:string;
-
-}
-
-class WindowsBuildSettings {   
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-class WebBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-class AndroidBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-    sDKVersion: string;
-    minSDKVersion: string;
-    activityName: string;
-    iconPath: string;
-}
-
-class IOSBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-    provisionFile: string;
-    appIDPrefix: string;
-}
-
-class LinuxBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-export = BuildSettings;

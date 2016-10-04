@@ -131,6 +131,9 @@ elements
 	LogoMac
 		bitmap logo_mac.png
 
+	LogoLinux
+		bitmap logo_linux.png
+
 	LogoWindows-Small
 		bitmap logo_windows.png
 		width 48
@@ -158,6 +161,11 @@ elements
 
 	LogoWindows-Small
 		bitmap logo_windows.png
+		width 48
+		height 48
+
+	LogoLinux-Small
+		bitmap logo_linux.png
 		width 48
 		height 48
 

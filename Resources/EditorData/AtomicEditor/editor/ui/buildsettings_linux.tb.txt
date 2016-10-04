@@ -1,0 +1,22 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: distribution: gravity
+		TBTextField: text: "App Name:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: app_name, autofocus: 1
+				lp: min-width: 220
+	TBLayout: distribution: gravity
+		TBTextField: text: "App Identifier:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: app_identifier, autofocus: 0
+				lp: min-width: 220
+	TBLayout: distribution: gravity
+		TBTextField: text: "Company Name:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: company_name, autofocus: 0
+				lp: min-width: 220
+	TBLayout: distribution: gravity
+		TBTextField: text: "Product Name:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: product_name, autofocus: 0
+				lp: min-width: 220

@@ -20,62 +20,26 @@
 // THE SOFTWARE.
 //
 
-class BuildSettings {
+#include "../Project/Project.h"
+#include "../Build/BuildLinux.h"
+#include "PlatformLinux.h"
 
-  constructor() {
+namespace ToolCore
+{
 
-  }
-
-}
-
-class MacBuildSettings {
-
-    appName:string;
-    package:string;
-    companyName:string;
-    productName:string;
+PlatformLinux::PlatformLinux(Context* context) : Platform(context)
+{
 
 }
 
-class WindowsBuildSettings {   
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
+PlatformLinux::~PlatformLinux()
+{
+
 }
 
-class WebBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
+BuildBase* PlatformLinux::NewBuild(Project *project)
+{
+    return new BuildLinux(context_, project);
 }
 
-class AndroidBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-    sDKVersion: string;
-    minSDKVersion: string;
-    activityName: string;
-    iconPath: string;
 }
-
-class IOSBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-    provisionFile: string;
-    appIDPrefix: string;
-}
-
-class LinuxBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-export = BuildSettings;

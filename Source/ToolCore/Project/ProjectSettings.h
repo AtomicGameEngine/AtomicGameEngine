@@ -85,6 +85,7 @@ namespace ToolCore
         bool GetSupportsAndroid() const;
         bool GetSupportsIOS() const;
         bool GetSupportsWeb() const;
+        bool GetSupportsLinux() const;
 
         void AddSupportedPlatform(const String& platform);
 
