@@ -47,6 +47,11 @@ namespace ToolCore
         return platforms_.Contains("web");
     }
 
+    bool ProjectSettings::GetSupportsLinux() const
+    {
+        return platforms_.Contains("linux");
+    }
+
     bool ProjectSettings::GetSupportsPlatform(const String& platform) const
     {
         return platforms_.Contains(platform);

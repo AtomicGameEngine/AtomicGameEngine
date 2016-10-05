@@ -30,6 +30,7 @@ import MacSettingsWidget = require("./platforms/MacSettingsWidget");
 import AndroidSettingsWidget = require("./platforms/AndroidSettingsWidget");
 import IOSSettingsWidget = require("./platforms/IOSSettingsWidget");
 import WebSettingsWidget = require("./platforms/WebSettingsWidget");
+import LinuxSettingsWidget = require("./platforms/LinuxSettingsWidget");
 
 export interface BuildSettingsWidget {
 
@@ -58,14 +59,16 @@ export class BuildSettingsWindow extends ModalWindow {
         platformSource.addItem(new Atomic.UISelectItem("Android", "AndroidBuildSettings", "LogoAndroid"));
         platformSource.addItem(new Atomic.UISelectItem("iOS", "iOSBuildSettings", "LogoIOS"));
         platformSource.addItem(new Atomic.UISelectItem("WebGL", "WebGLBuildSettings", "LogoHTML5"));
+        platformSource.addItem(new Atomic.UISelectItem("Linux", "LinuxBuildSettings", "LogoLinux"));
 
         platformSelect.setSource(platformSource);
 
         var lp = new Atomic.UILayoutParams();
 
+        var myh = 74 * platformSource.getItemCount(); // 74 pixels per platform icon
         lp.minWidth = 160;
-        lp.minHeight = 370;
-        lp.maxHeight = 370;
+        lp.minHeight = myh;
+        lp.maxHeight = myh;
 
         platformSelect.layoutParams = lp;
         platformSelect.gravity = Atomic.UI_GRAVITY_ALL;
@@ -77,6 +80,7 @@ export class BuildSettingsWindow extends ModalWindow {
         this.addPlatformWidget("ANDROID", new AndroidSettingsWidget(), "LogoAndroid", 2);
         this.addPlatformWidget("IOS", new IOSSettingsWidget(), "LogoIOS", 3);
         this.addPlatformWidget("WEB", new WebSettingsWidget(), "LogoHTML5", 4);
+        this.addPlatformWidget("LINUX", new LinuxSettingsWidget(), "LogoLinux", 5);
 
         var currentPlatform = ToolCore.toolSystem.currentPlatform;
         this.setDisplayPlatform(currentPlatform);
@@ -186,6 +190,10 @@ export class BuildSettingsWindow extends ModalWindow {
             }
             if (ev.refid == "WebGLBuildSettings") {
                 this.setDisplayPlatform(toolSystem.getPlatformByName("WEB"));
+                return true;
+            }
+            if (ev.refid == "LinuxBuildSettings") {
+                this.setDisplayPlatform(toolSystem.getPlatformByName("LINUX"));
                 return true;
             }
 

@@ -31,6 +31,7 @@ import MacSettingsWidget = require("./platforms/MacSettingsWidget");
 import AndroidSettingsWidget = require("./platforms/AndroidSettingsWidget");
 import IOSSettingsWidget = require("./platforms/IOSSettingsWidget");
 import WebSettingsWidget = require("./platforms/WebSettingsWidget");
+import LinuxSettingsWidget = require("./platforms/LinuxSettingsWidget");
 
 class BuildWindow extends ModalWindow {
 
@@ -54,6 +55,7 @@ class BuildWindow extends ModalWindow {
             case "ANDROID": this.platformIndicator.skinBg = "LogoAndroid"; break;
             case "IOS": this.platformIndicator.skinBg = "LogoIOS"; break;
             case "WEB": this.platformIndicator.skinBg = "LogoHTML5"; break;
+            case "LINUX": this.platformIndicator.skinBg = "LogoLinux"; break;
 
         }
 

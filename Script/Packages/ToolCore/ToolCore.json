@@ -5,15 +5,15 @@
 						 	 "Source/ToolCore/Subprocess", "Source/ToolCore/NETTools"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "ToolPrefs", "SubprocessSystem", "Subprocess",
 								"Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
-							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
+							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "PlatformLinux", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter", "JavascriptImporter", "JSONImporter",
 							 "TextureImporter", "SpriterImporter", "PEXImporter", "CSharpImporter", "NETAssemblyImporter",
 							 "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
 							 "NETProjectSystem",
-						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS",
-						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "IOSBuildSettings"],
+						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS", "BuildLinux",
+						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "IOSBuildSettings", "LinuxBuildSettings"],
 	"typescript_decl" : {
 
 		"ModelImporter" : [

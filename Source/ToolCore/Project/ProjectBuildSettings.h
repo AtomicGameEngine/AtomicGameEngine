@@ -199,6 +199,36 @@ private:
     String appidPrefix_;
 };
 
+class LinuxBuildSettings : public RefCounted
+{
+    ATOMIC_REFCOUNTED(LinuxBuildSettings)
+
+public:
+
+    LinuxBuildSettings() {}
+
+    const String& GetAppName() const { return appName_; }
+    const String& GetPackageName() const { return packageName_; }
+    const String& GetCompanyName() const { return companyName_; }
+    const String& GetProductName() const { return productName_; }
+
+    void SetAppName(const String& name) { appName_ = name; }
+    void SetPackageName(const String& packageName) { packageName_ = packageName; }
+    void SetCompanyName(const String& companyName) { companyName_ = companyName; }
+    void SetProductName(const String& productName) { productName_ = productName; }
+
+    void Write(JSONValue& parent);
+    void Read(JSONValue& parent);
+
+private:
+
+    String appName_;
+    String packageName_;
+    String companyName_;
+    String productName_;
+};
+
+
 class ProjectBuildSettings : public Object
 {
     ATOMIC_OBJECT(ProjectBuildSettings, Object);
@@ -214,6 +244,7 @@ public:
     WebBuildSettings* GetWebBuildSettings() { return webBuildSettings_; }
     AndroidBuildSettings* GetAndroidBuildSettings() { return androidBuildSettings_; }
     IOSBuildSettings* GetIOSBuildSettings() { return iosBuildSettings_; }
+    LinuxBuildSettings* GetLinuxBuildSettings() { return linuxBuildSettings_; }
 
     bool Load(const String& path);
     void Save(const String& path);
@@ -225,6 +256,7 @@ private:
     SharedPtr<WebBuildSettings> webBuildSettings_;
     SharedPtr<AndroidBuildSettings> androidBuildSettings_;
     SharedPtr<IOSBuildSettings> iosBuildSettings_;
+    SharedPtr<LinuxBuildSettings> linuxBuildSettings_;
 
 };
 

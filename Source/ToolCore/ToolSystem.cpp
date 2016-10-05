@@ -30,6 +30,7 @@
 #include "Platform/PlatformWindows.h"
 #include "Platform/PlatformAndroid.h"
 #include "Platform/PlatformIOS.h"
+#include "Platform/PlatformLinux.h"
 
 #include "Assets/AssetDatabase.h"
 #include "Net/CurlManager.h"
@@ -64,6 +65,7 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     RegisterPlatform(new PlatformWindows(context));
     RegisterPlatform(new PlatformIOS(context));
     RegisterPlatform(new PlatformAndroid(context));
+    RegisterPlatform(new PlatformLinux(context));
 
     SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(ToolSystem, HandleUpdate));
 }

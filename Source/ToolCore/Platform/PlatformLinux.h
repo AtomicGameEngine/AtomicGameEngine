@@ -20,62 +20,29 @@
 // THE SOFTWARE.
 //
 
-class BuildSettings {
+#pragma once
 
-  constructor() {
+#include "Platform.h"
 
-  }
+namespace ToolCore
+{
+
+class PlatformLinux : public Platform
+{
+    ATOMIC_OBJECT(PlatformLinux, Platform);
+
+public:
+
+    PlatformLinux(Context* context);
+    virtual ~PlatformLinux();
+
+    String GetName() { return "LINUX"; }
+    PlatformID GetPlatformID() { return PLATFORMID_LINUX; }
+
+    BuildBase* NewBuild(Project* project);
+
+    virtual bool GetLicense() { return true; }
+
+};
 
 }
-
-class MacBuildSettings {
-
-    appName:string;
-    package:string;
-    companyName:string;
-    productName:string;
-
-}
-
-class WindowsBuildSettings {   
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-class WebBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-class AndroidBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-    sDKVersion: string;
-    minSDKVersion: string;
-    activityName: string;
-    iconPath: string;
-}
-
-class IOSBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-    provisionFile: string;
-    appIDPrefix: string;
-}
-
-class LinuxBuildSettings {
-    appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
-}
-
-export = BuildSettings;

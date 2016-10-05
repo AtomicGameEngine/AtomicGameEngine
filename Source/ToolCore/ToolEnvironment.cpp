@@ -57,17 +57,16 @@ bool ToolEnvironment::InitFromPackage()
 #ifdef ATOMIC_PLATFORM_WINDOWS
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
     String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
+    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x64/AtomicPlayer.exe";
 #elif ATOMIC_PLATFORM_LINUX
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
     String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
+    playerBinary_ = resourcesDir + "ToolData/Deployment/Linux/AtomicPlayer";
 #else
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
     String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
-#endif
-
-    //TODO: move this to deployment stuff
     playerAppFolder_ = resourcesDir + "ToolData/Deployment/MacOS/AtomicPlayer.app/";
-    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x64/AtomicPlayer.exe";
+#endif
 
     resourceCoreDataDir_ = resourcesDir + "CoreData";
     resourcePlayerDataDir_ = resourcesDir + "PlayerData";
