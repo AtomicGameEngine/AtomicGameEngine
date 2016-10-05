@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <Poco/File.h>
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
@@ -102,17 +103,12 @@ void BuildLinux::BuildNative(const String& buildPath)
 
     if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer"))
         return;
-        
-// the BuildCopyFile does not copy a file from one location to another,
-// instead it opens a new file, and copies the contents. This results
-// in the loss of file execution bits/acls. There is no cross platform
-// way to transferr or restore these on the copied file.
-#ifdef ATOMIC_PLATFORM_LINUX 
-    // linux-to-linux restore the execute permissions lost in copy
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem->SystemCommand ( "chmod +x " + buildPath_ + "/AtomicPlayer") ) 
-        return;
-#endif
+    
+    // to perpetuate the execute bits on the executable
+    String copiedFile = buildPath_ + "/AtomicPlayer";
+    Poco::File deploy(copiedFile.CString());
+    if (deploy.exists())
+        deploy.setExecutable(true);
 }
 
 
