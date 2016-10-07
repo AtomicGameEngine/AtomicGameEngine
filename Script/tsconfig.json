@@ -78,6 +78,7 @@
         "./AtomicEditor/ui/modal/build/BuildWindow.ts",
         "./AtomicEditor/ui/modal/build/platforms/AndroidSettingsWidget.ts",
         "./AtomicEditor/ui/modal/build/platforms/IOSSettingsWidget.ts",
+        "./AtomicEditor/ui/modal/build/platforms/LinuxSettingsWidget.ts",
         "./AtomicEditor/ui/modal/build/platforms/MacSettingsWidget.ts",
         "./AtomicEditor/ui/modal/build/platforms/WebSettingsWidget.ts",
         "./AtomicEditor/ui/modal/build/platforms/WindowsSettingsWidget.ts",

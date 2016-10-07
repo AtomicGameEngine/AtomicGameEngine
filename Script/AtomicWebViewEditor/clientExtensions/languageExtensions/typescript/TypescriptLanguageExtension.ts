@@ -493,7 +493,7 @@ class CustomCompletionProvider extends BuiltinServiceProviderOverride implements
             item: item as WorkerProcessTypes.MonacoWordCompletion
         };
 
-        return this.extension.workerRequest(WorkerProcessTypes.MonacoResolveCompletionItem, message)
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoResolveCompletionItemResponse, message)
             .then((e: WorkerProcessTypes.MonacoResolveCompletionItemResponseMessageData) => {
                 return e;
             });
@@ -514,7 +514,7 @@ class CustomHoverProvider extends BuiltinServiceProviderOverride implements mona
         return { startLineNumber, startColumn, endLineNumber, endColumn };
     }
 
-    provideHover(model, position) {
+    provideHover(model: monaco.editor.IReadOnlyModel, position: monaco.IPosition) {
         let resource = model.uri;
         const message: WorkerProcessTypes.MonacoGetQuickInfoMessageData = {
             command: WorkerProcessTypes.MonacoGetQuickInfo,
@@ -528,7 +528,7 @@ class CustomHoverProvider extends BuiltinServiceProviderOverride implements mona
                 if (e.contents) {
                     return {
                         range: this._textSpanToRange(resource, e.textSpan),
-                        contents: [e.contents]
+                        contents: [e.documentation, { language: "typescript", value: e.contents }]
                     };
                 }
             });

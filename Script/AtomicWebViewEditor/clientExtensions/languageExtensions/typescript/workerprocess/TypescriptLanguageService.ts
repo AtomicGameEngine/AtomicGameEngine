@@ -310,7 +310,8 @@ export class TypescriptLanguageService {
         if (results) {
             return {
                 contents: ts.displayPartsToString(results.displayParts),
-                range: results.textSpan
+                range: results.textSpan,
+                documentation: ts.displayPartsToString(results.documentation)
             };
         } else {
             return null;
