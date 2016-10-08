@@ -75,7 +75,7 @@ export function getSourceText(): string {
 export function loadCodeIntoEditor(code: string, filename: string, fileExt: string) {
 
     let monacoEditor = internalEditor.getInternalEditor();
-    let model = monaco.editor.createModel(code, null, monaco.Uri.file(filename));
+    let model = monaco.editor.createModel(code, null, monaco.Uri.parse(filename));
 
     model.updateOptions({
         insertSpaces: serviceLocator.clientServices.getApplicationPreference("codeEditor", "useSoftTabs", true),

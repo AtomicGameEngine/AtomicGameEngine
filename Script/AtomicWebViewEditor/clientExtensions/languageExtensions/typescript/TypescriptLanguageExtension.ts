@@ -323,7 +323,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 };
             });
 
-        monaco.editor.setModelMarkers(this.editor.getModel(), "Atomic", markers);
+        monaco.editor.setModelMarkers(this.editor.getModel(), "typescript", markers);
     }
 
     /**
