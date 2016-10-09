@@ -472,12 +472,13 @@ export default class TypescriptLanguageServiceWebWorker {
         let quickInfo = this.languageService.getQuickInfoAtPosition(filename, eventData.positionOffset);
 
         let message: WorkerProcessTypes.MonacoGetQuickInfoResponseMessageData = {
-            command: WorkerProcessTypes.MonacoGetQuickInfoResponse,
+            command: WorkerProcessTypes.MonacoGetQuickInfoResponse
         };
 
         if (quickInfo) {
             message.contents = quickInfo.contents;
             message.textSpan = quickInfo.range;
+            message.documentation = quickInfo.documentation;
         }
 
         port.postMessage(message);

@@ -107,6 +107,7 @@ export interface MonacoGetQuickInfoMessageData extends WorkerProcessMessageData 
 
 export interface MonacoGetQuickInfoResponseMessageData extends WorkerProcessMessageData {
     contents?: string;
+    documentation?: string;
     textSpan?: {
         start: number,
         length: number

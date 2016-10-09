@@ -32,10 +32,19 @@ import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventN
  */
 export function configure(fileExt: string, filename: string) {
 
+    // converter to handle new version of the renderWhitespace setting
+    const renderWhitespaceAdapter = (setting): 'none' | 'boundary' | 'all' => {
+        switch (setting.toLowerCase()) {
+            case "true": return "all";
+            case "false": return "none";
+            default: return setting;
+        }
+    };
+
     let monacoEditor = <monaco.editor.IStandaloneCodeEditor>internalEditor.getInternalEditor();
     monacoEditor.updateOptions({
         theme: serviceLocator.clientServices.getApplicationPreference("codeEditor", "theme", "vs-dark"),
-        renderWhitespace: serviceLocator.clientServices.getApplicationPreference("codeEditor", "showInvisibles", false),
+        renderWhitespace: renderWhitespaceAdapter(serviceLocator.clientServices.getApplicationPreference("codeEditor", "showInvisibles", "none")),
         mouseWheelScrollSensitivity: 2,
         fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12),
         fontFamily: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontFamily", "")
@@ -66,7 +75,7 @@ export function getSourceText(): string {
 export function loadCodeIntoEditor(code: string, filename: string, fileExt: string) {
 
     let monacoEditor = internalEditor.getInternalEditor();
-    let model = monaco.editor.createModel(code, null, monaco.Uri.file(filename));
+    let model = monaco.editor.createModel(code, null, monaco.Uri.parse(filename));
 
     model.updateOptions({
         insertSpaces: serviceLocator.clientServices.getApplicationPreference("codeEditor", "useSoftTabs", true),

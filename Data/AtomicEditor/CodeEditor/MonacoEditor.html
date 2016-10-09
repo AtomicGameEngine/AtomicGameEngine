@@ -42,6 +42,14 @@
             }
         });
 
+        // Need to override how Monaco web workers are getting resolved since for some reason they can't get located properly
+        // inside the Monaco editor code
+        window.MonacoEnvironment = {
+            getWorkerUrl: function(workerId, label) {
+                return 'source/monaco/vs/base/worker/' + workerId;
+            }
+        };
+
         var setupEditor = new Promise((resolve, reject) => {
             require(['vs/editor/editor.main'], function() {
                 var editor = monaco.editor.create(document.getElementById('editor'));

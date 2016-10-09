@@ -62,7 +62,7 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
             let editor = <monaco.editor.IStandaloneCodeEditor>ev.editor;
             monaco.editor.setModelLanguage(editor.getModel(), "turbobadger");
             editor.updateOptions({
-                renderWhitespace: true,
+                renderWhitespace: "all",
                 useTabStops: true,
             });
         }
