@@ -224,7 +224,7 @@ public:
         D3DLOCKED_RECT d3dLockedRect;
         IDirect3DTexture9* object = (IDirect3DTexture9*) webTexture2D_->GetTexture2D()->GetGPUObject();
 
-        if (FAILED(object->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
+        if (!object || FAILED(object->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
         {
             ATOMIC_LOGERROR("WebTexture2D - Could not lock texture");
             return;
