@@ -156,9 +156,11 @@ namespace AtomicEngine
 
 
                 // TODO: tune GC
+                /*
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 GC.Collect();
+                */
 
                 ExpireNatives();
             }

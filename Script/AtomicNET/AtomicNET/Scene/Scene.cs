@@ -81,7 +81,7 @@ namespace AtomicEngine
 
             Object[] args = new Object[1] { e.TimeStep };
 
-            foreach (var item in cscomponents)
+            foreach (var item in cscomponents.ToList())
             {
                 var info = item.Key;
 
@@ -90,7 +90,7 @@ namespace AtomicEngine
                 if (UpdateMethod == null)
                     continue;
 
-                foreach (var csc in item.Value)
+                foreach (var csc in item.Value.ToList())
                 {
                     if (!csc.Started || !csc.IsEnabled())
                         continue;
