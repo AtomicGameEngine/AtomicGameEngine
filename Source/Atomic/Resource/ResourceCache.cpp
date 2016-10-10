@@ -711,6 +711,8 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
         return SharedPtr<Resource>();
     }
 
+// ATOMIC BEGIN
+
     // Attempt to load the resource
     SharedPtr<File> file;
 
@@ -723,7 +725,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
         String ddsName = "DDS/" + name + ".dds";
         file = GetFile(ddsName, false);
         if (file)
-            LOGDEBUG("Loaded cached DDS " + name + ".dds");
+            ATOMIC_LOGDEBUG("Loaded cached DDS " + name + ".dds");
     }
     if (!file)
         file = GetFile(name, sendEventOnFailure);
@@ -731,6 +733,8 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     // #623 END TODO
     file = GetFile(name, sendEventOnFailure);
 #endif
+
+// ATOMIC END
 
     if (!file)
         return SharedPtr<Resource>();  // Error is already logged
