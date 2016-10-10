@@ -28,6 +28,7 @@
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Graphics/Camera.h>
 
+#include "PlayerEvents.h"
 #include "Player.h"
 
 namespace AtomicPlayer
@@ -66,11 +67,24 @@ Scene* Player::LoadScene(const String& filename, Camera *camera)
 
     Scene* scene = new Scene(context_);
 
+    VariantMap eventData;
+
+    eventData[PlayerSceneLoadBegin::P_SCENE] = scene;
+
+    scene->SendEvent(E_PLAYERSCENELOADBEGIN, eventData);
+
     if (!scene->LoadXML(*file))
     {
+        eventData[PlayerSceneLoadEnd::P_SCENE] = scene;
+        eventData[PlayerSceneLoadEnd::P_SUCCESS] = false;
+        scene->SendEvent(E_PLAYERSCENELOADEND, eventData);
         scene->ReleaseRef();
         return 0;
     }
+
+    eventData[PlayerSceneLoadEnd::P_SCENE] = scene;
+    eventData[PlayerSceneLoadEnd::P_SUCCESS] = true;
+    scene->SendEvent(E_PLAYERSCENELOADEND, eventData);
 
     if (currentScene_.Null())
     {

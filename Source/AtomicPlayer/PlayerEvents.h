@@ -24,32 +24,19 @@
 
 #include <Atomic/Core/Object.h>
 
-namespace Atomic
+using namespace Atomic;
+
+namespace AtomicPlayer
 {
-
-    /// Reference to CSAssembly made
-    ATOMIC_EVENT(E_CSCOMPONENTASSEMBLYREFERENCE, CSComponentAssemblyReference)
+    ATOMIC_EVENT(E_PLAYERSCENELOADBEGIN, PlayerSceneLoadBegin)
     {
-        ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
+        ATOMIC_PARAM(P_SCENE, Scene);        // Scene
     }
 
-    ATOMIC_EVENT(E_CSCOMPONENTLOAD, CSComponentLoad)
+    ATOMIC_EVENT(E_PLAYERSCENELOADEND, PlayerSceneLoadEnd)
     {
-        ATOMIC_PARAM(P_CLASSNAME, ClassName); // String
-        ATOMIC_PARAM(P_NATIVEINSTANCE, NativeInstance); // CSComponent as void*
-        ATOMIC_PARAM(P_FIELDVALUES, FieldValues);  // VariantMap as void*
-    }
-
-    ATOMIC_EVENT(E_CSCOMPONENTASSEMBLYCHANGED, CSComponentAssemblyChanged)
-    {
-        ATOMIC_PARAM(P_RESOURCE, Resource); // Resource
-        ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
-    }
-
-    ATOMIC_EVENT(E_CSCOMPONENTCLASSCHANGED, CSComponentClassChanged)
-    {
-        ATOMIC_PARAM(P_CSCOMPONENT, Component); // CSComponent*
-        ATOMIC_PARAM(P_CLASSNAME, Classname); // String
+        ATOMIC_PARAM(P_SCENE, Scene);       // Scene
+        ATOMIC_PARAM(P_SUCCESS, Success);   // bool
     }
 
 }

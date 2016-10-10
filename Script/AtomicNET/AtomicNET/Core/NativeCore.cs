@@ -356,6 +356,10 @@ namespace AtomicEngine
                 throw new InvalidOperationException("NativeCore.WrapNative - Attempting to wrap unknown native class id");
             }
 
+            // TODO: make CSComponent abstract and have general abstract logic here?
+            if (nativeType.Type == typeof(CSComponent))
+                return null;
+
             r = nativeType.managedConstructor(native);
 
             w = new WeakReference<RefCounted>(r);

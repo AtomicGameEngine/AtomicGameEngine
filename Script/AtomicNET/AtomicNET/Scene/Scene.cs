@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static System.Reflection.IntrospectionExtensions;
@@ -20,6 +21,8 @@ namespace AtomicEngine
                 //Log.Info($"Node REMOVED: {e.Node.Name}");
 
             });
+
+            SubscribeToEvent<CSComponentLoadEvent>(this, HandleCSComponentLoad);
 
             SubscribeToEvent<ComponentAddedEvent>(this, HandleComponentAdded);
             SubscribeToEvent<ComponentRemovedEvent>(this, HandleComponentRemoved);
@@ -44,17 +47,18 @@ namespace AtomicEngine
             // Handle Start
             if (cscomponentStart.Count > 0)
             {
-                var newList = new List<CSComponent>();
-                foreach (var csc in cscomponentStart)
+                var started = new List<CSComponent>();
+
+                foreach (var csc in cscomponentStart.ToList())
                 {
                     if (!csc.IsEnabled())
                     {
-                        newList.Add(csc);
                         continue;
                     }
 
                     // mark as started whether or not a Start method exists
                     csc.started = true;
+                    started.Add(csc);
 
                     CSComponentInfo info;
                     if (CSComponentCore.csinfoLookup.TryGetValue(csc.GetType(), out info))
@@ -67,7 +71,10 @@ namespace AtomicEngine
 
                 }
 
-                cscomponentStart = newList;
+                foreach (var csc in started)
+                {
+                    cscomponentStart.Remove(csc);
+                }
             }
 
             // Handle Scene Update
@@ -224,6 +231,73 @@ namespace AtomicEngine
 
         }
 
+        void HandleCSComponentLoad(CSComponentLoadEvent e)
+        {
+            var scriptMap = e.scriptMap;
+
+            // Get the NativeInstance as an IntPtr, otherwise we would be wrapping as a CSComponent
+            IntPtr csnative = scriptMap.GetVoidPtr("NativeInstance");
+
+            IntPtr fieldValues = IntPtr.Zero;
+            if (scriptMap.Contains("FieldValues"))
+                fieldValues = scriptMap.GetVoidPtr("FieldValues");
+
+            CSComponentInfo csinfo;
+
+            if (!CSComponentCore.componentCache.TryGetValue(e.ClassName, out csinfo))
+            {
+                return;
+            }
+
+            NativeCore.NativeContructorOverride = csnative;
+            var component = (CSComponent)Activator.CreateInstance(csinfo.Type);
+            NativeCore.VerifyNativeContructorOverrideConsumed();
+
+            if (fieldValues != IntPtr.Zero)
+                csinfo.ApplyFieldValues(component, fieldValues);
+
+            AddCSComponent(component);
+
+        }
+
+        void AddCSComponent(CSComponent csc)
+        {
+            CSComponentInfo info;
+
+            if (!CSComponentCore.csinfoLookup.TryGetValue(csc.GetType(), out info))
+            {
+                Log.Error("Scene.HandleComponentAdded - unable to get CSComponentInfo");
+                return;
+            }
+
+            List<CSComponent> cslist;
+
+            if (!cscomponents.TryGetValue(info, out cslist))
+            {
+                cslist = cscomponents[info] = new List<CSComponent>();
+            }
+
+            if (cslist.Contains(csc))
+            {
+                throw new InvalidOperationException("Scene.HandleComponentAdded - CSComponent already added to component list");
+            }
+
+            cslist.Add(csc);
+
+            if (cscomponentStart.Contains(csc))
+            {
+                throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already added to start list");
+            }
+
+            if (csc.started)
+            {
+                throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already started");
+            }
+
+            cscomponentStart.Add(csc);
+
+        }
+
         void HandleComponentAdded(ComponentAddedEvent e)
         {
             Component component;
@@ -239,9 +313,9 @@ namespace AtomicEngine
             }
             
 
+            // Check null (CSComponent) or other abstract component
             if (component == null)
-            {
-                Log.Error("Scene.HandleComponentAdded - null component");
+            {                
                 return;
             }
 
@@ -257,40 +331,7 @@ namespace AtomicEngine
             if (component.GetType().GetTypeInfo().IsSubclassOf(typeof(CSComponent)))
             {
                 var csc = (CSComponent)component;
-
-                CSComponentInfo info;
-
-                if (!CSComponentCore.csinfoLookup.TryGetValue(component.GetType(), out info))
-                {
-                    Log.Error("Scene.HandleComponentAdded - unable to get CSComponentInfo");
-                    return;
-                }
-
-                List<CSComponent> cslist;
-
-                if (!cscomponents.TryGetValue(info, out cslist))
-                {
-                    cslist = cscomponents[info] = new List<CSComponent>();
-                }
-
-                if (cslist.Contains(csc))
-                {
-                    throw new InvalidOperationException("Scene.HandleComponentAdded - CSComponent already added to component list");
-                }
-
-                cslist.Add(csc);
-
-                if (cscomponentStart.Contains(csc))
-                {
-                    throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already added to start list");
-                }
-
-                if (csc.started)
-                {
-                    throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already started");
-                }
-
-                cscomponentStart.Add(csc);
+                AddCSComponent(csc);
 
             }
 

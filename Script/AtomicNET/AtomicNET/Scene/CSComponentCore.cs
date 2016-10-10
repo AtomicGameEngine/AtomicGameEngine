@@ -144,32 +144,6 @@ namespace AtomicEngine
 
     public class CSComponentCore : NETScriptObject
     {
-
-        void HandleComponentLoad(uint eventType, ScriptVariantMap eventData)
-        {
-            var className = eventData["ClassName"];
-
-            IntPtr csnative = eventData.GetVoidPtr("NativeInstance");
-            IntPtr fieldValues = IntPtr.Zero;
-
-            if (eventData.Contains("FieldValues"))
-                fieldValues = eventData.GetVoidPtr("FieldValues");
-
-            CSComponentInfo csinfo;
-
-            if (!componentCache.TryGetValue(className, out csinfo))
-            {
-                return;
-            }
-
-            NativeCore.NativeContructorOverride = csnative;
-            var component = (CSComponent)Activator.CreateInstance(csinfo.Type);
-            NativeCore.VerifyNativeContructorOverrideConsumed();
-
-            if (fieldValues != IntPtr.Zero)
-                csinfo.ApplyFieldValues(component, fieldValues);
-        }
-
         [Obsolete("Method HandleComponentAssemblyReference is deprecated (loading component assemblies at runtime, will be changed to preload them)")]
         void HandleComponentAssemblyReference(uint eventType, ScriptVariantMap eventData)
         {
@@ -223,12 +197,11 @@ namespace AtomicEngine
             instance.ParseComponents();
 
             instance.SubscribeToEvent("CSComponentAssemblyReference", instance.HandleComponentAssemblyReference);
-            instance.SubscribeToEvent("CSComponentLoad", instance.HandleComponentLoad);
 
         }
 
         // type name -> CSComponentInfo lookup TODO: store with namespace to solve ambiguities
-        Dictionary<string, CSComponentInfo> componentCache = new Dictionary<string, CSComponentInfo>();
+        internal static Dictionary<string, CSComponentInfo> componentCache = new Dictionary<string, CSComponentInfo>();
 
         [Obsolete("Member parsedAssemblies is temporarily required for runtime component assemblies loading")]
         Dictionary<Assembly, bool> parsedAssemblies = new Dictionary<Assembly, bool>();

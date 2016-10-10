@@ -103,18 +103,9 @@ void CSComponent::SendLoadEvent()
     if (!componentClassName_.Length())
         return;
 
-    // TODO: We need to factor out runtime loading of CSComponent assemblies
-    CSComponentAssembly*  assemblyFile = 0;
-
-#ifdef ATOMIC_PLATFORM_DESKTOP
-    assemblyFile = CSComponentAssembly::ResolveClassAssembly(componentClassName_);
-#endif
-
     using namespace CSComponentLoad;
 
     VariantMap eventData;
-
-    eventData[P_ASSEMBLYPATH] = assemblyFile ? GetFileName(assemblyFile->GetFullPath()) : String::EMPTY;
 
     eventData[P_CLASSNAME] = componentClassName_;
     eventData[P_NATIVEINSTANCE] = (void*) this;
@@ -122,7 +113,8 @@ void CSComponent::SendLoadEvent()
     if (!fieldValues_.Empty())
         eventData[P_FIELDVALUES] = (void*) &fieldValues_;
 
-    SendEvent(E_CSCOMPONENTLOAD, eventData);
+    if (node_ && node_->GetScene())
+        node_->GetScene()->SendEvent(E_CSCOMPONENTLOAD, eventData);
 
 }
 
