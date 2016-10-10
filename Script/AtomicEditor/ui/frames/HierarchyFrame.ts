@@ -39,6 +39,7 @@ class HierarchyFrame extends Atomic.UIWidget {
     search: boolean = false;
     searchEdit: Atomic.UIEditField;
     selectedNode: Atomic.Node;
+    canReparent: boolean;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -51,6 +52,8 @@ class HierarchyFrame extends Atomic.UIWidget {
         this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
 
         this.searchEdit = <Atomic.UIEditField>this.getWidget("filter");
+
+        this.canReparent = true;
 
         var hierarchycontainer = parent.getWidget("hierarchycontainer");
         hierarchycontainer.addChild(this);
@@ -69,15 +72,21 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
 
-        // handle dropping on hierarchy, moving node, dropping prefabs, etc
-        this.subscribeToEvent(this.hierList.rootList, "DragEnded", (data) => this.handleDragEnded(data));
         // on mouse up clear the list's drag object
         this.subscribeToEvent("MouseButtonUp", () => {
-
-          this.hierList.rootList.dragObject = null;
-
+            // handle dropping on hierarchy, moving node, dropping prefabs, etc
+            this.subscribeToEvent(this.hierList.rootList, "DragEnded", (data) => this.handleDragEnded(data));
+            this.hierList.rootList.dragObject = null;
         });
 
+        this.subscribeToEvent("KeyDown", () => {
+            this.canReparent = false;
+        });
+
+        this.subscribeToEvent("KeyUp", () => {
+            this.canReparent = true;
+        });
+        
         this.subscribeToEvent(EditorEvents.ProjectClosed, (ev) => {
             
             this.scene = null;
@@ -340,19 +349,40 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (!ev.dragObject.object)
             return;
 
-        var typeName = ev.dragObject.object.typeName;
-
         var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
 
         if (!dropNode) return;
 
-        if (typeName == "Node") {
+        var dragNodeTypeName = ev.dragObject.object.typeName;
 
-            var dragNode = <Atomic.Node>ev.dragObject.object;
+        if (!this.canReparent)
+            return;
 
-            this.sceneEditor.reparentNode(dragNode, dropNode);
+        if (dragNodeTypeName == "Node") {
 
-        } else if (typeName == "Asset") {
+            if (this.sceneEditor.selection.getSelectedNodeCount() < 2) {
+
+                var dragNode = <Atomic.Node>ev.dragObject.object;
+                this.sceneEditor.reparentNode(dragNode, dropNode);
+
+            } else {
+
+                var tempSelectedList = [];
+
+                for (var i = 0; i < this.sceneEditor.selection.getSelectedNodeCount(); i++)
+                    tempSelectedList.push(this.sceneEditor.selection.getSelectedNode(i));
+
+                for (var j in tempSelectedList) {
+
+                    var tempNode = tempSelectedList[j];
+                    var typeName = tempNode.typeName;
+
+                    if (typeName == "Node")
+                        this.sceneEditor.reparentNode(tempNode, dropNode);
+                }
+            }
+
+        } else if (dragNodeTypeName == "Asset") {
 
             var asset = <ToolCore.Asset>ev.dragObject.object;
             var newNode = asset.instantiateNode(dropNode, asset.name);
