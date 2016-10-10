@@ -52,14 +52,6 @@ class ResourceSelection extends ModalWindow {
         this.setSize(800, 600);
         this.center();
 
-        //Activates the search as the user types
-        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => {
-
-            if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
-                this.populate(this.importerType, this.resourceType, true);
-            }
-        });
-
     }
 
     //adjusted to delete current folderlist and replace with search list if search is activated
@@ -127,6 +119,14 @@ class ResourceSelection extends ModalWindow {
             if (id == this.folderList.rootList.id) {
                 this.selectFile();
             }
+        }
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+
+            //Activates the search as the user types
+            if (ev.target == this.searchEdit)
+                this.populate(this.importerType, this.resourceType, true);
+
         }
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
