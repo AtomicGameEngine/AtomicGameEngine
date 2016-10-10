@@ -194,6 +194,10 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
     {
         for (unsigned i = 0; i < animationResources_.Size(); i++)
         {
+            if (animationResources_[i] == NULL)
+                continue;
+
+        
             if (name == animationResources_[i]->GetAnimationName())
             {
                 newAnimation = animationResources_[i];
@@ -930,6 +934,9 @@ void AnimationController::FindAnimation(const String& name, unsigned& index, Ani
     {
         for (unsigned i = 0; i < animationResources_.Size(); i++)
         {
+            if (animationResources_[i] == NULL)
+                continue;
+
             if (name == animationResources_[i]->GetAnimationName())
             {
                 nameHash = animationResources_[i]->GetName();
