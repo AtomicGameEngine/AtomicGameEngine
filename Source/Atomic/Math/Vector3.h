@@ -222,16 +222,6 @@ public:
     /// Linear interpolation with another vector.
     Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
 
-    Vector3 ClampedLerp(const Vector3& rhs, float t) const 
-    {
-        if (t > 1)
-            t = 1;
-        else if (t < 0)
-            t = 0;
-
-        return *this * (1.0f - t) + rhs * t;
-    }
-
     /// Test for equality with another vector with epsilon.
     bool Equals(const Vector3& rhs) const
     {
@@ -257,6 +247,18 @@ public:
             return *this;
     }
 
+    // ATOMIC BEGIN
+    Vector3 ClampedLerp(const Vector3& rhs, float t) const
+    {
+        if (t > 1)
+            t = 1;
+        else if (t < 0)
+            t = 0;
+
+        return *this * (1.0f - t) + rhs * t;
+    }
+    // ATOMIC END
+    
     /// Return float data.
     const float* Data() const { return &x_; }
 
