@@ -134,6 +134,7 @@ private:
     bool OnWidgetDying(tb::TBWidget *widget);    
     void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
     bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
+    void OnWindowClose(tb::TBWindow *window);
 
 
     tb::TBWidget* rootWidget_;

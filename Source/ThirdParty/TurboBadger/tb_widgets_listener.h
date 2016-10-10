@@ -59,6 +59,11 @@ public:
         to intercept events before they are handled, and block it (by returning true).
         Note, if returning true, other global listeners will still also be notified. */
     virtual bool OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev) { return false; }
+
+    // ATOMIC BEGIN
+    virtual void OnWindowClose(TBWindow *window) {}
+    // ATOMIC END
+
 private:
     friend class TBWidget;
     friend class TBEditField;
@@ -68,6 +73,11 @@ private:
     static void InvokeWidgetRemove(TBWidget *parent, TBWidget *child);
     static void InvokeWidgetFocusChanged(TBWidget *widget, bool focused);
     static bool InvokeWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev);
+
+    // ATOMIC BEGIN
+    friend class TBWindow;
+    static void InvokeWindowClose(TBWindow *window);
+    // ATOMIC END
 };
 
 /** TBWidgetSafePointer keeps a pointer to a widget that will be set to

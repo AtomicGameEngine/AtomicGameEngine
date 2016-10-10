@@ -109,6 +109,11 @@ ATOMIC_EVENT(E_UISHORTCUT, UIShortcut)
 
 }
 
+ATOMIC_EVENT(E_WINDOWCLOSED, WindowClosed)
+{
+    ATOMIC_PARAM(P_WINDOW, Window);               // UIWindow
+}
+
 ATOMIC_EVENT(E_UIWIDGETFOCUSCHANGED, UIWidgetFocusChanged)
 {
     ATOMIC_PARAM(P_WIDGET, Widget);             // UIWidget pointer

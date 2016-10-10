@@ -53,6 +53,16 @@ class ModalOps extends Atomic.ScriptObject {
 
         this.dimmer = new Atomic.UIDimmer();
 
+        this.subscribeToEvent("WindowClosed", (e) => {
+            if (e.window == this.opWindow)
+            {
+                this.opWindow = null;
+                if (this.dimmer.parent) {
+                    this.dimmer.parent.removeChild(this.dimmer, false);
+                }
+            }
+        });
+
     }
 
     showCreateProject(projectTemplateDefinition: ProjectTemplates.ProjectTemplateDefinition) {

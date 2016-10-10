@@ -4,6 +4,7 @@
 // ================================================================================
 
 #include "tb_widgets_listener.h"
+#include "tb_window.h"
 
 namespace tb {
 
@@ -84,6 +85,18 @@ bool TBWidgetListener::InvokeWidgetInvokeEvent(TBWidget *widget, const TBWidgetE
         handled |= static_cast<TBWidgetListener*>(link)->OnWidgetInvokeEvent(widget, ev);
     return handled;
 }
+
+// ATOMIC BEGIN
+void TBWidgetListener::InvokeWindowClose(TBWindow *window)
+{
+    TBLinkListOf<TBWidgetListenerGlobalLink>::Iterator global_i = g_listeners.IterateForward();
+    TBLinkListOf<TBWidgetListener>::Iterator local_i = window->m_listeners.IterateForward();
+    while (TBWidgetListener *listener = local_i.GetAndStep())
+        listener->OnWindowClose(window);
+    while (TBWidgetListenerGlobalLink *link = global_i.GetAndStep())
+        static_cast<TBWidgetListener*>(link)->OnWindowClose(window);
+}
+// ATOMIC END
 
 // == TBWidgetSafePointer ===================================================================================
 

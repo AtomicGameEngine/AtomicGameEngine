@@ -64,6 +64,9 @@ void TBWindow::ResizeToFitContent(RESIZE_FIT fit)
 
 void TBWindow::Close()
 {
+// ATOMIC BEGIN
+    TBWidgetListener::InvokeWindowClose(this);
+// ATOMIC END
     Die();
 }
 

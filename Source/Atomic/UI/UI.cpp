@@ -861,6 +861,17 @@ bool UI::OnWidgetDying(tb::TBWidget *widget)
     return false;
 }
 
+void UI::OnWindowClose(tb::TBWindow *window)
+{
+    if (widgetWrap_.Contains(window))
+    {
+        UIWidget* widget = widgetWrap_[window];
+        VariantMap eventData;
+        eventData[WindowClosed::P_WINDOW] = widget;
+        widget->SendEvent(E_WINDOWCLOSED, eventData);
+    }
+}
+
 void UI::OnWidgetFocusChanged(TBWidget *widget, bool focused)
 {
     if (widgetWrap_.Contains(widget))

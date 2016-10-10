@@ -189,11 +189,11 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
 
 void UIWidget::OnDelete()
 {
-    UnsubscribeFromAllEvents();   
-
     VariantMap eventData;
     eventData[WidgetDeleted::P_WIDGET] = this;
     this->SendEvent(E_WIDGETDELETED, eventData);
+
+    UnsubscribeFromAllEvents();
 
     if (widget_)
     {
