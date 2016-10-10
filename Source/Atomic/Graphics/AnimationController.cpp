@@ -194,6 +194,12 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
     {
         for (unsigned i = 0; i < animationResources_.Size(); i++)
         {
+            // ATOMIC BEGIN
+            // Check whether the animation resource isn't loaded
+            if (animationResources_[i] == NULL)
+                continue;
+            // ATOMIC END
+
             if (name == animationResources_[i]->GetAnimationName())
             {
                 newAnimation = animationResources_[i];
@@ -702,9 +708,9 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
             animations_[index].autoFadeTime_ = 0.0f;
-        
+
         animations_[index].removeOnCompletion_ = (ctrl & CTRL_REMOVEONCOMPLETION) != 0;
-        
+
         if (ctrl & CTRL_SETTIME)
         {
             unsigned char setTimeRev = buf.ReadUByte();
@@ -930,6 +936,12 @@ void AnimationController::FindAnimation(const String& name, unsigned& index, Ani
     {
         for (unsigned i = 0; i < animationResources_.Size(); i++)
         {
+            // ATOMIC BEGIN
+            // Check whether the animation resource isn't loaded
+            if (animationResources_[i] == NULL)
+                continue;
+            // ATOMIC END        
+
             if (name == animationResources_[i]->GetAnimationName())
             {
                 nameHash = animationResources_[i]->GetName();
