@@ -20,6 +20,26 @@ namespace AtomicEngine
         public float m22;
         public float m23;
 
+        static public readonly Matrix3x4 IDENTITY = CreateIdentity();
+
+        static Matrix3x4 CreateIdentity()
+        {
+            var m = new Matrix3x4();
+            m.m00 = 1.0f;
+            m.m01 = 0.0f;
+            m.m02 = 0.0f;
+            m.m03 = 0.0f;
+            m.m10 = 0.0f;
+            m.m11 = 1.0f;
+            m.m12 = 0.0f;
+            m.m13 = 0.0f;
+            m.m20 = 0.0f;
+            m.m21 = 0.0f;
+            m.m22 = 1.0f;
+            m.m23 = 0.0f;
+            return m;
+        }
+
         public Matrix3x4 Inverse()
         {
             float det = m00 * m11 * m22 +

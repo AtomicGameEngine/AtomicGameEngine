@@ -105,7 +105,7 @@ namespace AtomicEngine
             AObject obj;
 
             foreach (var subList in eventReceiverLookup.Values)
-            {                
+            {
                 subList.RemoveAll(item => item.Receiver.TryGetTarget(out obj) && obj == receiver);
             }
 
@@ -116,8 +116,8 @@ namespace AtomicEngine
             //TODO: OPTIMIZE
 
             if (sender == IntPtr.Zero)
-                return;         
-            
+                return;
+
             foreach (var subList in eventReceiverLookup.Values)
             {
                 var len = subList.Count;
@@ -144,18 +144,18 @@ namespace AtomicEngine
         static float expireDelta = 0.0f;
 
         // called ahead of E_UPDATE event
-#if ATOMIC_IOS
+        #if ATOMIC_IOS
         [MonoPInvokeCallback(typeof(UpdateDispatchDelegate))]
-#endif
+        #endif
         public static void UpdateDispatch(float timeStep)
         {
             expireDelta += timeStep;
             if (expireDelta > 2.0f)
             {
                 expireDelta = 0.0f;
-    
-                
-                // TODO: tune GC    
+
+
+                // TODO: tune GC
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 GC.Collect();
@@ -279,6 +279,9 @@ namespace AtomicEngine
         }
 
         // Called from RefCounted native destructor, refCounted is not valid for any operations here
+        #if ATOMIC_IOS
+        [MonoPInvokeCallback(typeof(RefCountedDeletedDelegate))]
+        #endif
         public static void RefCountedDeleted(IntPtr refCounted)
         {
             nativeLookup.Remove(refCounted);
