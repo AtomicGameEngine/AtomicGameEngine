@@ -32,7 +32,7 @@ namespace ToolCore
 class JSBModule;
 class JSBClass;
 class JSBEnum;
-
+class JSBEvent;
 class JSBPackageWriter;
 
 class JSBPackage : public Object
@@ -84,6 +84,12 @@ public:
     bool ContainsConstant(const String& constantName);
 
     static bool ContainsConstantAllPackages(const String& constantName);
+
+    /// Get an event from this package, matches on either eventID or eventName
+    JSBEvent* GetEvent(const String& eventID, const String& eventName);
+
+    // get an event by name across all loaded packages
+    static JSBEvent* GetEventAllPackages(const String& eventID, const String& eventName);
 
     void GenerateSource(JSBPackageWriter& packageWriter);
 

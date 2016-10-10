@@ -34,34 +34,39 @@
 namespace Atomic
 {
 
+// UI_WIDGET_* enums must match TurboBadger internal enum values, we assign directly to TB enum values
+// as C# script bindings need the values 
+// Note, this could be automated with a dumper util that compiles values in, however that is quite complicated
+
 /// Defines widget visibility, used with UIWidget::SetVisibility.
 enum UI_WIDGET_VISIBILITY
 {
     /// Visible (default)
-    UI_WIDGET_VISIBILITY_VISIBLE = tb:: WIDGET_VISIBILITY_VISIBLE,
+    UI_WIDGET_VISIBILITY_VISIBLE = 0, //tb::WIDGET_VISIBILITY_VISIBLE,
     /// Invisible, but layouted. Interaction disabled.
-    UI_WIDGET_VISIBILITY_INVISIBLE = tb::WIDGET_VISIBILITY_INVISIBLE,
+    UI_WIDGET_VISIBILITY_INVISIBLE = 1, //tb::WIDGET_VISIBILITY_INVISIBLE,
     /// Invisible and no layout. Interaction disabled.
-    UI_WIDGET_VISIBILITY_GONE = tb::WIDGET_VISIBILITY_GONE
+    UI_WIDGET_VISIBILITY_GONE = 2 //tb::WIDGET_VISIBILITY_GONE
 };
 
 /// TBWidget gravity (may be combined).
 /// Gravity gives hints about positioning and sizing preferences.
 enum UI_GRAVITY {
 
-    UI_GRAVITY_NONE = tb::WIDGET_GRAVITY_NONE,
-    UI_GRAVITY_LEFT = tb::WIDGET_GRAVITY_LEFT,
-    UI_GRAVITY_RIGHT = tb::WIDGET_GRAVITY_RIGHT,
-    UI_GRAVITY_TOP = tb::WIDGET_GRAVITY_TOP,
-    UI_GRAVITY_BOTTOM = tb::WIDGET_GRAVITY_BOTTOM,
+    UI_GRAVITY_NONE = 0,   // tb::WIDGET_GRAVITY_NONE,
+    UI_GRAVITY_LEFT = 1,   // tb::WIDGET_GRAVITY_LEFT,
+    UI_GRAVITY_RIGHT = 2,  // tb::WIDGET_GRAVITY_RIGHT,
+    UI_GRAVITY_TOP = 4,    // tb::WIDGET_GRAVITY_TOP,
+    UI_GRAVITY_BOTTOM = 8, // tb::WIDGET_GRAVITY_BOTTOM,
 
-    UI_GRAVITY_LEFT_RIGHT    = tb::WIDGET_GRAVITY_LEFT_RIGHT,
-    UI_GRAVITY_TOP_BOTTOM    = tb::WIDGET_GRAVITY_TOP_BOTTOM,
-    UI_GRAVITY_ALL            = tb::WIDGET_GRAVITY_ALL,
-    UI_GRAVITY_DEFAULT        = tb::WIDGET_GRAVITY_DEFAULT
+    UI_GRAVITY_LEFT_RIGHT    = 3 ,  // tb::WIDGET_GRAVITY_LEFT_RIGHT,
+    UI_GRAVITY_TOP_BOTTOM    = 12,  // tb::WIDGET_GRAVITY_TOP_BOTTOM,
+    UI_GRAVITY_ALL           = 15, // tb::WIDGET_GRAVITY_ALL,
+    UI_GRAVITY_DEFAULT       = 5   // tb::WIDGET_GRAVITY_DEFAULT
 };
 
 enum UI_EVENT_TYPE {
+
     /** Click event is what should be used to trig actions in almost all cases.
 
         It is invoked on a widget after POINTER_UP if the pointer is still inside
@@ -70,7 +75,7 @@ enum UI_EVENT_TYPE {
 
         If panning of scrollable widgets start while the pointer is down, CLICK
         won't be invoked when releasing the pointer (since that should stop panning). */
-    UI_EVENT_TYPE_CLICK = tb::EVENT_TYPE_CLICK,
+    UI_EVENT_TYPE_CLICK = 0, // tb::EVENT_TYPE_CLICK,
 
     /** Long click event is sent when the pointer has been down for some time
         without moving much.
@@ -79,76 +84,76 @@ enum UI_EVENT_TYPE {
         If this event isn't handled, the widget will invoke a CONTEXT_MENU event.
         If any of those are handled, the CLICK event that would normally be
         invoked after the pending POINTER_UP will be suppressed. */
-    UI_EVENT_TYPE_LONG_CLICK = tb::EVENT_TYPE_LONG_CLICK,
-    UI_EVENT_TYPE_POINTER_DOWN = tb::EVENT_TYPE_POINTER_DOWN,
-    UI_EVENT_TYPE_POINTER_UP = tb::EVENT_TYPE_POINTER_UP,
-    UI_EVENT_TYPE_POINTER_MOVE = tb::EVENT_TYPE_POINTER_MOVE,
-    UI_EVENT_TYPE_RIGHT_POINTER_DOWN = tb::EVENT_TYPE_RIGHT_POINTER_DOWN,
-    UI_EVENT_TYPE_RIGHT_POINTER_UP = tb::EVENT_TYPE_RIGHT_POINTER_UP,
-    UI_EVENT_TYPE_WHEEL = tb::EVENT_TYPE_WHEEL,
+    UI_EVENT_TYPE_LONG_CLICK = 1, // tb::EVENT_TYPE_LONG_CLICK,
+    UI_EVENT_TYPE_POINTER_DOWN = 2, // tb::EVENT_TYPE_POINTER_DOWN,
+    UI_EVENT_TYPE_POINTER_UP = 3, // tb::EVENT_TYPE_POINTER_UP,
+    UI_EVENT_TYPE_POINTER_MOVE = 4, // tb::EVENT_TYPE_POINTER_MOVE,
+    UI_EVENT_TYPE_RIGHT_POINTER_DOWN = 5, // tb::EVENT_TYPE_RIGHT_POINTER_DOWN,
+    UI_EVENT_TYPE_RIGHT_POINTER_UP = 6, // tb::EVENT_TYPE_RIGHT_POINTER_UP,
+    UI_EVENT_TYPE_WHEEL = 7, // tb::EVENT_TYPE_WHEEL,
 
     /** Invoked after changing text in a TBTextField, changing selected item
         in a TBSelectList etc. Invoking this event trigs synchronization with
         connected TBWidgetValue and other widgets connected to it. */
-    UI_EVENT_TYPE_CHANGED = tb::EVENT_TYPE_CHANGED,
-    UI_EVENT_TYPE_KEY_DOWN = tb::EVENT_TYPE_KEY_DOWN,
-    UI_EVENT_TYPE_KEY_UP = tb::EVENT_TYPE_KEY_UP,
+    UI_EVENT_TYPE_CHANGED = 8, // tb::EVENT_TYPE_CHANGED,
+    UI_EVENT_TYPE_KEY_DOWN = 9, // tb::EVENT_TYPE_KEY_DOWN,
+    UI_EVENT_TYPE_KEY_UP = 10, // tb::EVENT_TYPE_KEY_UP,
 
     /** Invoked by the platform when a standard keyboard shortcut is pressed.
         It's called before InvokeKeyDown (EVENT_TYPE_KEY_DOWN) and if the event
         is handled (returns true), the KeyDown is canceled.
         The ref_id will be set to one of the following:
             "cut", "copy", "paste", "selectall", "undo", "redo", "new", "open", "save". */
-    UI_EVENT_TYPE_SHORTCUT = tb::EVENT_TYPE_SHORTCUT,
+    UI_EVENT_TYPE_SHORTCUT = 11, // tb::EVENT_TYPE_SHORTCUT,
 
     /** Invoked when a context menu should be opened at the event x and y coordinates.
         It may be invoked automatically for a widget on long click, if nothing handles
         the long click event. */
-    UI_EVENT_TYPE_CONTEXT_MENU = tb::EVENT_TYPE_CONTEXT_MENU,
+    UI_EVENT_TYPE_CONTEXT_MENU = 12, // tb::EVENT_TYPE_CONTEXT_MENU,
 
     /** Invoked by the platform when one or multiple files has been dropped on
         the widget. The event is guaranteed to be a TBWidgetEventFileDrop. */
-    UI_EVENT_TYPE_FILE_DROP = tb::EVENT_TYPE_FILE_DROP,
+    UI_EVENT_TYPE_FILE_DROP = 13, // tb::EVENT_TYPE_FILE_DROP,
 
     /** Invoked by the platform when a tab container's tab changed */
-    UI_EVENT_TYPE_TAB_CHANGED = tb::EVENT_TYPE_TAB_CHANGED,
+    UI_EVENT_TYPE_TAB_CHANGED = 14, // tb::EVENT_TYPE_TAB_CHANGED,
 
     /** Custom event. Not used internally. ref_id may be used for additional type info. */
-    UI_EVENT_TYPE_CUSTOM = tb::EVENT_TYPE_CUSTOM
+    UI_EVENT_TYPE_CUSTOM = 15 // tb::EVENT_TYPE_CUSTOM
 };
 
 /** Defines widget z level relative to another widget, used with TBWidget::AddChildRelative. */
 enum UI_WIDGET_Z_REL {
-    UI_WIDGET_Z_REL_BEFORE = tb::WIDGET_Z_REL_BEFORE,        ///< Before the reference widget (visually behind reference).
-    UI_WIDGET_Z_REL_AFTER = tb::WIDGET_Z_REL_AFTER            ///< After the reference widget (visually above reference).
+    UI_WIDGET_Z_REL_BEFORE = 0, // tb::WIDGET_Z_REL_BEFORE,        ///< Before the reference widget (visually behind reference).
+    UI_WIDGET_Z_REL_AFTER = 1   // tb::WIDGET_Z_REL_AFTER            ///< After the reference widget (visually above reference).
 };
 
 /// TB_TEXT_ALIGN specifies horizontal text alignment
 enum UI_TEXT_ALIGN
 {
-    UI_TEXT_ALIGN_LEFT = tb::TB_TEXT_ALIGN_LEFT,
-    UI_TEXT_ALIGN_RIGHT = tb::TB_TEXT_ALIGN_RIGHT,
-    UI_TEXT_ALIGN_CENTER = tb::TB_TEXT_ALIGN_CENTER
+    UI_TEXT_ALIGN_LEFT = 0,     // tb::TB_TEXT_ALIGN_LEFT,
+    UI_TEXT_ALIGN_RIGHT = 1,    // tb::TB_TEXT_ALIGN_RIGHT,
+    UI_TEXT_ALIGN_CENTER = 2    // tb::TB_TEXT_ALIGN_CENTER
 };
 
 enum UI_WIDGET_STATE {
 
-    UI_WIDGET_STATE_NONE = tb::WIDGET_STATE_NONE,
-    UI_WIDGET_STATE_DISABLED = tb::WIDGET_STATE_DISABLED,
-    UI_WIDGET_STATE_FOCUSED = tb::WIDGET_STATE_FOCUSED,
-    UI_WIDGET_STATE_PRESSED = tb::WIDGET_STATE_PRESSED,
-    UI_WIDGET_STATE_SELECTED = tb::WIDGET_STATE_SELECTED,
-    UI_WIDGET_STATE_HOVERED = tb::WIDGET_STATE_HOVERED,
+    UI_WIDGET_STATE_NONE = 0,       // tb::WIDGET_STATE_NONE,
+    UI_WIDGET_STATE_DISABLED = 1,   // tb::WIDGET_STATE_DISABLED,
+    UI_WIDGET_STATE_FOCUSED = 2,    // tb::WIDGET_STATE_FOCUSED,
+    UI_WIDGET_STATE_PRESSED = 4,    // tb::WIDGET_STATE_PRESSED,
+    UI_WIDGET_STATE_SELECTED = 8,   // tb::WIDGET_STATE_SELECTED,
+    UI_WIDGET_STATE_HOVERED = 16,   // tb::WIDGET_STATE_HOVERED,
 
-    UI_WIDGET_STATE_ALL = tb::WIDGET_STATE_ALL
+    UI_WIDGET_STATE_ALL = 31        // tb::WIDGET_STATE_ALL
 
 };
 
 enum UI_AXIS {
     ///< Horizontal layout
-    UI_AXIS_X = tb::AXIS_X,
+    UI_AXIS_X = 0,  // tb::AXIS_X,
     ///< Vertical layout
-    UI_AXIS_Y = tb::AXIS_Y,
+    UI_AXIS_Y = 1   // tb::AXIS_Y,
 };
 
 

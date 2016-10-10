@@ -47,7 +47,7 @@ void CSPackageWriter::GenNativeFunctionSignature(JSBFunction* function, String& 
 {
     JSBClass* klass = function->GetClass();
 
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     Vector<String> args;
 

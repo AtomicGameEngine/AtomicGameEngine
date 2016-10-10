@@ -87,7 +87,7 @@ public:
                 }
             }
 
-            jenum->AddValue(name);
+            jenum->AddValue(name, value);
 
         }
 

@@ -3,7 +3,7 @@
 	"requires" : ["3D"],
 	"sources" : ["Source/Atomic/Navigation"],
 	"includes" : ["<Atomic/Scene/Node.h>"],
-	"classes" : ["Navigable", "NavigationMesh", "OffMeshConnection"],
+	"classes" : ["Navigable", "NavigationMesh", "DynamicNavigationMesh", "NavArea", "OffMeshConnection", "Obstacle", "CrowdAgent", "CrowdManager"],
 	"overloads" : {
 		"NavigationMesh" : {
 			"Build" : []

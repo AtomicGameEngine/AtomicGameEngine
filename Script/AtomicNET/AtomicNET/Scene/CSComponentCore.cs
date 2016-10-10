@@ -43,8 +43,11 @@ namespace AtomicEngine
             Type[] postUpdateParms = new Type[1] { typeof(float) };
             PostUpdateMethod = type.GetMethod("PostUpdate", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, postUpdateParms, null);
 
-            Type[] fixedUpdateParms = new Type[1] { typeof(float) };
-            FixedUpdateMethod = type.GetMethod("FixedUpdate", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, fixedUpdateParms, null);
+            Type[] physicsPreStepParms = new Type[1] { typeof(float) };
+            PhysicsPreStepMethod = type.GetMethod("PhysicsPreStep", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, physicsPreStepParms, null);
+
+            Type[] physicsPostStepParms = new Type[1] { typeof(float) };
+            PhysicsPostStepMethod = type.GetMethod("PhysicsPostStep", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, physicsPostStepParms, null);
 
             Type[] startParms = new Type[0] { };
             StartMethod = type.GetMethod("Start", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, startParms, null);
@@ -118,136 +121,22 @@ namespace AtomicEngine
 
         }
 
-        public void RegisterInstance(CSComponent component)
-        {
-            Instances.Add(component);
-
-            if (StartMethod != null)
-            {
-                StartList.Add(component);
-            }
-
-        }
-
-        public void FixedUpdate(Object[] args)
-        {
-            if (FixedUpdateMethod == null)
-                return;
-
-            foreach (var instance in Instances)
-            { 
-                var node = instance.Node;
-
-                if (node != null && node.IsEnabled())
-                {
-
-                    if (node.Scene != null)
-                    {
-                        FixedUpdateMethod.Invoke(instance, args);
-                    }
-                }
-            }
-        }
-
-        public void PostUpdate(Object[] args)
-        {
-            if (PostUpdateMethod == null)
-                return;
-
-            foreach (var instance in Instances)
-            {
-                var node = instance.Node;
-
-                if (node != null && node.IsEnabled())
-                {
-
-                    if (node.Scene != null)
-                    {
-                        PostUpdateMethod.Invoke(instance, args);
-                    }
-                }
-            }
-        }
-
-
-        public void Update(Object[] args)
-        {
-            if (StartMethod != null)
-            {
-                foreach (var instance in StartList)
-                {
-                    var node = instance.Node;
-
-                    if (node != null && node.IsEnabled())
-                    {
-                        if (node.Scene != null)
-                        {
-                            StartMethod.Invoke(instance, null);
-                        }
-                    }
-
-                }
-
-                // TODO: need to handle delayed starts when node isn't enabled
-                StartList.Clear();
-
-            }
-
-            if (UpdateMethod != null)
-            {
-                foreach (var instance in Instances)
-                {
-                    bool remove = false;
-
-                    var node = instance.Node;
-
-                    // TODO: Ideally we want to remove disabled instances,
-                    // and re-add them when re-enabled
-                    if (node != null /*&& node.IsEnabled()*/)
-                    {
-
-                        if (node.Scene != null)
-                        {
-                            if (node.IsEnabled())
-                                UpdateMethod.Invoke(instance, args);
-                        }
-                        else
-                        {
-                            remove = true;
-                        }
-                    }
-                    else
-                    {
-                        remove = true;
-                    }
-
-                    if (remove)
-                        RemoveList.Add(instance);
-                }
-            }
-
-            foreach (var instance in RemoveList)
-            {
-                Instances.Remove(instance);                
-            }
-
-            RemoveList.Clear();
-        }
-
-        public List<CSComponent> Instances = new List<CSComponent>();
-        public List<CSComponent> StartList = new List<CSComponent>();
-
-        public List<CSComponent> RemoveList = new List<CSComponent>();
-
         public FieldInfo[] InspectorFields;
         public Type Type;
 
-        public MethodInfo FixedUpdateMethod = null;
-        public MethodInfo PostUpdateMethod = null;
-        public MethodInfo UpdateMethod = null;        
+        // Start method called once
         public MethodInfo StartMethod = null;
-        
 
+        // Update called first
+        public MethodInfo UpdateMethod = null;
+
+        // Physics steps if any
+        public MethodInfo PhysicsPreStepMethod = null;
+        public MethodInfo PhysicsPostStepMethod = null;
+
+        // Post Update
+        public MethodInfo PostUpdateMethod = null;
+                
         ScriptVariantMap fieldMap = new ScriptVariantMap();
 
         public Dictionary<uint, FieldInfo> fieldLookup = new Dictionary<uint, FieldInfo>();
@@ -255,86 +144,12 @@ namespace AtomicEngine
 
     public class CSComponentCore : NETScriptObject
     {
-
-        public static void RegisterInstance(CSComponent component)
-        {
-            instance.csinfoLookup[component.GetType()].RegisterInstance(component);
-        }
-
-        void HandleUpdate(uint eventType, ScriptVariantMap eventData)
-        {
-            Object[] args = new Object[1] { eventData.GetFloat("timestep") };
-
-            foreach (var csinfo in csinfoLookup.Values)
-            {
-                csinfo.Update(args);
-            }
-
-        }
-
-        void HandlePhysicsPreStep(uint eventType, ScriptVariantMap eventData)
-        {
-            // TODO: eventData also has a PhysicsWorld pointer, which could be factored in for multiworld support
-
-            Object[] args = new Object[1] { eventData.GetFloat("timestep") };
-
-            foreach (var csinfo in csinfoLookup.Values)
-            {
-                csinfo.FixedUpdate(args);
-            }
-
-        }
-
-        void HandlePostUpdate(uint eventType, ScriptVariantMap eventData)
-        {
-            Object[] args = new Object[1] { eventData.GetFloat("timestep") };
-
-            foreach (var csinfo in csinfoLookup.Values)
-            {
-                csinfo.PostUpdate(args);
-            }
-
-        }
-
-        void HandleComponentLoad(uint eventType, ScriptVariantMap eventData)
-        {
-            var className = eventData["ClassName"];
-
-            IntPtr csnative = eventData.GetVoidPtr("NativeInstance");
-            IntPtr fieldValues = IntPtr.Zero;
-
-            if (eventData.Contains("FieldValues"))
-                fieldValues = eventData.GetVoidPtr("FieldValues");
-
-            CSComponentInfo csinfo;
-
-            if (!componentCache.TryGetValue(className, out csinfo))
-            {
-                return;
-            }
-
-            NativeCore.NativeContructorOverride = csnative;
-            var component = (CSComponent)Activator.CreateInstance(csinfo.Type);
-            NativeCore.VerifyNativeContructorOverrideConsumed();
-
-            if (fieldValues != IntPtr.Zero)
-                csinfo.ApplyFieldValues(component, fieldValues);
-
-            csinfo.RegisterInstance(component);
-
-        }
-
         [Obsolete("Method HandleComponentAssemblyReference is deprecated (loading component assemblies at runtime, will be changed to preload them)")]
         void HandleComponentAssemblyReference(uint eventType, ScriptVariantMap eventData)
         {
-#if ATOMIC_DESKTOP || ATOMIC_MOBILE
             string assemblyPath = eventData["AssemblyPath"];
             string assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
-
-            ParseAssembly(assembly);
-#endif
+            Log.Info($"Component Assembly referenced {assemblyName} ");
         }
 
         void ParseComponents()
@@ -382,23 +197,16 @@ namespace AtomicEngine
             instance.ParseComponents();
 
             instance.SubscribeToEvent("CSComponentAssemblyReference", instance.HandleComponentAssemblyReference);
-            instance.SubscribeToEvent("CSComponentLoad", instance.HandleComponentLoad);
-            instance.SubscribeToEvent("Update", instance.HandleUpdate);
-
-            // PhysicsPreStep gets mapped to FixedUpdate
-            instance.SubscribeToEvent("PhysicsPreStep", instance.HandlePhysicsPreStep);
-
-            instance.SubscribeToEvent("PostUpdate", instance.HandlePostUpdate);
 
         }
 
         // type name -> CSComponentInfo lookup TODO: store with namespace to solve ambiguities
-        Dictionary<string, CSComponentInfo> componentCache = new Dictionary<string, CSComponentInfo>();
+        internal static Dictionary<string, CSComponentInfo> componentCache = new Dictionary<string, CSComponentInfo>();
 
         [Obsolete("Member parsedAssemblies is temporarily required for runtime component assemblies loading")]
         Dictionary<Assembly, bool> parsedAssemblies = new Dictionary<Assembly, bool>();
 
-        Dictionary<Type, CSComponentInfo> csinfoLookup = new Dictionary<Type, CSComponentInfo>();
+        internal static Dictionary<Type, CSComponentInfo> csinfoLookup = new Dictionary<Type, CSComponentInfo>();
 
         static CSComponentCore instance;
     }

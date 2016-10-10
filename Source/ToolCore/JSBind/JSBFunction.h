@@ -139,19 +139,19 @@ public:
 
     JSBFunction(JSBClass* klass);
 
-    const String& GetName() { return name_; }
+    const String& GetName() const { return name_; }
 
     bool Match(JSBFunction* func);
 
-    bool IsConstructor() { return isConstructor_; }
-    bool IsDestructor() { return isDestructor_; }
-    bool IsSetter() { return isSetter_; }
-    bool IsGetter() { return isGetter_; }
+    bool IsConstructor() const { return isConstructor_; }
+    bool IsDestructor() const { return isDestructor_; }
+    bool IsSetter() const { return isSetter_; }
+    bool IsGetter() const { return isGetter_; }
     bool IsOverload() { return isOverload_; }
-    bool IsVirtual() { return isVirtual_; }
-    bool IsStatic() { return isStatic_; }
+    bool IsVirtual() const { return isVirtual_; }
+    bool IsStatic() const { return isStatic_; }
 
-    bool Skip(BindingLanguage language = BINDINGLANGUAGE_ANY)
+    bool Skip(BindingLanguage language = BINDINGLANGUAGE_ANY) const
     {
         if (skip_ || language == BINDINGLANGUAGE_ANY)
             return skip_;
@@ -161,16 +161,16 @@ public:
 
     unsigned GetID() const { return id_; }
 
-    JSBClass* GetClass() { return class_; }
+    JSBClass* GetClass() const { return class_; }
     const String& GetPropertyName() { return propertyName_; }
-    JSBFunctionType* GetReturnType() { return returnType_; }
+    JSBFunctionType* GetReturnType() const { return returnType_; }
 
     /// Get class return type or null
     JSBClass* GetReturnClass();
 
-    Vector<JSBFunctionType*>& GetParameters() { return parameters_; }
+    const Vector<JSBFunctionType*>& GetParameters() const { return parameters_; }
 
-    const String& GetDocString() { return docString_; }
+    const String& GetDocString() const { return docString_; }
 
     void SetName(const String& name) { name_ = name; }
     void SetConstructor(bool value = true) { isConstructor_ = value; }
@@ -236,7 +236,7 @@ public:
 
     void Dump()
     {
-        String sig;
+        String sig = ToString("Function ID: %u - ", id_);
         if (!returnType_)
             sig += "void ";
         else
@@ -253,6 +253,19 @@ public:
                  sig += ", ";
         }
         sig += ");";
+
+        String skipText;
+
+        if (GetSkipLanguage(BINDINGLANGUAGE_CSHARP))
+            skipText += "C#";
+
+        if (GetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT))
+            skipText += " JavaScript";
+
+        if (skipText.Length())
+        {
+            sig += ToString(" (Skipped: %s)", skipText.CString());
+        }
 
         ATOMIC_LOGINFOF("      %s", sig.CString());
 

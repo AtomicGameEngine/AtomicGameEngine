@@ -53,7 +53,7 @@ private:
     void GenerateManagedModuleClass(String& sourceOut);
     void GenerateManagedClasses(String& source);
     void GenerateManagedEnumsAndConstants(String& source);
-
+    void GenerateManagedNativeEvents(String& sourceOut);
 
     void WriteIncludes(String& source);
 

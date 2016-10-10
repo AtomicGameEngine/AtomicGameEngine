@@ -43,6 +43,9 @@ class RefCounted;
 // function that is called when ref count goes to 1 or 2+, used for script object lifetime
 typedef void (*RefCountChangedFunction)(RefCounted*, int refCount);
 
+// function callback for when a RefCounted is deleted
+typedef void(*RefCountedDeletedFunction)(RefCounted*);
+
 typedef const void* ClassID;
 
 /// Macro to be included in RefCounted derived classes for efficient RTTI
@@ -118,6 +121,9 @@ public:
     static void AddRefCountChangedFunction(RefCountChangedFunction function);
     static void RemoveRefCountChangedFunction(RefCountChangedFunction function);
 
+    static void AddRefCountedDeletedFunction(RefCountedDeletedFunction function);
+    static void RemoveRefCountedDeletedFunction(RefCountedDeletedFunction function);
+
 // ATOMIC END
 
 private:
@@ -135,6 +141,7 @@ private:
     void* jsHeapPtr_;
 
     static PODVector<RefCountChangedFunction> refCountChangedFunctions_;
+    static PODVector<RefCountedDeletedFunction> refCountedDeletedFunctions_;
 
     // ATOMIC END
 

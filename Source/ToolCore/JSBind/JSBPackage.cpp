@@ -26,6 +26,7 @@
 #include <Atomic/Resource/JSONFile.h>
 
 #include "JSBind.h"
+#include "JSBEvent.h"
 #include "JSBModule.h"
 #include "JSBPackage.h"
 #include "JSBPackageWriter.h"
@@ -77,6 +78,11 @@ void JSBPackage::ProcessModules()
         modules_[i]->PostProcessClasses();
     }
 
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        JSBEvent::ScanModuleEvents(modules_[i]);
+    }
+
 }
 
 void JSBPackage::GenerateSource(JSBPackageWriter& packageWriter)
@@ -108,6 +114,31 @@ JSBClass* JSBPackage::GetClassAllPackages(const String& name)
 
     return 0;
 
+}
+
+JSBEvent* JSBPackage::GetEvent(const String& eventID, const String& eventName)
+{
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        JSBEvent* event = modules_[i]->GetEvent(eventID, eventName);
+
+        if (event)
+            return event;
+    }
+
+    return 0;
+}
+
+JSBEvent* JSBPackage::GetEventAllPackages(const String& eventID, const String& eventName)
+{
+    for (unsigned i = 0; i < allPackages_.Size(); i++)
+    {
+        JSBEvent* event = allPackages_[i]->GetEvent(eventID, eventName);
+        if (event)
+            return event;
+    }
+
+    return 0;
 }
 
 JSBEnum* JSBPackage::GetEnum(const String& name)

@@ -191,9 +191,9 @@ void UIWidget::OnDelete()
 {
     VariantMap eventData;
     eventData[WidgetDeleted::P_WIDGET] = this;
-    SendEvent(E_WIDGETDELETED, eventData);
+    this->SendEvent(E_WIDGETDELETED, eventData);
 
-    UnsubscribeFromAllEvents();   
+    UnsubscribeFromAllEvents();
 
     if (widget_)
     {
@@ -201,13 +201,8 @@ void UIWidget::OnDelete()
         UI* ui = GetSubsystem<UI>();
 
         if (ui)
-        { 
-            if (ui->UnwrapWidget(widget_))
-            {
-                widget_ = 0;
-                ReleaseRef();
-                return;
-            }
+        {
+            ui->UnwrapWidget(widget_);
         }
     }
 

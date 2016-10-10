@@ -134,7 +134,7 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
 
     source_ += scriptName + "(";
 
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     for (unsigned i = 0; i < parameters.Size(); i++)
     {

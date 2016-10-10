@@ -18,6 +18,9 @@ namespace AtomicEngine
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void UpdateDispatchDelegate(float timeStep);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void RefCountedDeletedDelegate(IntPtr refCounted);
+
     public class NativeType
     {
 
@@ -72,36 +75,10 @@ namespace AtomicEngine
                 throw new InvalidOperationException("NativeCore.SubscribeToEvent - unable to find native receiver instance");
             }
 
-            RefCounted refcounted;
-            if (!w.TryGetTarget(out refcounted))
-            {
-                throw new InvalidOperationException("NativeCore.SubscribeToEvent - attempting to subscribe a GC'd AObject");
-            }
-
-            IntPtr nativeSender = IntPtr.Zero;
-            if (sender != null)
-            {
-                nativeSender = sender.nativeInstance;
-                if (!nativeLookup.TryGetValue(sender.nativeInstance, out w))
-                {
-                    throw new InvalidOperationException("NativeCore.SubscribeToEvent - unable to find native sender instance");
-                }
-
-                if (!w.TryGetTarget(out refcounted))
-                {
-                    throw new InvalidOperationException("NativeCore.SubscribeToEvent - attempting to subscribe to a GC'd AObject");
-                }
-            }
-
-            eventReceivers.Add(new EventSubscription(receiver, nativeSender));
+            eventReceivers.Add(new EventSubscription(receiver, sender));
         }
 
         static internal void UnsubscribeFromEvent(AObject receiver, uint eventType)
-        {
-            UnsubscribeFromEvent(receiver, null, eventType);
-        }
-
-        static internal void UnsubscribeFromEvent(AObject receiver, RefCounted sender, uint eventType)
         {
             List<EventSubscription> eventReceivers;
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
@@ -113,12 +90,41 @@ namespace AtomicEngine
                 if (!er.Receiver.TryGetTarget(out obj))
                     continue; // GC'd
 
-                if (obj == receiver &&
-                    (sender == null || er.Sender == sender.nativeInstance))
+                if (obj == receiver)
                 {
                     eventReceivers.Remove(er);
                     return;
                 }
+            }
+        }
+
+        static internal void UnsubscribeFromAllEvents(AObject receiver)
+        {
+            // TODO: Optimize
+
+            AObject obj;
+
+            foreach (var subList in eventReceiverLookup.Values)
+            {
+                subList.RemoveAll(item => item.Receiver.TryGetTarget(out obj) && obj == receiver);
+            }
+
+        }
+
+        static internal void RemoveEventSender(IntPtr sender)
+        {
+            //TODO: OPTIMIZE
+
+            if (sender == IntPtr.Zero)
+                return;
+
+            foreach (var subList in eventReceiverLookup.Values)
+            {
+                var len = subList.Count;
+
+                subList.RemoveAll(item => item.Sender == sender);
+
+                //TODO: The events are still in the receiver lookup tables!
             }
         }
 
@@ -138,15 +144,24 @@ namespace AtomicEngine
         static float expireDelta = 0.0f;
 
         // called ahead of E_UPDATE event
-#if ATOMIC_IOS
+        #if ATOMIC_IOS
         [MonoPInvokeCallback(typeof(UpdateDispatchDelegate))]
-#endif
+        #endif
         public static void UpdateDispatch(float timeStep)
         {
             expireDelta += timeStep;
             if (expireDelta > 2.0f)
             {
                 expireDelta = 0.0f;
+
+
+                // TODO: tune GC
+                /*
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                */
+
                 ExpireNatives();
             }
         }
@@ -165,25 +180,18 @@ namespace AtomicEngine
 
             }
 
-            AObject managedSender = null;
-            WeakReference<RefCounted> wr;
-            if (sender != IntPtr.Zero &&
-                nativeLookup.TryGetValue(sender, out wr))
-            {
-                RefCounted refCounted;
-                if (wr.TryGetTarget(out refCounted))
-                {
-                    managedSender = refCounted as AObject;
-                }
-            }
-
             // iterate over copy of list so we can modify it while running
             ScriptVariantMap scriptMap = null;
+            NativeEventData nativeEventData = null;
+
             AObject receiver;
             foreach (EventSubscription er in eventReceivers.ToList())
             {
                 // GC'd?
                 if (!er.Receiver.TryGetTarget(out receiver))
+                    continue;
+
+                if (er.Sender != IntPtr.Zero && er.Sender != sender)
                     continue;
 
                 if (scriptMap == null)
@@ -195,20 +203,22 @@ namespace AtomicEngine
 
                     scriptMap = svm[svmDepth++];
                     scriptMap.CopyVariantMap(eventData);
+                    nativeEventData = NativeEvents.GetNativeEventData(eventType, scriptMap);
+                    nativeEventData.sourceEventData = eventData;
                 }
 
-                if (managedSender != null && er.Sender == sender)
-                {
-                    receiver.HandleEvent(managedSender, eventType, scriptMap);
-                }
-                else if (er.Sender == IntPtr.Zero)
-                {
-                    receiver.HandleEvent(eventType, scriptMap);
-                }
+                receiver.HandleEvent(eventType, scriptMap, nativeEventData);
             }
 
             if (scriptMap != null)
+            {
                 svmDepth--;
+
+                if (nativeEventData != null)
+                {
+                    NativeEvents.ReleaseNativeEventData(nativeEventData);
+                }
+            }
 
         }
 
@@ -270,6 +280,16 @@ namespace AtomicEngine
 
         }
 
+        // Called from RefCounted native destructor, refCounted is not valid for any operations here
+        #if ATOMIC_IOS
+        [MonoPInvokeCallback(typeof(RefCountedDeletedDelegate))]
+        #endif
+        public static void RefCountedDeleted(IntPtr refCounted)
+        {
+            nativeLookup.Remove(refCounted);
+            RemoveEventSender(refCounted);
+        }
+
         // register a newly created native
         public static IntPtr RegisterNative(IntPtr native, RefCounted r)
         {
@@ -283,6 +303,10 @@ namespace AtomicEngine
             r.AddRef();
 
             nativeLookup[native] = new WeakReference<RefCounted>(r);
+
+            r.InstantiationType = InstantiationType.INSTANTIATION_NET;
+
+            r.PostNativeUpdate();
 
             return native;
         }
@@ -334,6 +358,10 @@ namespace AtomicEngine
                 throw new InvalidOperationException("NativeCore.WrapNative - Attempting to wrap unknown native class id");
             }
 
+            // TODO: make CSComponent abstract and have general abstract logic here?
+            if (nativeType.Type == typeof(CSComponent))
+                return null;
+
             r = nativeType.managedConstructor(native);
 
             w = new WeakReference<RefCounted>(r);
@@ -341,6 +369,15 @@ namespace AtomicEngine
 
             // store a ref, so native side will not be released while we still have a reference in managed code
             r.AddRef();
+
+            // Note: r.InstantiationType may be INSTANTIATION_NET here is we were GC'd, native still had a reference, and we came back
+            if (r.InstantiationType == InstantiationType.INSTANTIATION_NET)
+            {
+                //Log.Warn($"Wrapped {r.GetType().Name} was originally instantiated in NET, changing to native, this is likely an error");
+                //r.InstantiationType = InstantiationType.INSTANTIATION_NATIVE;
+            }
+
+            r.PostNativeUpdate();
 
             return (T)r;
         }
@@ -439,10 +476,16 @@ namespace AtomicEngine
             public WeakReference<AObject> Receiver;
             public IntPtr Sender;
 
-            public EventSubscription(AObject obj, IntPtr source)
+            public EventSubscription(AObject receiver)
             {
-                Receiver = new WeakReference<AObject>(obj);
-                Sender = source;
+                Receiver = new WeakReference<AObject>(receiver);
+                Sender = IntPtr.Zero;
+            }
+
+            public EventSubscription(AObject receiver, IntPtr sender)
+            {
+                Receiver = new WeakReference<AObject>(receiver);
+                Sender = sender;
             }
         }
 

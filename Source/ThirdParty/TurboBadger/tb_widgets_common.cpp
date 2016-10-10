@@ -680,7 +680,7 @@ bool TBSlider::OnEvent(const TBWidgetEvent &ev)
                 ev.special_key == TB_KEY_RIGHT || ev.special_key == TB_KEY_DOWN)
             return true;
     }
-    return false;
+    return TBWidget::OnEvent(ev);
 }
 
 void TBSlider::UpdateHandle()

@@ -104,7 +104,7 @@ bool JSBFunction::Match(JSBFunction* func)
             return false;
     }
 
-    Vector<JSBFunctionType*>& fparams = func->GetParameters();
+    const Vector<JSBFunctionType*>& fparams = func->GetParameters();
 
     if (parameters_.Size() != fparams.Size())
         return false;

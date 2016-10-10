@@ -2,6 +2,12 @@
     "examples" : [
 
         {
+            "name": "Feature Examples",
+            "desc" : "Multiple Feature Examples",
+            "screenshot" : "Example.png",
+            "folder" : "FeatureExamples"
+        },
+        {
             "name": "Basic2D",
             "desc" : "Basic2D Scene Example",
             "screenshot" : "Basic2D.png",

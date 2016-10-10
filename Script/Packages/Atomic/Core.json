@@ -8,6 +8,11 @@
 	"excludes" : {
 		"Object" : {
 			"SendEvent" : ["StringHash"]
+		},
+		"CSharp" : {
+			"Object" : {
+				"UnsubscribeFromAllEvents" : []
+			}
 		}
 	},
 	"overloads" : {

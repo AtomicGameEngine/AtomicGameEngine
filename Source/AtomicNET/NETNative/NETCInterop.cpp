@@ -1,10 +1,25 @@
 
+#include <Atomic/Script/ScriptVariant.h>
 #include <Atomic/Script/ScriptVariantMap.h>
 #include <Atomic/IPC/IPC.h>
 
 #include <Atomic/Graphics/VertexBuffer.h>
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Graphics.h>
+#include <Atomic/Graphics/RenderPath.h>
+#include <Atomic/Graphics/Camera.h>
+#include <Atomic/Graphics/Light.h>
+#include <Atomic/Graphics/Octree.h>
+#include <Atomic/Graphics/AnimatedModel.h>
+
+#include <Atomic/Navigation/NavigationMesh.h>
+#include <Atomic/Navigation/CrowdManager.h>
+
+#include <Atomic/Physics/PhysicsWorld.h>
+
+#include <Atomic/Scene/ValueAnimation.h>
+
+#include <Atomic/Input/Controls.h>
 
 
 #include "NETCore.h"
@@ -29,6 +44,13 @@ namespace Atomic
 
     extern "C"
     {
+        ATOMIC_EXPORT_API void csi_Atomic_VariantMap_SetBool(VariantMap* vmap, const char* key, bool value)
+        {
+            if (!vmap)
+                return;
+
+            (*vmap)[key] = value;
+        }
 
         ATOMIC_EXPORT_API ClassID csi_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
         {
@@ -49,14 +71,17 @@ namespace Atomic
         ATOMIC_EXPORT_API const char* csi_Atomic_AObject_GetTypeName(Object* self)
         {
 
-           static String returnValue;
-           returnValue = self->GetTypeName();
-           return returnValue.CString();
+            static String returnValue;
+            returnValue = self->GetTypeName();
+            return returnValue.CString();
         }
 
         ATOMIC_EXPORT_API int csi_Atomic_RefCounted_Refs(RefCounted* self)
         {
-           return self->Refs();
+            if (!self)
+                return 0;
+
+            return self->Refs();
         }
 
 
@@ -65,7 +90,16 @@ namespace Atomic
             obj->SendEvent(eventType, vmap ? vmap->GetVariantMap() : obj->GetEventDataMap());
         }
 
-        ATOMIC_EXPORT_API ClassID csi_Atomic_NETCore_Initialize(NETCoreEventDispatchFunction eventDispatch, NETCoreUpdateDispatchFunction updateDispatch)
+        ATOMIC_EXPORT_API void csi_Atomic_AObject_UnsubscribeFromAllEvents(Object* obj)
+        {
+            if (!obj)
+                return;
+
+            obj->UnsubscribeFromAllEvents();
+        }
+
+
+        ATOMIC_EXPORT_API ClassID csi_Atomic_NETCore_Initialize(NETCoreEventDispatchFunction eventDispatch, NETCoreUpdateDispatchFunction updateDispatch, NETCoreRefCountedDeletedFunction refCountedDeleted)
         {
             Context* context = new Context();
 
@@ -73,6 +107,7 @@ namespace Atomic
             NETCoreDelegates delegates;
             delegates.eventDispatch = eventDispatch;
             delegates.updateDispatch = updateDispatch;
+            delegates.refCountedDeleted = refCountedDeleted;
 
             NETCore* netCore = new NETCore(context, &delegates);
             context->RegisterSubsystem(netCore);
@@ -148,7 +183,7 @@ namespace Atomic
 
         }
 
-        ATOMIC_EXPORT_API void* csi_Atomic_VertexBuffer_Lock(VertexBuffer* vb , unsigned start, unsigned count, bool discard)
+        ATOMIC_EXPORT_API void* csi_Atomic_VertexBuffer_Lock(VertexBuffer* vb, unsigned start, unsigned count, bool discard)
         {
             if (!vb)
                 return nullptr;
@@ -164,6 +199,381 @@ namespace Atomic
 
             graphics->SetShaderParameter(param, *matrix);
         }
+
+        // RenderPath
+
+        ATOMIC_EXPORT_API void csi_Atomic_RenderPath_SetShaderParameter(RenderPath* renderPath, const char* name, ScriptVariant* value)
+        {
+            if (!renderPath || !name || !value)
+                return;
+
+            Vector2 v2 = value->GetVariant().GetVector2();
+
+            renderPath->SetShaderParameter(name, value->GetVariant());
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_RenderPath_GetShaderParameter(RenderPath* renderPath, const char* name, ScriptVariant* value)
+        {
+            if (!renderPath || !name || !value)
+                return;
+
+            value->SetVariant(renderPath->GetShaderParameter(name));
+        }
+
+        // Light
+
+        ATOMIC_EXPORT_API void csi_Atomic_Light_SetShadowBias(Light* light, BiasParameters* parameters)
+        {
+            if (!parameters)
+                return;
+
+            light->SetShadowBias(*parameters);
+
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Light_GetShadowBias(Light* light, BiasParameters* parameters)
+        {
+            if (!parameters)
+                return;
+
+            *parameters = light->GetShadowBias();
+
+        }
+
+
+        ATOMIC_EXPORT_API void csi_Atomic_Light_SetShadowCascade(Light* light, CascadeParameters* parameters)
+        {
+            if (!parameters)
+                return;
+
+            light->SetShadowCascade(*parameters);
+
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Light_GetShadowCascade(Light* light, CascadeParameters* parameters)
+        {
+            if (!parameters)
+                return;
+
+            *parameters = light->GetShadowCascade();
+
+        }
+
+
+        ATOMIC_EXPORT_API void csi_Atomic_Light_SetShadowFocus(Light* light, FocusParameters* parameters)
+        {
+            if (!parameters)
+                return;
+
+            light->SetShadowFocus(*parameters);
+
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Light_GetShadowFocus(Light* light, FocusParameters* parameters)
+        {
+            if (!parameters)
+                return;
+
+            *parameters = light->GetShadowFocus();
+        }
+
+        // Camera
+
+        ATOMIC_EXPORT_API void csi_Atomic_Camera_GetScreenRay(Camera* camera, float x, float y, Ray* ray)
+        {
+            if (!camera || !ray)
+                return;
+
+            *ray = camera->GetScreenRay(x, y);
+        }
+
+
+        ATOMIC_EXPORT_API void csi_Atomic_Camera_SetClipPlane(Camera* camera, Plane* plane)
+        {
+            if (!camera || !plane)
+                return;
+
+            camera->SetClipPlane(*plane);
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Camera_GetClipPlane(Camera* camera, Plane* plane)
+        {
+            if (!camera || !plane)
+                return;
+
+            *plane = camera->GetClipPlane();
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Camera_SetReflectionPlane(Camera* camera, Plane* plane)
+        {
+            if (!camera || !plane)
+                return;
+
+            camera->SetReflectionPlane(*plane);
+        }
+
+
+        ATOMIC_EXPORT_API void csi_Atomic_Camera_GetReflectionPlane(Camera* camera, Plane* plane)
+        {
+            if (!camera || !plane)
+                return;
+
+            *plane = camera->GetReflectionPlane();
+        }
+
+        // Octree
+
+        ATOMIC_EXPORT_API void csi_Atomic_Octree_Raycast_FreeResult(PODVector<RayQueryResult>* resultVector)
+        {
+            delete resultVector;
+        }
+    
+
+        // Any result vector must be freed with csi_Atomic_Octree_Raycast_FreeResult
+        ATOMIC_EXPORT_API RayQueryResult* csi_Atomic_Octree_Raycast(Octree *octree, const Ray& ray, const RayQueryLevel& level, float maxDistance, unsigned int flags, unsigned int viewMask,
+            bool single, void** resultVector, int *count) 
+        {
+            PODVector<RayQueryResult>* results = new PODVector<RayQueryResult>();
+
+            *count = 0;
+            *resultVector = 0;
+
+            RayOctreeQuery query(*results, ray, level, maxDistance, flags, viewMask);
+            
+            if (single)
+                octree->RaycastSingle(query);
+            else
+                octree->Raycast(query);
+
+            if (results->Size() == 0)
+            {
+                delete results;
+                return NULL;
+            }
+
+            *count = results->Size();
+            *resultVector = results;
+            return &(*results)[0];
+        }
+
+        
+        // NavigationMesh
+
+        ATOMIC_EXPORT_API void csi_Atomic_NavigationMesh_FindPath_FreeResult(PODVector<Vector3>* resultVector)
+        {
+            delete resultVector;
+        }
+
+
+        // Any result vector must be freed with csi_Atomic_NavigationMesh_FindPath_FreeResult
+        ATOMIC_EXPORT_API Vector3* csi_Atomic_NavigationMesh_FindPath(NavigationMesh *navMesh, Vector3* start, Vector3* end, Vector3 *extents, void** resultVector, int *count)
+        {
+            PODVector<Vector3>* results = new PODVector<Vector3>();
+
+            navMesh->FindPath(*results, *start, *end, *extents);
+
+            *count = 0;
+            *resultVector = 0;
+
+            if (results->Size() == 0)
+            {
+                delete results;
+                return NULL;
+            }
+
+            *count = results->Size();
+            *resultVector = results;
+            return &(*results)[0];
+        }
+
+        // AnimatedModel
+
+        ATOMIC_EXPORT_API Skeleton* csi_Atomic_AnimatedModel_GetSkeleton(AnimatedModel *animatedModel)
+        {
+            if (!animatedModel)
+                return 0;
+
+            return &animatedModel->GetSkeleton();
+        }
+
+        // Skeleton
+
+        ATOMIC_EXPORT_API void csi_Atomic_Skeleton_SetRootBoneIndex(Skeleton *skeleton, unsigned index)
+        {
+            if (!skeleton)
+                return;
+
+            skeleton->SetRootBoneIndex(index);
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Skeleton_Define(Skeleton *skeleton, Skeleton *src)
+        {
+            if (!skeleton || !src)
+                return;
+
+            skeleton->Define(*src);
+        }
+
+
+        ATOMIC_EXPORT_API void csi_Atomic_Skeleton_Reset(Skeleton *skeleton)
+        {
+            if (!skeleton)
+                return;
+
+            skeleton->Reset();
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Skeleton_ResetSilent(Skeleton *skeleton)
+        {
+            if (!skeleton)
+                return;
+
+            skeleton->ResetSilent();
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Skeleton_ClearBones(Skeleton *skeleton)
+        {
+            if (!skeleton)
+                return;
+
+            skeleton->ClearBones();
+        }
+
+        ATOMIC_EXPORT_API Bone* csi_Atomic_Skeleton_GetRootBone(Skeleton *skeleton)
+        {
+            if (!skeleton)
+                return 0;
+
+            return skeleton->GetRootBone();
+        }
+
+
+        ATOMIC_EXPORT_API Bone* csi_Atomic_Skeleton_GetBone_ByIndex(Skeleton *skeleton, unsigned index)
+        {
+            if (!skeleton)
+                return 0;
+
+            if (index >= skeleton->GetNumBones())
+                return 0;
+
+            return skeleton->GetBone(index);            
+        }
+
+        ATOMIC_EXPORT_API Bone* csi_Atomic_Skeleton_GetBone_ByName(Skeleton *skeleton, const char* name)
+        {
+            if (!skeleton || !name || !strlen(name))
+                return 0;
+
+            return skeleton->GetBone(name);
+        }
+
+        ATOMIC_EXPORT_API unsigned csi_Atomic_Skeleton_GetNumBones(Skeleton *skeleton)
+        {
+            if (!skeleton)
+                return 0;
+
+            return skeleton->GetNumBones();
+        }
+
+        // PhysicsWorld
+
+        ATOMIC_EXPORT_API void csi_Atomic_PhysicsWorld_RaycastSingle(PhysicsWorld* world, Ray* ray, float maxDistance, unsigned collisionMask, PhysicsRaycastResult* result)
+        {
+            if (!world || !ray || !result)
+                return;
+
+            world->RaycastSingle(*result, *ray, maxDistance, collisionMask);
+
+        }
+
+        // Controls
+        
+        ATOMIC_EXPORT_API unsigned csi_Atomic_Controls_GetButtons(Controls *controls)
+        {
+            return controls->buttons_;
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Controls_SetButtons(Controls *controls, unsigned value)
+        {
+            controls->buttons_ = value;
+        }
+
+        ATOMIC_EXPORT_API float csi_Atomic_Controls_GetYaw(Controls *controls)
+        {
+            return controls->yaw_;
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Controls_SetYaw(Controls *controls, float value)
+        {
+            controls->yaw_ = value;
+        }
+
+        ATOMIC_EXPORT_API float csi_Atomic_Controls_GetPitch(Controls *controls)
+        {
+            return controls->pitch_;
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Controls_SetPitch(Controls *controls, float value)
+        {
+            controls->pitch_ = value;
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Controls_Reset(Controls *_target)
+        {
+            _target->Reset();
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Controls_Set(Controls *_target, unsigned int buttons, int down)
+        {
+            _target->Set(buttons, down);
+        }
+
+        ATOMIC_EXPORT_API int csi_Atomic_Controls_IsDown(Controls *_target, unsigned int button)
+        {
+            return _target->IsDown(button);
+        }
+
+        ATOMIC_EXPORT_API Controls*  csi_Atomic_Controls_Create()
+        {
+            return new Controls();
+        }
+
+        ATOMIC_EXPORT_API void  csi_Atomic_Controls_Destroy(Controls *controls)
+        {
+            if (!controls)
+                return;
+
+            delete controls;
+        }
+
+        // CrowdManager
+
+        ATOMIC_EXPORT_API void  csi_Atomic_CrowdManager_GetObstacleAvoidanceParams(CrowdManager *manager, unsigned obstacleAvoidanceType, CrowdObstacleAvoidanceParams* parms)
+        {
+            if (!manager || !parms)
+                return;
+
+            *parms = manager->GetObstacleAvoidanceParams(obstacleAvoidanceType);
+        }
+
+        ATOMIC_EXPORT_API void  csi_Atomic_CrowdManager_SetObstacleAvoidanceParams(CrowdManager *manager, unsigned obstacleAvoidanceType, CrowdObstacleAvoidanceParams* parms)
+        {
+            if (!manager || !parms)
+                return;
+
+            manager->SetObstacleAvoidanceParams(obstacleAvoidanceType, *parms);
+        }
+
+        // ValueAnimation
+
+        ATOMIC_EXPORT_API bool csi_Atomic_ValueAnimation_SetKeyFrame(ValueAnimation* self, float time, ScriptVariant* variant)
+        {
+            if (!self || !variant)
+                return false;
+
+            return self->SetKeyFrame(time, variant->GetVariant());
+        }
+
 
 #ifdef ATOMIC_PLATFORM_IOS
         ATOMIC_EXPORT_API void SDL_IOS_Init(const char *resourceDir, const char *documentsDir)

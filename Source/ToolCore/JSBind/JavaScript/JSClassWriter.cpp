@@ -164,7 +164,7 @@ bool JSClassWriter::OmitFunction(JSBFunction* function)
     if (function->GetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT))
         return true;
 
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
     {

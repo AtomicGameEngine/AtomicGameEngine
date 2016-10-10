@@ -65,7 +65,7 @@ bool JSBFunctionSignature::Match(JSBFunction* function)
     if (name_ != function->GetName())
         return false;
 
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+    const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
     if (types_.Size() != parameters.Size())
         return false;
@@ -300,9 +300,26 @@ void JSBClass::Process()
 
         for (unsigned k = 0; k < excludes_.Size(); k++)
         {
-            if (excludes_[k]->Match(functions_[j]))
+            JSBFunctionSignature* sig = excludes_[k];
+
+            if (sig->Match(functions_[j]))
             {
-                functions_[j]->SetSkip(true);
+                if (!sig->associatedBindings_.Size())
+                {
+                    functions_[j]->SetSkip(true);
+                }
+                else
+                {
+                    for (unsigned x = 0; x < sig->associatedBindings_.Size(); x++)
+                    {
+                        // This shouldn't happen
+                        if (sig->associatedBindings_[x] == BINDINGLANGUAGE_ANY)
+                            continue;
+
+                        functions_[j]->SetSkipLanguage(sig->associatedBindings_[x]);
+                    }
+                }
+
                 break;
             }
 
@@ -323,7 +340,7 @@ void JSBClass::Process()
         // skip function if only one parameter of type Context, if not Constuctor
         if (!function->IsConstructor())
         {
-            Vector<JSBFunctionType*>& parameters = function->GetParameters();
+            const Vector<JSBFunctionType*>& parameters = function->GetParameters();
 
             if (parameters.Size() == 1 && parameters.At(0)->type_->asClassType())
             {
