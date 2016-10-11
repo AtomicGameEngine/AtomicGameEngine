@@ -73,8 +73,9 @@ namespace ToolCore
     }
 
     NETCSProject::NETCSProject(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen),
-        androidApplication_(false),
-        playerApplication_(false)
+        genAssemblyDocFile_(false),
+        playerApplication_(false),
+        androidApplication_(false)
     {
 
     }
@@ -418,6 +419,11 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
+        if (genAssemblyDocFile_)
+        {
+            pgroup.CreateChild("DocumentationFile").SetValue(outputPath + assemblyName_ + ".xml");
+        }
+
         if (SupportsDesktop())
         {
             pgroup.CreateChild("DebugType").SetValue(GetIsPCL() ? "pdbonly": "full");
@@ -504,6 +510,11 @@ namespace ToolCore
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
         pgroup.CreateChild("DebugSymbols").SetValue("true");
+
+        if (genAssemblyDocFile_)
+        {
+            pgroup.CreateChild("DocumentationFile").SetValue(outputPath + assemblyName_ + ".xml");
+        }
 
         if (SupportsDesktop())
         {
@@ -1244,6 +1255,7 @@ namespace ToolCore
 
         androidApplication_ = root["androidApplication"].GetBool();
         playerApplication_ = root["playerApplication"].GetBool();
+        genAssemblyDocFile_ = root["assemblyDocFile"].GetBool();
 
         rootNamespace_ = root["rootNamespace"].GetString();
         assemblyName_ = root["assemblyName"].GetString();
