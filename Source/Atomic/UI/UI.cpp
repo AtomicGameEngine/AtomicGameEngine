@@ -141,10 +141,8 @@ UI::~UI()
         
         tb::TBWidgetsAnimationManager::Shutdown();
 
-        // The root widget can acquire a delegate if it is retrieved in script (via getting parent), clear it here
-        rootWidget_->SetDelegate(0);
-        widgetWrap_.Clear();    
         delete rootWidget_;
+        widgetWrap_.Clear();
         
         // leak
         //delete TBUIRenderer::renderer_;
