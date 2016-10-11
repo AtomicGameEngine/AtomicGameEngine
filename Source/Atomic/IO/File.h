@@ -116,6 +116,9 @@ public:
     /// Reads a text file, ensuring data from file is 0 terminated
     virtual void ReadText(String& text);
 
+    /// Reads a text file, ensuring data from file is 0 terminated
+    virtual String ReadText() { String retValue; ReadText(retValue); return retValue; }
+
     /// Return the fullpath to the file
     const String& GetFullPath() const { return fullPath_; }
 
