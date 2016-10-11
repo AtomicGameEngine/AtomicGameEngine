@@ -139,6 +139,8 @@ namespace ToolCore
         String targetFrameworkProfile_;
         Vector<String> sharedReferences_;
 
+        bool genAssemblyDocFile_;
+
         bool playerApplication_;
 
         // Android

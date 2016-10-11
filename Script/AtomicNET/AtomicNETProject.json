@@ -38,6 +38,7 @@
         },
         {
             "name": "AtomicNET.Desktop",
+            "assemblyDocFile" : true,
             "platforms" : ["desktop"],
             "outputType" : "Library",
             "defineConstants" : ["ATOMIC_DESKTOP"],
