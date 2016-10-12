@@ -279,8 +279,6 @@ class MaterialInspector extends ScriptWidget {
             if (texture) {
                 inspector.material.setTexture(textureUnit, texture);
                 textureWidget.texture = inspector.getTextureThumbnail(texture);
-
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });
             }
 
         });
@@ -324,6 +322,7 @@ class MaterialInspector extends ScriptWidget {
 
         if (texture != null && textureWidget != null) {
             textureWidget.setTexture(null);
+            this.material.setTexture(textureUnit, null);
         }
 
     }
