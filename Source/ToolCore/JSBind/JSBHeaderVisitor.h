@@ -370,6 +370,69 @@ public:
 
     }
 
+    String parseDocString(int commentLine) const
+    {
+        const char* comment = NULL;
+        for (unsigned i = 0; i < unit_->commentCount(); i++)
+        {
+            const Token &tcomment = unit_->commentAt(i);
+            unsigned line;
+            unit_->getPosition(tcomment.utf16charsEnd(), &line);
+
+            if (line ==  commentLine)
+            {
+                comment = unit_->firstSourceChar() + tcomment.byteOffset;
+                break;
+            }
+        }
+
+        String docString;
+
+        if (comment && strlen(comment) > 3)
+        {
+            if (comment[0] == '/' && comment[1] == '/' && comment[2] == '/')
+            {
+                int index = 3;
+                while(comment[index] && comment[index] != '\n' && comment[index] != '\r')
+                {
+                    docString += comment[index++];
+                }
+
+            }
+
+            if (comment[0] == '/' && comment[1] == '*' && comment[2] == '*')
+            {
+                int index = 3;
+                bool foundStar = false;
+                while(comment[index])
+                {
+                    // did we find a star in the last loop?
+                    if (foundStar)
+                    {
+                        // We have a an end of block indicator, let's break
+                        if (comment[index] == '/' && foundStar)
+                            break;
+
+                        // This is just a star in the comment, not an end of comment indicator.  Let's keep it
+                        docString += '*';
+                    }
+
+                    foundStar = comment[index] == '*';
+
+                    if (!foundStar)
+                        docString += comment[index];
+
+                    index++;
+                }
+            }
+
+        }
+
+        return docString;
+
+
+    }
+
     JSBFunction* processFunction(JSBClass* klass, Function* function)
     {
         JSBFunction* jfunction = new JSBFunction(klass);
@@ -457,64 +520,11 @@ public:
         jfunction->sourceColumn_ = function->column();
         //const Token &token = unit_->tokenAt(function->sourceLocation());
         //const char* source = unit_->firstSourceChar() + token.byteOffset;
-        const char* comment = NULL;
-        for (unsigned i = 0; i < unit_->commentCount(); i++)
-        {
-            const Token &tcomment = unit_->commentAt(i);
-            unsigned line;
-            unit_->getPosition(tcomment.utf16charsEnd(), &line);
 
-            if (line ==  function->line() - 1)
-            {
-                comment = unit_->firstSourceChar() + tcomment.byteOffset;
-                break;
-            }
-        }
+        String docString = parseDocString(function->line() - 1);
 
-        if (comment && strlen(comment) > 3)
-        {
-            if (comment[0] == '/' && comment[1] == '/' && comment[2] == '/')
-            {
-                int index = 3;
-                while(comment[index] && comment[index] != '\n' && comment[index] != '\r')
-                {
-                    String docString = jfunction->GetDocString();
-                    docString += comment[index++];
-                    jfunction->SetDocString(docString);
-                }
-
-            }
-
-            if (comment[0] == '/' && comment[1] == '*' && comment[2] == '*')
-            {
-                int index = 3;
-                bool foundStar = false;
-                String docString = jfunction->GetDocString();
-                while(comment[index])
-                {
-                    // did we find a star in the last loop?
-                    if (foundStar)
-                    {
-                        // We have a an end of block indicator, let's break
-                        if (comment[index] == '/' && foundStar)
-                            break;
-
-                        // This is just a star in the comment, not an end of comment indicator.  Let's keep it
-                        docString += '*';
-                    }
-                    
-                    foundStar = comment[index] == '*';
-
-                    if (!foundStar)
-                        docString += comment[index];
-
-                    index++;
-                }
-                jfunction->SetDocString(docString);
-            }
-
-        }
-
+        if (docString.Length())
+            jfunction->SetDocString(docString);
 
         return jfunction;
 
@@ -606,6 +616,10 @@ public:
         }
 
         jclass->SetHeader(header_);
+
+        String docString = parseDocString(klass->line() - 1);
+        if (docString.Length())
+            jclass->SetDocString(docString);
 
         for (unsigned i = 0; i < klass->baseClassCount(); i++)
         {
