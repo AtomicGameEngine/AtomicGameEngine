@@ -157,6 +157,7 @@ public:
     JSBHeader* GetHeader() { return header_; }
     JSBModule* GetModule() { return module_; }
     JSBPackage* GetPackage() { return module_->GetPackage(); }
+    const String& GetDocString() const { return docString_; }
 
     bool IsNumberArray() { return numberArrayElements_ != 0; }
     int  GetNumberArrayElements() { return numberArrayElements_;}
@@ -168,6 +169,7 @@ public:
     void SetObject(bool value = true) { isObject_ = value; }
     void SetGeneric(bool value = true) { isGeneric_ = value; }
     void SetHeader(JSBHeader* header) { header_ = header; }
+    void SetDocString(const String& value) { docString_ = value; }
     void SetBaseClass(JSBClass* baseClass);
 
     void SetSkipFunction(const String& name, bool skip = true);
@@ -212,6 +214,8 @@ private:
     bool isAbstract_;
     bool isObject_;
     bool isGeneric_;
+
+    String docString_;
 
     // Vector3, Color, etc are marshalled via arrays
     int numberArrayElements_;

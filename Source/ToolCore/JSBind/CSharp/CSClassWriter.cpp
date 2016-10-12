@@ -187,6 +187,19 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     source += "\n";
     String line;
 
+    if (klass_->GetDocString().Length())
+    {
+        // monodocer -assembly:NETCore.dll -path:en -pretty
+        // mdoc export-html -o htmldocs en
+        source += IndentLine("/// <summary>\n");
+        if (klass_->GetDocString().Contains('\n'))
+            source += IndentLine("/* " + klass_->GetDocString() + "*/\n");
+        else
+            source += IndentLine("/// " + klass_->GetDocString() + "\n");
+
+        source += IndentLine("/// </summary>\n");
+    }
+
     if (klass_->GetBaseClass())
     {
         line = ToString("public partial class %s%s : %s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "", klass_->GetBaseClass()->GetName().CString());
