@@ -537,6 +537,9 @@ public:
 
     // ATOMIC BEGIN
 
+    /// Return number of True primitives drawn this frame.
+    unsigned GetSinglePassPrimitives() const { return numSinglePassPrimitives_; }
+
     /// Get the SDL_Window as a void* to avoid having to include the graphics implementation
     void* GetSDLWindow() { return window_; }
 
@@ -545,6 +548,10 @@ public:
     bool GetMaximized();
     IntVector2 GetMonitorResolution(int monitorId) const;
     void RaiseWindow();
+
+    int GetNumPasses() { return numPasses_; }
+    void ResetNumPasses() { numPasses_ = 0; }
+    void IncNumPasses() { numPasses_++; }
 
     // ATOMIC END
 
@@ -767,6 +774,14 @@ private:
     static const Vector2 pixelUVOffset;
     /// OpenGL3 support flag.
     static bool gl3Support;
+
+    // ATOMIC BEGIN
+
+    int numPasses_;
+    ///Number of true primitives
+    unsigned numSinglePassPrimitives_;
+
+    // ATOMIC END
 };
 
 /// Register Graphics library objects.
