@@ -7,6 +7,12 @@ namespace AtomicEngine
     public partial class Log : AObject
     {
 
+        public static void Debug(string message)
+        {
+            Log.Write(Constants.LOG_DEBUG, message);
+        }
+
+
         public static void Warn(string message)
         {
             Log.Write(Constants.LOG_WARNING, message);

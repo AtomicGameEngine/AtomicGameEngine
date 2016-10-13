@@ -68,11 +68,15 @@ namespace Atomic
             refCounted->ReleaseRef();
         }
 
-        ATOMIC_EXPORT_API const char* csi_Atomic_AObject_GetTypeName(Object* self)
+        ATOMIC_EXPORT_API const char* csi_Atomic_RefCounted_GetTypeName(RefCounted* self)
         {
+            if (!self->IsObject())
+            {
+                return "RefCounted";
+            }
 
             static String returnValue;
-            returnValue = self->GetTypeName();
+            returnValue = ((Object*)self)->GetTypeName();
             return returnValue.CString();
         }
 
