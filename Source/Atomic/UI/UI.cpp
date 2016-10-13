@@ -902,7 +902,10 @@ void UI::ToggleDebugHud()
     if (!hud)
         return;
 
-    hud->ToggleAll();
+    if (!hud->GetSceneOpen())
+        hud->ToggleAll();
+    else
+        hud->ToggleSceneHud();
 }
 
 void UI::ShowConsole(bool value)

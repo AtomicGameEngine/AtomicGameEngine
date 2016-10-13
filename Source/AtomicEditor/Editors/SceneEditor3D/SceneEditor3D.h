@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <Atomic/UI/SystemUI/SystemUI.h>
+#include <Atomic/UI/SystemUI/DebugHud.h>
+
 #include <TurboBadger/tb_widgets_common.h>
 
 #include "../ResourceEditor.h"
@@ -116,6 +119,8 @@ private:
     void HandleCubemapRenderEnd(StringHash eventType, VariantMap& eventData);
 
     void UpdateGizmoSnapSettings();
+
+    SharedPtr<SystemUI::DebugHud> debugHud_;
 
     SharedPtr<Scene> scene_;
 

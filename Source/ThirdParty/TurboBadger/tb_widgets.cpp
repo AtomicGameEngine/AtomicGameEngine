@@ -66,6 +66,7 @@ TBWidget::PaintProps::PaintProps()
 TBWidget::TBWidget()
     : m_parent(nullptr)
     , m_opacity(1.f)
+    , m_disabledOpacity(-1.0f)
     , m_state(WIDGET_STATE_NONE)
     , m_gravity(WIDGET_GRAVITY_DEFAULT)
     , m_layout_params(nullptr)
@@ -256,6 +257,17 @@ void TBWidget::SetOpacity(float opacity)
     if (opacity == 0) // Invalidate after setting opacity 0 will do nothing.
         Invalidate();
     m_opacity = opacity;
+    Invalidate();
+}
+
+void TBWidget::SetDisabledOpacity(float opacity)
+{
+    opacity = Clamp(opacity, -1.f, 1.f);
+    if (m_disabledOpacity == opacity)
+        return;
+    if (opacity == 0) // Invalidate after setting opacity 0 will do nothing.
+        Invalidate();
+    m_disabledOpacity = opacity;
     Invalidate();
 }
 
@@ -1161,7 +1173,10 @@ float TBWidget::CalculateOpacityInternal(WIDGET_STATE state, TBSkinElement *skin
     if (skin_element)
         opacity *= skin_element->opacity;
     if (state & WIDGET_STATE_DISABLED)
-        opacity *= g_tb_skin->GetDefaultDisabledOpacity();
+        if (m_disabledOpacity < 0.0f)
+            opacity *= g_tb_skin->GetDefaultDisabledOpacity();
+        else
+            opacity *= m_disabledOpacity;
     return opacity;
 }
 

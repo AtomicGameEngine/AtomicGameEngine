@@ -11,7 +11,8 @@
 				 "ParticleEffect2D", "ParticleEmitter2D", "PhysicsWorld2D",
 				 "TileMap2D", "PropertySet2D", "Tile2D", "TileMapObject2D", "TileMapLayer2D",
 				 "TmxLayer2D", "TmxTileLayer2D", "TmxObjectGroup2D", "TmxImageLayer2D", "TmxFile2D",
-				 "Light2DGroup", "Light2D", "DirectionalLight2D", "PositionalLight2D", "PointLight2D"],
+				 "Light2DGroup", "Light2D", "DirectionalLight2D", "PositionalLight2D", "PointLight2D",
+				 "Renderer2D"],
 	"jsmodulepreamble" : ["using namespace Atomic::Spriter;"],			 
 	"overloads" : {
 		"AnimatedSprite2D" : {
