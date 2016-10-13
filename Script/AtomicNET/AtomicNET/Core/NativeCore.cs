@@ -348,19 +348,24 @@ namespace AtomicEngine
 
             IntPtr classID = RefCounted.csi_Atomic_RefCounted_GetClassID(native);
 
-            // and store, with downcast support for instance Component -> StaticModel
-            // we never want to hit this path for script inherited natives
-
+            // Check whether this is a valid native class to wrap
             NativeType nativeType;
-
             if (!nativeClassIDToNativeType.TryGetValue(classID, out nativeType))
             {
-                throw new InvalidOperationException("NativeCore.WrapNative - Attempting to wrap unknown native class id");
+                if (logWrapUnknownNative)
+                {
+                    Log.Info("WrapNative returning null for unknown class: " + csi_Atomic_RefCounted_GetTypeName(native));
+                }
+
+                return null;
             }
 
             // TODO: make CSComponent abstract and have general abstract logic here?
             if (nativeType.Type == typeof(CSComponent))
                 return null;
+
+            // and store, with downcast support for instance Component -> StaticModel
+            // we never want to hit this path for script inherited natives
 
             r = nativeType.managedConstructor(native);
 
@@ -383,7 +388,7 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csi_Atomic_AObject_GetTypeName(IntPtr self);
+        private static extern string csi_Atomic_RefCounted_GetTypeName(IntPtr self);
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern int csi_Atomic_RefCounted_Refs(IntPtr self);
@@ -488,6 +493,9 @@ namespace AtomicEngine
                 Sender = sender;
             }
         }
+
+        // If true, we will log any attempted access to instances of unknown native classes
+        static bool logWrapUnknownNative = false;
 
     }
 
