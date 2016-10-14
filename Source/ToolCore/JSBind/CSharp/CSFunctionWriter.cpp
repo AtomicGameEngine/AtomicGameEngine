@@ -632,7 +632,7 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
                 }
                 else
                 {
-                    sig += name + " == null ? IntPtr.Zero : " + name + ".nativeInstance";
+                    sig += name + " == null ? IntPtr.Zero : " + name + ".NativeInstance";
                 }
 
             }

@@ -202,7 +202,24 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
 
     if (klass_->GetBaseClass())
     {
-        line = ToString("public partial class %s%s : %s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "", klass_->GetBaseClass()->GetName().CString());
+
+        String baseString = klass_->GetBaseClass()->GetName();
+
+        const PODVector<JSBClass*>& interfaces = klass_->GetInterfaces();
+
+        if (interfaces.Size())
+        {
+            StringVector baseStrings;
+            baseStrings.Push(baseString);
+            for (unsigned i = 0; i < interfaces.Size(); i++)
+            {
+                baseStrings.Push(interfaces.At(i)->GetName());
+            }
+
+            baseString = String::Joined(baseStrings, ",");
+        }
+
+        line = ToString("public partial class %s%s : %s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "", baseString.CString());
     }
     else
     {

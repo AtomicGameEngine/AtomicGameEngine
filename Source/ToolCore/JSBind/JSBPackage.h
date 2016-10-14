@@ -68,13 +68,13 @@ public:
     /// Returns whether bindings for a specific type should be generated for this package
     bool GenerateBindings(BindingType type) { return bindingTypes_.Contains(type); }
 
-    JSBClass* GetClass(const String& name);
+    JSBClass* GetClass(const String& name, bool includeInterfaces = false);
 
-    PODVector<JSBClass*>& GetAllClasses() { return allClasses_; }
+    PODVector<JSBClass*> GetAllClasses(bool includeInterfaces = false);
     void RegisterClass(JSBClass* cls) {allClasses_.Push(cls); }
 
     // get a class by name across all loaded packages
-    static JSBClass* GetClassAllPackages(const String& name);
+    static JSBClass* GetClassAllPackages(const String& name, bool includeInterfaces = false);
 
     JSBEnum* GetEnum(const String& name);
 

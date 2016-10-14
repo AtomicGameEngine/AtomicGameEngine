@@ -144,7 +144,7 @@ public:
             }
             else
             {
-                JSBClass* jclass = JSBPackage::GetClassAllPackages(classname);
+                JSBClass* jclass = JSBPackage::GetClassAllPackages(classname, true);
 
                 if (jclass)
                     jtype = new JSBClassType(jclass);
@@ -484,6 +484,12 @@ public:
 
                     JSBFunctionType* ftype = processFunctionArgType(arg);
 
+                    // TODO: expose interfaces to TS
+                    if (ftype && ftype->type_->asClassType() && ftype->type_->asClassType()->class_->IsInterface())
+                    {
+                        jfunction->SetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT);
+                    }
+
                     if (!ftype)
                     {
                         // if we don't have an initializer, the function cannot be bound
@@ -608,7 +614,7 @@ public:
     {
         String name = getNameString(klass->name());
 
-        JSBClass* jclass = module_->GetClass(name);
+        JSBClass* jclass = module_->GetClass(name, true);
 
         if (!jclass)
         {
@@ -616,6 +622,9 @@ public:
         }
 
         jclass->SetHeader(header_);
+
+        if (jclass->IsInterface())
+            return true;
 
         String docString = parseDocString(klass->line() - 1);
         if (docString.Length())
@@ -630,7 +639,16 @@ public:
 
             if (!base)
             {
-                ATOMIC_LOGINFOF("Warning: %s baseclass %s not in bindings", name.CString(), baseclassname.CString());
+                JSBClass* interface = JSBPackage::GetClassAllPackages(baseclassname, true);
+
+                if (interface)
+                {
+                    jclass->AddInterface(interface);
+                }
+                else
+                {
+                    ATOMIC_LOGINFOF("Warning: %s baseclass %s not in bindings", name.CString(), baseclassname.CString());
+                }
             }
             else
             {

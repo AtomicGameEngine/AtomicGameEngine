@@ -55,9 +55,21 @@ JSBModule::~JSBModule()
 
 }
 
-Vector<SharedPtr<JSBClass>> JSBModule::GetClasses()
+Vector<SharedPtr<JSBClass>> JSBModule::GetClasses(bool includeInterfaces)
 {
-    return classes_.Values();
+    if (includeInterfaces)
+        return classes_.Values();
+
+    Vector<SharedPtr<JSBClass>> retValue;
+
+    Vector<SharedPtr<JSBClass>> classes = classes_.Values();
+
+    for (unsigned i = 0; i < classes.Size(); i++)
+        if (!classes[i]->IsInterface())
+            retValue.Push(classes[i]);
+
+    return retValue;
+
 }
 
 Vector<SharedPtr<JSBEnum>> JSBModule::GetEnums()
@@ -382,10 +394,17 @@ void JSBModule::ScanHeaders()
 
 }
 
-JSBClass* JSBModule::GetClass(const String& name)
+JSBClass* JSBModule::GetClass(const String& name, bool includeInterfaces)
 {
     if (classes_.Contains(name))
-        return classes_[name];
+    {
+        JSBClass* klass = classes_[name];
+
+        if (!includeInterfaces && klass->IsInterface())
+            return 0;
+
+        return klass;
+    }
 
     return 0;
 }
@@ -394,19 +413,25 @@ void JSBModule::RegisterClass(String name)
 {
     String nativeName = name;
 
-    if (classnames_.Contains(name))
+    if (classnames_.Contains(name) || interfaceNames_.Contains(name))
     {
         if (classRenames_.Contains(name))
         {
             name = classRenames_[name];
         }
 
-        if (JSBPackage::GetClassAllPackages(nativeName))
+        if (JSBPackage::GetClassAllPackages(nativeName, true))
         {
             ErrorExit(ToString("Class collision: %s", name.CString()));
         }
 
-        JSBClass* cls = new JSBClass(context_, this, name, nativeName);
+        bool interface = false;
+        if (interfaceNames_.Contains(nativeName))
+        {
+            interface = true;
+        }
+
+        JSBClass* cls = new JSBClass(context_, this, name, nativeName, interface);
 
         if (genericClassnames_.Contains(name))
         {
@@ -706,6 +731,14 @@ bool JSBModule::Load(const String& jsonFilename)
         }
 
     }
+
+    JSONArray interfaces = root.Get("interfaces").GetArray();
+
+    for (unsigned i = 0; i < interfaces.Size(); i++)
+    {
+        interfaceNames_.Push(interfaces[i].GetString());
+    }
+
 
     JSONValue includes = root.Get("includes");
 

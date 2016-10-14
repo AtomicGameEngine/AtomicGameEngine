@@ -44,7 +44,7 @@ JSModuleWriter::JSModuleWriter(JSBModule *module) : JSBModuleWriter(module)
 
 void JSModuleWriter::WriteForwardDeclarations(String& source)
 {
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     for (unsigned i = 0; i < classes.Size(); i++)
     {
@@ -61,7 +61,7 @@ void JSModuleWriter::WriteForwardDeclarations(String& source)
 
 void JSModuleWriter::WriteClassDeclaration(String& source)
 {
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     source += "static void jsb_declare_classes(JSVM* vm)\n{\n";
 
@@ -139,10 +139,12 @@ void JSModuleWriter::WriteIncludes(String& source)
         eitr++;
     }
 
-    HashMap<StringHash, SharedPtr<JSBClass> >::Iterator citr = module_->classes_.Begin();
-    while (citr != module_->classes_.End())
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
+
+    Vector<SharedPtr<JSBClass>>::Iterator citr = classes.Begin();
+    while (citr != classes.End())
     {
-        allheaders.Push(citr->second_->GetHeader());
+        allheaders.Push((*citr)->GetHeader());
         citr++;
     }
 
@@ -188,7 +190,7 @@ void JSModuleWriter::WritePreamble(String& source)
 
 void JSModuleWriter::WriteClassDefine(String& source)
 {
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     source += "static void jsb_init_classes(JSVM* vm)\n{\n";
 
@@ -306,7 +308,7 @@ void JSModuleWriter::GenerateSource()
 
     source += "// Begin Classes\n";
 
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     for (unsigned i = 0; i < classes.Size(); i++)
     {

@@ -105,7 +105,7 @@ void JSPackageWriter::WriteProtoTypeSetup(String& source)
 {
     Vector<JSBClass*> written;
 
-    PODVector<JSBClass*>& allClasses = package_->GetAllClasses();
+    PODVector<JSBClass*> allClasses = package_->GetAllClasses();
 
     for (unsigned i = 0; i < allClasses.Size(); i++)
     {

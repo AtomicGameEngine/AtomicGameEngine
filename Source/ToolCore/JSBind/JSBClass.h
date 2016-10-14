@@ -121,7 +121,7 @@ class JSBClass : public Object
 
 public:
 
-    JSBClass(Context* context, JSBModule* module, const String& name, const String& nativeName);
+    JSBClass(Context* context, JSBModule* module, const String& name, const String& nativeName, bool interface);
     virtual ~JSBClass();
 
     const String& GetName() const { return name_; }
@@ -133,8 +133,9 @@ public:
     // Get all functions, including those in base classes
     void GetAllFunctions(PODVector<JSBFunction*>& functions);
 
-    bool IsGeneric() { return isGeneric_; }
-    bool IsAbstract() { return isAbstract_; }
+    bool IsGeneric() const { return isGeneric_; }
+    bool IsAbstract() const { return isAbstract_; }
+    bool IsInterface() const { return isInterface_; }
 
     /// Note that if we at some point want to generate bindings for JSBClass
     /// this override will need to be addressed, as we'll need to know that JSBClass is
@@ -165,6 +166,8 @@ public:
 
     JSBFunction* GetConstructor(BindingLanguage bindingLanguage = BINDINGLANGUAGE_ANY );
 
+    const PODVector<JSBClass*>& GetInterfaces() const { return interfaces_; }
+
     void SetAbstract(bool value = true) { isAbstract_ = value; }
     void SetObject(bool value = true) { isObject_ = value; }
     void SetGeneric(bool value = true) { isGeneric_ = value; }
@@ -177,6 +180,8 @@ public:
     void AddFunctionOverride(JSBFunctionSignature* override) { overrides_.Push(override); }
     void AddFunctionExclude(JSBFunctionSignature* exclude) { excludes_.Push(exclude); }
     void AddPropertyFunction(JSBFunction* function);
+
+    void AddInterface(JSBClass* klass) { interfaces_.Push(klass); }
 
     void AddTypeScriptDecl(const String& decl) { typeScriptDecls_.Push(decl); }
     unsigned GetNumTypeScriptDecl() { return typeScriptDecls_.Size(); }
@@ -204,6 +209,7 @@ private:
 
     PODVector<JSBFunction*> functions_;
     PODVector<JSBClass*> baseClasses_;
+    PODVector<JSBClass*> interfaces_;
 
     PODVector<JSBFunctionSignature*> overrides_;
     PODVector<JSBFunctionSignature*> excludes_;
@@ -214,6 +220,7 @@ private:
     bool isAbstract_;
     bool isObject_;
     bool isGeneric_;
+    bool isInterface_;
 
     String docString_;
 

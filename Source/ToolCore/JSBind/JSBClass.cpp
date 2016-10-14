@@ -124,9 +124,9 @@ bool JSBFunctionSignature::Match(JSBFunction* function)
 
 }
 
-JSBClass::JSBClass(Context* context, JSBModule *module, const String& name, const String& nativeName) : Object(context),
+JSBClass::JSBClass(Context* context, JSBModule *module, const String& name, const String& nativeName, bool interface) : Object(context),
     module_(module), name_(name), nativeName_(nativeName),
-    isAbstract_(false), isObject_(false), isGeneric_(false),
+    isAbstract_(false), isObject_(false), isGeneric_(false), isInterface_(interface),
     numberArrayElements_(0), arrayElementType_("float"),
     hasProperties_(false)
 {

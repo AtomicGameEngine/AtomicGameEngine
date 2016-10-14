@@ -64,10 +64,12 @@ void CSModuleWriter::WriteIncludes(String& source)
         eitr++;
     }
 
-    HashMap<StringHash, SharedPtr<JSBClass> >::Iterator citr = module_->classes_.Begin();
-    while (citr != module_->classes_.End())
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
+
+    Vector<SharedPtr<JSBClass>>::Iterator citr = classes.Begin();
+    while (citr != classes.End())
     {
-        allheaders.Push(citr->second_->GetHeader());
+        allheaders.Push((*citr)->GetHeader());
         citr++;
     }
 
@@ -143,7 +145,7 @@ void CSModuleWriter::GenerateNativeSource()
 
     source += "// Begin Classes\n";
 
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     for (unsigned i = 0; i < classes.Size(); i++)
     {
@@ -208,7 +210,7 @@ String CSModuleWriter::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
 void CSModuleWriter::GenerateManagedClasses(String& source)
 {
 
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     for (unsigned i = 0; i < classes.Size(); i++)
     {
@@ -526,7 +528,7 @@ void CSModuleWriter::GenerateManagedModuleClass(String& sourceOut)
 
     Indent();
 
-    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
 
     for (unsigned i = 0; i < classes.Size(); i++)
     {
