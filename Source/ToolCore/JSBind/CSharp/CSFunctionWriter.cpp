@@ -134,6 +134,18 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     {
         JSBFunctionType* ftype = fparams[i];
 
+        // Interface        
+        JSBClass* interface = 0;
+        if (ftype->type_->asClassType() && ftype->type_->asClassType()->class_->IsInterface())
+        {
+            // We need to downcast to the interface 
+            // TODO: this assumes Object* is in hierarchy, how do we validate this?
+            interface = ftype->type_->asClassType()->class_;
+            line = ToString("%s = dynamic_cast<%s*>((Object*)%s);\n", ftype->name_.CString(), interface->GetNativeName().CString(), ftype->name_.CString());
+            source += IndentLine(line);
+        }
+
+        // Vector
         JSBVectorType* vtype = ftype->type_->asVectorType();
 
         if (!vtype)
@@ -632,7 +644,7 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
                 }
                 else
                 {
-                    sig += name + " == null ? IntPtr.Zero : " + name + ".nativeInstance";
+                    sig += name + " == null ? IntPtr.Zero : " + name + ".NativeInstance";
                 }
 
             }

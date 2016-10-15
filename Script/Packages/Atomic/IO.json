@@ -2,6 +2,7 @@
 	"name" : "IO",
 	"sources" : ["Source/Atomic/IO"],
 	"classes" : ["Log", "File", "FileSystem", "FileWatcher", "BufferQueue"],
+	"interfaces" : ["Serializer", "Deserializer"],
 	"overloads" : {
 		"File" : {
 			"File" : ["Context", "String", "FileMode"]
@@ -16,7 +17,7 @@
 			"scanDir(pathName:string, filter:string, flags:number, recursive:boolean):Array<string>;"
 		]
 	},
-	
+
 	"haxe_decl" : {
 		"File" : [
 			"function readText():String;",

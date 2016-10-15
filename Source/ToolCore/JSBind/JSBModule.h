@@ -65,8 +65,8 @@ public:
     const String& GetName() { return name_; }
     JSBPackage* GetPackage() { return package_; }
 
-    JSBClass* GetClass(const String& name);
-    Vector<SharedPtr<JSBClass>> GetClasses();
+    JSBClass* GetClass(const String& name, bool includeInterfaces = false);
+    Vector<SharedPtr<JSBClass>> GetClasses(bool includeInterfaces = false);
     Vector<SharedPtr<JSBEnum>> GetEnums();
     HashMap<String, Constant>& GetConstants() { return constants_; }
 
@@ -125,6 +125,7 @@ private:
 
     Vector<String> sourceDirs_;
     Vector<String> classnames_;
+    Vector<String> interfaceNames_;
 
     Vector<String> genericClassnames_;
 

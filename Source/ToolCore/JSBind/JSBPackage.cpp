@@ -27,6 +27,7 @@
 
 #include "JSBind.h"
 #include "JSBEvent.h"
+#include "JSBClass.h"
 #include "JSBModule.h"
 #include "JSBPackage.h"
 #include "JSBPackageWriter.h"
@@ -91,11 +92,11 @@ void JSBPackage::GenerateSource(JSBPackageWriter& packageWriter)
     packageWriter.PostProcess();
 }
 
-JSBClass* JSBPackage::GetClass(const String& name)
+JSBClass* JSBPackage::GetClass(const String& name, bool includeInterfaces)
 {
     for (unsigned i = 0; i < modules_.Size(); i++)
     {
-        JSBClass* cls = modules_[i]->GetClass(name);
+        JSBClass* cls = modules_[i]->GetClass(name, includeInterfaces);
         if (cls)
             return cls;
     }
@@ -103,11 +104,27 @@ JSBClass* JSBPackage::GetClass(const String& name)
     return 0;
 }
 
-JSBClass* JSBPackage::GetClassAllPackages(const String& name)
+PODVector<JSBClass*> JSBPackage::GetAllClasses(bool includeInterfaces)
+{
+    PODVector<JSBClass*> retVector;
+
+    for (unsigned i = 0; i < allClasses_.Size(); i++)
+    {
+        if (!includeInterfaces && allClasses_[i]->IsInterface())
+            continue;
+
+        retVector.Push(allClasses_[i]);
+    }
+
+    return retVector;
+
+}
+
+JSBClass* JSBPackage::GetClassAllPackages(const String& name, bool includeInterfaces)
 {
     for (unsigned i = 0; i < allPackages_.Size(); i++)
     {
-        JSBClass* cls = allPackages_[i]->GetClass(name);
+        JSBClass* cls = allPackages_[i]->GetClass(name, includeInterfaces);
         if (cls)
             return cls;
     }

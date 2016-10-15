@@ -33,6 +33,8 @@ namespace AtomicEngine
             return refCounted.nativeInstance;
         }
 
+        public IntPtr NativeInstance { get { return nativeInstance; } }
+
         public IntPtr nativeInstance = IntPtr.Zero;
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
