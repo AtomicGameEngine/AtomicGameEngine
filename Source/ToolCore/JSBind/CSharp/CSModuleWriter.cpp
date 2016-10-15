@@ -131,7 +131,11 @@ void CSModuleWriter::GenerateNativeSource()
 
     WriteIncludes(source);
 
-    source += "\n#include <AtomicNET/NETNative/NETCore.h>\n";
+    // NOTE: We include Deserializer/Serializer here as they are interfaces
+    // If additional interfaces are introduced, consider generalizing this
+    source += "\n#include <Atomic/IO/Deserializer.h>\n";
+    source += "#include <Atomic/IO/Serializer.h>\n";
+    source += "#include <AtomicNET/NETNative/NETCore.h>\n";
 
     String ns = module_->GetPackage()->GetNamespace();
 
