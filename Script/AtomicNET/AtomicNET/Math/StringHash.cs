@@ -26,18 +26,18 @@ using System.Runtime.InteropServices;
 
 namespace AtomicEngine {
 
-	[StructLayout(LayoutKind.Sequential)]
-	public struct StringHash {
-		public uint Code;
-		public StringHash (uint code)
-		{
-			this.Code = code;
-		}
+    [StructLayout(LayoutKind.Sequential)]
+    public struct StringHash {
+        public uint Code;
+        public StringHash (uint code)
+        {
+            this.Code = code;
+        }
 
-		public StringHash (string str)
-		{
+        public StringHash (string str)
+        {
             this.Code = csi_Atomic_AtomicNET_StringToStringHash (str);
-		}
+        }
 
         public static implicit operator uint(StringHash hash)
         {
@@ -54,16 +54,16 @@ namespace AtomicEngine {
             return new StringHash(str);
         }
 
-		[DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-		extern static uint csi_Atomic_AtomicNET_StringToStringHash (string str);
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        extern static uint csi_Atomic_AtomicNET_StringToStringHash (string str);
 
-		public override string ToString ()
-		{
-			return $"StringHash({Code:x})";
-		}
+        public override string ToString ()
+        {
+            return $"StringHash({Code:x})";
+        }
 
         public static StringHash Zero = new StringHash(0);
-	}
+    }
 
 
 
