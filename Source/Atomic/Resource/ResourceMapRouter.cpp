@@ -43,7 +43,7 @@ ResourceMapRouter::ResourceMapRouter(Context* context, const String& mapFile) : 
         if (jsonFile.NotNull())
         {
             if (Load(jsonFile->GetRoot()))
-                GetSubsystem<ResourceCache>()->AddResourceRouter(this);
+                cache->AddResourceRouter(this);
         }
 
     }
@@ -66,7 +66,6 @@ bool ResourceMapRouter::Load(const JSONValue& json)
            resourceMap_[tags[0]][tags[1]] = itr->second_.GetString();
         }
 
-        //
         itr++;
     }
 
