@@ -63,9 +63,12 @@ enum ResourceRequest
     RESOURCE_GETFILE = 1
 };
 
+// ATOMIC BEGIN
 /// Optional resource request processor. Can deny requests, re-route resource file names, or perform other processing per request.
 class ATOMIC_API ResourceRouter : public Object
 {
+    ATOMIC_OBJECT(ResourceRouter, Object);
+
 public:
     /// Construct.
     ResourceRouter(Context* context) :
@@ -74,8 +77,9 @@ public:
     }
 
     /// Process the resource request and optionally modify the resource name string. Empty name string means the resource is not found or not allowed.
-    virtual void Route(String& name, ResourceRequest requestType) = 0;
+    virtual void Route(String& name, StringHash type, ResourceRequest requestType) = 0;
 };
+// ATOMIC END
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
 class ATOMIC_API ResourceCache : public Object
@@ -134,8 +138,10 @@ public:
     /// Remove a resource router object.
     void RemoveResourceRouter(ResourceRouter* router);
 
+    // ATOMIC BEGIN
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
-    SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
+    SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true, StringHash type = StringHash::ZERO);
+    // ATOMIC END
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
     Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)

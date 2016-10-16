@@ -381,10 +381,10 @@ bool ResourceCache::ReloadResource(Resource* resource)
 
     resource->SendEvent(E_RELOADSTARTED);
 
-    bool success = false;
-    SharedPtr<File> file = GetFile(resource->GetName());
-
 // ATOMIC BEGIN
+
+    bool success = false;
+    SharedPtr<File> file = GetFile(resource->GetName(), true, resource->GetType());
 
     if (file)
     {
@@ -513,17 +513,18 @@ void ResourceCache::RemoveResourceRouter(ResourceRouter* router)
         }
     }
 }
-
-SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
+// ATOMIC BEGIN
+SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure, StringHash type)
 {
     MutexLock lock(resourceMutex_);
 
     String name = SanitateResourceName(nameIn);
+
     if (!isRouting_)
     {
         isRouting_ = true;
         for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
-            resourceRouters_[i]->Route(name, RESOURCE_GETFILE);
+            resourceRouters_[i]->Route(name, type, RESOURCE_GETFILE);
         isRouting_ = false;
     }
 
@@ -567,6 +568,7 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
 
     return SharedPtr<File>();
 }
+// ATOMIC END
 
 Resource* ResourceCache::GetExistingResource(StringHash type, const String& nameIn)
 {
@@ -632,10 +634,12 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
         return 0;
     }
 
+    // ATOMIC BEGIN
     // Attempt to load the resource
-    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
+    SharedPtr<File> file = GetFile(name, sendEventOnFailure, type);
     if (!file)
         return 0;   // Error is already logged
+    // ATOMIC END
 
     ATOMIC_LOGDEBUG("Loading resource " + name);
     resource->SetName(name);
@@ -785,14 +789,16 @@ bool ResourceCache::Exists(const String& nameIn) const
 {
     MutexLock lock(resourceMutex_);
 
+    // ATOMIC BEGIN
     String name = SanitateResourceName(nameIn);
     if (!isRouting_)
     {
         isRouting_ = true;
         for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
-            resourceRouters_[i]->Route(name, RESOURCE_CHECKEXISTS);
+            resourceRouters_[i]->Route(name, StringHash::ZERO, RESOURCE_CHECKEXISTS);
         isRouting_ = false;
     }
+    // ATOMIC END
 
     if (name.Empty())
         return false;

@@ -24,6 +24,7 @@
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/Graphics/Graphics.h>
+#include <Atomic/Resource/ResourceMapRouter.h>
 #include <Atomic/UI/UI.h>
 #include <AtomicJS/Javascript/Javascript.h>
 
@@ -98,6 +99,9 @@ namespace Atomic
 
     void PlayerApp::Start()
     {
+        // Initialize resource mapper
+        SharedPtr<ResourceMapRouter> router(new ResourceMapRouter(context_, "__atomic_ResourceCacheMap.json"));
+
         UI* ui = GetSubsystem<UI>();
         ui->Initialize("DefaultUI/language/lng_en.tb.txt");
         ui->LoadDefaultPlayerSkin();

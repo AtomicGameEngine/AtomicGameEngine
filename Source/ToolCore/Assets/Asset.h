@@ -55,6 +55,8 @@ public:
 
     const String& GetGUID() const { return guid_; }
     const String& GetName() const { return name_; }
+
+    // Get absolute path to asset file
     const String& GetPath() const { return path_; }
 
     String GetExtension() const;
@@ -100,6 +102,9 @@ public:
 
     /// Instantiate a node from the asset
     Node* InstantiateNode(Node* parent, const String& name);
+
+    // Get a mapping of the assets path to cache file representations, by type
+    void GetAssetCacheMap(HashMap<String, String>& assetMap) { if (importer_.NotNull()) importer_->GetAssetCacheMap(assetMap); }
 
 
 private:

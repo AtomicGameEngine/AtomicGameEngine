@@ -85,6 +85,9 @@ private:
     bool ImportDirtyAssets();
     void PreloadAssets();
 
+    // Update mapping of asset paths to cache file representations, by type
+    void UpdateAssetCacheMap();
+
     SharedPtr<Project> project_;
     List<SharedPtr<Asset>> assets_;
 
@@ -96,6 +99,8 @@ private:
     Vector<String> usedGUID_;
 
     unsigned assetScanDepth_;
+    // Whether any asset was imported during scan
+    bool assetScanImport_;
 
 };
 
