@@ -43,7 +43,8 @@ namespace ToolCore
 {
 
 AssetDatabase::AssetDatabase(Context* context) : Object(context),
-    assetScanDepth_(0)
+    assetScanDepth_(0),
+    assetScanImport_(false)
 {
     SubscribeToEvent(E_LOADFAILED, ATOMIC_HANDLER(AssetDatabase, HandleResourceLoadFailed));
     SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(AssetDatabase, HandleProjectLoaded));
@@ -298,6 +299,7 @@ bool AssetDatabase::ImportDirtyAssets()
 
     for (unsigned i = 0; i < assets.Size(); i++)
     {
+        assetScanImport_ = true;
         assets[i]->Import();
         assets[i]->Save();
         assets[i]->dirty_ = false;
@@ -321,11 +323,66 @@ void AssetDatabase::PreloadAssets()
 
 }
 
+void AssetDatabase::UpdateAssetCacheMap()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    if (project_.Null())
+        return;
+
+    bool gen = assetScanImport_;
+    assetScanImport_ = false;
+
+    String cachepath = project_->GetProjectPath() + "Cache/__atomic_ResourceCacheMap.json";
+
+    if (!gen && !fileSystem->FileExists(cachepath))
+        gen = true;
+
+    if (!gen)
+        return;
+
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    HashMap<String, String> assetMap;
+    JSONValue jAssetMap;
+
+    while (itr != assets_.End())
+    {
+        assetMap.Clear();
+        (*itr)->GetAssetCacheMap(assetMap);
+
+        HashMap<String, String>::ConstIterator amitr = assetMap.Begin();
+
+        while (amitr != assetMap.End())
+        {
+            jAssetMap.Set(amitr->first_, amitr->second_);
+            amitr++;
+        }
+
+        itr++;
+    }
+
+    SharedPtr<File> file(new File(context_, cachepath, FILE_WRITE));
+    if (!file->IsOpen())
+    {
+        ATOMIC_LOGERRORF("Unable to update ResourceCacheMap: %s", cachepath.CString());
+        return;
+    }
+
+
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+    jsonFile->GetRoot().Set("assetMap", jAssetMap);
+
+    jsonFile->Save(*file);
+
+
+}
 
 void AssetDatabase::Scan()
 {
     if (!assetScanDepth_)
     {
+        assert(!assetScanImport_);
         SendEvent(E_ASSETSCANBEGIN);
     }
 
@@ -410,7 +467,8 @@ void AssetDatabase::Scan()
 
     if (!assetScanDepth_)
     {
-        SendEvent(E_ASSETSCANEND);
+        UpdateAssetCacheMap();
+        SendEvent(E_ASSETSCANEND);        
     }
 }
 

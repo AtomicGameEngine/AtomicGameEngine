@@ -87,9 +87,13 @@ void CSFunctionWriter::GenNativeCallParameters(String& sig)
             }
             else
             {
-                if (ptype->type_->asStringType() || ptype->type_->asStringHashType())
+                if (ptype->type_->asStringType())
                 {
                     args.Push(ToString("%s ? String(%s) : String::EMPTY", ptype->name_.CString(), ptype->name_.CString()));
+                }
+                else if (ptype->type_->asStringHashType())
+                {
+                    args.Push(ToString("StringHash(%s)", ptype->name_.CString()));
                 }
                 else
                 {
@@ -732,9 +736,13 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
     if (function_->GetReturnType())
     {
 
-        if (function_->GetReturnType()->type_->asStringType() || function_->GetReturnType()->type_->asStringHashType())
+        if (function_->GetReturnType()->type_->asStringType())
         {
             line += "return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(";
+        }
+        else if (function_->GetReturnType()->type_->asStringHashType())
+        {
+            line += "return ";
         }
         else if (function_->GetReturnType()->type_->asVectorType())
         {
@@ -774,7 +782,7 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
 
     if (function_->GetReturnType())
     {
-        if (function_->GetReturnType()->type_->asStringType() || function_->GetReturnType()->type_->asStringHashType())
+        if (function_->GetReturnType()->type_->asStringType())
             line += ")";
     }
 
@@ -1004,6 +1012,14 @@ String CSFunctionWriter::MapDefaultParameter(JSBFunctionType* parameter)
         dparm.assignment = "Quaternion.Identity";
         defaultStructParameters_.Push(dparm);
         return "default(Quaternion)";
+    }
+
+    if (init == "StringHash::ZERO")
+    {
+        dparm.type = "StringHash";
+        dparm.assignment = "StringHash.Zero";
+        defaultStructParameters_.Push(dparm);
+        return "default(StringHash)";
     }
 
     return String::EMPTY;

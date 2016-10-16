@@ -336,6 +336,30 @@ void ModelImporter::GetAnimations(PODVector<Animation*>& animations)
 
 }
 
+void ModelImporter::GetAssetCacheMap(HashMap<String, String>& assetMap)
+{
+    if (asset_.Null())
+        return;
+
+    String assetPath = asset_->GetRelativePath().ToLower();
+
+    String cachePath = asset_->GetGUID().ToLower();
+
+    // Default is load node xml
+    assetMap["Node;" + assetPath] = cachePath;
+    assetMap["Model;" + assetPath] = cachePath + ".mdl";
+
+    PODVector<Animation*> animations;
+
+    GetAnimations(animations);
+
+    for (unsigned i = 0; i < animations.Size(); i++)
+    {
+        Animation* anim = animations[i];
+        assetMap["Animation;" + anim->GetAnimationName().ToLower() + "@" + assetPath] = cachePath + "_" + anim->GetAnimationName() + ".ani";
+    }
+}
+
 bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
     if (!AssetImporter::LoadSettingsInternal(jsonRoot))

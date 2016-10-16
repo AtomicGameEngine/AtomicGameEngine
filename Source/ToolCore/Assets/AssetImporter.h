@@ -68,6 +68,9 @@ public:
 
 protected:
 
+    // Get a mapping of the assets path to cache file representations, by type
+    virtual void GetAssetCacheMap(HashMap<String, String>& assetMap) {}
+
     virtual bool Import() { return true; }
 
     WeakPtr<Asset> asset_;
