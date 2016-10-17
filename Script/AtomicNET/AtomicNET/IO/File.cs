@@ -7,9 +7,6 @@ namespace AtomicEngine
     public partial class File : AObject, Deserializer, Serializer
     {
 
-        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern uint csi_Atomic_File_Read(IntPtr self, IntPtr dest, uint size);
-
 
         /// <summary>
         /// Read bytes from the file. Return array of bytes of the length actually read (can be 0 length)
@@ -39,7 +36,7 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern uint csi_Atomic_File_Write(IntPtr self, IntPtr data, uint offset, uint size);
+        internal static extern uint csi_Atomic_File_Read(IntPtr self, IntPtr dest, uint size);
 
         /// <summary>
         /// Write bytes to the file, with optional offset into array and count of bytes to write. 
@@ -71,6 +68,9 @@ namespace AtomicEngine
             return bytesWritten;
 
         }
+
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern uint csi_Atomic_File_Write(IntPtr self, IntPtr data, uint offset, uint size);
 
 
     };
