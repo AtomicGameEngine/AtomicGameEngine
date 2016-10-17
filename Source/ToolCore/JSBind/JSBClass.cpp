@@ -275,8 +275,42 @@ void JSBClass::RecursiveAddBaseClass(PODVector<JSBClass*>& baseClasses)
     }
 }
 
+void JSBClass::MergeInterface(JSBClass* interface)
+{
+    if (!interface->IsInterface())
+    {
+        ATOMIC_LOGERRORF("JSBClass::MergeInterface - attempting to merge non-interface class %s", interface->GetName().CString());
+        return;
+    }
+
+    // We merge interfaces via cloning the method for those which aren't implemented in the class itself
+    // We don't use a common native wrapper, as we need to cast (sometimes using multiple inheritance, and this avoids an error prone dynamic cast)
+
+    for (unsigned i = 0; i < interface->functions_.Size(); i++)
+    {
+        JSBFunction* src = interface->functions_[i];
+
+        if (src->Skip() || src->IsConstructor() || src->IsDestructor())
+            continue;
+
+        if (!MatchFunction(src))
+        {
+            JSBFunction* function = src->Clone(this);
+            function->SetInterface(true);
+            AddFunction(function);
+        }
+    }
+}
+
 void JSBClass::Preprocess()
 {
+
+    // merge interfaces
+    for (unsigned i = 0; i < interfaces_.Size(); i++)
+    {
+        MergeInterface(interfaces_[i]);
+    }
+
     RecursiveAddBaseClass(baseClasses_);
 }
 

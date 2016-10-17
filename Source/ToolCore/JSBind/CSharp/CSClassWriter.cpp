@@ -50,6 +50,9 @@ void CSClassWriter::WriteNativeFunctions(String& source)
         if (function->Skip())
             continue;
 
+        if (klass_->IsInterface() && function->IsConstructor())
+            continue;
+
         if (function->IsDestructor())
             continue;
 
@@ -71,8 +74,11 @@ void CSClassWriter::GenerateNativeSource(String& sourceOut)
 
     JSBPackage* package = klass_->GetPackage();
 
-    source.AppendWithFormat("ATOMIC_EXPORT_API ClassID csb_%s_%s_GetClassIDStatic()\n{\n", package->GetName().CString(),klass_->GetName().CString());
-    source.AppendWithFormat("   return %s::GetClassIDStatic();\n}\n\n", klass_->GetNativeName().CString());
+    if (!klass_->IsInterface())
+    {
+        source.AppendWithFormat("ATOMIC_EXPORT_API ClassID csb_%s_%s_GetClassIDStatic()\n{\n", package->GetName().CString(), klass_->GetName().CString());
+        source.AppendWithFormat("   return %s::GetClassIDStatic();\n}\n\n", klass_->GetNativeName().CString());
+    }
 
     WriteNativeFunctions(source);
 
@@ -116,7 +122,7 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
             if (!fType)
                 continue;
 
-            String line = "public ";
+            String line = klass_->IsInterface() ? "" : "public ";
 
             JSBClass* baseClass = klass_->GetBaseClass();
             if (baseClass)
@@ -137,32 +143,47 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
 
             if (prop->getter_)
             {
-                source += IndentLine("get\n");
-                source += IndentLine("{\n");
+                if (klass_->IsInterface())
+                {
+                    source += IndentLine("get;\n");
+                }
+                else
+                {
+                    source += IndentLine("get\n");
+                    source += IndentLine("{\n");
 
-                Indent();
+                    Indent();
 
-                source += IndentLine(ToString("return %s();\n", prop->getter_->GetName().CString()));
+                    source += IndentLine(ToString("return %s();\n", prop->getter_->GetName().CString()));
 
-                Dedent();
+                    Dedent();
 
-                source += IndentLine("}\n");
+                    source += IndentLine("}\n");
+                }
             }
 
             if (prop->setter_)
             {
-                source += IndentLine("set\n");
-                source += IndentLine("{\n");
+                if (klass_->IsInterface())
+                {
+                    source += IndentLine("set;\n");
+                }
+                else
+                {
+                    source += IndentLine("set\n");
+                    source += IndentLine("{\n");
 
-                Indent();
+                    Indent();
 
-                source += IndentLine(ToString("%s(value);\n", prop->setter_->GetName().CString()));
+                    source += IndentLine(ToString("%s(value);\n", prop->setter_->GetName().CString()));
 
-                Dedent();
+                    Dedent();
 
-                source += IndentLine("}\n");
+                    source += IndentLine("}\n");
+
+                }
+
             }
-
 
             Dedent();
 
@@ -223,7 +244,12 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     }
     else
     {
-        line = ToString("public partial class %s%s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "");
+        String classString = "class";
+
+        if (klass_->IsInterface())
+            classString = "interface";
+
+        line = ToString("public partial %s %s%s\n", classString.CString(), klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "");
     }
 
 
@@ -241,11 +267,15 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     // line = "[SuppressUnmanagedCodeSecurity]\n";
     // source += IndentLine(line);
 
-    line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
-    source += IndentLine(line);
-    line = ToString("public static extern IntPtr csb_%s_%s_GetClassIDStatic();\n", package->GetName().CString(),klass_->GetName().CString());
-    source += IndentLine(line);
-    source += "\n";
+    if (!klass_->IsInterface())
+    {
+        line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
+        source += IndentLine(line);
+        line = ToString("public static extern IntPtr csb_%s_%s_GetClassIDStatic();\n", package->GetName().CString(), klass_->GetName().CString());
+        source += IndentLine(line);
+        source += "\n";
+    }
+
     Dedent();
 
     // managed functions
@@ -257,6 +287,9 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         JSBFunction* function = klass_->functions_.At(i);
 
         if (function->Skip())
+            continue;
+
+        if (klass_->IsInterface() && function->IsConstructor())
             continue;
 
         if (function->IsDestructor())
@@ -272,7 +305,7 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
 
     // There are some constructors being skipped (like HTTPRequest as it uses a vector of strings in args)
     // Make sure we have at least a IntPtr version
-    if (!CSFunctionWriter::GetWroteConstructor() && klass_->GetName() != "RefCounted")
+    if (!klass_->IsInterface() && !CSFunctionWriter::GetWroteConstructor() && klass_->GetName() != "RefCounted")
     {
         ATOMIC_LOGINFOF("WARNING: %s class didn't write a constructor, filling in generated native constructor", klass_->GetName().CString());
 
