@@ -578,6 +578,20 @@ namespace Atomic
             return self->SetKeyFrame(time, variant->GetVariant());
         }
 
+        // File
+
+        ATOMIC_EXPORT_API unsigned csi_Atomic_File_Read(File* self, void* dest, unsigned size)
+        {
+            return self->Read(dest, size);
+        }
+
+        ATOMIC_EXPORT_API unsigned csi_Atomic_File_Write(File* self, void* data, unsigned offset, unsigned size)
+        {
+            unsigned char* bytes = (unsigned char*) data;
+            bytes += offset;
+            return self->Write(bytes, size);
+        }
+
 
 #ifdef ATOMIC_PLATFORM_IOS
         ATOMIC_EXPORT_API void SDL_IOS_Init(const char *resourceDir, const char *documentsDir)
