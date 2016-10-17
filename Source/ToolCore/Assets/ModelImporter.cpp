@@ -131,12 +131,15 @@ bool ModelImporter::ImportAnimation(const String& filename, const String& name, 
 
             AnimatedModel* animatedModel = importNode_->GetComponent<AnimatedModel>();
             AnimationController* controller = importNode_->GetComponent<AnimationController>();
-            if (animatedModel && controller)
+            if (!controller)
             {
-                SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
-                if (animation)
-                    controller->AddAnimationResource(animation);
+                importNode_->CreateComponent<AnimationController>();
+                controller = importNode_->GetComponent<AnimationController>();
             }
+            SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
+
+            if (animation)
+                controller->AddAnimationResource(animation);
 
             ATOMIC_LOGINFOF("Import Info: %s : %s", info.name_.CString(), fileName.CString());
         }
