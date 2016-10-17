@@ -2,7 +2,7 @@ using System;
 namespace AtomicEngine
 {
 
-    public interface Serializer
+    public partial interface Serializer
     {
         IntPtr NativeInstance { get; }
 

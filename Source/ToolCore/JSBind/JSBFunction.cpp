@@ -28,6 +28,7 @@ namespace ToolCore
 unsigned JSBFunction::idCounter_ = 1;
 
 JSBFunction::JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
+                                  isInterface_(false),
                                   isConstructor_(false), isDestructor_(false),
                                   isGetter_(false), isSetter_(false),
                                   isOverload_(false), skip_(false),
@@ -129,5 +130,32 @@ JSBClass* JSBFunction::GetReturnClass()
     return returnType_->type_->asClassType()->class_;
 
 }
+
+JSBFunction* JSBFunction::Clone(JSBClass* dstClass)
+{
+    JSBFunction* dst = new JSBFunction(dstClass);
+
+    dst->name_ = name_;
+    dst->propertyName_ = propertyName_;;
+
+    dst->returnType_ = returnType_;
+    dst->parameters_ = parameters_;
+
+    dst->docString_ = docString_;
+
+    dst->isInterface_ = isInterface_;
+    dst->isConstructor_ = isConstructor_;
+    dst->isDestructor_ = isDestructor_;
+    dst->isGetter_ = isGetter_;
+    dst->isSetter_ = isSetter_;
+    dst->isOverload_ = isOverload_;
+    dst->isVirtual_ = isVirtual_;
+    dst->isStatic_ = isStatic_;
+    dst->skip_ = skip_;
+    dst->skipLanguages_ = skipLanguages_;
+
+    return dst;
+}
+
 
 }

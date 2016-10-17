@@ -199,6 +199,7 @@ public:
 
 private:
 
+    void MergeInterface(JSBClass* interface);
     void RecursiveAddBaseClass(PODVector<JSBClass *> &baseClasses);
 
     String name_;

@@ -143,10 +143,6 @@ void CSModuleWriter::GenerateNativeSource()
 
     source += "\n\nextern \"C\" \n{\n \n";
 
-    source += "// Begin Class Declarations\n";
-
-    source += "// End Class Declarations\n\n";
-
     source += "// Begin Classes\n";
 
     Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
@@ -214,7 +210,8 @@ String CSModuleWriter::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
 void CSModuleWriter::GenerateManagedClasses(String& source)
 {
 
-    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses();
+    // get All classes and interfaces
+    Vector<SharedPtr<JSBClass>> classes = module_->GetClasses(true);
 
     for (unsigned i = 0; i < classes.Size(); i++)
     {

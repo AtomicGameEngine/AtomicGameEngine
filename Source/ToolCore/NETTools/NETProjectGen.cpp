@@ -419,6 +419,9 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
+        // Don't warn on missing XML documentation
+        pgroup.CreateChild("NoWarn").SetValue("1591");
+
         if (genAssemblyDocFile_)
         {
             pgroup.CreateChild("DocumentationFile").SetValue(outputPath + assemblyName_ + ".xml");
@@ -508,6 +511,9 @@ namespace ToolCore
         pgroup.CreateChild("WarningLevel").SetValue("4");
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
+
+        // Don't warn on missing XML documentation
+        pgroup.CreateChild("NoWarn").SetValue("1591");
 
         pgroup.CreateChild("DebugSymbols").SetValue("true");
 

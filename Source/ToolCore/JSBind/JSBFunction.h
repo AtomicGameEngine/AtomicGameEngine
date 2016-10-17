@@ -143,6 +143,9 @@ public:
 
     bool Match(JSBFunction* func);
 
+    // clones function and adds to specified class
+    JSBFunction* Clone(JSBClass* dstClass);
+
     bool IsConstructor() const { return isConstructor_; }
     bool IsDestructor() const { return isDestructor_; }
     bool IsSetter() const { return isSetter_; }
@@ -150,6 +153,7 @@ public:
     bool IsOverload() { return isOverload_; }
     bool IsVirtual() const { return isVirtual_; }
     bool IsStatic() const { return isStatic_; }
+    bool IsInterface() const { return isInterface_; }
 
     bool Skip(BindingLanguage language = BINDINGLANGUAGE_ANY) const
     {
@@ -173,6 +177,7 @@ public:
     const String& GetDocString() const { return docString_; }
 
     void SetName(const String& name) { name_ = name; }
+    void SetClass(JSBClass* klass) { class_ = klass; }
     void SetConstructor(bool value = true) { isConstructor_ = value; }
     void SetDestructor(bool value = true) { isDestructor_ = value; }
     void SetSetter(bool value = true) { isSetter_ = value; }
@@ -182,6 +187,7 @@ public:
     void SetStatic(bool value = true) { isStatic_ = value; }
     void SetSkip(bool value) { skip_ = value; }
     void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
+    void SetInterface(bool interface) { isInterface_ = interface; }
     void SetDocString(const String& docString) { docString_ = docString; }
 
     void SetSkipLanguage(BindingLanguage language, bool skip = true)
@@ -285,6 +291,8 @@ private:
     Vector<JSBFunctionType*> parameters_;
 
     String docString_;
+
+    bool isInterface_;
 
     bool isConstructor_;
     bool isDestructor_;

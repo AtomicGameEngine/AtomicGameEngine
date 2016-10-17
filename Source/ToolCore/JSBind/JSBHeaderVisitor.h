@@ -623,9 +623,6 @@ public:
 
         jclass->SetHeader(header_);
 
-        if (jclass->IsInterface())
-            return true;
-
         String docString = parseDocString(klass->line() - 1);
         if (docString.Length())
             jclass->SetDocString(docString);
