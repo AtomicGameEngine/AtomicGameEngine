@@ -142,6 +142,11 @@ export class BuildSettingsWindow extends ModalWindow {
 
                 var index = this.platformSelect.value;
 
+                var showMessage = function(target, title, message) {
+                    var window = new Atomic.UIMessageWindow(target, "modal_error");
+                    window.show(title, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+                }
+
                 for (var name in this.platformInfo) {
 
                     var info: { widget: Atomic.UIWidget, index: number, logo: string } = this.platformInfo[name];
@@ -150,17 +155,41 @@ export class BuildSettingsWindow extends ModalWindow {
 
                         var platform = toolSystem.getPlatformByName(name);
 
-                        if (platform.platformID == ToolCore.PLATFORMID_IOS) {
+                        // Do we have a C# project?
+                        if (ToolCore.netProjectSystem.solutionAvailable) {
 
-                            if (Atomic.platform == "Windows") {
+                            if (platform.platformID == ToolCore.PLATFORMID_WEB) {
 
-                                var message = "\niOS Deployment requires running the Atomic Editor on MacOSX\n\n";
-                                new Atomic.UIMessageWindow(this, "modal_error").show("MacOSX Required", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+                                showMessage(this, "Platform Info", "\nThe web platform is not available when using C# at this time\n\n");
                                 return true;
 
                             }
 
+                            if (platform.platformID == ToolCore.PLATFORMID_IOS || platform.platformID == ToolCore.PLATFORMID_ANDROID) {
+
+                                var ide = Atomic.platform == "Windows" ? "Visual Studio" : "Xamarin Studio";
+                                var message = `Please open the following solution in ${ide}:\n\n ${ToolCore.netProjectSystem.solutionPath}\n\n`;
+                                message += "HINT: You can open the solution by clicking on any C# script in the project or from the Developer->Plugins->AtomicNET menu\n";
+                                showMessage(this, "IDE Deployment Required", message);
+                                return true;
+                            }
+
+
+                        } else {
+
+                            if (platform.platformID == ToolCore.PLATFORMID_IOS) {
+
+                                if (Atomic.platform == "Windows") {
+
+                                    showMessage(this, "MacOSX Required", "\niOS Deployment requires running the Atomic Editor on MacOSX\n\n");
+                                    return true;
+
+                                }
+
+                            }
+
                         }
+
 
                         toolSystem.setCurrentPlatform(platform.platformID);
 
