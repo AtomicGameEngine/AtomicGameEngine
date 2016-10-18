@@ -31,7 +31,7 @@ export interface ProjectTemplateDefinition {
     folder: string;
     languages: string[];
     appDelegateClass: string;
-    namespace: string[];
+    namespace: string;
 }
 
 // Supported project languages
@@ -96,29 +96,70 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
         return;
     }
 
-    let exampleJson = JSON.parse(jsonFile.readText());
-    let examples = <[ProjectTemplateDefinition]>exampleJson.examples;
+    let exampleFoldersJson = JSON.parse(jsonFile.readText());
+
+    // list of example folders
+    let exampleFolders = <[string]>exampleFoldersJson.examples;
+
+    let examples = <[ProjectTemplateDefinition]>[];
 
     // Update all the paths to a more fully qualified path
-    examples.forEach(example => {
+    exampleFolders.forEach(exampleFolder => {
 
-        example.folder = env.toolDataDir + "AtomicExamples/" + example.folder + "/";
+        let folder = Atomic.addTrailingSlash(env.toolDataDir + "AtomicExamples/" + exampleFolder);
+        let screenshot = folder + "Screenshot.png";
 
-        example.languages = [];
+        if (!fileSystem.dirExists(folder)) {
+            console.log("Skipping non-existent example ", folder);
+            return;
+        }
 
-        for (var i = 0; i < projectLanguages.length; i++) {
+        let exampleJsonFilename = folder + "AtomicExample.json";
 
-            if (fileSystem.dirExists(example.folder + projectLanguages[i])) {
-                example.languages.push(projectLanguages[i]);
+        if (!fileSystem.fileExists(exampleJsonFilename)) {
+            console.log("Skipping non-existent example json", exampleJsonFilename);
+            return;
+        }
+
+        jsonFile = new Atomic.File(exampleJsonFilename, Atomic.FILE_READ);
+
+        if (!jsonFile.isOpen()) {
+            console.log("Unable to open example json", exampleJsonFilename);
+            return;
+        }
+
+
+        let exampleJson = JSON.parse(jsonFile.readText());
+
+        if (!exampleJson.name || !exampleJson.desc) {
+            console.log("Unable to parse example json", exampleJsonFilename);
+            return;
+        }
+
+        let allLanguages = ["CSharp", "JavaScript", "TypeScript"];
+        let languages = [];
+
+        for (var i = 0; i < allLanguages.length; i++) {
+
+            if (fileSystem.dirExists(folder + allLanguages[i])) {
+                languages.push(allLanguages[i]);
             }
 
         }
 
-        example.screenshot = exampleInfoDir + example.screenshot;
+        examples.push({
+            name : exampleJson.name,
+            desc : exampleJson.desc,
+            screenshot : screenshot,
+            folder : folder,
+            languages : languages,
+            appDelegateClass : exampleJson.appDelegateClass,
+            namespace : exampleJson.namespace
+        })
 
     });
 
-    return exampleJson.examples;
+    return examples;
 }
 
 /**
@@ -335,7 +376,7 @@ function generateAtomicNETDesktopProject():boolean {
     if (!processAtomicNETTemplate(desktopFolder + "Program.cs", templateFolder + "Platforms/Desktop/Program.cs")) {
         return false;
     }
-    
+
     return true;
 }
 

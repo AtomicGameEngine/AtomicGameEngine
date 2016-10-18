@@ -1,163 +1,29 @@
 {
     "examples" : [
-
-        {
-            "name": "Feature Examples",
-            "desc" : "Multiple Feature Examples",
-            "screenshot" : "Example.png",
-            "folder" : "FeatureExamples"
-        },
-        {
-            "name": "Basic2D",
-            "desc" : "Basic2D Scene Example",
-            "screenshot" : "Basic2D.png",
-            "folder" : "Basic2D"
-        },
-        {
-            "name": "Basic3D",
-            "desc" : "Basic3D Scene Example",
-            "screenshot" : "Basic3D.png",
-            "folder" : "Basic3D"
-        },
-        {
-            "name": "2D Physics Platformer",
-            "desc" : "Moving platforms, vines, bats, oh my!",
-            "screenshot" : "PhysicsPlatformer2D.png",
-            "folder" : "PhysicsPlatformer"
-        },
-        {
-            "name": "ToonTown",
-            "desc" : "A cartoony scene with 3D character and physics",
-            "screenshot" : "ToonTown.png",
-            "folder" : "ToonTown"
-        },
-        {
-            "name": "AtomicBlaster",
-            "desc" : "Port of ShapeBlaster for XNA by Michael Hoffman",
-            "screenshot" : "AtomicBlaster.png",
-            "namespace" : "AtomicBlaster",
-            "appDelegateClass" : "GameRoot",
-            "folder" : "AtomicBlaster"
-        },
-        {
-            "name": "Roboman3D",
-            "desc" : "Character Controller with Physics",
-            "screenshot" : "Roboman3D.png",
-            "folder" : "RoboMan3D"
-        },
-        {
-            "name": "AtomicMutant",
-            "desc" : "Character Controller with Physics",
-            "screenshot" : "AtomicMutant.png",
-            "folder" : "AtomicMutant"
-        },
-        {
-            "name": "Butterflies",
-            "desc" : "Beautiful Butterflies!",
-            "screenshot" : "Butterflies.png",
-            "folder" : "Butterflies"
-        },
-        {
-            "name": "Space Game",
-            "desc" : "Example of simple game loop, UI, post process effects",
-            "screenshot" : "SpaceGame.png",
-            "folder" : "SpaceGame"
-        },
-        {
-            "name": "UIWebView",
-            "desc" : "Example Chromium WebView Widget",
-            "screenshot" : "UIWebView.png",
-            "folder" : "AtomicWebView"
-        },
-        {
-            "name": "WebView3D",
-            "desc" : "Example rendering a Chromium WebView in a 3D scene",
-            "screenshot" : "WebView3D.png",
-            "folder" : "WebView3D"
-        },
-        {
-            "name": "ParticleEmitter3D",
-            "desc" : "3D Particle Emitters",
-            "screenshot" : "ParticleEmitter3D.png",
-            "folder" : "ParticleEmitter3D"
-        },
-        {
-            "name": "Particles2D",
-            "desc" : "2D Particle Emitters",
-            "screenshot" : "Particles2D.png",
-            "folder" : "Particles2D"
-        },
-        {
-            "name": "Physics2D",
-            "desc" : "Simple 2D physics example",
-            "screenshot" : "Example.png",
-            "folder" : "Physics2D"
-        },
-        {
-            "name": "Breakout",
-            "desc" : "Simple version of the arcade classic",
-            "screenshot" : "Breakout.png",
-            "folder" : "Breakout"
-        },
-        {
-            "name": "CharacterAnimation2D",
-            "desc" : "2D Character Animation using Spriter",
-            "screenshot" : "CharacterAnimation2D.png",
-            "folder" : "CharacterAnimation2D"
-        },
-        {
-            "name": "CharacterAnimation3D",
-            "desc" : "3D Character Controller example",
-            "screenshot" : "CharacterAnimation3D.png",
-            "folder" : "CharacterAnimation3D"
-        },
-        {
-            "name": "Chickens",
-            "desc" : "Animated chickens, wandering about, cluck!",
-            "screenshot" : "Chickens.png",
-            "folder" : "Chickens"
-        },
-        {
-            "name": "CubeMapExample",
-            "desc" : "Cubemap rendering and generator example",
-            "screenshot" : "CubeMapExample.png",
-            "folder" : "CubeMapExample"
-        },
-        {
-            "name": "Light2D",
-            "desc" : "2D Lighting with shadows",
-            "screenshot" : "Light2D.png",
-            "folder" : "Light2DExample"
-        },
-        {
-            "name": "Render to Texture",
-            "desc" : "Example of rendering a scene on a 3d object",
-            "screenshot" : "RenderToTexture.png",
-            "folder" : "RenderToTexture"
-        },
-        {
-            "name": "Multiplayer Space Game",
-            "desc" : "Space Game varient with master server and NAT punchthru",
-            "screenshot" : "SpaceGame.png",
-            "folder" : "SpaceGameMultiplayer"
-        },
-        {
-            "name": "UISceneView2D",
-            "desc" : "Example of rendering a scene to a UISceneView widget",
-            "screenshot" : "UISceneView2D.png",
-            "folder" : "UISceneView2D"
-        },
-        {
-            "name": "WebTexture3D",
-            "desc" : "Example rendering a Chromium WebView on a 3D surface",
-            "screenshot" : "WebTexture3D.png",
-            "folder" : "WebTexture"
-        },
-        {
-            "name": "WaterShip",
-            "desc" : "Example water shader",
-            "screenshot" : "WaterShip.png",
-            "folder" : "WaterShip"
-        }
+        "FeatureExamples",
+        "Basic2D",
+        "Basic3D",
+        "PhysicsPlatformer",
+        "ToonTown",
+        "AtomicBlaster",
+        "RoboMan3D",
+        "AtomicMutant",
+        "Butterflies",
+        "SpaceGame",
+        "AtomicWebView",
+        "WebView3D",
+        "ParticleEmitter3D",
+        "Particles2D",
+        "Physics2D",
+        "Breakout",
+        "CharacterAnimation2D",
+        "CharacterAnimation3D",
+        "Chickens",
+        "CubeMapExample",
+        "Light2DExample",
+        "RenderToTexture",
+        "UISceneView2D",
+        "WebTexture",
+        "WaterShip"
     ]
 }

@@ -171,14 +171,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 }
 
-                var openProject = () => this.sendEvent(EditorEvents.LoadProject, { path: path });
+                var requestProjectLoad = () => this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
 
                 if (ToolCore.toolSystem.project) {
 
                     this.subscribeToEvent(EditorEvents.ProjectClosed, () => {
 
                         this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
-                        openProject();
+                        requestProjectLoad();
 
                     });
 
@@ -186,7 +186,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 } else {
 
-                    openProject();
+                    requestProjectLoad();
 
                 }
 

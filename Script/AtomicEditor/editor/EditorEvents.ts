@@ -68,6 +68,14 @@ export const CloseProject = "EditorCloseProject";
 export const ProjectClosed = "EditorProjectClosed";
 export const ProjectUnloadedNotification = "ProjectUnloadedNotification";
 
+export const RequestProjectLoad = "RequestProjectLoad";
+export interface RequestProjectLoadEvent {
+
+  // The full path to the .atomic file
+  path: string;
+
+}
+
 export const LoadProject = "EditorLoadProject";
 export const LoadProjectNotification = "EditorLoadProjectNotification";
 export interface LoadProjectEvent {

@@ -81,6 +81,15 @@ static int Atomic_GetParentPath(duk_context* ctx)
     return 1;
 }
 
+static int Atomic_GetPath(duk_context* ctx)
+{
+    String path = duk_require_string(ctx, 0);
+
+    duk_push_string(ctx, GetPath(path).CString());
+
+    return 1;
+}
+
 static int FileSystem_ScanDir(duk_context* ctx)
 {
     duk_push_this(ctx);
@@ -125,6 +134,9 @@ void jsapi_init_filesystem(JSVM* vm)
 
     duk_push_c_function(ctx, Atomic_AddTrailingSlash, 1);
     duk_put_prop_string(ctx, -2, "addTrailingSlash");
+
+    duk_push_c_function(ctx, Atomic_GetPath, 1);
+    duk_put_prop_string(ctx, -2, "getPath");
 
     duk_push_c_function(ctx, Atomic_GetParentPath, 1);
     duk_put_prop_string(ctx, -2, "getParentPath");
