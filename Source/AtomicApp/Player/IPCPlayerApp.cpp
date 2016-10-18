@@ -194,7 +194,8 @@ namespace Atomic
             SubscribeToEvent(E_PLAYERQUIT, ATOMIC_HANDLER(IPCPlayerApp, HandleQuit));
         }
 
-        
+        GetSubsystem<Graphics>()->RaiseWindow();
+
 
     }
 

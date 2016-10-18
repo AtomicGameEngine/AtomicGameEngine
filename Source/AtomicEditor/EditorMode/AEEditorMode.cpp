@@ -128,6 +128,9 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 bool EditorMode::PlayProject(String addArgs, bool debug)
 {
+    if (playerBroker_.NotNull())
+        return false;
+
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();

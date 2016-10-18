@@ -327,7 +327,11 @@ namespace ToolCore
         {
             fileSystem->ScanDir(results, AddTrailingSlash(projectPath) + "Resources", "*.dll", SCAN_FILES, true);
             if (!results.Size())
-                return;
+            {
+                solutionPath_.Clear();
+                return;                
+            }
+                
         }            
 
         // if the solution or project assemblies don't exist mark as dirty
