@@ -29,6 +29,12 @@ function installBuildTasks(rootTask) {
         task = netTask;
     }
 
+    if (config["with-web"]) {
+        var webTask = jake.Task['build:web_player'];
+        task.prereqs.push("build:web_player")
+        task = webTask;
+    }
+
     if (config["with-ios"]) {
         var iosTask = jake.Task['build:ios_native'];
         task.prereqs.push("build:ios_native")

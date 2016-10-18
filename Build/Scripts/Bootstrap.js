@@ -26,6 +26,7 @@ function printHelp() {
     console.log("--help          : This help text");
     console.log("--with-android  : Build with Android platform support");
     console.log("--with-ios      : Build with iOS platform support");
+    console.log("--with-web      : Build with Web platform support");
     console.log("--debug         : Build debug version of the editor and associated platform runtimes");
     console.log("--noclean       : Do not clean before building, useful during development");
     console.log("--nonet         : Build without AtomicNET C# scripting support");
@@ -79,6 +80,14 @@ if (cmd == "buildeditor") {
 
         if (!process.env.ANDROID_NDK) {
             console.log("\nANDROID_NDK environment variable not set, exiting\n");
+            process.exit(1);
+        }
+    }
+
+    if (config["with-web"]) {
+
+        if (!process.env.EMSCRIPTEN) {
+            console.log("\nEMSCRIPTEN environment variable not set, consider running 'source /Path/To/emsdk_env.sh', exiting\n");
             process.exit(1);
         }
     }

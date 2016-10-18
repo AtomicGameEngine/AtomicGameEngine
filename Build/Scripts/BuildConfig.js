@@ -36,7 +36,7 @@ function processOptions(config) {
             config["with-atomicnet"] = programFileExists('/usr/bin/xbuild');
         }
 	}
-	
+
     // paths
     config.atomicRoot = path.resolve(__dirname, "../..") + "/";
     config.artifactsRoot = config.atomicRoot + "Artifacts/";
@@ -60,6 +60,7 @@ exports = module.exports = processOptions(require('minimist')(process.argv.slice
         "noclean" : false,
         "debug" : false,
         "nonet" : false,
+        "with-web" : false,
         "with-android" : false,
         "with-ios" : false,
         "with-docs" : false,
