@@ -70,6 +70,7 @@ namespace ToolCore
         String solutionPath_;
         StringVector configurations_;
         StringVector platforms_;
+        StringVector targets_;
 
         NETBuildStatus status_;
         String allArgs_;
