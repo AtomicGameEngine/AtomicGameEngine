@@ -21,6 +21,8 @@
 //
 
 import EditorEvents = require("../editor/EditorEvents");
+import EditorUI = require("../ui/EditorUI");
+import ProjectTemplates = require("ProjectTemplates");
 
 class ResourceOps extends Atomic.ScriptObject {
 
@@ -34,8 +36,73 @@ class ResourceOps extends Atomic.ScriptObject {
 
         });
 
+        this.subscribeToEvent(EditorEvents.RequestProjectLoad, (ev: EditorEvents.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); })
+
     }
 
+    handleRequestProjectLoad(ev:EditorEvents.RequestProjectLoadEvent) {
+
+        var fs = Atomic.fileSystem;
+        var projectPath = Atomic.addTrailingSlash(Atomic.getPath(ev.path));
+
+        var openProject = () => this.sendEvent(EditorEvents.LoadProject, { path: ev.path });
+
+        // Check whether there is a cache folder, if so, this project has been loaded before
+        if (Atomic.fileSystem.dirExists(projectPath + "Cache")) {
+            openProject();
+            return;
+        } else {
+
+            // this may be an example
+            var parentPath = Atomic.getParentPath(projectPath);
+            var exampleInfoPath = parentPath + "AtomicExample.json";
+
+            if (!fs.fileExists(exampleInfoPath)) {
+
+                openProject();
+                return;
+            }
+
+            var jsonFile = new Atomic.File(exampleInfoPath, Atomic.FILE_READ);
+
+            if (!jsonFile.isOpen()) {
+                return;
+            }
+
+            var exampleJson = JSON.parse(jsonFile.readText());
+
+            var allLanguages = ["CSharp", "JavaScript", "TypeScript"];
+            var language = null;
+
+            for (var i = 0; i < allLanguages.length; i++) {
+
+                if (projectPath.indexOf(allLanguages[i]) != -1) {
+                    language = allLanguages[i];
+                    break
+                }
+            }
+
+            if (!language) {
+                return;
+            }
+
+            var projectDef = {
+                name : exampleJson.name ? exampleJson.name : "Anonymous Example",
+                desc : exampleJson.desc ? exampleJson.desc : "",
+                screenshot : parentPath + "Screenshot.png",
+                folder : parentPath,
+                languages : [language],
+                appDelegateClass : exampleJson.appDelegateClass,
+                namespace : exampleJson.namespace
+
+            }
+
+            var ops = EditorUI.getModelOps();
+            ops.showCreateProject(projectDef, projectPath);
+
+        }
+
+    }
 
 }
 

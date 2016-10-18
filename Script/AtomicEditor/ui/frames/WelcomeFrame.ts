@@ -69,7 +69,6 @@ class WelcomeFrame extends ScriptWidget {
     handleClickedExample(example: ProjectTemplates.ProjectTemplateDefinition) {
 
         var ops = EditorUI.getModelOps();
-        var env = ToolCore.toolEnvironment;
         ops.showCreateProject(example);
     }
 
@@ -234,7 +233,7 @@ class WelcomeFrame extends ScriptWidget {
                 var path = utils.openProjectFileDialog();
                 if (path) {
 
-                    this.sendEvent(EditorEvents.LoadProject, { path: path });
+                    this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
 
                 }
 
@@ -254,7 +253,7 @@ class WelcomeFrame extends ScriptWidget {
                     return;
                 }
                 var path: string = this.recent[this.recentList.getSelectedItemID()];
-                this.sendEvent(EditorEvents.LoadProject, { path: path });
+                this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
             }
 
             if (id == "recentProjectsContextMenu") {

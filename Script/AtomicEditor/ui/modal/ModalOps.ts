@@ -65,11 +65,11 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateDefinition: ProjectTemplates.ProjectTemplateDefinition) {
+    showCreateProject(projectTemplateDefinition: ProjectTemplates.ProjectTemplateDefinition, projectPath?: string) {
 
         if (this.show()) {
 
-            this.opWindow = new CreateProject(projectTemplateDefinition);
+            this.opWindow = new CreateProject(projectTemplateDefinition, projectPath);
 
         }
 

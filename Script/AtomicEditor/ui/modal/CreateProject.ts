@@ -28,10 +28,11 @@ import ProjectTemplates = require("../../resources/ProjectTemplates");
 
 class CreateProject extends ModalWindow {
 
-    constructor(projectTemplate: ProjectTemplates.ProjectTemplateDefinition) {
+    constructor(projectTemplate: ProjectTemplates.ProjectTemplateDefinition, projectPath?: string) {
 
         super();
 
+        this.projectPath = projectPath;
         this.projectTemplate = projectTemplate;
 
         this.init("Create Project", "AtomicEditor/editor/ui/createproject.tb.txt");
@@ -67,7 +68,13 @@ class CreateProject extends ModalWindow {
 
         }
 
-        this.projectPathField.text = userDocuments;
+        // If we're specifying where to put the project (initially), then we are opening
+        // an example directly so use the same name
+        if (projectPath) {
+            this.projectNameField.text = projectTemplate.name;
+        }
+
+        this.projectPathField.text = projectPath ? projectPath : userDocuments;
         this.populateLanguageSelectionList();
 
         // Need to manually set the focus so the contents get auto-selected
@@ -133,144 +140,153 @@ class CreateProject extends ModalWindow {
 
         var folder = this.projectPathField.text.trim();
 
+        var projectPath = this.projectPath;
+
+        // if we changed the project path, clear it
+        if (folder != this.projectPath) {
+            projectPath = "";
+        }
+
         if (!folder) {
             EditorUI.showModalError("New Project Editor Error", "Please choose a root project folder");
             return false;
         }
 
-        folder += "/" + name;
-
         var fileSystem = Atomic.getFileSystem();
 
-        if (fileSystem.dirExists(folder) || fileSystem.fileExists(folder)) {
+        if (!projectPath) {
 
-            var message = folder + " exists\n\nPlease choose a different root folder or project name";
-            EditorUI.showModalError("New Project Editor Error", message);
-            return false;
+            folder += "/" + name;
 
+            if (fileSystem.dirExists(folder) || fileSystem.fileExists(folder)) {
+
+                var message = folder + " exists\n\nPlease choose a different root folder or project name";
+                EditorUI.showModalError("New Project Editor Error", message);
+                return false;
+
+            }
         }
 
         folder = Atomic.addTrailingSlash(folder);
-        if (!fileSystem.dirExists(folder)) {
 
-            // Determine if we have a language template for the selected language.
-            let selectedLanguage = this.projectLanguageField.text;
+        // Determine if we have a language template for the selected language.
+        let selectedLanguage = this.projectLanguageField.text;
 
-            // Check whether we have a required IDE installed for C# projects
-            var atomicNET = false;
-            if (selectedLanguage == "CSharp" || selectedLanguage == "C#") {
+        // Check whether we have a required IDE installed for C# projects
+        var atomicNET = false;
+        if (selectedLanguage == "CSharp" || selectedLanguage == "C#") {
 
-                atomicNET = true;
-                if (!ToolCore.netProjectSystem.getIDEAvailable()) {
-                    this.hide();
-                    EditorUI.getModelOps().showAtomicNETWindow();
-                    return false;
-                }
-            }
-
-            let templateFolder = "";
-            for (let i = 0; i < this.projectTemplate.languages.length; i++) {
-                if (this.projectTemplate.languages[i] === selectedLanguage) {
-                    templateFolder = this.projectTemplate.folder + selectedLanguage + "/";
-                    break;
-                }
-            }
-
-            // Do the creation!
-            if (templateFolder != "" && fileSystem.dirExists(templateFolder)) {
-
-                if (!fileSystem.copyDir(templateFolder, folder)) {
-                  var message = "Unable to copy folder: " + templateFolder + " to " + folder;
-                  EditorUI.showModalError("New Project Editor Error", message);
-                  return false;
-                }
-
-                var utils = new Editor.FileUtils();
-
-                utils.createDirs(folder + "Cache");
-                utils.createDirs(folder + "Settings");
-
-                if (!fileSystem.dirExists(folder)) {
-                    var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
-                    EditorUI.showModalError("New Project Editor Error", message);
-                    return false;
-                }
-
-                // Look for the .atomic project file and if it exists, then rename it
-                let fileResults = fileSystem.scanDir(folder, "*.atomic", Atomic.SCAN_FILES, false);
-                if (fileResults.length === 1) {
-                    fileSystem.rename(folder + fileResults[0], folder + name + ".atomic");
-                } else {
-                    // Just create the file.  We either don't have one existing, or we have more than one and don't know which one to rename
-                    var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
-                    file.close();
-                }
-
-                // Look for a .userprefs file and if it exists, then rename it
-                fileResults = fileSystem.scanDir(folder, "*.userprefs", Atomic.SCAN_FILES, false);
-                if (fileResults.length === 1) {
-                    fileSystem.rename(folder + fileResults[0], folder + name + ".userprefs");
-                }
-
-                // create project settings
-
-                var platforms = ["desktop"];
-
-                if (this.androidButton.value == 1) {
-                    platforms.push("android");
-                }
-
-                if (this.iosButton.value == 1) {
-                    platforms.push("ios");
-                }
-
-                var projectSettings = {
-                    name : name,
-                    platforms : platforms
-                }
-
-                var jsonFile = new Atomic.File(folder + "Settings/Project.json", Atomic.FILE_WRITE);
-                if (jsonFile.isOpen()) {
-                    jsonFile.writeString(JSON.stringify(projectSettings, null, 2));
-                    jsonFile.flush();
-                    jsonFile.close();
-                }
-
-                // Generate AtomicNET project if necessary
-                if (atomicNET) {
-                    if (!ProjectTemplates.generateAtomicNETProject({
-                        name: name,
-                        appID : this.appIDField.text,
-                        platforms : platforms,
-                        projectFolder : folder,
-                        projectTemplate : this.projectTemplate
-                    })) {
-                        var message = "Unable to generate AtomicNET project: " + folder;
-                        EditorUI.showModalError("New Project Editor Error", message);
-                        return false;
-                    }
-                }
-
+            atomicNET = true;
+            if (!ToolCore.netProjectSystem.getIDEAvailable()) {
                 this.hide();
-
-                this.sendEvent(EditorEvents.LoadProject, { path: folder });
-                return true;
-            } else {
-                let message = [
-                    "Unable to create project for:",
-                    "",
-                    `language: ${selectedLanguage}`,
-                    `template: ${templateFolder}`,
-                    "",
-                    "Please choose a different language."
-                ].join("\n");
-
-                EditorUI.showModalError("New Project Editor Error", message);
+                EditorUI.getModelOps().showAtomicNETWindow();
                 return false;
             }
         }
 
-        return false;
+        let templateFolder = "";
+        for (let i = 0; i < this.projectTemplate.languages.length; i++) {
+            if (this.projectTemplate.languages[i] === selectedLanguage) {
+                templateFolder = this.projectTemplate.folder + selectedLanguage + "/";
+                break;
+            }
+        }
+
+        // Do the creation!
+        if (templateFolder != "" && fileSystem.dirExists(templateFolder)) {
+
+            if (!projectPath) {
+                if (!fileSystem.copyDir(templateFolder, folder)) {
+                    var message = "Unable to copy folder: " + templateFolder + " to " + folder;
+                    EditorUI.showModalError("New Project Editor Error", message);
+                    return false;
+                }
+            }
+
+            var utils = new Editor.FileUtils();
+
+            utils.createDirs(folder + "Cache");
+            utils.createDirs(folder + "Settings");
+
+            if (!fileSystem.dirExists(folder)) {
+                var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
+                EditorUI.showModalError("New Project Editor Error", message);
+                return false;
+            }
+
+            // Look for the .atomic project file and if it exists, then rename it
+            let fileResults = fileSystem.scanDir(folder, "*.atomic", Atomic.SCAN_FILES, false);
+            if (fileResults.length === 1) {
+                fileSystem.rename(folder + fileResults[0], folder + name + ".atomic");
+            } else {
+                // Just create the file.  We either don't have one existing, or we have more than one and don't know which one to rename
+                var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
+                file.close();
+            }
+
+            // Look for a .userprefs file and if it exists, then rename it
+            fileResults = fileSystem.scanDir(folder, "*.userprefs", Atomic.SCAN_FILES, false);
+            if (fileResults.length === 1) {
+                fileSystem.rename(folder + fileResults[0], folder + name + ".userprefs");
+            }
+
+            // create project settings
+
+            var platforms = ["desktop"];
+
+            if (this.androidButton.value == 1) {
+                platforms.push("android");
+            }
+
+            if (this.iosButton.value == 1) {
+                platforms.push("ios");
+            }
+
+            var projectSettings = {
+                name : name,
+                platforms : platforms
+            }
+
+            var jsonFile = new Atomic.File(folder + "Settings/Project.json", Atomic.FILE_WRITE);
+            if (jsonFile.isOpen()) {
+                jsonFile.writeString(JSON.stringify(projectSettings, null, 2));
+                jsonFile.flush();
+                jsonFile.close();
+            }
+
+            // Generate AtomicNET project if necessary
+            if (atomicNET) {
+                if (!ProjectTemplates.generateAtomicNETProject({
+                    name: name,
+                    appID : this.appIDField.text,
+                    platforms : platforms,
+                    projectFolder : folder,
+                    projectTemplate : this.projectTemplate
+                })) {
+                    var message = "Unable to generate AtomicNET project: " + folder;
+                    EditorUI.showModalError("New Project Editor Error", message);
+                    return false;
+                }
+            }
+
+            this.hide();
+
+            this.sendEvent(EditorEvents.LoadProject, { path: folder });
+            return true;
+        } else {
+            let message = [
+                "Unable to create project for:",
+                "",
+                `language: ${selectedLanguage}`,
+                `template: ${templateFolder}`,
+                "",
+                "Please choose a different language."
+            ].join("\n");
+
+            EditorUI.showModalError("New Project Editor Error", message);
+            return false;
+        }
+
     }
 
     handleLanguageSwitch(selectedLanguage:string) {
@@ -364,6 +380,8 @@ class CreateProject extends ModalWindow {
     iosButton: Atomic.UIButton;
     html5Button: Atomic.UIButton;
 
+    // if we have specified a projectPath, the dest will not be the combination of path + name
+    projectPath: string;
     projectTemplate: ProjectTemplates.ProjectTemplateDefinition;
 }
 

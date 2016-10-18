@@ -301,6 +301,7 @@ declare module Atomic {
     export function destroy(component: Atomic.JSComponent): boolean;
 
     export function getParentPath(path: string): string;
+    export function getPath(path: string): string;
     export function addTrailingSlash(path: string): string;
     export function getExtension(path: string): string;
 
