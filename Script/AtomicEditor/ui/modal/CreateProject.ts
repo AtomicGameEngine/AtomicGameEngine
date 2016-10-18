@@ -140,6 +140,13 @@ class CreateProject extends ModalWindow {
 
         var folder = this.projectPathField.text.trim();
 
+        var projectPath = this.projectPath;
+
+        // if we changed the project path, clear it
+        if (folder != this.projectPath) {
+            projectPath = "";
+        }
+
         if (!folder) {
             EditorUI.showModalError("New Project Editor Error", "Please choose a root project folder");
             return false;
@@ -147,7 +154,7 @@ class CreateProject extends ModalWindow {
 
         var fileSystem = Atomic.getFileSystem();
 
-        if (!this.projectPath) {
+        if (!projectPath) {
 
             folder += "/" + name;
 
@@ -188,7 +195,7 @@ class CreateProject extends ModalWindow {
         // Do the creation!
         if (templateFolder != "" && fileSystem.dirExists(templateFolder)) {
 
-            if (!this.projectPath) {
+            if (!projectPath) {
                 if (!fileSystem.copyDir(templateFolder, folder)) {
                     var message = "Unable to copy folder: " + templateFolder + " to " + folder;
                     EditorUI.showModalError("New Project Editor Error", message);
