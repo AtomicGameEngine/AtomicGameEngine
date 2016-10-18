@@ -253,7 +253,7 @@ class WelcomeFrame extends ScriptWidget {
                     return;
                 }
                 var path: string = this.recent[this.recentList.getSelectedItemID()];
-                this.sendEvent(EditorEvents.LoadProject, { path: path });
+                this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
             }
 
             if (id == "recentProjectsContextMenu") {
