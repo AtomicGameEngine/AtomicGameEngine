@@ -426,6 +426,10 @@ public:
     // ATOMIC BEGIN
     /// Reload textures.
     void ReloadTextures();
+
+    /// Return number of true primitives rendered.
+    unsigned GetSinglePassPrimitives() { return numSinglePassPrimitives_; }
+
     // ATOMIC END
 
 private:
@@ -598,6 +602,12 @@ private:
     bool initialized_;
     /// Flag for views needing reset.
     bool resetViews_;
+    // ATOMIC BEGIN
+
+    /// Number of True primitives (3D geometry only.)
+    unsigned numSinglePassPrimitives_;
+
+    // ATOMIC END
 };
 
 }
