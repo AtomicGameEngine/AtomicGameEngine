@@ -268,6 +268,10 @@ Graphics::Graphics(Context* context) :
     instancingSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
+    // ATOMIC BEGIN
+    numPasses_(0),
+    numSinglePassPrimitives_(0),
+    // ATOMIC END
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
@@ -736,6 +740,9 @@ bool Graphics::BeginFrame()
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         SetTexture(i, 0);
 
+    // ATOMIC BEGIN
+    numSinglePassPrimitives_ = 0;
+    // ATOMIC END
     numPrimitives_ = 0;
     numBatches_ = 0;
 
@@ -847,6 +854,12 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     impl_->device_->DrawPrimitive(d3dPrimitiveType, vertexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
+    // ATOMIC END
+
     ++numBatches_;
 }
 
@@ -864,6 +877,12 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
+    // ATOMIC END
+
     ++numBatches_;
 }
 
@@ -881,6 +900,12 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
+    // ATOMIC END
+
     ++numBatches_;
 }
 
@@ -911,6 +936,11 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += instanceCount * primitiveCount;
+
+    // ATOMIC BEGIN
+    numSinglePassPrimitives_ += instanceCount * primitiveCount;
+    // ATOMIC END
+
     ++numBatches_;
 }
 
@@ -941,6 +971,11 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += instanceCount * primitiveCount;
+
+    // ATOMIC BEGIN
+    numSinglePassPrimitives_ += instanceCount * primitiveCount;
+    // ATOMIC END
+
     ++numBatches_;
 }
 
