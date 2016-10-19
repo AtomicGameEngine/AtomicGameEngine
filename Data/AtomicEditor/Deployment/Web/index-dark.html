@@ -1,0 +1,29 @@
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Atomic Game Engine Web Player</title>
+<link rel='shortcut icon' href='favicon.ico' type='image/x-icon'/ >
+<style type="text/css">
+body {
+	background-color: #3b3b3b;
+}
+</style>
+</head>
+
+<body>
+<a href="http://atomicgameengine.com/"><img src="Atomic_Logo_Header-i.png"></a>
+<center>
+<iframe id="playerframe" src="AtomicPlayer.html" width="800" height="512", marginwidth="0", marginheight="0", frameborder="0", scrolling="no"></iframe>
+</center>
+<h4 style="color:tan;">Notes:</h4>
+<p style="color:tan;">* Run on <b>Firefox</b> for best results.</p>
+<p style="color:tan;">* Powered by the <a href="http://atomicgameengine.com/">Atomic Game Engine</a></p>
+</body>
+
+<script>
+function focus()
+{
+    var iframe = document.getElementById('playerframe');
+    iframe.contentWindow.focus();
+}
+window.setInterval(focus, 100);
+</script>

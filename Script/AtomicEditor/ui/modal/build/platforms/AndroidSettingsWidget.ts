@@ -36,7 +36,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         this.sdkTargetSelect = <Atomic.UISelectDropdown>this.getWidget("sdk_target_select");
         this.appNameEdit = <Atomic.UIEditField>this.getWidget("app_name");
         this.packageNameEdit = <Atomic.UIEditField>this.getWidget("app_package");
-        this.productNameEdit = <Atomic.UIEditField>this.getWidget("product_name");
         this.companyNameEdit = <Atomic.UIEditField>this.getWidget("company_name");
 
 
@@ -190,7 +189,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         this.appNameEdit.text = this.settings.appName;
         this.packageNameEdit.text = this.settings.packageName;
-        this.productNameEdit.text = this.settings.productName;
         this.companyNameEdit.text = this.settings.companyName;
         this.iconNameEdit.text = this.settings.iconPath;
 
@@ -203,7 +201,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         this.settings.appName = this.appNameEdit.text;
         this.settings.packageName = this.packageNameEdit.text;
-        this.settings.productName = this.productNameEdit.text;
         this.settings.companyName = this.companyNameEdit.text;
         this.settings.sDKVersion = this.sdkTargetSelect.text;
         this.settings.iconPath = this.iconNameEdit.text;
@@ -229,7 +226,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
     appNameEdit: Atomic.UIEditField;
     packageNameEdit: Atomic.UIEditField;
-    productNameEdit: Atomic.UIEditField;
     companyNameEdit: Atomic.UIEditField;
 
     releaseNameEdit : Atomic.UIEditField;

@@ -5,25 +5,38 @@ TBLayout: axis: y, distribution: gravity, position: left
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: app_name, autofocus: 1
 				lp: min-width: 220
-	TBLayout: distribution: gravity
-		TBTextField: text: "App Identifier:"
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: app_identifier, autofocus: 0
-				lp: min-width: 220
-	TBLayout: distribution: gravity
-		TBTextField: text: "Company Name:"
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: company_name, autofocus: 0
-				lp: min-width: 220
-	TBLayout: distribution: gravity
-		TBTextField: text: "Product Name:"
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: product_name, autofocus: 0
-				lp: min-width: 220
 	TBSeparator: gravity: left right, skin: AESeparator
-	TBTextField: text: "Icon:"
-	TBLayout: gravity: left right, distribution-position: right bottom
-		TBSkinImage: skin: LogoAtomic64
-	TBTextField: text: "Splash Screen:"
-	TBLayout: gravity: left right, distribution-position: right bottom
-		TBSkinImage: skin: LogoAtomic64
+	TBLayout: distribution: gravity
+		TBTextField: text: "Game Width:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: web_game_width, autofocus: 0, text: 800
+				lp: min-width: 200
+				tooltip width of the game frame in pixels
+	TBLayout: distribution: gravity
+		TBTextField: text: "Game Height:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: web_game_height, autofocus: 0, text: 512
+				lp: min-width: 200
+				tooltip height of the game frame in pixels
+	TBLayout: axis: y, position: left, distribution: gravity
+		TBTextField: text: "Fav Icon:", id: favicon_text, skin: DarkGrayText
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: favicon_name, autofocus: 0
+				lp: min-width: 250
+			TBButton: text: "Choose", id: favicon_choose
+				tooltip Path to favicon.ico
+	TBTextField: text: "Web Page Theme:"
+	TBLayout: axis: y,  position: left
+		TBClickLabel: text: Editor Dark 
+			TBRadioButton: group-id: webtheme, id: web_dark, value: 1
+		TBClickLabel: text: Editor Light
+			TBRadioButton: group-id: webtheme, id: web_light
+		TBClickLabel: text: Atomic Gradient
+			TBRadioButton: group-id: webtheme, id: web_atomic
+		TBClickLabel: text: New York Lake
+			TBRadioButton: group-id: webtheme, id: web_lake
+		TBClickLabel: text: Fireworks
+			TBRadioButton: group-id: webtheme, id: web_fireworks
+		TBClickLabel: text: Retro
+			TBRadioButton: group-id: webtheme, id: web_retro
+

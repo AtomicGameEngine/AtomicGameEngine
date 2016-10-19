@@ -16,11 +16,6 @@ TBLayout: axis: y, distribution: gravity, position: left
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: company_name, autofocus: 1
 				lp: min-width: 220
-	TBLayout: distribution: gravity
-		TBTextField: text: "Product Name:"
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: product_name, autofocus: 1
-				lp: min-width: 220
 	TBLayout: axis: y, position: left, distribution: gravity
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBButton: id: choose_icon, lp: min-width: 48, min-height: 48, max-width: 48, max-height: 48

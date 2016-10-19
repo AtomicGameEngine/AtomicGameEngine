@@ -33,38 +33,103 @@ class WebSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
       this.load("AtomicEditor/editor/ui/buildsettings_html5.tb.txt");
 
       this.appNameEdit = <Atomic.UIEditField>this.getWidget("app_name");
-      this.packageNameEdit = <Atomic.UIEditField>this.getWidget("app_identifier");
-      this.productNameEdit = <Atomic.UIEditField>this.getWidget("product_name");
-      this.companyNameEdit = <Atomic.UIEditField>this.getWidget("company_name");
+      this.radioDark = <Atomic.UICheckBox>this.getWidget("web_dark");
+      this.radioLight = <Atomic.UICheckBox>this.getWidget("web_light");
+      this.radioAtomic = <Atomic.UICheckBox>this.getWidget("web_atomic");
+      this.radioLake = <Atomic.UICheckBox>this.getWidget("web_lake");
+      this.radioFireworks = <Atomic.UICheckBox>this.getWidget("web_fireworks");
+      this.radioRetro = <Atomic.UICheckBox>this.getWidget("web_retro");
+      this.faviconName = <Atomic.UIEditField>this.getWidget("favicon_name");
+      this.gameWidth = <Atomic.UIEditField>this.getWidget("web_game_width");
+      this.gameHeight = <Atomic.UIEditField>this.getWidget("web_game_height");
 
       this.refreshWidgets();
 
+      this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
     }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
+
+        if (ev.target.id == "favicon_choose") {
+            var fileUtils = new Editor.FileUtils();
+            var path = fileUtils.findFile("", "");
+            if ( path.length > 0 )
+                this.faviconName.text = path;
+            return true;
+        } 
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            if (ev.target.id == "web_dark") {
+                this.settings.pageTheme = 0;
+            }
+            if (ev.target.id == "web_light") {
+                this.settings.pageTheme = 1;
+            }
+            if (ev.target.id == "web_atomic") {
+                this.settings.pageTheme = 2;
+            }
+            if (ev.target.id == "web_lake") {
+                this.settings.pageTheme = 3;
+            }
+            if (ev.target.id == "web_fireworks") {
+                this.settings.pageTheme = 4;
+            }
+            if (ev.target.id == "web_retro") {
+                this.settings.pageTheme = 5;
+            }
+            return true;
+        }
+         return false;
+   }
 
     refreshWidgets() {
 
         this.appNameEdit.text = this.settings.appName;
-        this.packageNameEdit.text = this.settings.packageName;
-        this.productNameEdit.text = this.settings.productName;
-        this.companyNameEdit.text = this.settings.companyName;
+        this.faviconName.text = this.settings.faviconName;
+        this.gameWidth.text = this.settings.gameWidth;
+        this.gameHeight.text = this.settings.gameHeight;
+        if ( this.settings.pageTheme == 0 ) this.radioDark.value = 1;
+            else this.radioDark.value = 0;
+        if ( this.settings.pageTheme == 1 ) this.radioLight.value = 1;
+            else this.radioLight.value = 0;
+        if ( this.settings.pageTheme == 2 ) this.radioAtomic.value = 1;
+            else this.radioAtomic.value = 0;
+        if ( this.settings.pageTheme == 3 ) this.radioLake.value = 1;
+            else this.radioLake.value = 0;
+        if ( this.settings.pageTheme == 4 ) this.radioFireworks.value = 1;
+            else this.radioFireworks.value = 0;
+        if ( this.settings.pageTheme == 5 ) this.radioRetro.value = 1;
+            else this.radioRetro.value = 0;
     }
 
     storeValues() {
 
         this.settings.appName = this.appNameEdit.text;
-        this.settings.packageName = this.packageNameEdit.text;
-        this.settings.productName = this.productNameEdit.text;
-        this.settings.companyName = this.companyNameEdit.text;
-
+        this.settings.faviconName = this.faviconName.text;
+        this.settings.gameWidth = this.gameWidth.text;
+        this.settings.gameHeight = this.gameHeight.text;
+        if ( this.radioDark.value  == 1 ) this.settings.pageTheme = 0;
+        if ( this.radioLight.value == 1 ) this.settings.pageTheme = 1;
+        if ( this.radioAtomic.value == 1 ) this.settings.pageTheme = 2;
+        if ( this.radioLake.value == 1 ) this.settings.pageTheme = 3;
+        if ( this.radioFireworks.value == 1 ) this.settings.pageTheme = 4;
+        if ( this.radioRetro.value == 1 ) this.settings.pageTheme = 5;
     }
 
     appNameEdit: Atomic.UIEditField;
-    packageNameEdit: Atomic.UIEditField;
-    productNameEdit: Atomic.UIEditField;
-    companyNameEdit: Atomic.UIEditField;
+    radioRetro: Atomic.UICheckBox;
+    radioDark: Atomic.UICheckBox;
+    radioLight: Atomic.UICheckBox;
+    radioAtomic: Atomic.UICheckBox;
+    radioLake: Atomic.UICheckBox;
+    radioFireworks: Atomic.UICheckBox;
+    faviconChoose: Atomic.UIButton;
+    faviconName: Atomic.UIEditField;
+    gameWidth: Atomic.UIEditField;
+    gameHeight: Atomic.UIEditField;
 
     settings: ToolCore.WebBuildSettings;
-
 
 }
 
