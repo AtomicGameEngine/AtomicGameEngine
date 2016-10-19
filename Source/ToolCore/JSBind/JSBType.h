@@ -114,6 +114,8 @@ public:
         case Bool:
             return "bool";
         case Short:
+            if (isUnsigned_)
+                return "unsigned short";
             return "short";
         case Int:
             if (isUnsigned_)
