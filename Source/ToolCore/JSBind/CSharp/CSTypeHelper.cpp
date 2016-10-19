@@ -159,6 +159,8 @@ String CSTypeHelper::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
         return "byte";
     if (ptype->kind_ == JSBPrimitiveType::Char)
         return "char";
+    if (ptype->kind_ == JSBPrimitiveType::Short && ptype->isUnsigned_)
+        return "ushort";
     if (ptype->kind_ == JSBPrimitiveType::Short)
         return "short";
     if (ptype->kind_ == JSBPrimitiveType::LongLong)
