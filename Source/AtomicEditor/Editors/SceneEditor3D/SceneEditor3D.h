@@ -22,6 +22,7 @@
 
 #pragma once
 
+
 #include <TurboBadger/tb_widgets_common.h>
 
 #include "../ResourceEditor.h"

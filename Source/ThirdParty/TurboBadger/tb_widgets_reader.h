@@ -105,31 +105,32 @@ public:
 
     Resource name:		TBWidget property:			Values:
 
-    id					TBWidget::m_id				TBID (string or int)
-    group-id			TBWidget::m_group_id		TBID (string or int)
-    value				TBWidget::SetValue			integer
-    data				TBWidget::m_data			integer
-    is-group-root		TBWidget::SetIsGroupRoot	boolean
-    is-focusable		TBWidget::SetIsFocusable	boolean
-    want-long-click		TBWidget::SetWantLongClick	boolean
-    ignore-input		TBWidget::SetIgnoreInput	boolean
-    opacity				TBWidget::SetOpacity		float (0 - 1)
-    text				TBWidget::SetText			string
-    connection			TBWidget::Connect			string
-    axis				TBWidget::SetAxis			x or y
-    gravity				TBWidget::SetGravity		string (combination of left, top, right, bottom, or all)
-    visibility			TBWidget::SetVisibility		string (visible, invisible, gone)
-    state				TBWidget::SetState			string (disabled)
-    skin				TBWidget::SetSkinBg			TBID (string or int)
-    rect				TBWidget::SetRect			4 integers (x, y, width, height)
-    lp>width			TBWidget::SetLayoutParams	dimension
-    lp>min-width		TBWidget::SetLayoutParams	dimension
-    lp>max-width		TBWidget::SetLayoutParams	dimension
-    lp>pref-width		TBWidget::SetLayoutParams	dimension
-    lp>height			TBWidget::SetLayoutParams	dimension
-    lp>min-height		TBWidget::SetLayoutParams	dimension
-    lp>max-height		TBWidget::SetLayoutParams	dimension
-    lp>pref-height		TBWidget::SetLayoutParams	dimension
+    id					TBWidget::m_id					TBID (string or int)
+    group-id			TBWidget::m_group_id			TBID (string or int)
+    value				TBWidget::SetValue				integer
+    data				TBWidget::m_data				integer
+    is-group-root		TBWidget::SetIsGroupRoot		boolean
+    is-focusable		TBWidget::SetIsFocusable		boolean
+    want-long-click		TBWidget::SetWantLongClick		boolean
+    ignore-input		TBWidget::SetIgnoreInput		boolean
+    opacity				TBWidget::SetOpacity			float (0 - 1)
+    disabledOpacity		TBWidget::SetDisabledOpacity	float (0 - 1)
+    text				TBWidget::SetText				string
+    connection			TBWidget::Connect				string
+    axis				TBWidget::SetAxis				x or y
+    gravity				TBWidget::SetGravity			string (combination of left, top, right, bottom, or all)
+    visibility			TBWidget::SetVisibility			string (visible, invisible, gone)
+    state				TBWidget::SetState				string (disabled)
+    skin				TBWidget::SetSkinBg				TBID (string or int)
+    rect				TBWidget::SetRect				4 integers (x, y, width, height)
+    lp>width			TBWidget::SetLayoutParams		dimension
+    lp>min-width		TBWidget::SetLayoutParams		dimension
+    lp>max-width		TBWidget::SetLayoutParams		dimension
+    lp>pref-width		TBWidget::SetLayoutParams		dimension
+    lp>height			TBWidget::SetLayoutParams		dimension
+    lp>min-height		TBWidget::SetLayoutParams		dimension
+    lp>max-height		TBWidget::SetLayoutParams		dimension
+    lp>pref-height		TBWidget::SetLayoutParams		dimension
     autofocus			The TBWidget will be focused automatically the first time its TBWindow is activated.
     font>name			Font name
     font>size			Font size

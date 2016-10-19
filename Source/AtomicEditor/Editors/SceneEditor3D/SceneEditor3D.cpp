@@ -24,6 +24,8 @@
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Scene.h>
+#include <Atomic/UI/SystemUI/SystemUI.h>
+#include <Atomic/UI/SystemUI/DebugHud.h>
 #include <Atomic/Graphics/Camera.h>
 
 #include <Atomic/Graphics/DebugRenderer.h>
@@ -71,6 +73,8 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     Project* project = tsystem->GetProject();
     userPrefs_ = project->GetUserPrefs();
 
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
@@ -105,6 +109,7 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     sceneView_->SetGravity(UI_GRAVITY_ALL);
 
     rootContentWidget_->AddChild(sceneView_);
+    rootContentWidget_->AddChild(profilerContentWidget_);
 
     gizmo3D_ = new Gizmo3D(context_);
     gizmo3D_->SetView(sceneView_);
@@ -120,6 +125,12 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     // future size changes will be handled automatically
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
+
+    int profilerWidth = rect.Width() - profilerText_->GetRect().Width();
+    int profilerHeight = rect.Height() - modeText_->GetRect().Height();
+
+    profilerContentWidget_->SetSize(profilerWidth, profilerHeight);
+    profilerContentWidget_->Disable();
 
     SubscribeToEvent(E_PROJECTUSERPREFSAVED, ATOMIC_HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
@@ -217,6 +228,22 @@ void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (!cubemapRenderCount_)
         gizmo3D_->Update();
+
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (debugHud->GetShowSceneHud())
+    {
+        debugHud->SetSceneOpen(true);
+        statsText_->SetText(debugHud->GetStatsString());
+        modeText_->SetText(debugHud->GetModeString());
+        profilerText_->SetText(debugHud->GetProfilerString());
+    }
+    else
+    {
+        statsText_->SetText(String::EMPTY);
+        modeText_->SetText(String::EMPTY);
+        profilerText_->SetText(String::EMPTY);
+    }
 }
 
 void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
