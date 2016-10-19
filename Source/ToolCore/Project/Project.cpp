@@ -26,6 +26,7 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include <Atomic/Resource/JSONFile.h>
 
@@ -123,7 +124,49 @@ bool Project::Load(const String& fullpath)
     else
     {
         projectPath_ = AddTrailingSlash(fullpath);
-        projectFilePath_ = projectPath_ + GetFileName(RemoveTrailingSlash(projectPath_)) + ".atomic";
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        StringVector results;
+        fileSystem->ScanDir(results, projectPath_, "*.atomic", SCAN_FILES, false);
+
+        if (!results.Size())
+        {
+            // no atomic file, so use the parent path name
+            projectFilePath_ = projectPath_ + GetFileName(RemoveTrailingSlash(projectPath_)) + ".atomic";
+        }
+        else
+        {
+            String result = projectPath_ + results[0];
+
+            if (results.Size() > 1)
+            {
+                // multiple *.atomic files, use newest, and report
+
+                unsigned newest = 0xFFFFFFFF;
+
+                for (unsigned i = 0; i < results.Size(); i++)
+                {
+                    String atomicFilePath = projectPath_ + results[i];
+
+                    unsigned modtime = fileSystem->GetLastModifiedTime(atomicFilePath);
+
+                    if (!modtime)
+                        continue;
+
+                    if (newest > modtime)
+                    {
+                        newest = modtime;
+                        result = atomicFilePath;
+                    }
+
+                }
+
+                ATOMIC_LOGERRORF("Project::Load - Multiple .atomic files found in project, selecting newest: %s", result.CString());
+
+            }
+
+            projectFilePath_ = result;
+        }
 
     }
 
