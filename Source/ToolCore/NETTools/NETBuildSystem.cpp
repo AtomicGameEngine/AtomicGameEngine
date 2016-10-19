@@ -61,7 +61,8 @@ namespace ToolCore
     }
 
     NETBuildSystem::NETBuildSystem(Context* context) :
-        Object(context)
+        Object(context),
+        verbose_(false)
     {
         SubscribeToEvent(E_TOOLUPDATE, ATOMIC_HANDLER(NETBuildSystem, HandleToolUpdate));
         SubscribeToEvent(E_NETBUILDATOMICPROJECT, ATOMIC_HANDLER(NETBuildSystem, HandleBuildAtomicProject));
@@ -82,7 +83,8 @@ namespace ToolCore
 
         const String& text = eventData[SubprocessOutput::P_TEXT].GetString();
 
-        // LOGINFOF(text.CString());
+        if (verbose_)
+            ATOMIC_LOGINFOF(text.CString());
 
         curBuild_->output_ += text;
 
@@ -109,6 +111,11 @@ namespace ToolCore
 
         bool success = true;
         String errorMsg;
+
+        if (verbose_)
+        {
+            ATOMIC_LOGINFOF("AtomicNET Build Command: %s", curBuild_->allArgs_.CString());
+        }
 
         if (!code)
         {
@@ -351,6 +358,20 @@ namespace ToolCore
             }
 
             compile += ToString("\"%s\" \"%s\" %s %s", xbuildBinary.CString(), solutionPath.CString(), platforms.CString(), configs.CString());
+
+            if (curBuild_->targets_.Size()) {
+
+                StringVector targets;
+
+                for (unsigned i = 0; i < curBuild_->targets_.Size(); i++)
+                {
+                    const char* tname = curBuild_->targets_[i].CString();
+                    targets.Push(ToString("%s:Rebuild", tname));
+                }
+
+                compile += " /target:\"" + String::Joined(targets, ";") + "\"";
+
+            }
 
             args.Push(compile);
 
