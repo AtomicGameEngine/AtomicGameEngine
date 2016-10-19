@@ -426,6 +426,7 @@ public:
     // ATOMIC BEGIN
     /// Reload textures.
     void ReloadTextures();
+
     // ATOMIC END
 
 private:
