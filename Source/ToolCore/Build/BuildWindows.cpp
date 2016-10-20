@@ -55,13 +55,13 @@ void BuildWindows::Initialize()
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
-    
+
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
         AddResourceDir(defaultResourcePaths[i]);
     }
     BuildDefaultResourceEntries();
-    
+
     // Include the project resources and cache separately
     AddProjectResourceDir(project->GetResourcePath());
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
@@ -88,7 +88,7 @@ bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const Str
         }
     }
     // #623 END TODO
-    
+
     return BuildBase::CheckIncludeResourceFile(resourceDir, fileName);
 }
 
@@ -101,19 +101,26 @@ bool BuildWindows::BuildManaged(const String& buildPath)
     ProjectSettings* settings = project->GetProjectSettings();
 
     String projectPath = project->GetProjectPath();
-    String releaseBins = projectPath + "AtomicNET/Release/Bin/Desktop/";
-    String releaseExe = releaseBins + settings->GetName() + ".exe";
 
-    if (!fileSystem->FileExists(releaseExe))
+#ifdef ATOMIC_DEBUG
+    String config = "Debug";
+#else
+    String config = "Release";
+#endif
+
+    String managedBins = projectPath + ToString("AtomicNET/%s/Bin/Desktop/", config.CString());
+    String managedExe = managedBins + settings->GetName() + ".exe";
+
+    if (!fileSystem->FileExists(managedExe))
     {
-        BuildError(ToString("Error building managed project, please compile the release binary %s before building", releaseExe.CString()));
+        BuildError(ToString("Error building managed project, please compile the %s binary %s before building", config.CString(), managedExe.CString()));
         return false;
     }
-    
+
     StringVector results;
     StringVector filtered;
 
-    fileSystem->ScanDir(results, releaseBins, "", SCAN_FILES, false);
+    fileSystem->ScanDir(results, managedBins, "", SCAN_FILES, false);
 
     StringVector filterList;
 
@@ -137,13 +144,13 @@ bool BuildWindows::BuildManaged(const String& buildPath)
     {
         String filename = filtered[i];
 
-        if (!BuildCopyFile(releaseBins + filename, buildPath_ + "/" + filename))
+        if (!BuildCopyFile(managedBins + filename, buildPath_ + "/" + filename))
             return false;
 
     }
 
     return true;
-  
+
 }
 
 void BuildWindows::BuildNative(const String& buildPath)
@@ -177,7 +184,7 @@ void BuildWindows::Build(const String& buildPath)
 
     if (!resourcesOnly_)
         buildPath_ += GetBuildSubfolder();
-        
+
     BuildLog("Starting Windows Deployment");
 
     Initialize();
@@ -185,7 +192,7 @@ void BuildWindows::Build(const String& buildPath)
     if (!resourcesOnly_ && !BuildClean(buildPath_))
         return;
 
-    String rootSourceDir = tenv->GetRootSourceDir();        
+    String rootSourceDir = tenv->GetRootSourceDir();
 
     if (!BuildCreateDirectory(buildPath_))
         return;
@@ -230,7 +237,7 @@ void BuildWindows::Build(const String& buildPath)
     {
         BuildNative(buildPath);
     }
-    
+
     BuildLog("Windows Deployment Complete");
 
     buildSystem->BuildComplete(PLATFORMID_WINDOWS, buildPath_);
