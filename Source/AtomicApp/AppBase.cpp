@@ -55,7 +55,7 @@ namespace Atomic
             Vector<String> args = arguments_;
             for (unsigned i = 0; i < args.Size(); i++)
             {
-                if (arguments_[i].Contains(" "))
+                if (arguments_[i].Contains(" ") && !arguments_[i].Contains("\""))
                     args[i] = ToString("\"%s\"", arguments_[i].CString());
             }
 
