@@ -110,7 +110,9 @@ namespace ToolCore
             if (sourceFilePath.Length())
                 args.Push(sourceFilePath);
 
+#ifndef ATOMIC_PLATFORM_OSX
             QuoteArguments(args);
+#endif
 
             try
             {
@@ -146,11 +148,15 @@ namespace ToolCore
                 args.push_back(idePath_.CString());
 
 #endif
+
+#ifdef ATOMIC_PLATFORM_OSX
+                args.push_back(sourceFilePath.CString());
+#else
                 if (sourceFilePath.Contains(" ") && !sourceFilePath.Contains("\""))
                     args.push_back(("\"" + sourceFilePath + "\"").CString());
                 else
                     args.push_back(sourceFilePath.CString());
-
+#endif
 
                 Poco::Process::launch(command.CString(), args);
 
