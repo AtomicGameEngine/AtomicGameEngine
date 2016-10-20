@@ -70,4 +70,11 @@ ATOMIC_API void SetMiniDumpDir(const String& pathName);
 /// Return minidump write location.
 ATOMIC_API String GetMiniDumpDir();
 
+// ATOMIC BEGIN
+
+/// Encloses arguments that contain space in quotes
+ATOMIC_API void QuoteArguments(Vector<String>& args);
+
+// ATOMIC END
+
 }

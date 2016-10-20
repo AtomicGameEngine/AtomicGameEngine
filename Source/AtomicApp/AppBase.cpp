@@ -51,13 +51,9 @@ namespace Atomic
         else
         {
             // Add quotes to any arguments that need them, and construct command line
-
             Vector<String> args = arguments_;
-            for (unsigned i = 0; i < args.Size(); i++)
-            {
-                if (arguments_[i].Contains(" "))
-                    args[i] = ToString("\"%s\"", arguments_[i].CString());
-            }
+
+            QuoteArguments(args);
 
             String commandline = String::Joined(args, " ");
 
