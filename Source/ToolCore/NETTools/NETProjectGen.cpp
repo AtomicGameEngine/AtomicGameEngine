@@ -1140,14 +1140,21 @@ namespace ToolCore
 
 #endif
 
-
                     propertyGroup.CreateChild("StartAction").SetValue("Project");
 
                     startArguments += ToString("--project \"%s\"", atomicProjectPath.CString());
 
                     propertyGroup.CreateChild("StartArguments").SetValue(startArguments);
 
+#ifdef ATOMIC_DEBUG
+                    // When building a debug build, default native code debugging to true
+                    if (cfg == "Debug")
+                    {
+                        propertyGroup.CreateChild("EnableUnmanagedDebugging").SetValue("true");
+                    }
+#endif                    
                 }
+
 
                 String userSettingsSource = userSettings->ToString();
                 SharedPtr<File> output(new File(context_, GetSanitizedPath(userSettingsFilename), FILE_WRITE));
