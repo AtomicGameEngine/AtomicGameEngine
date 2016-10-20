@@ -23,6 +23,7 @@
 #include <Poco/Environment.h>
 
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Core/ProcessUtils.h>
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
@@ -107,7 +108,9 @@ namespace ToolCore
             args.Push(solutionPath_);
 
             if (sourceFilePath.Length())
-                args.Push(sourceFilePath);                       
+                args.Push(sourceFilePath);
+
+            QuoteArguments(args);
 
             try
             {
@@ -125,7 +128,7 @@ namespace ToolCore
                 return;
 
             try
-            {                
+            {
                 std::vector<std::string> args;
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
@@ -143,7 +146,12 @@ namespace ToolCore
                 args.push_back(idePath_.CString());
 
 #endif
-                args.push_back(sourceFilePath.CString());
+                if (sourceFilePath.Contains(" ") && !sourceFilePath.Contains("\""))
+                    args.push_back(("\"" + sourceFilePath + "\"").CString());
+                else
+                    args.push_back(sourceFilePath.CString());
+
+
                 Poco::Process::launch(command.CString(), args);
 
             }
@@ -289,14 +297,14 @@ namespace ToolCore
 
         if (solutionDirty_)
         {
-            // set to false in case of error, we don't want to keep trying to 
+            // set to false in case of error, we don't want to keep trying to
             // rebuild, TODO: better error handling
             solutionDirty_ = false;
             GenerateSolution();
         }
 
         if (projectAssemblyDirty_)
-        {        
+        {
             BuildAtomicProject();
             projectAssemblyDirty_ = false;
         }
@@ -308,8 +316,8 @@ namespace ToolCore
         using namespace ProjectLoaded;
 
         String projectPath = eventData[P_PROJECTPATH].GetString();
-        Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());        
-        
+        Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());
+
         if (GetExtension(projectPath) == ".atomic")
             projectPath = GetParentPath(projectPath);
 
@@ -329,10 +337,10 @@ namespace ToolCore
             if (!results.Size())
             {
                 solutionPath_.Clear();
-                return;                
+                return;
             }
-                
-        }            
+
+        }
 
         // if the solution or project assemblies don't exist mark as dirty
 
@@ -353,13 +361,13 @@ namespace ToolCore
     {
         if (solutionDirty_)
         {
-            // set to false in case of error, we don't want to keep trying to 
+            // set to false in case of error, we don't want to keep trying to
             // rebuild, TODO: better error handling
             solutionDirty_ = false;
             GenerateSolution();
         }
     }
-    
+
     void NETProjectSystem::HandleProjectUnloaded(StringHash eventType, VariantMap& eventData)
     {
         Clear();
@@ -384,7 +392,7 @@ namespace ToolCore
 
     void NETProjectSystem::HandleResourceAdded(StringHash eventType, VariantMap& eventData)
     {
-        
+
     }
 
     void NETProjectSystem::HandleResourceRemoved(StringHash eventType, VariantMap& eventData)
@@ -402,7 +410,7 @@ namespace ToolCore
 
     }
 
-    void NETProjectSystem::Initialize()    
+    void NETProjectSystem::Initialize()
     {
         Clear();
 
