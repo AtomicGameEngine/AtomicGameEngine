@@ -65,7 +65,12 @@ class WebBuildSettings : public RefCounted
 
 public:
 
-    WebBuildSettings() {}
+    WebBuildSettings() 
+    {
+        pageTheme_ = 0;  
+        gameWidth_ = "800";
+        gameHeight_ = "512";
+    }
 
     const String& GetAppName() const { return appName_; }
     const String& GetGameWidth() const { return gameWidth_; }
