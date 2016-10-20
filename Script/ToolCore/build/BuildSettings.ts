@@ -46,16 +46,16 @@ class WindowsBuildSettings {
 
 class WebBuildSettings {
     appName: string;
-    packageName: string;
-    companyName: string;
-    productName: string;
+    pageTheme: number;
+    gameWidth: string;
+    gameHeight: string;
+    faveIconName: string;
 }
 
 class AndroidBuildSettings {
     appName: string;
     packageName: string;
     companyName: string;
-    productName: string;
     sDKVersion: string;
     minSDKVersion: string;
     activityName: string;

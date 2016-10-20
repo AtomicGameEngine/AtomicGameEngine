@@ -88,9 +88,10 @@ void WebBuildSettings::Write(JSONValue& parent)
     JSONValue json;
 
     json.Set("appName", appName_);
-    json.Set("packageName", packageName_);
-    json.Set("companyName", companyName_);
-    json.Set("productName", productName_);
+    json.Set("gameWidth", gameWidth_);
+    json.Set("gameHeight", gameHeight_);
+    json.Set("faviconName", faviconName_);
+    json.Set("pageTheme", pageTheme_ );
 
     parent.Set("WebBuildSettings", json);
 
@@ -104,10 +105,10 @@ void WebBuildSettings::Read(JSONValue& parent)
         return;
 
     appName_ = json.Get("appName").GetString();
-    packageName_ = json.Get("packageName").GetString();
-    companyName_ = json.Get("companyName").GetString();
-    productName_ = json.Get("productName").GetString();
-
+    gameWidth_ = json.Get("gameWidth").GetString();
+    gameHeight_ = json.Get("gameHeight").GetString();
+    faviconName_ = json.Get("faviconName").GetString();
+    pageTheme_ = json.Get("pageTheme").GetInt();
 }
 
 void AndroidBuildSettings::Write(JSONValue& parent)
@@ -177,8 +178,8 @@ void IOSBuildSettings::Read(JSONValue& parent)
     companyName_ = json.Get("companyName").GetString();
     productName_ = json.Get("productName").GetString();
 
-    provisionFile_ = json.Get("provisionFile").GetString();;
-    appidPrefix_ = json.Get("appIDPrefix").GetString();;
+    provisionFile_ = json.Get("provisionFile").GetString();
+    appidPrefix_ = json.Get("appIDPrefix").GetString();
 
 }
 

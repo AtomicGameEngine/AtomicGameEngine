@@ -46,7 +46,8 @@ protected:
 
     void Initialize();
 
-
+    bool ReadReplace ( String infile, String outfile, String title, String width, String height );
+ 
 };
 
 }

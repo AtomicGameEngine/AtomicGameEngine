@@ -65,17 +65,24 @@ class WebBuildSettings : public RefCounted
 
 public:
 
-    WebBuildSettings() {}
+    WebBuildSettings() 
+    {
+        pageTheme_ = 0;  
+        gameWidth_ = "800";
+        gameHeight_ = "512";
+    }
 
     const String& GetAppName() const { return appName_; }
-    const String& GetPackageName() const { return packageName_; }
-    const String& GetCompanyName() const { return companyName_; }
-    const String& GetProductName() const { return productName_; }
+    const String& GetGameWidth() const { return gameWidth_; }
+    const String& GetGameHeight() const { return gameHeight_; }
+    const String& GetFaviconName() const { return faviconName_; }
+    int GetPageTheme() const { return pageTheme_; }
 
     void SetAppName(const String& name) { appName_ = name; }
-    void SetPackageName(const String& packageName) { packageName_ = packageName; }
-    void SetCompanyName(const String& companyName) { companyName_ = companyName; }
-    void SetProductName(const String& productName) { productName_ = productName; }
+    void SetGameWidth(const String& packageName) { gameWidth_ = packageName; }
+    void SetGameHeight(const String& companyName) { gameHeight_ = companyName; }
+    void SetFaviconName(const String& productName) { faviconName_ = productName; }
+    void SetPageTheme( int number ) { pageTheme_ = number; }
 
     void Write(JSONValue& parent);
     void Read(JSONValue& parent);
@@ -83,9 +90,10 @@ public:
 private:
 
     String appName_;
-    String packageName_;
-    String companyName_;
-    String productName_;
+    String gameWidth_;
+    String gameHeight_;
+    String faviconName_;
+    int pageTheme_;
 };
 
 class WindowsBuildSettings : public RefCounted

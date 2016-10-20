@@ -24,6 +24,3 @@ TBLayout: axis: y, distribution: gravity, position: left
 	TBTextField: text: "Icon:"
 	TBLayout: gravity: left right, distribution-position: right bottom
 		TBSkinImage: skin: LogoAtomic64
-	TBTextField: text: "Splash Screen:"
-	TBLayout: gravity: left right, distribution-position: right bottom
-		TBSkinImage: skin: LogoAtomic64
