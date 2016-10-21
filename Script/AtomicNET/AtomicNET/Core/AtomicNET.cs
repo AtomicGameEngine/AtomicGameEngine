@@ -9,33 +9,49 @@ namespace AtomicEngine
 
     public static class AtomicNET
     {
-
-        public static Context Context => context;
-        public static ResourceCache Cache;
+        public static Context Context => context;        
 
         public static T GetSubsystem<T>() where T : AObject
         {
-            AObject subSystem = null;
-            subSystems.TryGetValue(typeof(T), out subSystem);
-            return (T)subSystem;
-        }
+            AObject subsystem = null;
+            var type = typeof(T);
 
-        public static void RegisterSubsystem(String name, AObject instance = null)
-        {
-            if (instance != null)
+            // See if already registered (or a managed subsystem which will only be in the dictionary)
+            if (subSystems.TryGetValue(type, out subsystem))
             {
-                subSystems[instance.GetType()] = instance;
-                return;
+                return (T) subsystem;
             }
 
-            var subsystem = AtomicNET.Context.GetSubsystem(name);
+            // If we're a managed type, throw error
+            if (!NativeCore.IsNativeType(type))
+            {
+                throw new System.InvalidOperationException($"AtomicNET.GetSubsystem<T> - Attempting to get null subsystem: {type.Name}");
+            }
 
+            // Look up possible native subsystem 
+            subsystem = AtomicNET.Context.GetSubsystem(type.Name);
+
+            // If we didn't find one, this is an error
             if (subsystem == null)
             {
-                throw new System.InvalidOperationException("AtomicNET.RegisterSubsystem - Attempting to register null subsystem");
+                throw new System.InvalidOperationException($"AtomicNET.GetSubsystem<T> - Attempting to get null subsystem: {type.Name}");
             }
 
-            subSystems[subsystem.GetType()] = subsystem;
+            // register the subsystem
+            RegisterSubsystem(subsystem);
+
+            return (T)subsystem;
+        }
+
+        public static void RegisterSubsystem(AObject instance)
+        {
+            var type = instance.GetType();
+            if (subSystems.ContainsKey(type))
+            {
+                Log.Error($"AtomicNET.RegisterSubsystem - Attempting to reregister subsystem: {type.Name}");
+                return;
+            }
+            subSystems[instance.GetType()] = instance;
         }
 
         public static uint StringToStringHash(string value)
@@ -87,9 +103,9 @@ namespace AtomicEngine
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
             if (core != null)
-                AtomicNET.RegisterSubsystem("NETCore", core);
+                AtomicNET.RegisterSubsystem(core);
 
-            context = core.Context;
+            context = core.Context;            
 
             NativeCore.Initialize();
             CSComponentCore.Initialize();
