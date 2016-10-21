@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../IO/FileSystem.h"
 #include "../IO/File.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
@@ -155,4 +156,32 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
     return 0;
 }
 
+// ATOMIC BEGIN
+void PackageFile::Scan(Vector<String>& result, const String& pathName, const String& filter, bool recursive) const
+{
+    result.Clear();
+
+    String sanitizedPath = GetSanitizedPath(pathName);
+    String filterExtension = filter.Substring(filter.FindLast('.'));
+    if (filterExtension.Contains('*'))
+        filterExtension.Clear();
+
+    const StringVector& entryNames = GetEntryNames();
+    for (StringVector::ConstIterator i = entryNames.Begin(); i != entryNames.End(); ++i)
+    {
+        String entryName = GetSanitizedPath(*i);
+        if ((filterExtension.Empty() || entryName.EndsWith(filterExtension)) &&
+            entryName.StartsWith(sanitizedPath))
+        {
+            String fileName = entryName.Substring(sanitizedPath.Length());
+            if (fileName.StartsWith("\\") || fileName.StartsWith("/"))
+                fileName = fileName.Substring(1, fileName.Length() - 1);
+            if (!recursive && (fileName.Contains("\\") || fileName.Contains("/")))
+                continue;
+
+            result.Push(fileName);
+        }
+    }
+}
+// ATOMIC END
 }

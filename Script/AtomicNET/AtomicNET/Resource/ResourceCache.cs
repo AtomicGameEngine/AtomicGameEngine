@@ -14,6 +14,16 @@ namespace AtomicEngine
             return (T)GetResource(typeof(T).Name, path);
         }
 
-    }
+        public System.IO.Stream GetFileStream(string name, bool sendEventOnFailure = true)
+        {
+            File file = GetFile(name, sendEventOnFailure);
+            if (file != null &&
+                file.IsOpen())
+            {
+                return file.ToStream();
+            }
 
+            return null;
+        }
+    }
 }

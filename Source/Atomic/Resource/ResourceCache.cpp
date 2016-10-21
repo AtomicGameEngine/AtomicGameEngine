@@ -1196,4 +1196,54 @@ void RegisterResourceLibrary(Context* context)
     XMLFile::RegisterObject(context);
 }
 
+// ATOMIC BEGIN
+ResourceNameIterator::ResourceNameIterator()
+{
+    Reset();
+}
+
+const String& ResourceNameIterator::GetCurrent()
+{
+    return (index_ < filenames_.Size()) ?
+        filenames_[index_] :
+        String::EMPTY;
+}
+
+bool ResourceNameIterator::MoveNext()
+{
+    return ++index_ < filenames_.Size();
+}
+
+void ResourceNameIterator::Reset()
+{
+    index_ = -1;
+}
+
+void ResourceCache::Scan(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const
+{
+    Vector<String> interimResult;
+
+    for (unsigned i = 0; i < packages_.Size(); ++i)
+    {
+        packages_[i]->Scan(interimResult, pathName, filter, recursive);
+        result.Insert(result.End(), interimResult);
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+    {
+        fileSystem->ScanDir(interimResult, resourceDirs_[i] + pathName, filter, flags, recursive);
+        result.Insert(result.End(), interimResult);
+    }
+}
+
+SharedPtr<ResourceNameIterator> ResourceCache::Scan(const String& pathName, const String& filter, unsigned flags, bool recursive) const
+{
+    SharedPtr<ResourceNameIterator> enumerator(new ResourceNameIterator());
+    Scan(enumerator->filenames_, pathName, filter, flags, recursive);
+
+    return enumerator;
+}
+// ATOMIC END
+
 }
