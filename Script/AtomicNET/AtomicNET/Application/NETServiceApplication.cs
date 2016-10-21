@@ -20,8 +20,6 @@ namespace AtomicEngine
 
             app.Initialize();
 
-            AtomicNET.RegisterSubsystem("IPC");
-
             return app;
         }
 

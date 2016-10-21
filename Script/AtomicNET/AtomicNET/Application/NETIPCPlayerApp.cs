@@ -22,8 +22,6 @@ namespace AtomicEngine
 
             app.Initialize();
 
-            RegisterSubsystems();
-
             return app;
         }
 
