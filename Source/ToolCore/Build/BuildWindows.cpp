@@ -113,7 +113,7 @@ bool BuildWindows::BuildManaged(const String& buildPath)
 
     if (!fileSystem->FileExists(managedExe))
     {
-        BuildError(ToString("Error building managed project, please compile the %s binary %s before building", config.CString(), managedExe.CString()));
+        FailBuild(ToString("Error building managed project, please compile the %s binary %s before building", config.CString(), managedExe.CString()));
         return false;
     }
 

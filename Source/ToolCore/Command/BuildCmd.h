@@ -49,6 +49,7 @@ private:
 
     String buildPlatform_;
     String assetsBuildTag_;
+    bool autoLog_;
 
 };
 

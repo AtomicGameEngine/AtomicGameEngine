@@ -84,6 +84,8 @@ public:
     bool GetBuildFailed() const { return buildFailed_; }
     const Vector<String>& GetBuildErrors() const { return buildErrors_; }
 
+    void SetAutoLog(bool autoLog) { autoLog_ = autoLog; }
+
 protected:
 
     bool BuildClean(const String& path);
@@ -118,6 +120,7 @@ protected:
 
     bool resourcesOnly_;
     bool verbose_;
+    bool autoLog_;
 
 private:
     void BuildFilteredProjectResourceEntries();

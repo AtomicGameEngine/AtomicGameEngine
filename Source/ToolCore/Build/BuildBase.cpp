@@ -239,6 +239,9 @@ void BuildBase::BuildLog(const String& message, bool sendEvent)
 {
     buildLog_.Push(message);
 
+    if (autoLog_)
+        ATOMIC_LOGINFO(message);
+    
     if (sendEvent)
     {
         String colorMsg = ToString("<color #D4FB79>%s</color>\n", message.CString());
@@ -253,6 +256,9 @@ void BuildBase::BuildWarn(const String& warning, bool sendEvent)
 {
     buildWarnings_.Push(warning);
 
+    if (autoLog_)
+        ATOMIC_LOGWARNING(warning);
+
     if (sendEvent)
     {
         String colorMsg = ToString("<color #FFFF00>%s</color>\n", warning.CString());
@@ -266,6 +272,9 @@ void BuildBase::BuildWarn(const String& warning, bool sendEvent)
 void BuildBase::BuildError(const String& error, bool sendEvent)
 {
     buildErrors_.Push(error);
+
+    if (autoLog_)
+        ATOMIC_LOGERROR(error);
 
     if (sendEvent)
     {
