@@ -1044,7 +1044,7 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
     if (isMaster_)
     {
         // Note: do not update bone bounding box here, instead do it in either of the threaded updates
-        worldBoundingBox_ = boneBoundingBox_.Transformed(node_->GetWorldTransform());
+        worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
     }
     else
     {
