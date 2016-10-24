@@ -72,6 +72,8 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
 
+        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
         // on mouse up clear the list's drag object
         this.subscribeToEvent("MouseButtonUp", () => {
             // handle dropping on hierarchy, moving node, dropping prefabs, etc
