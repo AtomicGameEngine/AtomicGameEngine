@@ -33,6 +33,13 @@
 // ATOMIC END
 #endif
 
+// ATOMIC BEGIN
+#if defined(__linux__)
+#include <sys/prctl.h>
+#include <signal.h>
+#endif
+// ATOMIC END
+
 #include "../DebugNew.h"
 
 namespace Atomic
@@ -53,6 +60,12 @@ Application::Application(Context* context) :
     Object(context),
     exitCode_(EXIT_SUCCESS)
 {
+// ATOMIC BEGIN
+#if defined(__linux__)
+    prctl(PR_SET_PDEATHSIG, SIGHUP);
+#endif
+// ATOMIC END
+
     engineParameters_ = Engine::ParseParameters(GetArguments());
 
     // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
