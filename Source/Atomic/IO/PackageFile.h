@@ -85,6 +85,12 @@ public:
     /// Return list of file names in the package.
     const Vector<String> GetEntryNames() const { return entries_.Keys(); }
 
+    // ATOMIC BEGIN
+    
+    /// Scan package for specified files.
+    void Scan(Vector<String>& result, const String& pathName, const String& filter, bool recursive) const;
+    
+    // ATOMIC END
 private:
     /// File entries.
     HashMap<String, PackageEntry> entries_;

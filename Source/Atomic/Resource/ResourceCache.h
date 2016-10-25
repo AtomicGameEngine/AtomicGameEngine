@@ -79,6 +79,23 @@ public:
     /// Process the resource request and optionally modify the resource name string. Empty name string means the resource is not found or not allowed.
     virtual void Route(String& name, StringHash type, ResourceRequest requestType) = 0;
 };
+
+/// Helper class to expose resource iteration to script
+class ResourceNameIterator : public RefCounted
+{
+    ATOMIC_REFCOUNTED(ResourceNameIterator);
+public:
+    ResourceNameIterator();
+
+    const String& GetCurrent();
+    bool MoveNext();
+    void Reset();
+
+    Vector<String> filenames_;
+private:
+    unsigned index_;
+};
+
 // ATOMIC END
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
@@ -222,6 +239,11 @@ public:
     unsigned GetNumResourceDirs() const { return resourceDirs_.Size(); }
     /// Get resource directory at a given index
     const String& GetResourceDir(unsigned index) const { return index < resourceDirs_.Size() ? resourceDirs_[index] : String::EMPTY; }
+    
+    /// Scan for specified files.
+    void Scan(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
+    /// Scan specified files, returning them as an iterator
+    SharedPtr<ResourceNameIterator> Scan(const String& pathName, const String& filter, unsigned flags, bool recursive) const;
 
     // ATOMIC END
 
