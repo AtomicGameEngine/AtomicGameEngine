@@ -293,10 +293,4 @@ void IPC::Shutdown()
     context_->RemoveSubsystem<IPC>();
 }
 
-
-
-
-
-
-
 }
