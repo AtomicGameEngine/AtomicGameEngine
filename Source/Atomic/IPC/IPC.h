@@ -52,6 +52,9 @@ public:
     /// Destruct.
     virtual ~IPC();
 
+    // Shutdown IPC subsystem, requests any brokers to exit
+    void Shutdown();
+
     // queues an event from a worker or broker receiving thread
     void QueueEvent(unsigned id, StringHash eventType, VariantMap& eventData);
 
