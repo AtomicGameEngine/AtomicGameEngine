@@ -25,7 +25,9 @@
 #endif
 
 #include "../Core/CoreEvents.h"
+#include "../Core/Context.h"
 #include "../Engine/Engine.h"
+#include "../Input/InputEvents.h"
 #include "../IO/Log.h"
 
 #include "IPCBroker.h"
@@ -277,5 +279,18 @@ void IPC::QueueEvent(unsigned id, StringHash eventType, VariantMap& eventData)
     eventMutex_.Release();
 }
 
+void IPC::Shutdown()
+{
+
+    // request broker exit
+    for (unsigned i = 0; i < brokers_.Size(); i++)
+    {
+        SharedPtr<IPCBroker>& broker = brokers_[i];
+        VariantMap evData;
+        broker->PostMessage(E_EXITREQUESTED, evData);
+    }
+
+    context_->RemoveSubsystem<IPC>();
+}
 
 }

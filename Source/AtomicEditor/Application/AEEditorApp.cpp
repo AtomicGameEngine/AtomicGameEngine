@@ -185,7 +185,12 @@ namespace AtomicEditor
 
     void AEEditorApp::Stop()
     {
-        context_->RemoveSubsystem<IPC>();
+        IPC* ipc = GetSubsystem<IPC>();
+
+        if (ipc)
+        {
+            ipc->Shutdown();
+        }
 
         AppBase::Stop();
     }
