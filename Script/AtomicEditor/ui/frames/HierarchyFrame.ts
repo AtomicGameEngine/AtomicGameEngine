@@ -446,7 +446,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         } else if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
-            if (this.menu.handleNodeContextMenu(data.target, data.refid)) {
+            if (this.menu.handleNodeContextMenu(data.target, data.refid, this.sceneEditor)) {
                 return true;
             }
 
