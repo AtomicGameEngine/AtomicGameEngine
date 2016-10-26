@@ -92,6 +92,7 @@ GroupSources("Scene")
 GroupSources("UI")
 GroupSources("Web")
 GroupSources("Script")
+GroupSources("BuildInfo")
 
 # Handle Git Revision
 include(GetGitRevisionDescription)

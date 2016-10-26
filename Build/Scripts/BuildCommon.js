@@ -256,25 +256,18 @@ namespace('build', function() {
 
     console.log( "Generating Examples..." );
 
-    common.cleanCreateDir( config.toolDataFolder + "AtomicExamples");
+    // TODO: support pulling examples from a specific branch/commit/etc
+    var exampleSrc = atomicRoot + "Submodules/AtomicExamples/";
+    var exampleDst = config.toolDataFolder + "AtomicExamples/";
 
-    cmds = [
-      "git clone https://github.com/AtomicGameEngine/AtomicExamples " + config.toolDataFolder + "AtomicExamples",
-    ];
+    common.testRemoveDir( exampleDst);
 
-    jake.exec(cmds, function() {
+    fs.copySync(exampleSrc, exampleDst);
 
-      fs.removeSync( config.toolDataFolder + "AtomicExamples/.git" );
+    // remove the .git file/folder and save some space
+    fs.removeSync( exampleDst + ".git" );
 
-      complete();
-
-      console.log( "completed installing example programs" )
-
-        }, {
-
-      printStdout: true
-
-    });
+    complete();
 
   });
 

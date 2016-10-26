@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.8.12.1)
 
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Build/CMake/Modules)
 
+include(AtomicGit)
 include(AtomicUtils)
 
 add_definitions(-DATOMIC_ROOT_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -DATOMIC_ROOT_BUILD_DIR="${CMAKE_BINARY_DIR}")
@@ -47,10 +48,6 @@ if(CLDOC)
 endif()
 
 if (ATOMIC_WEBVIEW)
-
-  if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows)
-    message( FATAL_ERROR "\nBUILD ERROR:\nSubmodules not initialized.  When cloning repository, please use:\ngit clone --recursive https://github.com/AtomicGameEngine/AtomicGameEngine\n" )
-  endif()
 
   if(APPLE)
     if(POLICY CMP0037)

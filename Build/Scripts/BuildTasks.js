@@ -17,7 +17,7 @@ function installBuildTasks(rootTask) {
         task = docTask;
     }
 
-    if (config["with-examples"]) {
+    if (!config["noexamples"]) {
         var examplesTask = jake.Task['build:genexamples'];
         task.prereqs.push("build:genexamples")
         task = examplesTask;

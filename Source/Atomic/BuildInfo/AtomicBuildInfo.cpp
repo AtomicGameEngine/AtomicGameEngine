@@ -35,6 +35,15 @@ String AtomicBuildInfo::GetBuildName()
 #endif
 }
 
+bool AtomicBuildInfo::GetDevBuild()
+{
+#ifdef ATOMIC_DEV_BUILD
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool AtomicBuildInfo::GetDistBuild()
 {
 #ifdef ATOMIC_BUILD_DIST

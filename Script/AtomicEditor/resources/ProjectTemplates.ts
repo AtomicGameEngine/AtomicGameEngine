@@ -107,6 +107,12 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
     exampleFolders.forEach(exampleFolder => {
 
         let folder = Atomic.addTrailingSlash(env.toolDataDir + "AtomicExamples/" + exampleFolder);
+
+        // if we're building from source tree, adjust the path
+        if (Atomic.AtomicBuildInfo.getDevBuild()) {
+            folder = Atomic.addTrailingSlash(env.rootSourceDir + "Submodules/AtomicExamples/" + exampleFolder);
+        }
+
         let screenshot = folder + "Screenshot.png";
 
         if (!fileSystem.dirExists(folder)) {
