@@ -64,7 +64,7 @@ exports = module.exports = processOptions(require('minimist')(process.argv.slice
         "with-android" : false,
         "with-ios" : false,
         "with-docs" : false,
-        "with-examples" : false,
+        "noexamples" : false,
         "package" : false
     }
 }));
