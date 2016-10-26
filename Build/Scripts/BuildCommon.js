@@ -256,15 +256,15 @@ namespace('build', function() {
 
     console.log( "Generating Examples..." );
 
-    common.testRemoveDir( exampleDst);
-
     // TODO: support pulling examples from a specific branch/commit/etc
     var exampleSrc = atomicRoot + "Submodules/AtomicExamples/";
     var exampleDst = config.toolDataFolder + "AtomicExamples/";
 
+    common.testRemoveDir( exampleDst);
+
     fs.copySync(exampleSrc, exampleDst);
 
-    // remove the .git folder and save some space
+    // remove the .git file/folder and save some space
     fs.removeSync( exampleDst + ".git" );
 
     complete();
