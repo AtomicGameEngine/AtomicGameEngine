@@ -6,6 +6,8 @@ if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF/.git OR NOT EXISTS ${CMAKE_SOU
 
     if(GIT_FOUND)
 
+        message ("\n\nUpdating submodules, please wait...\n\n")
+
         execute_process( COMMAND ${GIT_EXECUTABLE} submodule update --init
                          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                          RESULT_VARIABLE ATOMIC_GIT_STATUS )
