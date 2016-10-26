@@ -52,7 +52,10 @@ class AtomicBuildInfo : public RefCounted
     /// Get the build string in form (BuildName): BuildDate BuildTime Git:SHA
     static String GetBuildString();
 
-    /// Get whether this is a dist build
+    /// Get whether this is binary or source tree development build
+    static bool GetDevBuild();
+
+    /// Get whether this is a distibution/installer binary build
     static bool GetDistBuild();
 
 };
