@@ -718,7 +718,8 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
         for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
             // ATOMIC BEGIN
-            ret->geometryNames_[i] = geometryNames_[i];
+            if (ret->geometryNames_.Size())
+                ret->geometryNames_[i] = geometryNames_[i];
             // ATOMIC END
 
             SharedPtr<Geometry> cloneGeometry;

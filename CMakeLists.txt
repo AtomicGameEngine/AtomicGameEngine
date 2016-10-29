@@ -74,3 +74,15 @@ if (ATOMIC_WEBVIEW)
 endif()
 
 add_subdirectory(Source)
+
+
+
+if (ATOMIC_DESKTOP AND ATOMIC_DEV_BUILD)
+
+    set (ATOMIC_CPLUSPLUS_EXAMPLES 1)
+
+    if (ATOMIC_CPLUSPLUS_EXAMPLES)
+        add_subdirectory(Submodules/AtomicExamples/FeatureExamples/CPlusPlus)
+    endif()
+
+endif()
