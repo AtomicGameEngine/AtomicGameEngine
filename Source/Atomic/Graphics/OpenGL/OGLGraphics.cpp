@@ -260,10 +260,14 @@ Graphics::Graphics(Context* context_) :
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight"),
 #ifndef GL_ES_VERSION_2_0
-    apiName_("GL2")
+    apiName_("GL2"),
 #else
-    apiName_("GLES2")
+    apiName_("GLES2"),
 #endif
+    // ATOMIC BEGIN
+    graphicsFps_(0.0),
+    frameCounter_(0)
+    // ATOMIC END
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -667,6 +671,10 @@ void Graphics::EndFrame()
 
     SDL_GL_SwapWindow(window_);
 
+    // ATOMIC BEGIN
+    calculateGraphicsFps();
+    // ATOMIC END
+    
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
 }

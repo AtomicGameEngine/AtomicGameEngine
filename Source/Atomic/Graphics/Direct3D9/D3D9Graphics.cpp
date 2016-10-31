@@ -276,7 +276,11 @@ Graphics::Graphics(Context* context) :
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
-    apiName_("D3D9")
+    apiName_("D3D9"),
+    // ATOMIC BEGIN
+    graphicsFps_(0.0),
+    frameCounter_(0)
+    // ATOMIC END
 {
     SetTextureUnitMappings();
 
@@ -779,6 +783,10 @@ void Graphics::EndFrame()
             impl_->queryIssued_ = true;
         }
     }
+
+    // ATOMIC BEGIN
+    calculateGraphicsFps();
+    // ATOMIC END
 
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
