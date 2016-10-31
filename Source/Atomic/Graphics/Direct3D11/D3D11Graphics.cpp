@@ -233,7 +233,11 @@ Graphics::Graphics(Context* context) :
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
-    apiName_("D3D11")
+    apiName_("D3D11"),
+    // ATOMIC BEGIN
+    graphicsFps_(0.0),
+    frameCounter_(0)
+    // ATOMIC END
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -608,6 +612,10 @@ void Graphics::EndFrame()
         SendEvent(E_ENDRENDERING);
         impl_->swapChain_->Present(vsync_ ? 1 : 0, 0);
     }
+
+    // ATOMIC BEGIN
+    calculateGraphicsFps();
+    // ATOMIC END
 
     // Clean up too large scratch buffers
     CleanupScratchBuffers();

@@ -21,7 +21,7 @@
 //
 
 #pragma once
-
+#include "../Core/Timer.h"
 #include "../Container/ArrayPtr.h"
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
@@ -546,6 +546,7 @@ public:
     IntVector2 GetMonitorResolution(int monitorId) const;
     void RaiseWindow();
 
+    float GetGraphicsFps() const { return graphicsFps_; }
     // ATOMIC END
 
 private:
@@ -767,6 +768,14 @@ private:
     static const Vector2 pixelUVOffset;
     /// OpenGL3 support flag.
     static bool gl3Support;
+
+    // ATOMIC BEGIN
+    void calculateGraphicsFps();
+    float graphicsFps_;
+    unsigned frameCounter_;
+    Timer fpsTimer_;
+    // ATOMIC END
+
 };
 
 /// Register Graphics library objects.

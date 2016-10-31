@@ -339,6 +339,19 @@ void Graphics::RaiseWindow()
         SDL_RaiseWindow(window_);
 }
 
+void Graphics::calculateGraphicsFps()
+{
+    if ( fpsTimer_.GetMSec(false) >= 1000 ) // have we got to a second yet
+    {
+        graphicsFps_ = (float)frameCounter_;
+        frameCounter_ = 0;
+        fpsTimer_.Reset();
+    }
+    else
+    {
+        frameCounter_ ++; 
+    }
+}
 
 // ATOMIC END
 
