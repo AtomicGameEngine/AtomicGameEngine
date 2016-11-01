@@ -128,9 +128,12 @@ public:
     bool IsPaused() const { return paused_; }
     /// Return whether to run the next frame even if paused (for stepping frame by frame)
     bool GetRunNextPausedFrame() const { return runNextPausedFrame_; }
-   
+
+    /// Return the engine's current framerate (updated at 1/2 second intervals)
+    unsigned GetFps() const { return fps_; }
     
     bool GetDebugBuild() const;
+
     // ATOMIC END
 
 private:
@@ -182,6 +185,14 @@ private:
     bool paused_;
     /// Whether to run the next frame even if paused (for stepping frame by frame)
     bool runNextPausedFrame_;
+
+    /// Time since last fps display update
+    float fpsTimeSinceUpdate_;
+    /// Frames since last fps display update
+    float fpsFramesSinceUpdate_;
+    /// Calculated fps
+    unsigned fps_;
+
     // ATOMIC END
    
 };
