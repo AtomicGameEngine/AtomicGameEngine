@@ -72,6 +72,9 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+static const float ENGINE_FPS_UPDATE_INTERVAL = 0.5f;
+// ATOMIC END
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // From dbgint.h
@@ -119,7 +122,10 @@ Engine::Engine(Context* context) :
     audioPaused_(false),
     // ATOMIC BEGIN    
     paused_(false),
-    runNextPausedFrame_(false)
+    runNextPausedFrame_(false),
+    fpsTimeSinceUpdate_(ENGINE_FPS_UPDATE_INTERVAL),
+    fpsFramesSinceUpdate_(0),
+    fps_(0)
     // ATOMIC END
 {
     // Register self as a subsystem
@@ -164,7 +170,7 @@ Engine::Engine(Context* context) :
 #endif
 
     SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(Engine, HandleExitRequested));
-    // ATOMIC BEGIN    
+    // ATOMIC BEGIN        
     SubscribeToEvent(E_PAUSERESUMEREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseResumeRequested));
     SubscribeToEvent(E_PAUSESTEPREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseStepRequested));
     // ATOMIC END
@@ -513,8 +519,17 @@ void Engine::RunFrame()
         Update();
 
     }
-// ATOMIC END
 
+    fpsTimeSinceUpdate_ += timeStep_;
+    ++fpsFramesSinceUpdate_;
+    if (fpsTimeSinceUpdate_ > ENGINE_FPS_UPDATE_INTERVAL)
+    {
+        fps_ = (int)(fpsFramesSinceUpdate_ / fpsTimeSinceUpdate_);
+        fpsFramesSinceUpdate_ = 0;
+        fpsTimeSinceUpdate_ = 0;
+    }
+
+// ATOMIC END
 
     Render();
     ApplyFrameLimit();
