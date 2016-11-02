@@ -35,7 +35,7 @@ namespace AtomicTool
 
 class AtomicTool : public Application
 {
-    ATOMIC_OBJECT(AtomicTool, Application);
+    ATOMIC_OBJECT(AtomicTool, Application)
 
 public:
 
@@ -69,8 +69,6 @@ private:
     void DoActivation();
     void DoDeactivation();
 
-    // use a variant map instead?
-    String cliDataPath_;
     String activationKey_;
     bool deactivate_;
 

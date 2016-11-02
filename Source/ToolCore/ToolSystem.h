@@ -47,9 +47,6 @@ public:
     Project* GetProject() { return project_; }
     void CloseProject();
 
-    const String& GetDataPath() { return dataPath_; }
-    void SetDataPath(const String& path) { dataPath_ = path; }
-
     // Platforms
     void RegisterPlatform(Platform* platform);
     Platform* GetPlatformByID(PlatformID platform);
@@ -58,15 +55,9 @@ public:
     void SetCurrentPlatform(PlatformID platform);
     Platform* GetCurrentPlatform();
 
-    void SetCLI() { cli_ = true; }
-    bool IsCLI() { return cli_; }
-
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
-    /// Full path to data files
-    String dataPath_;
 
     SharedPtr<Platform> currentPlatform_;
 
@@ -74,8 +65,6 @@ private:
     HashMap<unsigned, SharedPtr<Platform> > platforms_;
 
     SharedPtr<Project> project_;
-
-    bool cli_;
 
     float updateDelta_;
 
