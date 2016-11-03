@@ -35,6 +35,10 @@ namespace('build', function() {
             fs.copySync(buildDir + "Source/AtomicPlayer/Application/libAtomicPlayer.so",
             editorResourceFolder + "ToolData/Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so");
 
+            // Install local deployment
+            fs.copySync(buildDir + "Source/AtomicPlayer/Application/libAtomicPlayer.so",
+            atomicRoot + "Artifacts/AtomicEditor/Resources/ToolData/Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so");
+
             complete();
 
         }, {
