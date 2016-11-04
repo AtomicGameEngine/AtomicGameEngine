@@ -31,6 +31,7 @@
 #include <Atomic/Resource/JSONFile.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEnvironment.h"
 #include "../ToolEvents.h"
 #include "../Platform/Platform.h"
 
@@ -74,13 +75,14 @@ void Project::SaveUserPrefs()
 bool Project::LoadUserPrefs()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     String path = GetProjectPath() + "UserPrefs.json";
 
     userPrefs_->Load(path);
 
     // If we're in CLI mode, the Build folder is always relative to project
-    if (tsystem->IsCLI())
+    if (tenv->GetCLI())
     {
         String path = GetPath(projectFilePath_) + "Build";
         userPrefs_->SetLastBuildPath(path);

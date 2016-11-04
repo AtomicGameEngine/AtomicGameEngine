@@ -27,6 +27,10 @@ function copyAtomicEditor() {
     fs.copySync(buildDir + "Source/AtomicEditor/" + config["config"],
     config.artifactsRoot + "AtomicEditor");
 
+    // copy AtomicTool
+    fs.copySync(buildDir +  "Source/AtomicTool/" + config["config"] +"/AtomicTool.exe",
+    editorAppFolder + "AtomicTool.exe");
+    
     // We need some resources to run
     fs.copySync(atomicRoot + "Resources/CoreData",
     editorAppFolder + "Resources/CoreData");

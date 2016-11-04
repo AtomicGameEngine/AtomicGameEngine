@@ -59,35 +59,8 @@ void AtomicTool::Setup()
 {
     const Vector<String>& arguments = GetArguments();
 
-    for (unsigned i = 0; i < arguments.Size(); ++i)
-    {
-        if (arguments[i].Length() > 1)
-        {
-            String argument = arguments[i].ToLower();
-            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
-
-            if (argument == "--cli-data-path")
-            {
-                if (!value.Length())
-                    ErrorExit("Unable to parse --cli-data-path");
-
-                cliDataPath_ = AddTrailingSlash(value);
-            }
-            else if (argument == "--activate")
-            {
-                if (!value.Length())
-                    ErrorExit("Unable to parse --activation product key");
-
-                activationKey_ = value;
-            }
-            else if (argument == "--deactivate")
-            {
-                deactivate_ = true;
-            }
-
-        }
-
-    }
+    if (arguments.Contains("-toolbootstrap"))
+        ToolEnvironment::SetBootstrapping();
 
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
@@ -220,24 +193,12 @@ void AtomicTool::Start()
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);
 
-//#ifdef ATOMIC_DEV_BUILD
-
-    if (!env->InitFromJSON())
+    // Initialize the ToolEnvironment
+    if (!env->Initialize(true))
     {
-        ErrorExit(ToString("Unable to initialize tool environment from %s", env->GetDevConfigFilename().CString()));
+        ErrorExit("Unable to initialize tool environment");
         return;
     }
-
-    if (!cliDataPath_.Length())
-    {
-        cliDataPath_ = env->GetRootSourceDir() + "/Resources/";
-    }
-
-//#endif
-
-    tsystem->SetCLI();
-    tsystem->SetDataPath(cliDataPath_);
-
 
     if (activationKey_.Length())
     {

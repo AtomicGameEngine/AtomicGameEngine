@@ -240,6 +240,7 @@ namespace ToolCore
 
             StringVector stringVector;
             String platforms;
+            StringVector processedPlatforms;
             String configs;
 
             for (unsigned i = 0; i < curBuild_->configurations_.Size(); i++)
@@ -254,6 +255,20 @@ namespace ToolCore
             {
                 // map platform
                 String platform = curBuild_->platforms_[i];
+
+                if (platform == "windows" || platform == "macosx" || platform == "linux")
+                {
+                    ATOMIC_LOGINFOF("Platform \"%s\" mapped to \"desktop\"", platform.CString());
+                    platform = "desktop";
+                }
+
+                if (processedPlatforms.Contains(platform))
+                {
+                    ATOMIC_LOGWARNINGF("Platform \"%s\" is duplicated, skipping", platform.CString());
+                    continue;
+                }
+
+                processedPlatforms.Push(platform);
 
                 if (platform == "desktop" || platform == "android")
                 {

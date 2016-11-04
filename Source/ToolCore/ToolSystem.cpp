@@ -50,7 +50,6 @@ namespace ToolCore
 {
 
 ToolSystem::ToolSystem(Context* context) : Object(context),
-    cli_(false),
     updateDelta_(0.0f)
 {
     context_->RegisterSubsystem(new AssetDatabase(context_));

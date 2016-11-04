@@ -64,7 +64,7 @@ namespace('build', function() {
 
         var cmds = [];
 
-        var netCmd = host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platforms + " -config " + config["config"];
+        var netCmd = host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platforms + " -config " + config["config"] + " -toolbootstrap";
 
         console.log(netCmd);
 

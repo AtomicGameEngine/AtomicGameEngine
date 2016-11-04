@@ -37,7 +37,10 @@ using namespace rapidjson;
 namespace ToolCore
 {
 
+bool ToolEnvironment::bootstrapping_ = false;
+
 ToolEnvironment::ToolEnvironment(Context* context) : Object(context),
+    cli_(false),
     toolPrefs_(new ToolPrefs(context))
 {
 
@@ -48,7 +51,7 @@ ToolEnvironment::~ToolEnvironment()
 
 }
 
-bool ToolEnvironment::InitFromPackage()
+bool ToolEnvironment::InitFromDistribution()
 {
     toolPrefs_->Load();
 
@@ -75,8 +78,6 @@ bool ToolEnvironment::InitFromPackage()
 
     // AtomicNET
 
-    // atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());       
-
 #ifdef ATOMIC_DEBUG
     String config = "Debug";
 #else
@@ -94,77 +95,35 @@ bool ToolEnvironment::InitFromPackage()
     return true;
 }
 
-bool ToolEnvironment::InitFromJSON(bool atomicTool)
+bool ToolEnvironment::Initialize(bool cli)
 {
+    bool result = true;
 
+    cli_ = cli;
     toolPrefs_->Load();
 
-    // make sure config path is initialized
-    GetDevConfigFilename();
+#ifdef ATOMIC_DEV_BUILD
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
+    SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR, true);
 
-    if (atomicTool || !fileSystem->FileExists(devConfigFilename_))
+#else
+
+    if (!bootstrapping_)
     {
-        // default to build directories
+        result = InitFromDistribution();
 
+    }
+    else
+    {
         SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
         SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR, true);
 
-        return true;
     }
-
-    File jsonFile(context_, devConfigFilename_);
-
-    if (!jsonFile.IsOpen())
-        return false;
-
-    String json;
-    jsonFile.ReadText(json);
-
-    if (!json.Length())
-        return false;
-
-    rapidjson::Document document;
-    if (document.Parse<0>(json.CString()).HasParseError())
-    {
-        return false;
-    }
-
-    const Value::Member* rootSourceDir = document.FindMember("rootSourceDir");
-    if (rootSourceDir && rootSourceDir->value.IsString())
-        SetRootSourceDir(rootSourceDir->value.GetString());
-    else
-        return false;
-
-    const Value::Member* rootBuildDir = document.FindMember("rootBuildDir");
-    if (rootBuildDir && rootBuildDir->value.IsString())
-        SetRootBuildDir(rootBuildDir->value.GetString(), true);
-    else
-        return false;
-
-
-    return true;
-
-}
-
-
-const String& ToolEnvironment::GetDevConfigFilename()
-{
-    if (devConfigFilename_.Length())
-        return devConfigFilename_;
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
-#ifdef ATOMIC_PLATFORM_OSX
-    devConfigFilename_ = fileSystem->GetUserDocumentsDir() + ".atomicgameengine/toolEnv.json";
-#elif ATOMIC_PLATFORM_WINDOWS
-    devConfigFilename_ = fileSystem->GetUserDocumentsDir() + "AtomicGameEngine/toolEnv.json";
-#else
-    devConfigFilename_ = fileSystem->GetUserDocumentsDir() + ".atomicgameengine/toolEnv.json";
 #endif
 
-    return devConfigFilename_;
+    return result;
+
 }
 
 void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
@@ -265,8 +224,6 @@ void ToolEnvironment::Dump()
     ATOMIC_LOGINFOF("Tool Data Dir: %s", toolDataDir_.CString());
 
     ATOMIC_LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());
-
-    ATOMIC_LOGINFOF("Dev Config File: %s", devConfigFilename_.CString());
 
 }
 

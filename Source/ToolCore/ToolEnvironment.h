@@ -46,10 +46,7 @@ public:
     ToolEnvironment(Context* context);
     virtual ~ToolEnvironment();
 
-    bool InitFromPackage();
-
-    // dev build init env from json
-    bool InitFromJSON(bool atomicTool = false);
+    bool Initialize(bool cli = false);
 
     /// Root source and build directories for development source tree builds
     void SetRootSourceDir(const String& sourceDir);
@@ -77,7 +74,8 @@ public:
 
     const String& GetToolDataDir() { return toolDataDir_; }
 
-    const String& GetDevConfigFilename();
+    // Returns true if we running from a command line tool (aka: AtomicTool)
+    bool GetCLI() { return cli_; }
 
     // AtomicNET
 
@@ -94,7 +92,14 @@ public:
 
     void Dump();
 
+    static void SetBootstrapping() { bootstrapping_ = true; }
+
 private:
+
+    bool InitFromDistribution();
+
+    // Whether we are running from a command line tool, such as AtomicTool
+    bool cli_;
 
     // root source directory (for development builds)
     String rootSourceDir_;
@@ -137,8 +142,6 @@ private:
     String iosBuildDir_;
     String webBuildDir_;
 
-    String devConfigFilename_;
-
     // AtomicNET
     String atomicNETRootDir_;
     String atomicNETCoreAssemblyDir_;
@@ -146,6 +149,8 @@ private:
     String monoExecutableDir_;
 
     SharedPtr<ToolPrefs> toolPrefs_;
+
+    static bool bootstrapping_;
 };
 
 }
