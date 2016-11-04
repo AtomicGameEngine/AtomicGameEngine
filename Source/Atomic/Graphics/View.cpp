@@ -1588,9 +1588,15 @@ void View::ExecuteRenderPathCommands()
                     ATOMIC_PROFILE(RenderLights);
 
                     SetRenderTargets(command);
+// ATOMIC BEGIN
+                    graphics_->SetNumPasses(0);
 
                     for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
                     {
+
+                        graphics_->SetNumPasses(graphics_->GetNumPasses() + 1);
+
+// ATOMIC END
                         // If reusing shadowmaps, render each of them before the lit batches
                         if (renderer_->GetReuseShadowMaps() && NeedRenderShadowMap(*i))
                         {
@@ -3043,6 +3049,11 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         {
             graphics_->SetViewport(shadowQueue.shadowViewport_);
             shadowQueue.shadowBatches_.Draw(this, shadowQueue.shadowCamera_, false, false, true);
+
+// ATOMIC BEGIN
+            graphics_->SetNumPasses(graphics_->GetNumPasses() + 1);
+// ATOMIC END
+
         }
     }
 

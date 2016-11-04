@@ -96,6 +96,8 @@ public:
     void ShowDebugHud(bool value);
     void ToggleDebugHud();
 
+    void SetDebugHudExtents(bool useRootExtents = true, const IntVector2& position = IntVector2::ZERO, const IntVector2& size = IntVector2::ZERO);
+
     void ShowConsole(bool value);
     void ToggleConsole();
 

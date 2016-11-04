@@ -739,6 +739,10 @@ bool Graphics::BeginFrame()
     numPrimitives_ = 0;
     numBatches_ = 0;
 
+    // ATOMIC BEGIN
+    numSinglePassPrimitives_ = 0;
+    // ATOMIC END
+
     SendEvent(E_BEGINRENDERING);
 
     return true;
@@ -848,6 +852,11 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
+    // ATOMIC END
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
@@ -865,6 +874,12 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
+    // ATOMIC END
+
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
@@ -882,6 +897,12 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
+    // ATOMIC END
+
 }
 
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
@@ -912,6 +933,12 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += instanceCount * primitiveCount;
+    // ATOMIC END
+
 }
 
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
@@ -942,6 +969,12 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
+
+    // ATOMIC BEGIN
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += instanceCount * primitiveCount;
+    // ATOMIC END
+
 }
 
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)

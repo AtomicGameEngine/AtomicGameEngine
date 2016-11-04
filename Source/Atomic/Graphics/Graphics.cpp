@@ -59,6 +59,11 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+unsigned Graphics::numPasses_ = 0;
+unsigned Graphics::numSinglePassPrimitives_ = 0;
+// ATOMIC END
+
 void Graphics::SetExternalWindow(void* window)
 {
     if (!window_)

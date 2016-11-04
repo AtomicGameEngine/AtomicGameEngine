@@ -36,6 +36,7 @@ namespace SystemUI
 
 class Font;
 class Text;
+class UIElement;
 
 static const unsigned DEBUGHUD_SHOW_NONE = 0x0;
 static const unsigned DEBUGHUD_SHOW_STATS = 0x1;
@@ -46,7 +47,7 @@ static const unsigned DEBUGHUD_SHOW_ALL = 0x7;
 /// Displays rendering stats and profiling information.
 class ATOMIC_API DebugHud : public Object
 {
-    ATOMIC_OBJECT(DebugHud, Object);
+    ATOMIC_OBJECT(DebugHud, Object)
 
 public:
     /// Construct.
@@ -106,9 +107,14 @@ public:
     /// Clear all application-specific stats.
     void ClearAppStats();
 
+    void SetExtents(bool useRootExtents = true, const IntVector2& position = IntVector2::ZERO, const IntVector2& size = IntVector2::ZERO);
+
 private:
     /// Handle logic post-update event. The HUD texts are updated here.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
+
+    /// Rendering stats text.
+    SharedPtr<UIElement> layout_;
 
     /// Rendering stats text.
     SharedPtr<Text> statsText_;

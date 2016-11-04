@@ -1181,7 +1181,27 @@ void UIWidget::SetTooltip(const String& tooltip)
         return;
 
     widget_->SetTooltip(tooltip.CString());
+
 }
 
+IntVector2 UIWidget::ConvertToRoot(const IntVector2 position) const
+{
+    IntVector2 result = position;
+
+    if (widget_)
+        widget_->ConvertToRoot(result.x_, result.y_);
+
+    return result;
+}
+
+IntVector2 UIWidget::ConvertFromRoot(const IntVector2 position) const
+{
+    IntVector2 result = position;
+
+    if (widget_)
+        widget_->ConvertFromRoot(result.x_, result.y_);
+
+    return result;
+}
 
 }
