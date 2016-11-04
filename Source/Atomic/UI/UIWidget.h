@@ -313,6 +313,13 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetLayoutMaxHeight(int height);
     int GetLayoutMaxHeight();
 
+    //  Get x and y (relative to this widget) relative to the upper left corner of the root widget
+    IntVector2 ConvertToRoot(const IntVector2 position ) const;
+
+    // Get x and y (relative to the upper left corner of the root widget) relative to this widget
+    IntVector2 ConvertFromRoot(const IntVector2 position) const;
+
+
     // Opacity and AutoOpacity (AutoOpacity sets visibility as well based on opacity being 0.0 or non-0.0).
     void SetOpacity(float opacity);
     float GetOpacity();

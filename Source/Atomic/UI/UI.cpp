@@ -905,6 +905,17 @@ void UI::ToggleDebugHud()
     hud->ToggleAll();
 }
 
+void UI::SetDebugHudExtents(bool useRootExtent, const IntVector2& position, const IntVector2& size)
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (!hud)
+        return;
+
+    hud->SetExtents(useRootExtent, position, size);
+
+}
+
 void UI::ShowConsole(bool value)
 {
     SystemUI::Console* console = GetSubsystem<SystemUI::Console>();

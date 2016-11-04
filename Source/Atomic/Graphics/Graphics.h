@@ -545,7 +545,17 @@ public:
     bool GetMaximized();
     IntVector2 GetMonitorResolution(int monitorId) const;
     void RaiseWindow();
+    
+    /// Return number of passes drawn this frame
+    static unsigned GetNumPasses() { return numPasses_; }
+    /// Set number of passes drawn this frame
+    static void SetNumPasses(unsigned value) { numPasses_ = value; }
 
+    /// Return number of single render pass primitives drawn this frame (D3D9 Only)
+    static unsigned GetSinglePassPrimitives() { return numSinglePassPrimitives_; }
+    /// Set number of single render pass primitives drawn this frame (D3D9 Only)
+    static void SetSinglePassPrimitives(unsigned value) { numSinglePassPrimitives_ = value; }
+  
     // ATOMIC END
 
 private:
@@ -767,6 +777,11 @@ private:
     static const Vector2 pixelUVOffset;
     /// OpenGL3 support flag.
     static bool gl3Support;
+
+// ATOMIC BEGIN
+    static unsigned numPasses_;
+    static unsigned numSinglePassPrimitives_;
+// ATOMIC END
 };
 
 /// Register Graphics library objects.
