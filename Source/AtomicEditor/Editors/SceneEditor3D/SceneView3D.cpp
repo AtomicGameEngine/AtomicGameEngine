@@ -29,6 +29,9 @@
 #include <Atomic/Scene/PrefabComponent.h>
 #include <Atomic/Graphics/Camera.h>
 
+#include <Atomic/UI/SystemUI/SystemUI.h>
+#include <Atomic/UI/SystemUI/DebugHud.h>
+
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Graphics/Viewport.h>
@@ -669,6 +672,9 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     Enable();
+
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+    debugHud->SetSceneOpen(true);
 
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();

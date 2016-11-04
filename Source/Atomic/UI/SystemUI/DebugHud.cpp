@@ -30,6 +30,7 @@
 #include "Text.h"
 #include "SystemUI.h"
 #include "DebugHud.h"
+#include "UI/UI.h"
 
 #include "../../DebugNew.h"
 
@@ -60,11 +61,13 @@ DebugHud::DebugHud(Context* context) :
     Object(context),
     profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1000),
-    useRendererStats_(false),
+    useRendererStats_(true),
     mode_(DEBUGHUD_SHOW_NONE),
     fpsTimeSinceUpdate_(FPS_UPDATE_INTERVAL),
     fpsFramesSinceUpdate_(0),
-    fps_(0)
+    fps_(0),
+    isSceneOpen_(false),
+    showSceneHud_(false)
 {
     SystemUI* ui = GetSubsystem<SystemUI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -104,6 +107,12 @@ void DebugHud::Update(float timeStep)
     if (!renderer || !graphics)
         return;
 
+    UI* ui = GetSubsystem<UI>();
+    if (GetSceneOpen())
+    {
+        ui->ShowDebugHud(false);
+    }
+
     // Ensure UI-elements are not detached
     if (!statsText_->GetParent())
     {
@@ -114,7 +123,7 @@ void DebugHud::Update(float timeStep)
         uiRoot->AddChild(profilerText_);
     }
 
-    if (statsText_->IsVisible())
+    if (statsText_->IsVisible() || GetSceneOpen())
     {
         fpsTimeSinceUpdate_ += timeStep;
         ++fpsFramesSinceUpdate_;
@@ -125,7 +134,7 @@ void DebugHud::Update(float timeStep)
             fpsTimeSinceUpdate_ = 0;
         }
 
-        unsigned primitives, batches;
+        unsigned primitives, batches, singlePassPrimitives, editorPrimitives;
         if (!useRendererStats_)
         {
             primitives = graphics->GetNumPrimitives();
@@ -137,10 +146,15 @@ void DebugHud::Update(float timeStep)
             batches = renderer->GetNumBatches();
         }
 
+        singlePassPrimitives = graphics->GetSinglePassPrimitives();
+        editorPrimitives = graphics->GetNumPrimitives() - renderer->GetNumPrimitives();
+
         String stats;
-        stats.AppendWithFormat("FPS %d\nTriangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
+        stats.AppendWithFormat("FPS %d\nTriangles (All passes) %u\nTriangles (Single pass) %u\nTriangles (Editor) %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
             fps_,
             primitives,
+            singlePassPrimitives,
+            editorPrimitives,
             batches,
             renderer->GetNumViews(),
             renderer->GetNumLights(true),
@@ -155,9 +169,10 @@ void DebugHud::Update(float timeStep)
         }
 
         statsText_->SetText(stats);
+        statsString_ = stats;
     }
 
-    if (modeText_->IsVisible())
+    if (modeText_->IsVisible() || GetSceneOpen())
     {
         String mode;
         mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
@@ -172,6 +187,7 @@ void DebugHud::Update(float timeStep)
             graphics->GetApiName().CString());
 
         modeText_->SetText(mode);
+        modeString_ = mode;
     }
 
     Profiler* profiler = GetSubsystem<Profiler>();
@@ -181,10 +197,11 @@ void DebugHud::Update(float timeStep)
         {
             profilerTimer_.Reset();
 
-            if (profilerText_->IsVisible())
+            if (profilerText_->IsVisible() || GetSceneOpen())
             {
                 String profilerOutput = profiler->PrintData(false, false, profilerMaxDepth_);
                 profilerText_->SetText(profilerOutput);
+                profilerString_ = profilerOutput;
             }
 
             profiler->BeginInterval();
@@ -293,6 +310,11 @@ bool DebugHud::ResetAppStats(const String& label)
 void DebugHud::ClearAppStats()
 {
     appStats_.Clear();
+}
+
+void DebugHud::ToggleSceneHud()
+{
+    SetShowSceneHud(!GetShowSceneHud());
 }
 
 void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
