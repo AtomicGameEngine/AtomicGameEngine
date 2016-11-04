@@ -164,13 +164,15 @@ void DebugHud::Update(float timeStep)
         unsigned editorPrimitives = graphics->GetNumPrimitives() - renderer->GetNumPrimitives();
 
         if (singlePassPrimitives)
-            stats.AppendWithFormat("FPS %d\nTriangles (All passes) %u\nTriangles (Single pass) %u\nTriangles (Editor) %u\n", fps_, primitives, singlePassPrimitives, editorPrimitives);
+            stats.AppendWithFormat("FPS %d\nTriangles (All passes) %u\nTriangles (Single pass) %u\nTriangles (Editor) %u\n", 
+                fps_, 
+                primitives, 
+                singlePassPrimitives, 
+                editorPrimitives);
         else
             stats.AppendWithFormat("FPS %d\nTriangles %u\n", fps_, primitives);
                     
         stats.AppendWithFormat("Batches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
-            fps_,
-            primitives,
             batches,
             renderer->GetNumViews(),
             renderer->GetNumLights(true),
