@@ -271,7 +271,12 @@ class MainFrameMenu extends Atomic.ScriptObject {
             if (refid == "tools toggle profiler") {
                 Atomic.ui.toggleDebugHud();
                 return true;
-            }
+            } else if (refid.indexOf("tools log") != -1) {
+
+                let logName = refid.indexOf("editor") != -1 ? "AtomicEditor" : "AtomicPlayer";
+                let logFolder = Atomic.fileSystem.getAppPreferencesDir(logName, "Logs");
+                Atomic.fileSystem.systemOpen(logFolder);
+            } 
 
         } else if (target.id == "menu build popup") {
 
@@ -354,7 +359,12 @@ var editItems = {
 
 var toolsItems = {
 
-    "Toggle Profiler": ["tools toggle profiler"]
+    "Toggle Profiler": ["tools toggle profiler"],
+    "Logs": {
+        "Player Log": ["tools log player"],
+        "Editor Log": ["tools log editor"]
+    }
+    
 
 };
 
@@ -376,7 +386,6 @@ var developerItems = {
             "Force Reimport": ["developer assetdatabase force"]
         }
     }
-
 
 };
 
