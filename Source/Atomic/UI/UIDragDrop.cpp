@@ -87,11 +87,14 @@ void UIDragDrop::DragEnd()
 {
     SharedPtr<UIDragObject> dragObject = dragObject_;
     SharedPtr<UIWidget> currentTargetWidget(currentTargetWidget_);
+    SharedPtr<UIWidget> dragSourceWidget(dragSourceWidget_);
+
 
     // clean up
     currentTargetWidget_ = 0;
     dragObject_ = 0;
-    dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
+    dragSourceWidget_ = 0;
+    dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);    
 
     if (currentTargetWidget.Null())
     {
