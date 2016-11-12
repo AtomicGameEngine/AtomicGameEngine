@@ -144,13 +144,11 @@ class MainFrame extends ScriptWidget {
     disableProjectMenus() {
         this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
         this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
-        this.getWidget("menu tools").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
     }
 
     enableProjectMenus() {
         this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
         this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
-        this.getWidget("menu tools").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
     }
 
     shutdown() {
