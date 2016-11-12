@@ -41,6 +41,9 @@ class ListViewItemWidget;
 
 class ListViewItemWidget : public TBLayout
 {
+    // For safe typecasting
+    TBOBJECT_SUBCLASS(ListViewItemWidget, TBLayout)
+
 public:
     ListViewItemWidget(ListViewItem *item, ListViewItemSource *source, TBSelectItemViewer *sourceviewer, int index);
     virtual bool OnEvent(const TBWidgetEvent &ev);
