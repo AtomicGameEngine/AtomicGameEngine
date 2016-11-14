@@ -120,7 +120,8 @@ UI::UI(Context* context) :
     skinLoaded_(false),
     consoleVisible_(false),
     exitRequested_(false),
-    changedEventsBlocked_(0)
+    changedEventsBlocked_(0),
+    tooltipHoverTime_ (0.0f)
 {
 
     SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(UI, HandleExitRequested));
