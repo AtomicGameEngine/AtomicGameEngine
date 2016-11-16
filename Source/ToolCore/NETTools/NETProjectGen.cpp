@@ -165,15 +165,17 @@ namespace ToolCore
 
                 compile.SetAttribute("Include", path.CString());
 
+                String link = result[j];
+
                 // put generated files into generated folder
                 if (sourceFolder.Contains("Generated") && sourceFolder.Contains("CSharp") && sourceFolder.Contains("Packages"))
                 {
-                    compile.CreateChild("Link").SetValue("Generated\\" + result[j]);
+                    link = "Generated\\" + result[j];
                 }
-                else
-                {
-                    compile.CreateChild("Link").SetValue(result[j]);
-                }
+
+                link.Replace('/', '\\');
+
+                compile.CreateChild("Link").SetValue(link);
 
             }
 
