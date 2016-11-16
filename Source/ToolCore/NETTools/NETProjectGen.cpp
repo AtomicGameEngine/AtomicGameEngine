@@ -407,13 +407,17 @@ namespace ToolCore
         String outputPath = assemblyOutputPath_;
         outputPath.Replace("$ATOMIC_CONFIG$", "Release");
 
-        String atomicProjectPath = projectGen_->GetAtomicProjectPath();
-
-        if (atomicProjectPath.Length())
+        if (IsAbsolutePath(outputPath))
         {
-            if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+
+            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
+
+            if (atomicProjectPath.Length())
             {
-                ATOMIC_LOGERRORF("NETCSProject::CreateReleasePropertyGroup - unable to get relative output path");
+                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+                {
+                    ATOMIC_LOGERRORF("NETCSProject::CreateReleasePropertyGroup - unable to get relative output path");
+                }
             }
         }
 
@@ -432,8 +436,9 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
-        // Don't warn on missing XML documentation
-        pgroup.CreateChild("NoWarn").SetValue("1591");
+        // 1591 - Don't warn on missing documentation 
+        // 1570 - malformed xml, remove once (https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1161) resolved
+        pgroup.CreateChild("NoWarn").SetValue("1591;1570");
 
         if (genAssemblyDocFile_)
         {
@@ -509,14 +514,18 @@ namespace ToolCore
         String outputPath = assemblyOutputPath_;
         outputPath.Replace("$ATOMIC_CONFIG$", "Debug");
 
-        String atomicProjectPath = projectGen_->GetAtomicProjectPath();
-
-        if (atomicProjectPath.Length())
+        if (IsAbsolutePath(outputPath))
         {
-            if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
+
+            if (atomicProjectPath.Length())
             {
-                ATOMIC_LOGERRORF("NETCSProject::CreateDebugPropertyGroup - unable to get relative output path");
+                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+                {
+                    ATOMIC_LOGERRORF("NETCSProject::CreateDebugPropertyGroup - unable to get relative output path");
+                }
             }
+
         }
 
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
@@ -535,8 +544,9 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
-        // Don't warn on missing XML documentation
-        pgroup.CreateChild("NoWarn").SetValue("1591");
+        // 1591 - Don't warn on missing documentation 
+        // 1570 - malformed xml, remove once (https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1161) resolved
+        pgroup.CreateChild("NoWarn").SetValue("1591;1570");
 
         pgroup.CreateChild("DebugSymbols").SetValue("true");
 
@@ -1820,11 +1830,9 @@ namespace ToolCore
         if (!JSONFile::ParseJSON(netJSONString, netJSON))
             return false;
 
-#else
+#endif
 
         AtomicNETCopyAssemblies(context_, atomicProjectPath_ + "AtomicNET/Lib/");
-
-#endif
 
 #ifdef ATOMIC_DEV_BUILD
 
