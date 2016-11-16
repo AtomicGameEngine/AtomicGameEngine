@@ -1314,7 +1314,18 @@ bool GetRelativePath(const String& fromPath, const String& toPath, String& outpu
     }
 
     if (startIdx == toParts.Size())
+    {
+        if (from.EndsWith("/") && to.EndsWith("/"))
+        {
+            for (unsigned i = 0; i < fromParts.Size() - startIdx; i++)
+            {
+                output += "../";
+            }
+
+            return true;
+        }
         return false;
+    }
 
     for (int i = 0; i < (int)fromParts.Size() - startIdx; i++)
     {
