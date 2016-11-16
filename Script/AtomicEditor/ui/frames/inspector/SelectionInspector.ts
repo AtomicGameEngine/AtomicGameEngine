@@ -145,7 +145,7 @@ class JSComponentSection extends ComponentSection {
         this.hasDynamicAttr = true;
 
         this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
-
+        this.updateTitleFromComponentClass();
     }
 
     private handleAttributeEditResourceChanged(ev: AttributeEditResourceChangedEvent) {
@@ -157,7 +157,15 @@ class JSComponentSection extends ComponentSection {
 
         var attrInfos = jsc.getAttributes();
         this.updateDynamicAttrInfos(attrInfos);
+        this.updateTitleFromComponentClass();
+    }
 
+    private updateTitleFromComponentClass() {
+        this.text = this.editType.typeName;
+        let jsc = this.editType.getFirstObject() as Atomic.JSComponent;
+        if (jsc && jsc.componentFile) {
+            this.text = jsc.componentFile.name.split("/").pop();
+        }
     }
 
 }
