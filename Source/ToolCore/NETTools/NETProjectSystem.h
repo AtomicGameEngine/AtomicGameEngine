@@ -92,6 +92,7 @@ namespace ToolCore
 
         String idePath_;
 
+        String projectPath_;
         String solutionPath_;
         String projectAssemblyPath_;
 
@@ -104,5 +105,8 @@ namespace ToolCore
         WeakPtr<Subprocess> ideSubprocess_;
 
     };
+
+    /// Copies the core Atomic NET assemblies to a specified folder
+    bool AtomicNETCopyAssemblies(Context* context, const String& dstFolder);
 
 }

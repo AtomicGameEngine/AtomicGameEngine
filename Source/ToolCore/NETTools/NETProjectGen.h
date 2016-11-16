@@ -95,7 +95,6 @@ namespace ToolCore
 
         void CreateCompileItemGroup(XMLElement &projectRoot);
         void CreateReferencesItemGroup(XMLElement &projectRoot);
-        void CreateProjectReferencesItemGroup(XMLElement & projectRoot);
         void CreatePackagesItemGroup(XMLElement &projectRoot);
         void CreateMainPropertyGroup(XMLElement &projectRoot);
         void CreateDebugPropertyGroup(XMLElement &projectRoot);

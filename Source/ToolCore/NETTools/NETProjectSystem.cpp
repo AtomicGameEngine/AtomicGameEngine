@@ -30,6 +30,7 @@
 #include <Atomic/Resource/ResourceEvents.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEnvironment.h"
 #include "../Assets/AssetEvents.h"
 #include "../Assets/AssetDatabase.h"
 #include "../Project/Project.h"
@@ -321,25 +322,25 @@ namespace ToolCore
     {
         using namespace ProjectLoaded;
 
-        String projectPath = eventData[P_PROJECTPATH].GetString();
+        projectPath_ = eventData[P_PROJECTPATH].GetString();
         Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());
 
-        if (GetExtension(projectPath) == ".atomic")
-            projectPath = GetParentPath(projectPath);
+        if (GetExtension(projectPath_) == ".atomic")
+            projectPath_ = GetParentPath(projectPath_);
 
         String projectName = project->GetProjectSettings()->GetName();
 
-        solutionPath_ = AddTrailingSlash(projectPath) + "AtomicNET/Solution/" + projectName + ".sln";
-        projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resources/" + projectName + ".dll";
+        solutionPath_ = AddTrailingSlash(projectPath_) + "AtomicNET/Solution/" + projectName + ".sln";
+        projectAssemblyPath_ = AddTrailingSlash(projectPath_) + "Resources/" + projectName + ".dll";
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
         // TODO: We need a better way of marking C# projects
         StringVector results;
-        fileSystem->ScanDir(results, AddTrailingSlash(projectPath) + "Resources", "*.cs", SCAN_FILES, true);
+        fileSystem->ScanDir(results, AddTrailingSlash(projectPath_) + "Resources", "*.cs", SCAN_FILES, true);
         if (!results.Size())
         {
-            fileSystem->ScanDir(results, AddTrailingSlash(projectPath) + "Resources", "*.dll", SCAN_FILES, true);
+            fileSystem->ScanDir(results, AddTrailingSlash(projectPath_) + "Resources", "*.dll", SCAN_FILES, true);
             if (!results.Size())
             {
                 solutionPath_.Clear();
@@ -413,7 +414,7 @@ namespace ToolCore
 
     void NETProjectSystem::HandleAssetMoved(StringHash eventType, VariantMap& eventData)
     {
-
+        
     }
 
     void NETProjectSystem::Initialize()
@@ -472,6 +473,65 @@ namespace ToolCore
         }
 
 #endif
+
+    }
+
+    bool AtomicNETCopyAssemblies(Context* context, const String& dstFolder)
+    {
+        FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
+        ToolEnvironment* tenv = context->GetSubsystem<ToolEnvironment>();
+
+        StringVector results;
+        fileSystem->ScanDir(results, tenv->GetAtomicNETCoreAssemblyDir(), "*", SCAN_FILES, true);
+
+        for (unsigned i = 0; i < results.Size(); i++)
+        {
+            String srcFile = tenv->GetAtomicNETCoreAssemblyDir() + results[i];
+            String dstFile = dstFolder + results[i];
+
+            unsigned srcModifiedTime = 0;
+
+            if (fileSystem->FileExists(srcFile))
+            {
+                srcModifiedTime = fileSystem->GetLastModifiedTime(srcFile);
+            }
+
+            // skip if same modified time
+            if (srcModifiedTime && fileSystem->FileExists(dstFile))
+            {
+
+                if (srcModifiedTime == fileSystem->GetLastModifiedTime(dstFile))
+                {
+                    ATOMIC_LOGDEBUGF("NETProjectSystem::CopyAtomicAssemblies - Skipping AtomicNET %s as %s exists and has same modified time", srcFile.CString(), dstFile.CString());
+                    continue;
+                }
+
+                ATOMIC_LOGDEBUGF("NETProjectSystem::CopyAtomicAssemblies - %u %u", srcModifiedTime, fileSystem->GetLastModifiedTime(dstFile));
+
+            }
+
+            String dstPath = GetPath(dstFile);
+
+            if (!fileSystem->CreateDirsRecursive(dstPath))
+            {
+                ATOMIC_LOGERRORF("NETProjectGen::CopyAtomicAssemblies - Unable to create folder: %s", dstPath.CString());
+                continue;
+            }
+
+            if (!fileSystem->Copy(srcFile, dstFile))
+            {
+                ATOMIC_LOGERRORF("NETProjectGen::CopyAtomicAssemblies - Unable to copy file from: %s to %s", srcFile.CString(), dstPath.CString());
+                continue;
+            }
+
+            // Update time so we don't needlessly copy
+            if (srcModifiedTime)
+                fileSystem->SetLastModifiedTime(dstFile, srcModifiedTime);
+
+            ATOMIC_LOGDEBUGF(" NETProjectSystem::CopyAtomicAssemblies - Copied AtomicNET %s to %s", srcFile.CString(), dstPath.CString());
+        }
+
+        return true;
 
     }
 

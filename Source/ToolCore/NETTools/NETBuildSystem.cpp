@@ -351,7 +351,7 @@ namespace ToolCore
 
             // close out quote
             compile += "\"";
-                
+
             args.Push(compile);
 
 #else
@@ -459,6 +459,8 @@ namespace ToolCore
         configurations.Push("Release");
 #endif
 
+        AtomicNETCopyAssemblies(context_, project->GetProjectPath() + "AtomicNET/Lib/");
+
         String solutionPath = project->GetProjectPath() + "AtomicNET/Solution/" + project->GetProjectSettings()->GetName() + ".sln";
 
         NETBuild* build = Build(solutionPath, platforms, configurations);
@@ -468,7 +470,7 @@ namespace ToolCore
             ProjectSettings* settings = project->GetProjectSettings();
 
             // This path is currently only hit when refreshing for desktop
-            if (settings->GetSupportsAndroid() || settings->GetSupportsIOS()) 
+            if (settings->GetSupportsAndroid() || settings->GetSupportsIOS())
             {
                 // Build the PCL, which will get copied to Resources
                 build->targets_.Push(project->GetProjectSettings()->GetName());

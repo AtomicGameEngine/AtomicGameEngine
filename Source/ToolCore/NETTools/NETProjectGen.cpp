@@ -34,6 +34,7 @@
 #include "../Project/Project.h"
 
 #include "NETProjectGen.h"
+#include "NETProjectSystem.h"
 
 namespace ToolCore
 {
@@ -164,15 +165,17 @@ namespace ToolCore
 
                 compile.SetAttribute("Include", path.CString());
 
+                String link = result[j];
+
                 // put generated files into generated folder
                 if (sourceFolder.Contains("Generated") && sourceFolder.Contains("CSharp") && sourceFolder.Contains("Packages"))
                 {
-                    compile.CreateChild("Link").SetValue("Generated\\" + result[j]);
+                    link = "Generated\\" + result[j];
                 }
-                else
-                {
-                    compile.CreateChild("Link").SetValue(result[j]);
-                }
+
+                link.Replace('/', '\\');
+
+                compile.CreateChild("Link").SetValue(link);
 
             }
 
@@ -205,6 +208,7 @@ namespace ToolCore
     void NETCSProject::CreateReferencesItemGroup(XMLElement &projectRoot)
     {
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+        const String atomicProjectPath = projectGen_->GetAtomicProjectPath();
 
         XMLElement xref;
         XMLElement igroup = projectRoot.CreateChild("ItemGroup");
@@ -213,13 +217,9 @@ namespace ToolCore
         {
             String ref = references_[i];
 
-            // project reference
-            if (projectGen_->GetCSProjectByName(ref))
-                continue;
-
             String platform;
 
-            if (projectGen_->GetAtomicProjectPath().Length() && ref.StartsWith("AtomicNET"))
+            if (ref.StartsWith("AtomicNET"))
             {
                 if (GetIsPCL())
                 {
@@ -244,12 +244,45 @@ namespace ToolCore
                     platform = "iOS";
                 }
 
+                // When building Atomic Projects, assemblies will be in the Lib folder
+                String config = "Lib";
+
+                // If we're not building a project, assemblies will be either Debug or Release
+                if (!atomicProjectPath.Length())
+                {
+#ifdef ATOMIC_DEBUG
+                    config = "Debug";
+#else
+                    config = "Release";
+#endif
+                }
 
                 if (platform.Length())
                 {
-                    String atomicNETAssembly = tenv->GetAtomicNETCoreAssemblyDir() + ToString("%s/%s.dll", platform.CString(), ref.CString());
-                    xref = igroup.CreateChild("Reference");
-                    xref.SetAttribute("Include", atomicNETAssembly);
+                    String relativeAssemblyPath;
+
+                    if (GetRelativePath(projectPath_, GetParentPath(projectGen_->GetSolution()->GetOutputPath()), relativeAssemblyPath))
+                    {
+                        xref = igroup.CreateChild("Reference");
+                        xref.SetAttribute("Include", ref);                        
+
+                        // Specify the assembly path, which is the same based on native build
+                        String assemblyPath = relativeAssemblyPath + ToString("%s/%s/%s.dll", config.CString(), platform.CString(), ref.CString());
+
+                        // Setup hint paths with both release/debug config, although they point to same assembly, they don't need to
+                        XMLElement hintPath = xref.CreateChild("HintPath");
+                        hintPath.SetAttribute("Condition", "'$(Configuration)' == 'Release'");
+                        hintPath.SetValue(assemblyPath);
+
+                        hintPath = xref.CreateChild("HintPath");
+                        hintPath.SetAttribute("Condition", "'$(Configuration)' == 'Debug'");
+                        hintPath.SetValue(assemblyPath);
+                    }
+                    else
+                    {
+                        ATOMIC_LOGERRORF("NETCSProject::CreateReferencesItemGroup - Unable to get relative path from %s to solution", projectPath_.CString());
+                    }
+
                 }
 
                 continue;
@@ -276,8 +309,6 @@ namespace ToolCore
             xref.SetAttribute("Include", ref);
 
         }
-
-        const String atomicProjectPath = projectGen_->GetAtomicProjectPath();
 
         if (atomicProjectPath.Length())
         {
@@ -307,32 +338,6 @@ namespace ToolCore
         }
 
     }
-
-    void NETCSProject::CreateProjectReferencesItemGroup(XMLElement &projectRoot)
-    {
-
-        XMLElement igroup = projectRoot.CreateChild("ItemGroup");
-
-        for (unsigned i = 0; i < references_.Size(); i++)
-        {
-            const String& ref = references_[i];
-            NETCSProject* project = projectGen_->GetCSProjectByName(ref);
-
-            if (!project)
-                continue;
-
-
-            XMLElement projectRef = igroup.CreateChild("ProjectReference");
-            projectRef.SetAttribute("Include", ToString("..\\%s\\%s.csproj", ref.CString(), ref.CString()));
-
-            XMLElement xproject = projectRef.CreateChild("Project");
-            xproject.SetValue(ToString("{%s}", project->GetProjectGUID().ToLower().CString()));
-
-            XMLElement xname = projectRef.CreateChild("Name");
-            xname.SetValue(project->GetName());
-        }
-    }
-
 
     void NETCSProject::CreatePackagesItemGroup(XMLElement &projectRoot)
     {
@@ -404,6 +409,20 @@ namespace ToolCore
         String outputPath = assemblyOutputPath_;
         outputPath.Replace("$ATOMIC_CONFIG$", "Release");
 
+        if (IsAbsolutePath(outputPath))
+        {
+
+            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
+
+            if (atomicProjectPath.Length())
+            {
+                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+                {
+                    ATOMIC_LOGERRORF("NETCSProject::CreateReleasePropertyGroup - unable to get relative output path");
+                }
+            }
+        }
+
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
 
         Vector<String> constants;
@@ -419,8 +438,9 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
-        // Don't warn on missing XML documentation
-        pgroup.CreateChild("NoWarn").SetValue("1591");
+        // 1591 - Don't warn on missing documentation 
+        // 1570 - malformed xml, remove once (https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1161) resolved
+        pgroup.CreateChild("NoWarn").SetValue("1591;1570");
 
         if (genAssemblyDocFile_)
         {
@@ -496,6 +516,20 @@ namespace ToolCore
         String outputPath = assemblyOutputPath_;
         outputPath.Replace("$ATOMIC_CONFIG$", "Debug");
 
+        if (IsAbsolutePath(outputPath))
+        {
+            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
+
+            if (atomicProjectPath.Length())
+            {
+                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+                {
+                    ATOMIC_LOGERRORF("NETCSProject::CreateDebugPropertyGroup - unable to get relative output path");
+                }
+            }
+
+        }
+
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
 
         Vector<String> constants;
@@ -512,8 +546,9 @@ namespace ToolCore
         pgroup.CreateChild("ConsolePause").SetValue("false");
         pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
 
-        // Don't warn on missing XML documentation
-        pgroup.CreateChild("NoWarn").SetValue("1591");
+        // 1591 - Don't warn on missing documentation 
+        // 1570 - malformed xml, remove once (https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1161) resolved
+        pgroup.CreateChild("NoWarn").SetValue("1591;1570");
 
         pgroup.CreateChild("DebugSymbols").SetValue("true");
 
@@ -609,24 +644,31 @@ namespace ToolCore
             String platform = "Linux";
             String filename = "libAtomicNETNative.so";
 #endif
+            String relativeNativePath;
 
-#ifdef ATOMIC_DEV_BUILD
+            String configPath = config;
 
-            String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/" + platform + "/" + filename;
-#else
-            String nativePath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/" + platform + "/" + filename;
-#endif
-            atomicNETNativeDLL.SetAttribute("Include", nativePath);
-            atomicNETNativeDLL.CreateChild("Link").SetValue(filename);
-            atomicNETNativeDLL.CreateChild("CopyToOutputDirectory").SetValue("PreserveNewest");
+            if (projectGen_->GetAtomicProjectPath().Length())
+                configPath = "Lib";
+
+            if (GetRelativePath(projectPath_, GetParentPath(projectGen_->GetSolution()->GetOutputPath()), relativeNativePath))
+            {
+                String nativePath = relativeNativePath + configPath + "/Native/" + platform + "/" + filename;
+
+                atomicNETNativeDLL.SetAttribute("Include", nativePath);
+                atomicNETNativeDLL.CreateChild("Link").SetValue(filename);
+                atomicNETNativeDLL.CreateChild("CopyToOutputDirectory").SetValue("PreserveNewest");
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-            XMLElement d3dCompilerDLL = itemGroup.CreateChild("None");
-            String d3dCompilerPath = AddTrailingSlash(tenv->GetAtomicNETRootDir()) + config + "/Native/" + platform + "/D3DCompiler_47.dll";
-            d3dCompilerDLL.SetAttribute("Include", d3dCompilerPath);
-            d3dCompilerDLL.CreateChild("Link").SetValue("D3DCompiler_47.dll");
-            d3dCompilerDLL.CreateChild("CopyToOutputDirectory").SetValue("PreserveNewest");
+                XMLElement d3dCompilerDLL = itemGroup.CreateChild("None");
+                String d3dCompilerPath = relativeNativePath + configPath + "/Native/" + platform + "/D3DCompiler_47.dll";
+                d3dCompilerDLL.SetAttribute("Include", d3dCompilerPath);
+                d3dCompilerDLL.CreateChild("Link").SetValue("D3DCompiler_47.dll");
+                d3dCompilerDLL.CreateChild("CopyToOutputDirectory").SetValue("PreserveNewest");
 #endif
+
+            }
+
         }
         else
         {
@@ -1074,7 +1116,6 @@ namespace ToolCore
         CreateDebugPropertyGroup(project);
         CreateReleasePropertyGroup(project);
         CreateReferencesItemGroup(project);
-        CreateProjectReferencesItemGroup(project);
         CreateCompileItemGroup(project);
         CreatePackagesItemGroup(project);
 
@@ -1743,9 +1784,9 @@ namespace ToolCore
 
         return LoadProject(jvalue);
     }
-
+\
     bool NETProjectGen::LoadAtomicProject(const String& atomicProjectPath)
-    {
+    {        
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
         ToolSystem* tsystem = GetSubsystem<ToolSystem>();
 
@@ -1790,7 +1831,10 @@ namespace ToolCore
 
         if (!JSONFile::ParseJSON(netJSONString, netJSON))
             return false;
+
 #endif
+
+        AtomicNETCopyAssemblies(context_, atomicProjectPath_ + "AtomicNET/Lib/");
 
 #ifdef ATOMIC_DEV_BUILD
 

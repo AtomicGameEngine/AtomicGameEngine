@@ -644,7 +644,10 @@ public:
                 }
                 else
                 {
-                    ATOMIC_LOGINFOF("Warning: %s baseclass %s not in bindings", name.CString(), baseclassname.CString());
+                    if (!i)
+                    {
+                        ATOMIC_LOGINFOF("Warning: %s first baseclass %s not in bindings", name.CString(), baseclassname.CString());
+                    }
                 }
             }
             else
