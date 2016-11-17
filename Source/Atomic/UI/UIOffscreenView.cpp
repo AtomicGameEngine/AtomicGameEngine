@@ -225,39 +225,39 @@ static inline SPECIAL_KEY GetSpecialKey(int keycode)
     return specialKey;
 }
 
-void UIOffscreenView::InvokeRightPointerDown(int x, int y, int click_count, int qualifiers, bool super)
+void UIOffscreenView::InvokeRightPointerDown(int x, int y, int click_count, int qualifiers, bool superDown)
 {
-    widget_->InvokeRightPointerDown(x, y, click_count, GetModifierKeys(qualifiers, super));
+    widget_->InvokeRightPointerDown(x, y, click_count, GetModifierKeys(qualifiers, superDown));
 }
 
-void UIOffscreenView::InvokeRightPointerUp(int x, int y, int qualifiers, bool super)
+void UIOffscreenView::InvokeRightPointerUp(int x, int y, int qualifiers, bool superDown)
 {
-    widget_->InvokeRightPointerUp(x, y, GetModifierKeys(qualifiers, super));
+    widget_->InvokeRightPointerUp(x, y, GetModifierKeys(qualifiers, superDown));
 }
 
-void UIOffscreenView::InvokePointerDown(int x, int y, int click_count, int qualifiers, bool touch, int touchId, bool super)
+void UIOffscreenView::InvokePointerDown(int x, int y, int click_count, int qualifiers, bool touch, int touchId, bool superDown)
 {
-    widget_->InvokePointerDown(x, y, click_count, GetModifierKeys(qualifiers, super), touch, touchId);
+    widget_->InvokePointerDown(x, y, click_count, GetModifierKeys(qualifiers, superDown), touch, touchId);
 }
 
-void UIOffscreenView::InvokePointerUp(int x, int y, int qualifiers, bool touch, int touchId, bool super)
+void UIOffscreenView::InvokePointerUp(int x, int y, int qualifiers, bool touch, int touchId, bool superDown)
 {
-    widget_->InvokePointerUp(x, y, GetModifierKeys(qualifiers, super), touch, touchId);
+    widget_->InvokePointerUp(x, y, GetModifierKeys(qualifiers, superDown), touch, touchId);
 }
 
-void UIOffscreenView::InvokePointerMove(int x, int y, int qualifiers, bool touch, int touchId, bool super)
+void UIOffscreenView::InvokePointerMove(int x, int y, int qualifiers, bool touch, int touchId, bool superDown)
 {
-    widget_->InvokePointerMove(x, y, GetModifierKeys(qualifiers, super), touch, touchId);
+    widget_->InvokePointerMove(x, y, GetModifierKeys(qualifiers, superDown), touch, touchId);
 }
 
-void UIOffscreenView::InvokeWheel(int x, int y, int delta_x, int delta_y, int qualifiers, bool super)
+void UIOffscreenView::InvokeWheel(int x, int y, int delta_x, int delta_y, int qualifiers, bool superDown)
 {
-    widget_->InvokeWheel(x, y, delta_x, delta_y, GetModifierKeys(qualifiers, super));
+    widget_->InvokeWheel(x, y, delta_x, delta_y, GetModifierKeys(qualifiers, superDown));
 }
 
-bool UIOffscreenView::InvokeKey(int key, int keycode, bool down, int qualifiers, bool super)
+bool UIOffscreenView::InvokeKey(int key, int keycode, bool down, int qualifiers, bool superDown)
 {
-    return widget_->InvokeKey(key, GetSpecialKey(keycode), GetModifierKeys(qualifiers, super), down);
+    return widget_->InvokeKey(key, GetSpecialKey(keycode), GetModifierKeys(qualifiers, superDown), down);
 }
 
 }
