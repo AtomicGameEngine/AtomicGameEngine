@@ -26,14 +26,17 @@
 
 #include "../Core/Object.h"
 #include "../UI/UIBatch.h"
+#include "../Container/HashSet.h"
 
 namespace Atomic
 {
 
+class RenderSurface;
 class VertexBuffer;
 class UIRenderer;
 class UIWidget;
 class UIPopupWindow;
+class UIOffscreenView;
 
 namespace SystemUI
 {
@@ -52,13 +55,14 @@ public:
     virtual ~UI();
 
     tb::TBWidget* GetRootWidget() { return rootWidget_; }
+    HashSet<UIOffscreenView*>* GetOffscreenViews() { return &offscreenViews_; }
     bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
 
     void SetKeyboardDisabled(bool disabled) {keyboardDisabled_ = disabled; }
     void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 
-    void Render(bool resetRenderTargets = true);
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    void Render();
+    static void GetBatches(PODVector<UIBatch>* batches, PODVector<float>* vertexData, tb::TBWidget* rootWidget, UIRenderer* renderer, bool clearBatches = true, bool clearVertexData = true);
     void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
     void Initialize(const String& languageFile);
@@ -116,6 +120,10 @@ public:
 
     UIWidget* GetHoveredWidget();
 
+    UIOffscreenView* FindOffscreenViewAtScreenPosition(const IntVector2& screenPos, IntVector2& viewPos);
+
+    tb::TBWidget* GetInternalWidgetAndProjectedPositionFor(const IntVector2& screenPos, IntVector2& viewPos);
+
     // Debugging
     static void DebugShowSettingsWindow(UIWidget* parent);
 
@@ -128,8 +136,8 @@ private:
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
 
-    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
-    void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
+    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd, RenderSurface* renderSurface, bool clearRenderSurface);
+    static void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
 
     // TBWidgetListener
     void OnWidgetDelete(tb::TBWidget *widget);
@@ -140,6 +148,7 @@ private:
 
 
     tb::TBWidget* rootWidget_;
+    HashSet<UIOffscreenView*> offscreenViews_;
     UIRenderer* renderer_;
 
     /// UI rendering batches.
@@ -165,6 +174,8 @@ private:
     bool exitRequested_;
     
     float tooltipHoverTime_;
+
+    bool InvokeKey(unsigned key, unsigned special_key, unsigned modifierkeys, bool keydown);
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
