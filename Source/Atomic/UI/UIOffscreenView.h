@@ -35,6 +35,8 @@
 namespace Atomic
 {
 
+class UI;
+
 /// a root widget that renders offscreen
 class UIOffscreenView : public UIWidget
 {
