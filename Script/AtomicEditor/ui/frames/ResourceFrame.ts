@@ -167,13 +167,6 @@ class ResourceFrame extends ScriptWidget {
 
         var closedIndex = editors.indexOf(editor.fullPath);
 
-        if (editor.typeName == "SceneEditor3D") {
-
-            this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: (<Editor.SceneEditor3D> null) });
-
-        }
-
-
         // remove from lookup
         delete this.editors[editor.fullPath];
 
