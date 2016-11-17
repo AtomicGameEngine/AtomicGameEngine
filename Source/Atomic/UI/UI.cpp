@@ -87,6 +87,7 @@ using namespace tb;
 #include "UISlider.h"
 #include "UIColorWidget.h"
 #include "UIColorWheel.h"
+#include "UIOffscreenView.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -312,13 +313,23 @@ void UI::AddFont(const String& fontFile, const String& name)
     tb::g_font_manager->AddFontInfo(fontFile.CString(), name.CString());
 }
 
-void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd, RenderSurface* renderSurface, bool clearRenderSurface)
 {
-
     if (batches.Empty())
         return;
 
-    Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
+    Vector2 invScreenSize;
+    if (renderSurface)
+    {
+        invScreenSize.x_ = 1.0f / (float)renderSurface->GetWidth();
+        invScreenSize.y_ = 1.0f / (float)renderSurface->GetHeight();
+    }
+    else
+    {
+        invScreenSize.x_ = 1.0f / (float)graphics_->GetWidth();
+        invScreenSize.y_ = 1.0f / (float)graphics_->GetHeight();
+    }
+
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
     Vector2 offset(-1.0f, 1.0f);
 
@@ -340,6 +351,12 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetStencilTest(false);
 
     graphics_->ResetRenderTargets();
+
+    if (renderSurface)
+        graphics_->SetRenderTarget(0, renderSurface);
+
+    if (clearRenderSurface)
+        graphics_->Clear(Atomic::CLEAR_COLOR);
 
     graphics_->SetVertexBuffer(buffer);
 
@@ -410,11 +427,26 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
 }
 
 
-void UI::Render(bool resetRenderTargets)
+void UI::Render()
 {
-    SetVertexData(vertexBuffer_, vertexData_);
-    Render(vertexBuffer_, batches_, 0, batches_.Size());
+    // Render the off-screen root widgets.
+    for (HashSet<UIOffscreenView*>::Iterator i = offscreenViews_.Begin(); i != offscreenViews_.End(); ++i)
+    {
+        UIOffscreenView* view = *i;
 
+        // Create a vertex buffer for the view, if it doesn't already exist.
+        if (view->vertexBuffer_.Null())
+            view->vertexBuffer_ = vertexBuffer_ = new VertexBuffer(context_);
+
+        SetVertexData(view->vertexBuffer_, view->vertexData_);
+        Render(view->vertexBuffer_, view->batches_, 0, view->batches_.Size(), view->GetRenderSurface(), view->GetClearRenderTargetEachFrame());
+    }
+
+    // Render the on-screen root widget.
+    SetVertexData(vertexBuffer_, vertexData_);
+    Render(vertexBuffer_, batches_, 0, batches_.Size(), 0, false);
+
+    // Render the SystemUI (probably going away at some point).
     SystemUI::SystemUI* systemUI = GetSubsystem<SystemUI::SystemUI>();
     if (systemUI)
         systemUI->Render();
@@ -422,35 +454,38 @@ void UI::Render(bool resetRenderTargets)
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Get rendering batches from the non-modal UI elements
-    batches_.Clear();
-    vertexData_.Clear();
-
-    tb::TBRect rect = rootWidget_->GetRect();
-
-    IntRect currentScissor = IntRect(0, 0, rect.w, rect.h);
-    GetBatches(batches_, vertexData_, currentScissor);
-
-}
-
-void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
-{
-    //if (!initialized_)
-    //    return;
-
     TBAnimationManager::Update();
 
-    rootWidget_->InvokeProcessStates();
-    rootWidget_->InvokeProcess();
+    // Render the off-screen root widgets.
+    for (HashSet<UIOffscreenView*>::Iterator i = offscreenViews_.Begin(); i != offscreenViews_.End(); ++i)
+    {
+        UIOffscreenView* view = *i;
+        GetBatches(&view->batches_, &view->vertexData_, view->widget_, renderer_);
+    }
 
-    tb::g_renderer->BeginPaint(rootWidget_->GetRect().w, rootWidget_->GetRect().h);
+    // Render the on-screen root widget.
+    GetBatches(&batches_, &vertexData_, rootWidget_, renderer_);
+}
 
-    renderer_->currentScissor_ = currentScissor;
-    renderer_->batches_ = &batches;
-    renderer_->vertexData_ = &vertexData;
-    rootWidget_->InvokePaint(tb::TBWidget::PaintProps());
+void UI::GetBatches(PODVector<UIBatch>* batches, PODVector<float>* vertexData, tb::TBWidget* rootWidget, UIRenderer* renderer, bool clearBatches, bool clearVertexData)
+{
+    if (clearBatches)
+        batches->Clear();
+    if (clearVertexData)
+        vertexData->Clear();
 
-    tb::g_renderer->EndPaint();
+    rootWidget->InvokeProcessStates();
+    rootWidget->InvokeProcess();
+
+    tb::TBRect rect = rootWidget->GetRect();
+    renderer->BeginPaint(rect.w, rect.h);
+
+    renderer->currentScissor_ = IntRect(0, 0, rect.w, rect.h);
+    renderer->batches_ = batches;
+    renderer->vertexData_ = vertexData;
+    rootWidget->InvokePaint(tb::TBWidget::PaintProps());
+
+    renderer->EndPaint();
 }
 
 void UI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
@@ -621,19 +656,22 @@ void UI::PruneUnreachableWidgets()
 
         itr.GotoNext();
 
-        VariantMap eventData;
-        eventData[WidgetDeleted::P_WIDGET] = (UIWidget*) (*itr).second_;
-        (*itr).second_->SendEvent(E_WIDGETDELETED, eventData);
+        if (itr->second_.Null())
+            continue;
 
-        tb::TBWidget* toDelete = (*itr).first_;
+        VariantMap eventData;
+        eventData[WidgetDeleted::P_WIDGET] = (UIWidget*) itr->second_;
+        itr->second_->SendEvent(E_WIDGETDELETED, eventData);
+
+        tb::TBWidget* toDelete = itr->first_;
         UnwrapWidget(toDelete);
         delete toDelete;
-
     }
 }
 
 void UI::WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget)
 {
+    assert (widget);
     assert (!widgetWrap_.Contains(tbwidget));
     widgetWrap_[tbwidget] = widget;
 }
@@ -946,20 +984,20 @@ void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
 
 SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String& message)
 {
-
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
 
     SystemUI::MessageBox* messageBox = new SystemUI::MessageBox(context_, message, title, 0, xmlFile);
 
     return messageBox;
-
-
 }
 
 UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
 {
-    return WrapWidget(rootWidget_->GetWidgetAt(x, y, include_children));
+    IntVector2 viewPos;
+    tb::TBWidget* widget = GetInternalWidgetAndProjectedPositionFor(IntVector2(x, y), viewPos);
+
+    return WrapWidget(widget->GetWidgetAt(viewPos.x_, viewPos.y_, include_children));
 }
 
 bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
