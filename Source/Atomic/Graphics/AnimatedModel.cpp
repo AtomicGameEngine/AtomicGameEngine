@@ -1043,8 +1043,12 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
 {
     if (isMaster_)
     {
+        // ATOMIC BEGIN
+        // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1166
         // Note: do not update bone bounding box here, instead do it in either of the threaded updates
-        worldBoundingBox_ = boneBoundingBox_.Transformed(node_->GetWorldTransform());
+        if (context_->GetEditorContext())
+            worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
+        // ATOMIC END
     }
     else
     {
