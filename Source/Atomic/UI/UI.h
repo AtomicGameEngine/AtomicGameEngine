@@ -55,7 +55,7 @@ public:
     virtual ~UI();
 
     tb::TBWidget* GetRootWidget() { return rootWidget_; }
-    HashSet<UIOffscreenView*>* GetOffscreenViews() { return &offscreenViews_; }
+    HashSet<UIOffscreenView*>& GetOffscreenViews() { return offscreenViews_; }
     bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
 
     void SetKeyboardDisabled(bool disabled) {keyboardDisabled_ = disabled; }
@@ -120,9 +120,8 @@ public:
 
     UIWidget* GetHoveredWidget();
 
-    UIOffscreenView* FindOffscreenViewAtScreenPosition(const IntVector2& screenPos, IntVector2& viewPos);
-
-    tb::TBWidget* GetInternalWidgetAndProjectedPositionFor(const IntVector2& screenPos, IntVector2& viewPos);
+    /// Give the screen position, and get back a view. viewPos is the projected positiion in the returned view's space.
+    UIOffscreenView* GetOffscreenViewAtScreenPosition(const IntVector2& screenPos, IntVector2& viewPos);
 
     // Debugging
     static void DebugShowSettingsWindow(UIWidget* parent);
@@ -132,6 +131,8 @@ private:
     static WeakPtr<Context> uiContext_;
     static void TBFileReader(const char* filename, void** data, unsigned* length);
     static void TBIDRegisterStringCallback(unsigned id, const char* value);
+
+    tb::TBWidget* GetInternalWidgetProjectedPosition(const IntVector2& screenPos, IntVector2& viewPos);
 
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);

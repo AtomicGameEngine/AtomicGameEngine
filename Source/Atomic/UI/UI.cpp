@@ -995,9 +995,13 @@ SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String
 UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
 {
     IntVector2 viewPos;
-    tb::TBWidget* widget = GetInternalWidgetAndProjectedPositionFor(IntVector2(x, y), viewPos);
+    tb::TBWidget* root = GetInternalWidgetProjectedPosition(IntVector2(x, y), viewPos);
+    tb::TBWidget* widget = root->GetWidgetAt(viewPos.x_, viewPos.y_, include_children);
 
-    return WrapWidget(widget->GetWidgetAt(viewPos.x_, viewPos.y_, include_children));
+    if (!widget)
+        return nullptr;
+
+    return WrapWidget(widget);
 }
 
 bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)

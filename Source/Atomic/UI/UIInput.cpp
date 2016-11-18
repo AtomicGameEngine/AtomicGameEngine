@@ -37,7 +37,7 @@ using namespace tb;
 namespace Atomic
 {
 
-static inline MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
+MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
 {
     MODIFIER_KEYS code = TB_MODIFIER_NONE;
     if (qualifiers & QUAL_ALT)   code |= TB_ALT;
@@ -45,6 +45,100 @@ static inline MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
     if (qualifiers & QUAL_SHIFT) code |= TB_SHIFT;
     if (superKey)                code |= TB_SUPER;
     return code;
+}
+
+SPECIAL_KEY GetSpecialKey(int keycode)
+{
+    SPECIAL_KEY specialKey;
+
+    switch (keycode)
+    {
+    case KEY_RETURN:
+    case KEY_RETURN2:
+    case KEY_KP_ENTER:
+        specialKey = TB_KEY_ENTER;
+        break;
+    case KEY_F1:
+        specialKey = TB_KEY_F1;
+        break;
+    case KEY_F2:
+        specialKey = TB_KEY_F2;
+        break;
+    case KEY_F3:
+        specialKey = TB_KEY_F3;
+        break;
+    case KEY_F4:
+        specialKey = TB_KEY_F4;
+        break;
+    case KEY_F5:
+        specialKey = TB_KEY_F5;
+        break;
+    case KEY_F6:
+        specialKey = TB_KEY_F6;
+        break;
+    case KEY_F7:
+        specialKey = TB_KEY_F7;
+        break;
+    case KEY_F8:
+        specialKey = TB_KEY_F8;
+        break;
+    case KEY_F9:
+        specialKey = TB_KEY_F9;
+        break;
+    case KEY_F10:
+        specialKey = TB_KEY_F10;
+        break;
+    case KEY_F11:
+        specialKey = TB_KEY_F11;
+        break;
+    case KEY_F12:
+        specialKey = TB_KEY_F12;
+        break;
+    case KEY_LEFT:
+        specialKey = TB_KEY_LEFT;
+        break;
+    case KEY_UP:
+        specialKey = TB_KEY_UP;
+        break;
+    case KEY_RIGHT:
+        specialKey = TB_KEY_RIGHT;
+        break;
+    case KEY_DOWN:
+        specialKey = TB_KEY_DOWN;
+        break;
+    case KEY_PAGEUP:
+        specialKey = TB_KEY_PAGE_UP;
+        break;
+    case KEY_PAGEDOWN:
+        specialKey = TB_KEY_PAGE_DOWN;
+        break;
+    case KEY_HOME:
+        specialKey = TB_KEY_HOME;
+        break;
+    case KEY_END:
+        specialKey = TB_KEY_END;
+        break;
+    case KEY_INSERT:
+        specialKey = TB_KEY_INSERT;
+        break;
+    case KEY_TAB:
+        specialKey = TB_KEY_TAB;
+        break;
+    case KEY_DELETE:
+        specialKey = TB_KEY_DELETE;
+        break;
+    case KEY_BACKSPACE:
+        specialKey = TB_KEY_BACKSPACE;
+        break;
+    case KEY_ESCAPE:
+        specialKey = TB_KEY_ESC;
+        break;
+    default:
+        specialKey = TB_KEY_UNDEFINED;
+        break;
+    }
+
+    return specialKey;
 }
 
 
@@ -56,7 +150,7 @@ static int toupr_ascii(int ascii)
     return ascii;
 }
 
-UIOffscreenView* UI::FindOffscreenViewAtScreenPosition(const IntVector2& screenPos, IntVector2& viewPos)
+UIOffscreenView* UI::GetOffscreenViewAtScreenPosition(const IntVector2& screenPos, IntVector2& viewPos)
 {
     for (HashSet<UIOffscreenView*>::Iterator it = offscreenViews_.Begin(); it != offscreenViews_.End(); ++it)
     {
@@ -96,9 +190,9 @@ UIOffscreenView* UI::FindOffscreenViewAtScreenPosition(const IntVector2& screenP
     return nullptr;
 }
 
-tb::TBWidget* UI::GetInternalWidgetAndProjectedPositionFor(const IntVector2& screenPos, IntVector2& viewPos)
+tb::TBWidget* UI::GetInternalWidgetProjectedPosition(const IntVector2& screenPos, IntVector2& viewPos)
 {
-    UIOffscreenView* osView = FindOffscreenViewAtScreenPosition(screenPos, viewPos);
+    UIOffscreenView* osView = GetOffscreenViewAtScreenPosition(screenPos, viewPos);
     if (osView)
         return osView->GetInternalWidget();
 
@@ -144,7 +238,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     if (button == MOUSEB_RIGHT)
         widget->InvokeRightPointerDown(viewPos.x_, viewPos.y_, counter, mod);
@@ -177,7 +271,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     if (button == MOUSEB_RIGHT)
         widget->InvokeRightPointerUp(viewPos.x_, viewPos.y_, mod);
@@ -199,7 +293,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     widget->InvokePointerMove(viewPos.x_, viewPos.y_, tb::TB_MODIFIER_NONE, false);
 
@@ -220,7 +314,7 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     widget->InvokeWheel(viewPos.x_, viewPos.y_, 0, -delta, tb::TB_MODIFIER_NONE);
 }
@@ -251,7 +345,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     widget->InvokePointerDown(viewPos.x_, viewPos.y_, counter, TB_MODIFIER_NONE, true, touchId);
 }
@@ -268,7 +362,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     widget->InvokePointerMove(viewPos.x_, viewPos.y_, TB_MODIFIER_NONE, true, touchId);
 }
@@ -285,7 +379,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 
 
     IntVector2 viewPos;
-    tb::TBWidget* widget = UI::GetInternalWidgetAndProjectedPositionFor(pos, viewPos);
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
 
     widget->InvokePointerUp(viewPos.x_, viewPos.y_, TB_MODIFIER_NONE, true, touchId);
 }
@@ -424,91 +518,7 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
 #endif
     MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
 
-    SPECIAL_KEY specialKey = TB_KEY_UNDEFINED;
-
-    switch (keycode)
-    {
-    case KEY_RETURN:
-    case KEY_RETURN2:
-    case KEY_KP_ENTER:
-        specialKey =  TB_KEY_ENTER;
-        break;
-    case KEY_F1:
-        specialKey = TB_KEY_F1;
-        break;
-    case KEY_F2:
-        specialKey = TB_KEY_F2;
-        break;
-    case KEY_F3:
-        specialKey = TB_KEY_F3;
-        break;
-    case KEY_F4:
-        specialKey = TB_KEY_F4;
-        break;
-    case KEY_F5:
-        specialKey = TB_KEY_F5;
-        break;
-    case KEY_F6:
-        specialKey = TB_KEY_F6;
-        break;
-    case KEY_F7:
-        specialKey = TB_KEY_F7;
-        break;
-    case KEY_F8:
-        specialKey = TB_KEY_F8;
-        break;
-    case KEY_F9:
-        specialKey = TB_KEY_F9;
-        break;
-    case KEY_F10:
-        specialKey = TB_KEY_F10;
-        break;
-    case KEY_F11:
-        specialKey = TB_KEY_F11;
-        break;
-    case KEY_F12:
-        specialKey = TB_KEY_F12;
-        break;
-    case KEY_LEFT:
-        specialKey = TB_KEY_LEFT;
-        break;
-    case KEY_UP:
-        specialKey = TB_KEY_UP;
-        break;
-    case KEY_RIGHT:
-        specialKey = TB_KEY_RIGHT;
-        break;
-    case KEY_DOWN:
-        specialKey = TB_KEY_DOWN;
-        break;
-    case KEY_PAGEUP:
-        specialKey = TB_KEY_PAGE_UP;
-        break;
-    case KEY_PAGEDOWN:
-        specialKey = TB_KEY_PAGE_DOWN;
-        break;
-    case KEY_HOME:
-        specialKey = TB_KEY_HOME;
-        break;
-    case KEY_END:
-        specialKey = TB_KEY_END;
-        break;
-    case KEY_INSERT:
-        specialKey = TB_KEY_INSERT;
-        break;
-    case KEY_TAB:
-        specialKey = TB_KEY_TAB;
-        break;
-    case KEY_DELETE:
-        specialKey = TB_KEY_DELETE;
-        break;
-    case KEY_BACKSPACE:
-        specialKey = TB_KEY_BACKSPACE;
-        break;
-    case KEY_ESCAPE:
-        specialKey =  TB_KEY_ESC;
-        break;
-    }
+    SPECIAL_KEY specialKey = GetSpecialKey(keycode);
 
     if (specialKey == TB_KEY_UNDEFINED)
     {

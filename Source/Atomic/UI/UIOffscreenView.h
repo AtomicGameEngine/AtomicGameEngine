@@ -73,17 +73,17 @@ public:
     /// Set wether to clear the render target each frame.
     void SetClearRenderTargetEachFrame(bool clear) { clearRenderTargetEachFrame_ = clear; }
     /// Save PNG to a serializer.
-    bool SavePNGTo(Serializer& dest) const;
+    bool SavePNG(Serializer& dest) const;
     /// Save PNG to a file.
     bool SavePNG(const String& fileName) const;
 
-    void InvokeRightPointerDown(int x, int y, int click_count, int qualifiers, bool superDown = false);
-    void InvokeRightPointerUp(int x, int y, int qualifiers, bool superDown = false);
-    void InvokePointerDown(int x, int y, int click_count, int qualifiers, bool touch, int touchId, bool superDown = false);
-    void InvokePointerUp(int x, int y, int qualifiers, bool touch, int touchId, bool superDown = false);
-    void InvokePointerMove(int x, int y, int qualifiers, bool touch, int touchId, bool superDown = false);
-    void InvokeWheel(int x, int y, int delta_x, int delta_y, int qualifiers, bool superDown = false);
-    bool InvokeKey(int key, int keycode, bool down, int qualifiers, bool superDown = false);
+    void InvokeRightPointerDown(int x, int y, int click_count, int qualifiers, bool superKeyDown = false);
+    void InvokeRightPointerUp(int x, int y, int qualifiers, bool superKeyDown = false);
+    void InvokePointerDown(int x, int y, int click_count, int qualifiers, bool touch, int touchId, bool superKeyDown = false);
+    void InvokePointerUp(int x, int y, int qualifiers, bool touch, int touchId, bool superKeyDown = false);
+    void InvokePointerMove(int x, int y, int qualifiers, bool touch, int touchId, bool superKeyDown = false);
+    void InvokeWheel(int x, int y, int delta_x, int delta_y, int qualifiers, bool superKeyDown = false);
+    bool InvokeKey(int key, int keycode, bool down, int qualifiers, bool superKeyDown = false);
 
 protected:
 
