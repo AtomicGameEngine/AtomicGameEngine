@@ -1,9 +1,9 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D)
+                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
+                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
+                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D)
 
 # TODO: Look into the application-extension flag for iOS
 #if (IOS)
@@ -11,7 +11,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 #    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fapplication-extension")
 #endif()
 
-set (CSATOMICDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/CSharp/Packages/")
+set (CSATOMICDIR "${ATOMIC_SOURCE_DIR}/Artifacts/Build/Source/Generated/CSharp/Packages/")
 
 file (GLOB CSHARP_BINDINGS_SOURCE ${CSATOMICDIR}/Atomic/Native/*.cpp ${CSATOMICDIR}/Atomic/Native/*.h
                                   ${CSATOMICDIR}/AtomicNETNative/Native/*.cpp ${CSATOMICDIR}/AtomicNETNative/Native/*.h
@@ -27,8 +27,8 @@ if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
 endif()
 
 if (ANDROID)
-	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
-	set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+	include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/include)
+	set (SOURCE_FILES ${SOURCE_FILES} ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 endif()
 
 add_library(AtomicNETNative SHARED ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE})
@@ -55,7 +55,7 @@ if (APPLE)
         set_target_properties(AtomicNETNative PROPERTIES
           FRAMEWORK TRUE
           MACOSX_FRAMEWORK_IDENTIFIER com.atomicgameengine.atomicnetframework
-          MACOSX_FRAMEWORK_INFO_PLIST ${CMAKE_SOURCE_DIR}/Build/CMake/IOS/AtomicNET.framework.plist
+          MACOSX_FRAMEWORK_INFO_PLIST ${ATOMIC_SOURCE_DIR}/Build/CMake/IOS/AtomicNET.framework.plist
           # PUBLIC_HEADER dynamicFramework.h
           XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
         )
@@ -80,7 +80,7 @@ elseif(ANDROID)
     set (ATOMICNET_NATIVE_PLATFORM Android)
 endif()
 
-set (ATOMICNET_NATIVE_DIR "${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>/Native/${ATOMICNET_NATIVE_PLATFORM}")
+set (ATOMICNET_NATIVE_DIR "${ATOMIC_SOURCE_DIR}/Artifacts/AtomicNET/$<$<CONFIG:debug>:Debug>$<$<CONFIG:release>:Release>/Native/${ATOMICNET_NATIVE_PLATFORM}")
 
 if (NOT IOS)
 

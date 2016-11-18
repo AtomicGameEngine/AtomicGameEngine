@@ -203,3 +203,19 @@ macro (setup_executable)
     setup_target ()
 
 endmacro ()
+
+macro (include_directories_exported)
+    include_directories(${ARGV})
+    set (ATOMIC_INCLUDE_DIRS ${ATOMIC_INCLUDE_DIRS} ${ARGV} CACHE INTERNAL "Atomic game engine include directories" FORCE)
+endmacro ()
+
+macro (add_definitions_exported)
+    add_definitions(${ARGV})
+    set (ATOMIC_DEFINITIONS ${ATOMIC_DEFINITIONS} ${ARGV} CACHE INTERNAL "Atomic game engine definitions" FORCE)
+endmacro ()
+
+macro (add_link_libraries_exported)
+    set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} ${ARGV} CACHE INTERNAL "Atomic game engine link libraries" FORCE)
+endmacro ()
+
+
