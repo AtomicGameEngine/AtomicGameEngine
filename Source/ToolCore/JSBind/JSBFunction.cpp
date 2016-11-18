@@ -53,11 +53,15 @@ void JSBFunction::Process()
     // if not already marked as a getter
     if (!isGetter_)
     {
-        if (!parameters_.Size() && returnType_)
+        // Check for whether this is a property getter function
+        // IsObject is special as we don't want a property to it
+        if (!parameters_.Size() && returnType_ && name_ != "IsObject")
         {
-            if (name_.Length() > 3 && name_.StartsWith("Get") && isupper(name_[3]))
+            if ((name_.Length() > 3 && name_.StartsWith("Get") && isupper(name_[3])) ||
+                (name_.Length() > 2 && name_.StartsWith("Is") && isupper(name_[2])) )
             {
-                String pname = name_.Substring(3);
+                String pname = name_.Substring(name_.StartsWith("Get") ? 3 : 2);
+
                 class_->SetSkipFunction(pname);
                 isGetter_ = true;
                 propertyName_ = pname;
