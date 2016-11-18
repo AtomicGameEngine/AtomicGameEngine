@@ -85,7 +85,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    handleNodeContextMenu(target: Atomic.UIWidget, refid: string): boolean {
+    handleNodeContextMenu(target: Atomic.UIWidget, refid: string, editor: Editor.SceneEditor3D): boolean {
 
         if (target.id == "node context menu") {
 
@@ -105,6 +105,8 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                 scene.sendEvent("SceneEditNodeRemoved", { node: node, parent: node.parent, scene: scene });
                 node.remove();
                 scene.sendEvent("SceneEditAddRemoveNodes", { end: true });
+
+                editor.selection.delete();
 
                 return true;
 

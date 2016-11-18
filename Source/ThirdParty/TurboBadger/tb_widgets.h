@@ -461,6 +461,12 @@ public:
     void SetOpacity(float opacity);
     float GetOpacity() const { return m_opacity; }
 
+    /** Set opacity for this widget and its children from 0.0 - 1.0 when in WIDGET_STATE_DISABLED.
+    If disabled opacity is < 0, default skin opacity will be used.
+    If opacity is 0 (invisible), the widget won't receive any input. */
+    void SetDisabledOpacity(float opacity);
+    float GetDisabledOpacity() const { return m_disabledOpacity; }
+
     /** Set visibility for this widget and its children.
         If visibility is not WIDGET_VISIBILITY_VISIBLE, the widget won't receive any input. */
     void SetVisibilility(WIDGET_VISIBILITY vis);
@@ -1020,6 +1026,7 @@ private:
     TBWidgetValueConnection m_connection; ///< TBWidget value connection
     TBLinkListOf<TBWidgetListener> m_listeners;	///< List of listeners
     float m_opacity;				///< Opacity 0-1. See SetOpacity.
+    float m_disabledOpacity;		///< Opacity 0-1. See SetDisabledOpacity.
     WIDGET_STATE m_state;			///< The widget state (excluding any auto states)
     WIDGET_GRAVITY m_gravity;		///< The layout gravity setting.
     TBFontDescription m_font_desc;	///< The font description.
