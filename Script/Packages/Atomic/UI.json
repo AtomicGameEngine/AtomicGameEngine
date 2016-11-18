@@ -12,6 +12,9 @@
 								"UIScrollContainer", "UISeparator", "UIDimmer", "UISelectDropdown", "UISlider",
 								"UIOffscreenView"],
 	"overloads" : {
+		"UIOffscreenView": {
+			"SavePNG": ["String"]
+		}
 	},
 	"typescript_decl" : {
 
