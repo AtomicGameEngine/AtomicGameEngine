@@ -177,6 +177,25 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
         if (ev.ref_id == TBIDC("close"))
         {
             RequestClose();
+        } else if (ev.ref_id == TBIDC("paste")) {
+            // Paste needs to be handled here due to permissions in the web client that don't allow paste to be called from JavaScript.
+            // The others can be passed directly to the editor and be handled there
+            webClient_->SendFocusEvent(true);
+            webClient_->ShortcutPaste();
+        } else if (ev.ref_id == TBIDC("undo")) {
+            webClient_->SendFocusEvent(true);
+            webClient_->ShortcutUndo();
+        } else if (ev.ref_id == TBIDC("redo")) {
+            webClient_->SendFocusEvent(true);
+            webClient_->ShortcutRedo();
+        } else {
+            String shortcut;
+            UI* ui = GetSubsystem<UI>();
+            ui->GetTBIDString(ev.ref_id, shortcut);
+
+            webClient_->SendFocusEvent();
+            //webClient_->SendKeyEvent(Atomicjkb);
+            webClient_->ExecuteJavaScript(ToString("HOST_invokeShortcut(\"%s\");", shortcut.CString()));
         }
     }
 

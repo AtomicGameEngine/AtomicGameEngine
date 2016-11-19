@@ -33,7 +33,7 @@ import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventN
 export function configure(fileExt: string, filename: string) {
 
     // converter to handle new version of the renderWhitespace setting
-    const renderWhitespaceAdapter = (setting): 'none' | 'boundary' | 'all' => {
+    const renderWhitespaceAdapter = (setting): "none" | "boundary" | "all" => {
         switch (setting.toLowerCase()) {
             case "true": return "all";
             case "false": return "none";
@@ -153,4 +153,47 @@ export function preferencesChanged(prefs: Editor.ClientExtensions.PreferencesCha
 
 export function setEditor(editor: any) {
     internalEditor.setInternalEditor(editor);
+}
+
+/**
+ * Called when the editor should respond to a host shortcut command
+ */
+export function invokeShortcut(shortcut: Editor.EditorShortcutType) {
+
+    const ed = internalEditor.getInternalEditor();
+    // Execute in the next cycle
+    window.setTimeout(() => {
+
+        ed.focus();
+        switch (shortcut) {
+            case "cut":
+            case "copy":
+            case "undo":
+            case "redo":
+                window.document.execCommand(shortcut);
+                break;
+
+            case "selectall":
+                ed.setSelection(ed.getModel().getFullModelRange());
+                break;
+        }
+    }, 100);
+
+
+    /*
+case "undo":
+    cmd = ed["cursor"]["_handlers"]["undo"];
+    ed.executeCommand("Atomic", cmd);
+    break;
+    //ed.executeCommand("Atomic", ))
+    // ed.executeCommand("Atomic", "undo");
+case "redo":
+    cmd = ed["cursor"]["_handlers"]["redo"];
+    ed.executeCommand("Atomic", cmd);
+    break;
+    */
+    //const sel = ed.getSelection();
+    //if (!sel.isEmpty()) {
+    //const s = ed.getModel().getValueInRange(sel);
+    //}
 }

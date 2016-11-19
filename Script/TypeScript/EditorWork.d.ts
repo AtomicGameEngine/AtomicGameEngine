@@ -514,3 +514,10 @@ declare module Editor.ClientExtensions {
         addCustomHostRoutine(routineName: string, callback: (...any) => void);
     }
 }
+
+declare module Editor {
+    /**
+     * Valid editor shortcuts that can be called from menus
+     */
+    export type EditorShortcutType = "cut" | "copy" | "paste" | "undo" | "redo" | "close" | "frameselected" | "selectall";
+}
