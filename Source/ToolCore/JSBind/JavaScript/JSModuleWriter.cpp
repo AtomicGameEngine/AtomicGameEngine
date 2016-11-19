@@ -243,8 +243,12 @@ void JSModuleWriter::WriteModulePreInit(String& source)
     Vector<String> constants = module_->constants_.Keys();
 
     for (unsigned i = 0; i < constants.Size(); i++)
-    {
-        source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", constants.At(i).CString());
+    {       // use char primitive type to signify a const string constant 
+        if ( module_->constants_[ constants.At(i) ].type->ToString() == "char" )
+            source.AppendWithFormat("duk_push_string(ctx, \"%s\");\n", constants.At(i).CString() );
+        else
+            source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", constants.At(i).CString());
+
         source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n", constants.At(i).CString());
     }
 
