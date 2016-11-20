@@ -112,6 +112,12 @@
                 interop.getInstance().invokeShortcut(shortcut);
             });
         }
+
+        function HOST_formatCode() {
+            setupEditor.then((interop) => {
+                interop.getInstance().formatCode();
+            });
+        }
     </script>
 
 </body>

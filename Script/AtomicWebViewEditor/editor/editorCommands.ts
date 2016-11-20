@@ -56,6 +56,10 @@ export function configure(fileExt: string, filename: string) {
         filename: filename,
         editor: monacoEditor
     });
+    
+    // Override CMD/CTRL+I since that is going to be used for Format Code and in the editor it is assigned to something else
+    monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I, null, null);
+
 }
 
 /**
@@ -156,12 +160,21 @@ export function setEditor(editor: any) {
 }
 
 /**
+ * Called when a resource is getting deleted
+ * @param  {string} path
+ */
+export function formatCode() {
+    serviceLocator.sendEvent(ClientExtensionEventNames.FormatCodeEvent, null);
+}
+
+/**
  * Called when the editor should respond to a host shortcut command
  */
 export function invokeShortcut(shortcut: Editor.EditorShortcutType) {
 
     const ed = internalEditor.getInternalEditor();
     ed.focus();
+
     switch (shortcut) {
         case "cut":
         case "copy":

@@ -234,4 +234,11 @@ export default class HostInteropType {
     invokeShortcut(shortcut: Editor.EditorShortcutType) {
        editorCommands.invokeShortcut(shortcut);
     }
+
+    /**
+     * Format the code inside the editor
+     */
+    formatCode() {
+        editorCommands.formatCode();
+    }
 }

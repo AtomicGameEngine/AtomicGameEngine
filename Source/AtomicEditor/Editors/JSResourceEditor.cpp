@@ -167,7 +167,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
 
 void JSResourceEditor::FormatCode()
 {
-    //webClient_->ExecuteJavaScript("beautifyCode();");
+    webClient_->ExecuteJavaScript("HOST_formatCode();");
 }
 
 bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)

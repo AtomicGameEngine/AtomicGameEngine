@@ -420,6 +420,7 @@ declare module Editor.ClientExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
         projectUnloaded?();
+        formatCode?();
         preferencesChanged?(preferences: PreferencesChangedEventData);
     }
 

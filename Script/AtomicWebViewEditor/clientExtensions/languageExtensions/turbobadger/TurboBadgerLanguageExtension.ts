@@ -28,6 +28,7 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
     description: string = "TurboBadger language services for the editor.";
 
     private serviceLocator: Editor.ClientExtensions.ClientServiceLocator;
+    private active = false;
 
     /**
     * Initialize the language service
@@ -54,7 +55,7 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-
+            this.active = true;
             monaco.languages.register({ id: "turbobadger" });
             // TODO: set up syntax hilighter
             // monaco.languages.setMonarchTokensProvider("turbobadger", this.getTokensProvider());
@@ -78,6 +79,15 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
             editor.getModel().updateOptions({
                 insertSpaces: false
             });
+        }
+    }
+
+    /**
+     * Format the code
+     */
+    formatCode() {
+        if (this.active) {
+            alert("Code formatted not available for this syntax.");
         }
     }
 }

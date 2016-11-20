@@ -27,6 +27,9 @@ export default class JavascriptLanguageExtension implements Editor.ClientExtensi
     name: string = "ClientJavascriptLanguageExtension";
     description: string = "Javascript language services for the editor.";
 
+    private editor: monaco.editor.IStandaloneCodeEditor;
+    private active = false;
+
     private serviceLocator: Editor.ClientExtensions.ClientServiceLocator;
 
     /**
@@ -55,14 +58,18 @@ export default class JavascriptLanguageExtension implements Editor.ClientExtensi
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            // TODO: configure the editor
-            //let editor = <AceAjax.Editor>ev.editor;
-            //editor.session.setMode("ace/mode/javascript");
-
-            //editor.setOptions({
-                //enableBasicAutocompletion: true,
-                //enableLiveAutocompletion: true
-            //});
+            this.editor = ev.editor; // cache this so that we can reference it later
+            this.active = true;
+        } else {
+            this.active = false;
         }
+    }
+
+    /**
+     * Format the code
+     * @memberOf JavascriptLanguageExtension
+     */
+    formatCode() {
+        // do nothing.  This is being handled by the TypeScriptLanguageExtension
     }
 }
