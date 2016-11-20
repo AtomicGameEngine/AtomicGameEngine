@@ -711,6 +711,9 @@ void Engine::DumpMemory()
 
 void Engine::Update()
 {
+    if (exiting_)
+        return;
+    
     ATOMIC_PROFILE(Update);
 
     // Logic update event
@@ -732,6 +735,9 @@ void Engine::Update()
 
 void Engine::Render()
 {
+    if ( exiting_ )
+        return;
+
     if (headless_)
         return;
 
