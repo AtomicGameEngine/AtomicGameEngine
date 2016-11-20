@@ -168,7 +168,6 @@ class Shortcuts extends Atomic.ScriptObject {
         if (!ToolCore.toolSystem.project) return;
         var resourceFrame = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
         if (resourceFrame) {
-            resourceFrame.setFocus();
             resourceFrame.invokeShortcut(shortcut);
         }
     }

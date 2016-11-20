@@ -161,39 +161,16 @@ export function setEditor(editor: any) {
 export function invokeShortcut(shortcut: Editor.EditorShortcutType) {
 
     const ed = internalEditor.getInternalEditor();
-    // Execute in the next cycle
-    window.setTimeout(() => {
+    ed.focus();
+    switch (shortcut) {
+        case "cut":
+        case "copy":
+        case "paste":
+            window.document.execCommand(shortcut);
+            break;
 
-        ed.focus();
-        switch (shortcut) {
-            case "cut":
-            case "copy":
-            case "undo":
-            case "redo":
-                window.document.execCommand(shortcut);
-                break;
-
-            case "selectall":
-                ed.setSelection(ed.getModel().getFullModelRange());
-                break;
-        }
-    }, 100);
-
-
-    /*
-case "undo":
-    cmd = ed["cursor"]["_handlers"]["undo"];
-    ed.executeCommand("Atomic", cmd);
-    break;
-    //ed.executeCommand("Atomic", ))
-    // ed.executeCommand("Atomic", "undo");
-case "redo":
-    cmd = ed["cursor"]["_handlers"]["redo"];
-    ed.executeCommand("Atomic", cmd);
-    break;
-    */
-    //const sel = ed.getSelection();
-    //if (!sel.isEmpty()) {
-    //const s = ed.getModel().getValueInRange(sel);
-    //}
+        case "selectall":
+            ed.setSelection(ed.getModel().getFullModelRange());
+            break;
+    }
 }

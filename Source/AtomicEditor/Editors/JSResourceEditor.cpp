@@ -177,24 +177,38 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
         if (ev.ref_id == TBIDC("close"))
         {
             RequestClose();
-        } else if (ev.ref_id == TBIDC("paste")) {
-            // Paste needs to be handled here due to permissions in the web client that don't allow paste to be called from JavaScript.
-            // The others can be passed directly to the editor and be handled there
-            webClient_->SendFocusEvent(true);
-            webClient_->ShortcutPaste();
         } else if (ev.ref_id == TBIDC("undo")) {
-            webClient_->SendFocusEvent(true);
-            webClient_->ShortcutUndo();
+            // Need to physically send the CTRL/CMD+Z to the browser so that
+            // the internal editor responds appropriately.  The browser UNDO doesn't fire off
+            // the right events inside the editor.
+            VariantMap map;
+            map[KeyUp::P_KEY] = KEY_Z;
+            map[KeyUp::P_SCANCODE] = SCANCODE_Z;
+            #ifdef ATOMIC_PLATFORM_OSX
+            map["ForceSuperDown"] = true;
+            #else
+            map[KeyUp::P_QUALIFIERS] = QUAL_CTRL;
+            #endif
+            webClient_->SendKeyEvent( StringHash("KeyDown"), map);
         } else if (ev.ref_id == TBIDC("redo")) {
-            webClient_->SendFocusEvent(true);
-            webClient_->ShortcutRedo();
+            // Need to physically send the CTRL/CMD+SHIFT+Z to the browser so that
+            // the internal editor responds appropriately.  The browser REDO doesn't fire off
+            // the right events inside the editor.
+            VariantMap map;
+            map[KeyUp::P_KEY] = KEY_Z;
+            map[KeyUp::P_SCANCODE] = SCANCODE_Z;
+            #ifdef ATOMIC_PLATFORM_OSX
+            map[KeyUp::P_QUALIFIERS] = QUAL_SHIFT;
+            map["ForceSuperDown"] = true;
+            #else
+            map[KeyUp::P_QUALIFIERS] = QUAL_SHIFT | QUAL_CTRL;
+            #endif
+            webClient_->SendKeyEvent( StringHash("KeyDown"), map);
         } else {
             String shortcut;
             UI* ui = GetSubsystem<UI>();
             ui->GetTBIDString(ev.ref_id, shortcut);
 
-            webClient_->SendFocusEvent();
-            //webClient_->SendKeyEvent(Atomicjkb);
             webClient_->ExecuteJavaScript(ToString("HOST_invokeShortcut(\"%s\");", shortcut.CString()));
         }
     }
