@@ -45,6 +45,10 @@ static int Node_CreateJSComponent(duk_context* ctx)
 {
     String path = duk_require_string(ctx, 0);
 
+    if (Atomic::GetExtension(path).Empty()) {
+        path += ".js";
+    }
+
     bool hasArgs = false;
     int argIdx = -1;
     if (duk_get_top(ctx) > 1 && duk_is_object(ctx, 1))
