@@ -1,8 +1,8 @@
-include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Assimp/include
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
+include_directories (${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
+                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Assimp/include
+                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/nativefiledialog
+                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
 
 add_definitions(-DCPLUSPLUS_WITHOUT_QT -DCURL_STATICLIB)
 

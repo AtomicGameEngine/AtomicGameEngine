@@ -3,7 +3,7 @@ find_program(CLDOC cldoc)
 if(CLDOC)
 
     get_property(include_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-    get_directory_property( DEFS DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS )
+    get_directory_property( DEFS DIRECTORY ${ATOMIC_SOURCE_DIR} COMPILE_DEFINITIONS )
     
     FOREACH(infileName ${include_dirs})
         LIST(APPEND DOC_INCLUDES "-I${infileName}")
@@ -21,7 +21,7 @@ if(CLDOC)
 
     MESSAGE(STATUS "Enabling documentation for: " ${COMPNAME})
 
-    SET(doc_args generate ${CXX_LIST} ${C_LIST} -std=c++11 -DATOMIC_DEV_BUILD=1 ${DOC_DEFINES} ${DOC_INCLUDES} -- --type html --language c++ --output ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicDocs )
+    SET(doc_args generate ${CXX_LIST} ${C_LIST} -std=c++11 -DATOMIC_DEV_BUILD=1 ${DOC_DEFINES} ${DOC_INCLUDES} -- --type html --language c++ --output ${ATOMIC_SOURCE_DIR}/Artifacts/Build/AtomicDocs )
 
     LIST( APPEND doc_args ${SOURCE_FILES} )
 

@@ -1,13 +1,6 @@
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/WebSocketPP/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/ASIO/include)
+include_directories(${ATOMIC_INCLUDE_DIRS})
+include_directories_exported(${CMAKE_CURRENT_SOURCE_DIR})
 
 file (GLOB CONTAINER_SOURCE Container/*.cpp Container/*.h)
 file (GLOB CORE_SOURCE Core/*.cpp Core/*.h)

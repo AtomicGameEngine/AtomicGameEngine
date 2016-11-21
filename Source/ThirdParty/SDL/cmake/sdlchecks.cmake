@@ -104,7 +104,9 @@ endmacro()
 macro(CheckOSS)
   if(OSS)
     # Urho3D - bug fix - should use different variables for different checks, however, we replace the whole checks with find_package() approach for consistency sake
-    find_package (OSS)
+    # ATOMIC BEGIN
+    find_package (OSS QUIET)    # silence warnings
+    # ATOMIC END
     if(OSS_FOUND)
       include_directories (${OSS_INCLUDE_DIRS})
       if (OSS_LIBRARIES)
@@ -132,7 +134,9 @@ endmacro()
 macro(CheckALSA)
   if(ALSA)
     # Urho3D - bug fix - use the more trusted FindALSA module as it has been tested to work for both native and cross-compiling build
-    find_package (ALSA)
+    # ATOMIC BEGIN
+    find_package (ALSA QUIET)    # silence warnings
+    # ATOMIC END
     # todo: remove this fix when the minimum CMake version has been raised to higher than 2.8.7
     # There is a bug in older version of FindALSA.cmake module where it erroneously include 'alsa' directory component into the variable
     # For cross-compiling build to work correctly, this extra directory component must be removed
@@ -169,7 +173,9 @@ endmacro()
 macro(CheckPulseAudio)
   if(PULSEAUDIO)
     # Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (PulseAudio)
+    # ATOMIC BEGIN
+    find_package (PulseAudio QUIET)    # silence warnings
+    # ATOMIC END
     if(PULSEAUDIO_FOUND)
       include_directories (${PULSEAUDIO_INCLUDE_DIRS})
       set(HAVE_PULSEAUDIO TRUE)
@@ -201,7 +207,9 @@ endmacro()
 macro(CheckESD)
   if(ESD)
     # Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (Esound)
+    # ATOMIC BEGIN 
+    find_package (Esound QUIET)    # silence warnings
+    # ATOMIC END
     if(ESOUND_FOUND)
       include_directories (${ESOUND_INCLUDE_DIRS})
       set(HAVE_ESD TRUE)
@@ -232,7 +240,9 @@ endmacro()
 macro(CheckARTS)
   if(ARTS)
     # Urho3D - bug fix - do not use (host) arts-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (aRts)
+    # ATOMIC BEGIN 
+    find_package (aRts QUIET)    # silence warnings
+    # ATOMIC END
     if(ARTS_FOUND)
       include_directories (${ARTS_INCLUDE_DIRS})
       file(GLOB ARTS_SOURCES ${SDL2_SOURCE_DIR}/src/audio/arts/*.c)
@@ -263,7 +273,9 @@ endmacro()
 macro(CheckNAS)
   if(NAS)
     # Urho3D - bug fix - do not use check_include_file() for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (NetworkAudioSystem)
+    # ATOMIC BEGIN 
+    find_package (NetworkAudioSystem QUIET)    # silence warnings
+    # ATOMIC END
     if(NAS_FOUND)
       include_directories (${NAS_INCLUDE_DIRS})
       set(HAVE_NAS TRUE)
@@ -294,7 +306,9 @@ endmacro()
 macro(CheckSNDIO)
   if(SNDIO)
     # Urho3D - bug fix - do not use check_include_file() for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (RoarAudio)
+    # ATOMIC BEGIN 
+    find_package (RoarAudio QUIET)    # silence warnings
+    # ATOMIC END
     if(SNDIO_FOUND)
       include_directories (${SNDIO_INCLUDE_DIRS})
       set(HAVE_SNDIO TRUE)
@@ -325,7 +339,9 @@ endmacro()
 macro(CheckFusionSound)
   if(FUSIONSOUND)
     # Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (FusionSound 1.0.0)
+    # ATOMIC BEGIN
+    find_package (FusionSound 1.0.0 QUIET)    # silence warnings
+    # ATOMIC END
     if(FUSIONSOUND_FOUND)
       include_directories (${FUSIONSOUND_INCLUDE_DIRS})
       set(HAVE_FUSIONSOUND TRUE)
@@ -552,7 +568,9 @@ endmacro()
 macro(CheckMir)
     if(VIDEO_MIR)
         # Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-        find_package (Mir)
+        # ATOMIC BEGIN 
+        find_package (Mir QUIET)    # silence warnings
+        # ATOMIC END
         if (MIR_FOUND)
             include_directories (${MIR_INCLUDE_DIRS})
             set(HAVE_VIDEO_MIR TRUE)
@@ -588,7 +606,9 @@ endmacro()
 macro(CheckWayland)
   if(VIDEO_WAYLAND)
     # Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (Wayland)
+    # ATOMIC BEGIN 
+    find_package (Wayland QUIET)    # silence warnings
+    # ATOMIC END
     if(WAYLAND_FOUND)
       include_directories (${WAYLAND_INCLUDE_DIRS})
       set(HAVE_VIDEO_WAYLAND TRUE)
@@ -635,7 +655,9 @@ endmacro()
 macro(CheckDirectFB)
   if(VIDEO_DIRECTFB)
     # Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
-    find_package (DirectFB 1.0.0)
+    # ATOMIC BEGIN
+    find_package (DirectFB 1.0.0 QUIET)    # silence warnings
+    # ATOMIC END
     if(DIRECTFB_FOUND)
       include_directories (${DIRECTFB_INCLUDE_DIRS})
       set(HAVE_VIDEO_DIRECTFB TRUE)

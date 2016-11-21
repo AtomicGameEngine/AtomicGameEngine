@@ -25,12 +25,12 @@ elseif(EMSCRIPTEN)
 
 endif()
 
-set (JAVASCRIPT_BINDINGS_PLATFORM_ROOT "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated")
+set (JAVASCRIPT_BINDINGS_PLATFORM_ROOT "${ATOMIC_SOURCE_DIR}/Artifacts/Build/Source/Generated")
 
 if(NOT EXISTS "${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/Javascript")
 
 execute_process ( COMMAND ${ATOMIC_NODE_JAKE};build:precreateScriptBindings[${JAVASCRIPT_BINDINGS_PLATFORM}]
-                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" )
+                  WORKING_DIRECTORY "${ATOMIC_SOURCE_DIR}" )
 
 endif()
 

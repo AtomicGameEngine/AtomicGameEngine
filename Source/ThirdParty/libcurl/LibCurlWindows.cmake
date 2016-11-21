@@ -1,5 +1,5 @@
 
-include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/zlib)
+include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/zlib)
 
 if (ATOMIC_PROJECT_ARCH STREQUAL "x86")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/32bit)
