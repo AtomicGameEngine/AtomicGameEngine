@@ -294,10 +294,22 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         if (this.active) {
             const action = this.editor.getAction("editor.action.format");
             if (action && action.isSupported()) {
+                let wasEmpty = false;
+                let cursorPosition;
+
                 if (this.editor.getSelection().isEmpty()) {
+                    wasEmpty = true;
+                    cursorPosition = this.editor.getPosition();
+
                     this.editor.setSelection(this.editor.getModel().getFullModelRange());
                 }
-                action.run();
+
+                action.run().then(() => {
+                    // Make sure we put the cursor back to where it was
+                    if (wasEmpty && cursorPosition) {
+                        this.editor.setPosition(cursorPosition);
+                    }
+                });
             }
         }
     }
