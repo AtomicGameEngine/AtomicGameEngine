@@ -210,6 +210,7 @@ public:
     void D3D9Blit(const IntRect& dstRect, unsigned char* src, unsigned srcStride, bool discard = false)
     {
 #ifndef ATOMIC_D3D11
+#ifndef ATOMIC_OPENGL
 
         RECT d3dRect;
 
@@ -242,12 +243,14 @@ public:
 
         object->UnlockRect(level);
 #endif
+#endif
     }
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
 #ifndef ATOMIC_D3D11
+#ifndef ATOMIC_OPENGL
 
         if (type == PET_VIEW)
         {
@@ -302,6 +305,7 @@ public:
 
         }
 
+#endif
 #endif
 
     }
