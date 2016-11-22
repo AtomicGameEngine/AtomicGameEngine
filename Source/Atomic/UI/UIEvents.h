@@ -66,6 +66,15 @@ ATOMIC_EVENT(E_WIDGETFOCUSCHANGED, WidgetFocusChanged)
 }
 
 
+ATOMIC_EVENT(E_WIDGETRESIZED, WidgetResized)
+{
+    ATOMIC_PARAM(P_WIDGET, Widget);        // UIWidget pointer
+    ATOMIC_PARAM(P_WIDTH, Width);          // int
+    ATOMIC_PARAM(P_HEIGHT, Height);        // int
+    ATOMIC_PARAM(P_OLDWIDTH, OldWidth);    // int
+    ATOMIC_PARAM(P_OLDHEIGHT, OldHeight);  // int
+}
+
 ATOMIC_EVENT(E_WIDGETDELETED, WidgetDeleted)
 {
     ATOMIC_PARAM(P_WIDGET, Widget);             // UIWidget pointer

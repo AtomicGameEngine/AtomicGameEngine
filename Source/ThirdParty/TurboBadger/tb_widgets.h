@@ -350,6 +350,7 @@ public:
     virtual bool OnEvent(const TBWidgetEvent &ev) = 0;
     virtual void OnFocusChanged(bool focused) = 0;
     virtual void OnDelete() = 0;
+    virtual void OnResized(int oldWidth, int oldHeight) = 0;
 };
 
 /** The base TBWidget class.

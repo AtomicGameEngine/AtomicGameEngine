@@ -482,6 +482,11 @@ void TBLayout::OnResized(int old_w, int old_h)
     InvalidateLayout(INVALIDATE_LAYOUT_TARGET_ONLY);
     SizeConstraints sc(GetRect().w, GetRect().h);
     ValidateLayout(sc);
+
+    TBWidgetDelegate* delegate = GetDelegate();
+
+    if (delegate)
+        delegate->OnResized(old_w, old_h);
 }
 
 void TBLayout::OnInflateChild(TBWidget *child)

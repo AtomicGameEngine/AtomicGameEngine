@@ -1,0 +1,42 @@
+definitions
+	menubutton
+		lp: height: 28, width: 28
+		skin TBButton.uniformflat
+TBLayout: distribution: gravity, spacing: 4
+	TBButton
+		@include definitions>menubutton
+		TBSkinImage: skin: PlayButton, id: skin_image
+		id maintoolbar_play
+		tooltip Play project
+	TBButton
+		@include definitions>menubutton
+		TBSkinImage: skin: PauseButton, id: skin_image
+		id maintoolbar_pause
+		tooltip Pause/Resume playing project
+	TBButton
+		@include definitions>menubutton
+		TBSkinImage: skin: StepButton, id: skin_image
+		id maintoolbar_step
+		tooltip Step paused project 1 frame
+	TBLayout: gravity: left right
+		TBWidget	
+	TBButton: toggle-mode: 1
+		@include definitions>menubutton
+		TBSkinImage: skin: 3DTranslateBitmap
+		id 3d_translate
+		tooltip Translate
+	TBButton: toggle-mode: 1
+		@include definitions>menubutton
+		TBSkinImage: skin: 3DRotateBitmap
+		id 3d_rotate
+		tooltip Rotate
+	TBButton: toggle-mode: 1
+		@include definitions>menubutton
+		TBSkinImage: skin: 3DScaleBitmap
+		id 3d_scale
+		tooltip Scale
+	TBButton: toggle-mode: 1
+		lp: width: 64
+		text: "Local"
+		id 3d_axismode
+		tooltip Effect world or local object

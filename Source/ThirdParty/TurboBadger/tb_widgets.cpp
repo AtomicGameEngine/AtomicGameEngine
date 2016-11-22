@@ -890,6 +890,9 @@ void TBWidget::OnResized(int old_w, int old_h)
 
         child->SetRect(rect);
     }
+
+    if (m_delegate)
+        m_delegate->OnResized(old_w, old_h);
 }
 
 void TBWidget::OnInflateChild(TBWidget *child)

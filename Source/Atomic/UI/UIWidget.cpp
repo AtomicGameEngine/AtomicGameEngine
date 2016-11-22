@@ -1204,4 +1204,18 @@ IntVector2 UIWidget::ConvertFromRoot(const IntVector2 position) const
     return result;
 }
 
+void UIWidget::OnResized(int oldWidth, int oldHeight)
+{
+    VariantMap eventData;
+
+    using namespace WidgetResized;
+    eventData[P_WIDGET] = this;
+    eventData[P_WIDTH] = widget_->GetRect().w;
+    eventData[P_HEIGHT] = widget_->GetRect().h;
+    eventData[P_OLDWIDTH] = oldWidth;
+    eventData[P_OLDHEIGHT] = oldHeight;
+
+    SendEvent(E_WIDGETRESIZED, eventData);
+}
+
 }

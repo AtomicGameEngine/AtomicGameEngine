@@ -21,6 +21,28 @@
 //
 import EditorEvents = require("../../editor/EditorEvents");
 
+class SceneToolbar extends Atomic.UIWidget {
+
+    constructor(parent: Atomic.UIWidget) {
+
+        super();
+
+        this.load("AtomicEditor/editor/ui/scenetoolbar.tb.txt");
+
+        parent.addChild(this);
+
+        this.subscribeToEvent(parent, "WidgetResized", (ev:Atomic.UIWidgetResizedEvent) => {
+
+          this.setPosition(0,0);
+          this.setSize(parent.width, 32);
+
+        });
+
+    }
+}
+
+
+
 export default class Scene3dResourceEditorBuilder implements Editor.Extensions.ResourceEditorBuilder {
 
     canHandleResource(resourcePath: string) : boolean {
@@ -28,9 +50,12 @@ export default class Scene3dResourceEditorBuilder implements Editor.Extensions.R
         return ext == ".scene";
     }
 
-    getEditor(resourceFram: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor {
+    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor {
 
         const editor = new Editor.SceneEditor3D(resourcePath, tabContainer);
+
+        let toolbar = new SceneToolbar(editor.sceneView3D);
+
         editor.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: editor });
 
         return editor;

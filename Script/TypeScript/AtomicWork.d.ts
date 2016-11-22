@@ -192,6 +192,14 @@ declare module Atomic {
         widget: UIWidget;
     }
 
+    export interface UIWidgetResizedEvent {
+        widget: UIWidget;
+        height: number;
+        width: number;
+        oldWidth: number;
+        oldHeight: number;
+    }
+
     export interface UIWidgetDeletedEvent {
 
         widget: UIWidget;

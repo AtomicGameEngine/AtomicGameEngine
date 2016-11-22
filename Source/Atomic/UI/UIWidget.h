@@ -212,8 +212,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
 
     /// Set focus to first widget which accepts it
-    void SetFocusRecursive();
-    void OnFocusChanged(bool focused);
+    void SetFocusRecursive();    
 
     void SetState(UI_WIDGET_STATE state, bool on);
     bool GetState(UI_WIDGET_STATE state);
@@ -332,8 +331,12 @@ protected:
 
     void SetWidget(tb::TBWidget* widget);
 
+    // TBWidgetDelegate methods
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
     virtual void OnDelete();
+    void OnFocusChanged(bool focused);
+    virtual void OnResized(int oldWidth, int oldHeight);
+
 
     String id_;
     tb::TBWidget* widget_;
