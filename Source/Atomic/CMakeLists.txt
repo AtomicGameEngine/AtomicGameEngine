@@ -32,9 +32,11 @@ endif()
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
 
 if (MSVC)
-    if (ATOMIC_D3D11)
+    if (ATOMIC_D3D11) #DirectX 11
       file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
-    else()
+    elseif (ATOMIC_OPENGL) #OpenGL
+	  file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
+	else() #DirectX 9
       file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
     endif()
 else()
