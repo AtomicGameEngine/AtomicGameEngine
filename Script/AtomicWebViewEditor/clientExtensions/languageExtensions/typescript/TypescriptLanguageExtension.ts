@@ -131,6 +131,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
+            let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
+            this.editor = editor; // cache this so that we can reference it later
             this.active = true;
 
             this.overrideBuiltinServiceProviders();
@@ -143,8 +145,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
             this.filename = ev.filename;
 
-            let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
-            this.editor = editor; // cache this so that we can reference it later
             // Let's turn some things off in the editor.  These will be provided by the shared web worker
             if (this.isJsFile(ev.filename)) {
                 monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
@@ -284,6 +284,33 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     saveFile(event: WorkerProcessTypes.SaveMessageData) {
         if (this.active) {
             this.serviceLocator.clientServices.getHostInterop().saveFile(event.filename, event.code);
+        }
+    }
+
+    /**
+     * Format the code
+     */
+    formatCode() {
+        if (this.active) {
+            const action = this.editor.getAction("editor.action.format");
+            if (action && action.isSupported()) {
+                let wasEmpty = false;
+                let cursorPosition;
+
+                if (this.editor.getSelection().isEmpty()) {
+                    wasEmpty = true;
+                    cursorPosition = this.editor.getPosition();
+
+                    this.editor.setSelection(this.editor.getModel().getFullModelRange());
+                }
+
+                action.run().then(() => {
+                    // Make sure we put the cursor back to where it was
+                    if (wasEmpty && cursorPosition) {
+                        this.editor.setPosition(cursorPosition);
+                    }
+                });
+            }
         }
     }
 

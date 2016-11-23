@@ -38,7 +38,7 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     //this should be moved somewhere else...
-    invokePlayOrStopPlayer(debug:boolean = false) {
+    invokePlayOrStopPlayer(debug: boolean = false) {
         this.sendEvent(EditorEvents.SaveAllResources);
         if (Atomic.editorMode.isPlayerEnabled()) {
             this.sendEvent("IPCPlayerExitRequest");
@@ -63,8 +63,8 @@ class Shortcuts extends Atomic.ScriptObject {
 
                         let pos = Atomic.graphics.windowPosition;
 
-                        playerWindow.x = pos[0] + (Atomic.graphics.width/2 - playerWindow.width/2);
-                        playerWindow.y = pos[1] + (Atomic.graphics.height/2 - playerWindow.height/2);
+                        playerWindow.x = pos[0] + (Atomic.graphics.width / 2 - playerWindow.width / 2);
+                        playerWindow.y = pos[1] + (Atomic.graphics.height / 2 - playerWindow.height / 2);
 
                         // if too small a window, use default (which maximizes)
                         if (playerWindow.width < 480) {
@@ -164,7 +164,7 @@ class Shortcuts extends Atomic.ScriptObject {
         }
     }
 
-    invokeResourceFrameShortcut(shortcut: string) {
+    invokeResourceFrameShortcut(shortcut: Editor.EditorShortcutType) {
         if (!ToolCore.toolSystem.project) return;
         var resourceFrame = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
         if (resourceFrame) {

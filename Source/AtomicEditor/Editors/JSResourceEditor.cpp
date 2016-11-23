@@ -167,7 +167,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
 
 void JSResourceEditor::FormatCode()
 {
-    //webClient_->ExecuteJavaScript("beautifyCode();");
+    webClient_->ExecuteJavaScript("HOST_formatCode();");
 }
 
 bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
@@ -177,6 +177,41 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
         if (ev.ref_id == TBIDC("close"))
         {
             RequestClose();
+        } else if (ev.ref_id == TBIDC("undo")) {
+            // Need to physically send the CTRL/CMD+Z to the browser so that
+            // the internal editor responds appropriately.  The browser UNDO doesn't fire off
+            // the right events inside the editor.
+            VariantMap map;
+            map[KeyUp::P_KEY] = KEY_Z;
+            map[KeyUp::P_SCANCODE] = SCANCODE_Z;
+            #ifdef ATOMIC_PLATFORM_OSX
+            map["ForceSuperDown"] = true;
+            #else
+            map[KeyUp::P_QUALIFIERS] = QUAL_CTRL;
+            webClient_->SendFocusEvent();
+            #endif
+            webClient_->SendKeyEvent( StringHash("KeyDown"), map);
+        } else if (ev.ref_id == TBIDC("redo")) {
+            // Need to physically send the CTRL/CMD+SHIFT+Z to the browser so that
+            // the internal editor responds appropriately.  The browser REDO doesn't fire off
+            // the right events inside the editor.
+            VariantMap map;
+            map[KeyUp::P_KEY] = KEY_Z;
+            map[KeyUp::P_SCANCODE] = SCANCODE_Z;
+            #ifdef ATOMIC_PLATFORM_OSX
+            map[KeyUp::P_QUALIFIERS] = QUAL_SHIFT;
+            map["ForceSuperDown"] = true;
+            #else
+            map[KeyUp::P_QUALIFIERS] = QUAL_SHIFT | QUAL_CTRL;
+            webClient_->SendFocusEvent();
+            #endif
+            webClient_->SendKeyEvent( StringHash("KeyDown"), map);
+        } else {
+            String shortcut;
+            UI* ui = GetSubsystem<UI>();
+            ui->GetTBIDString(ev.ref_id, shortcut);
+
+            webClient_->ExecuteJavaScript(ToString("HOST_invokeShortcut(\"%s\");", shortcut.CString()));
         }
     }
 

@@ -30,4 +30,5 @@ export default class ClientExtensionEventNames {
     static ResourceRenamedEvent = "ResourceRenamedEvent";
     static ResourceDeletedEvent = "ResourceDeletedEvent";
     static PreferencesChangedEvent = "PreferencesChangedEvent";
+    static FormatCodeEvent = "FormatCodeEvent";
 }
