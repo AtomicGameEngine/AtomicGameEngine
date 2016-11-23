@@ -27,6 +27,10 @@ function printHelp() {
     console.log("--with-android  : Build with Android platform support");
     console.log("--with-ios      : Build with iOS platform support");
     console.log("--with-web      : Build with Web platform support");
+if (os.platform() == "win32") {
+    console.log("--opengl        : Enable OpenGL renderer");
+    console.log("--d3d11         : Enable DirectX 11 renderer");
+}
     console.log("--debug         : Build debug version of the editor and associated platform runtimes");
     console.log("--noclean       : Do not clean before building, useful during development");
     console.log("--nonet         : Build without AtomicNET C# scripting support");
@@ -91,6 +95,37 @@ if (cmd == "buildeditor") {
             process.exit(1);
         }
     }
+
+    if (config["d3d11"] && config["opengl"]) {
+
+        if (os.platform() == "win32") {
+            console.log("\nBoth DirectX 11 and OpenGL flags specified. Please choose only one at a time.\nExiting...\n");
+            process.exit(1);
+        }
+    }
+
+    if (config["d3d11"]) {
+
+        if (os.platform() != "win32") {
+            console.log("\nDirectX 11 build requires Windows, exiting\n");
+            process.exit(1);
+        }
+        else {
+            console.log("\nDirectX 11 build selected.\n");
+        }
+    }
+
+
+    if (config["opengl"]) {
+
+        if (os.platform() != "win32") {
+            console.log("\nOpenGL flag ignored, OpenGL is default on non-Windows platforms anyway.\nContinuing...\n");
+        }
+        else {
+            console.log("\nOpenGL build selected.\n");
+        }
+    }
+
 
     buildTask.invoke();
 

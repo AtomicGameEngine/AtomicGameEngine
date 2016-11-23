@@ -18,10 +18,17 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS )
 
 add_link_libraries_exported(MojoShader user32 gdi32 winmm imm32 ole32 oleaut32 version uuid Ws2_32)
 
-if (ATOMIC_D3D11)
+if (ATOMIC_D3D11) #DirectX 11
     add_definitions_exported(-DATOMIC_D3D11)
     add_link_libraries_exported(d3d11 d3dcompiler dxguid)
-else()
+elseif(ATOMIC_OPENGL) #OpenGL
+	find_package(OpenGL REQUIRED)
+	include_directories(${OpenGL_INCLUDE_DIRS})
+	link_directories(${OpenGL_LIBRARY_DIRS})
+	add_definitions(${OpenGL_DEFINITIONS})
+	add_definitions (-DATOMIC_OPENGL -DGLEW_STATIC)
+	list (APPEND ATOMIC_LINK_LIBRARIES GLEW opengl32 glu32)
+else() #DirectX 9
     add_link_libraries_exported(d3d9 d3dcompiler)
 endif()
 

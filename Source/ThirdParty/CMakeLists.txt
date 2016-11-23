@@ -50,7 +50,7 @@ if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(libsquish)
 endif ()
 
-if (LINUX OR APPLE AND NOT IOS)
+if (LINUX OR APPLE OR ATOMIC_OPENGL AND NOT IOS)
     add_subdirectory(GLEW)
 endif()
 

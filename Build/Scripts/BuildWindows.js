@@ -136,6 +136,9 @@ namespace('build', function() {
         if (devBuild === undefined)
         devBuild = 1;
 
+        var opengl = config["opengl"] ? "ON" : "OFF"; 
+        var d3d11 = config["d3d11"] ? "ON" : "OFF"; 
+
         var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
 
         if (!fs.existsSync(slnRoot)) {
@@ -146,7 +149,7 @@ namespace('build', function() {
 
         var cmds = [];
 
-        cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild);
+        cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild + " " + opengl + " " + d3d11);
 
         jake.exec(cmds, function() {
 
