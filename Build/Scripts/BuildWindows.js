@@ -135,14 +135,9 @@ namespace('build', function() {
     }, function(devBuild) {
         if (devBuild === undefined)
         devBuild = 1;
-	
-	    var d3d11 = "OFF";
-		var opengl = "OFF";
-		
-	    if (config["opengl"])
-			opengl = "ON";
-		else if (config["d3d11"])
-			d3d11 = "ON";
+
+        var opengl = config["opengl"] ? "ON" : "OFF"; 
+        var d3d11 = config["d3d11"] ? "ON" : "OFF"; 
 
         var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
 
