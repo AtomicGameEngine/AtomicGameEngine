@@ -494,6 +494,10 @@ void Engine::RunFrame()
     time->BeginFrame(timeStep_);
 
 // ATOMIC BEGIN
+
+    if ( exiting_ ) // exit check for script event handlers
+        return;
+
     // If paused, or pause when minimized -mode is in use, stop updates and audio as necessary
     if ((paused_ && !runNextPausedFrame_) ||
         (pauseMinimized_ && input->IsMinimized()))
@@ -711,8 +715,6 @@ void Engine::DumpMemory()
 
 void Engine::Update()
 {
-    if (exiting_)
-        return;
     
     ATOMIC_PROFILE(Update);
 
@@ -735,8 +737,6 @@ void Engine::Update()
 
 void Engine::Render()
 {
-    if ( exiting_ )
-        return;
 
     if (headless_)
         return;
