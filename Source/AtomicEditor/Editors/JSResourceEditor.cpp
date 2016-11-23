@@ -188,7 +188,7 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
             map["ForceSuperDown"] = true;
             #else
             map[KeyUp::P_QUALIFIERS] = QUAL_CTRL;
-			webClient_->SendFocusEvent();
+            webClient_->SendFocusEvent();
             #endif
             webClient_->SendKeyEvent( StringHash("KeyDown"), map);
         } else if (ev.ref_id == TBIDC("redo")) {
@@ -203,7 +203,7 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
             map["ForceSuperDown"] = true;
             #else
             map[KeyUp::P_QUALIFIERS] = QUAL_SHIFT | QUAL_CTRL;
-			webClient_->SendFocusEvent();
+            webClient_->SendFocusEvent();
             #endif
             webClient_->SendKeyEvent( StringHash("KeyDown"), map);
         } else {
