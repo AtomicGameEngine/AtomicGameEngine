@@ -1,4 +1,6 @@
 
+include_directories_exported(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
 add_subdirectory(AtomicJS)

@@ -42,6 +42,8 @@ void TBWidget::OnInflate(const INFLATE_INFO &info)
 
     SetOpacity(info.node->GetValueFloat("opacity", GetOpacity()));
 
+    SetDisabledOpacity(info.node->GetValueFloat("disabled-Opacity", GetDisabledOpacity()));
+
     if (const char *text = info.node->GetValueString("text", nullptr))
         SetText(text);
 

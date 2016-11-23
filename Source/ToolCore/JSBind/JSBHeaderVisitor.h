@@ -568,6 +568,24 @@ public:
 
         Type* type = dtype.type();
 
+        if (type->isNamedType())
+        {
+            String classname = getNameString(type->asNamedType()->name());
+            if ( dtype.isConst() && classname == "String" )  // find a const string
+            {
+                const StringLiteral* sinit = decl->getInitializer();
+                if (sinit)
+                {
+                    if (sinit->chars())
+                    {
+                        String svalue = sinit->chars();
+                        module_->RegisterConstant(getNameString(decl->name()).CString(), svalue, JSBPrimitiveType::Char );
+                        return true;  // tag this constant as a Char type, because there is no String Primitive type
+                   }
+                }
+            }
+        }
+
         if (type->isPointerType() || type->isReferenceType())
             return true;
 

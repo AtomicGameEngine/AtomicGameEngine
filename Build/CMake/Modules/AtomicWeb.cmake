@@ -3,8 +3,7 @@ include(AtomicCommon)
 
 set (JAVASCRIPT_BINDINGS_PLATFORM "WEB")
 
-add_definitions(-DATOMIC_PLATFORM_WEB)
-add_definitions(-DATOMIC_OPENGL -Wno-warn-absolute-paths -DATOMIC_TBUI -DNO_POPEN)
+add_definitions_exported(-DATOMIC_PLATFORM_WEB -DATOMIC_OPENGL -DATOMIC_TBUI -DNO_POPEN)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -std=gnu++0x -Wno-warn-absolute-paths -Wno-unknown-warning-option")

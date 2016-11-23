@@ -33,7 +33,7 @@ import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventN
 export function configure(fileExt: string, filename: string) {
 
     // converter to handle new version of the renderWhitespace setting
-    const renderWhitespaceAdapter = (setting): 'none' | 'boundary' | 'all' => {
+    const renderWhitespaceAdapter = (setting): "none" | "boundary" | "all" => {
         switch (setting.toLowerCase()) {
             case "true": return "all";
             case "false": return "none";
@@ -56,6 +56,11 @@ export function configure(fileExt: string, filename: string) {
         filename: filename,
         editor: monacoEditor
     });
+
+    // Override CMD/CTRL+I since that is going to be used for Format Code and in the editor it is assigned to something else
+    const noOpCommand: monaco.editor.ICommandHandler = () => { };
+    monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I, noOpCommand, null);
+
 }
 
 /**
@@ -153,4 +158,33 @@ export function preferencesChanged(prefs: Editor.ClientExtensions.PreferencesCha
 
 export function setEditor(editor: any) {
     internalEditor.setInternalEditor(editor);
+}
+
+/**
+ * Called when a resource is getting deleted
+ * @param  {string} path
+ */
+export function formatCode() {
+    serviceLocator.sendEvent(ClientExtensionEventNames.FormatCodeEvent, null);
+}
+
+/**
+ * Called when the editor should respond to a host shortcut command
+ */
+export function invokeShortcut(shortcut: Editor.EditorShortcutType) {
+
+    const ed = internalEditor.getInternalEditor();
+    ed.focus();
+
+    switch (shortcut) {
+        case "cut":
+        case "copy":
+        case "paste":
+            window.document.execCommand(shortcut);
+            break;
+
+        case "selectall":
+            ed.setSelection(ed.getModel().getFullModelRange());
+            break;
+    }
 }

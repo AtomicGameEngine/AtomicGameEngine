@@ -70,7 +70,10 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
+        this.subscribeToEvent(EditorEvents.EditorResourceClose, (data) => this.handleEditorResourceClosed(data));
         this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
+
+        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
         // on mouse up clear the list's drag object
         this.subscribeToEvent("MouseButtonUp", () => {
@@ -191,19 +194,17 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     }
 
-    handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
+    setSceneEditor(sceneEditor:Editor.SceneEditor3D) {
+
+        if (this.sceneEditor == sceneEditor) {
+            return;
+        }
 
         if (this.scene)
             this.unsubscribeFromEvents(this.scene);
-
-        this.sceneEditor = null;
-        this.scene = null;
-
-        if (!event.sceneEditor)
-            return;
-
-        this.sceneEditor = event.sceneEditor;
-        this.scene = event.sceneEditor.scene;
+        
+        this.sceneEditor = sceneEditor;
+        this.scene = sceneEditor == null ? null : sceneEditor.scene;
 
         this.populate();
 
@@ -234,6 +235,20 @@ class HierarchyFrame extends Atomic.UIWidget {
 
 
         }
+        
+    }
+
+    handleEditorResourceClosed(event) {
+
+        if (this.sceneEditor == event.editor) {
+            this.setSceneEditor(null);
+        }
+
+    }
+    
+    handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
+
+        this.setSceneEditor(event.sceneEditor);
 
     }
 
@@ -444,7 +459,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         } else if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
-            if (this.menu.handleNodeContextMenu(data.target, data.refid)) {
+            if (this.menu.handleNodeContextMenu(data.target, data.refid, this.sceneEditor)) {
                 return true;
             }
 

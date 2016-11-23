@@ -1,6 +1,6 @@
 
 # If submodules aren't initialized, look for git and initialize
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF/.git OR NOT EXISTS ${CMAKE_SOURCE_DIR}/Submodules/AtomicExamples/.git)
+if (NOT EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF/.git OR NOT EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/AtomicExamples/.git)
 
     find_package(Git)
 
@@ -9,7 +9,7 @@ if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF/.git OR NOT EXISTS ${CMAKE_SOU
         message ("\n\nUpdating submodules, please wait...\n\n")
 
         execute_process( COMMAND ${GIT_EXECUTABLE} submodule update --init
-                         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                         WORKING_DIRECTORY ${ATOMIC_SOURCE_DIR}
                          RESULT_VARIABLE ATOMIC_GIT_STATUS )
 
         # check return status

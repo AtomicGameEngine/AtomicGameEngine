@@ -1,8 +1,8 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty)
+                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty)
 
-set (CSATOMICNETSCRIPTNATIVEDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/CSharp/Packages/AtomicNETScript/Native")
-set (JSATOMICNETSCRIPTDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/Javascript/Packages/AtomicNETScript")
+set (CSATOMICNETSCRIPTNATIVEDIR "${ATOMIC_SOURCE_DIR}/Artifacts/Build/Source/Generated/CSharp/Packages/AtomicNETScript/Native")
+set (JSATOMICNETSCRIPTDIR "${ATOMIC_SOURCE_DIR}/Artifacts/Build/Source/Generated/Javascript/Packages/AtomicNETScript")
 
 file ( GLOB ATOMICNETSCRIPT_BINDINGS_SOURCE ${CSATOMICNETSCRIPTNATIVEDIR}/*.cpp ${CSATOMICNETSCRIPTNATIVEDIR}/*.h
                                             ${JSATOMICNETSCRIPTDIR}/*.cpp ${JSATOMICNETSCRIPTDIR}/*.h )

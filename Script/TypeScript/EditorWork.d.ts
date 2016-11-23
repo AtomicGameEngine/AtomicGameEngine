@@ -420,6 +420,7 @@ declare module Editor.ClientExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
         projectUnloaded?();
+        formatCode?();
         preferencesChanged?(preferences: PreferencesChangedEventData);
     }
 
@@ -513,4 +514,11 @@ declare module Editor.ClientExtensions {
          */
         addCustomHostRoutine(routineName: string, callback: (...any) => void);
     }
+}
+
+declare module Editor {
+    /**
+     * Valid editor shortcuts that can be called from menus
+     */
+    export type EditorShortcutType = "cut" | "copy" | "paste" | "undo" | "redo" | "close" | "frameselected" | "selectall";
 }

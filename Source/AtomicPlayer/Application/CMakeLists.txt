@@ -1,10 +1,10 @@
 
-include_directories(${CMAKE_SOURCE_DIR}/Source)
-include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
-                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D )
+include_directories(${ATOMIC_SOURCE_DIR}/Source)
+include_directories ( ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
+                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
+                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D )
 
 # Define source files
 file (GLOB SOURCE_FILES *.cpp *.h )
@@ -13,20 +13,20 @@ file (GLOB SOURCE_FILES *.cpp *.h )
 
 if (MSVC)
     set (EXE_TYPE WIN32)
-    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
+    set (SOURCE_FILES ${SOURCE_FILES} ${ATOMIC_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
 elseif(APPLE)
     #ICNS
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
 if (NOT IOS)
-    set(ATOMIC_PLAYER_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
+    set(ATOMIC_PLAYER_ICON ${ATOMIC_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
 endif()
     set_source_files_properties(${ATOMIC_PLAYER_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set (EXE_TYPE MACOSX_BUNDLE)
 endif()
 
 if (ANDROID)
-	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
-	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+	include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/include)
+	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 else()
 
 # iOS AtomicPlayer currently disabled
@@ -66,7 +66,7 @@ if (APPLE)
 #      XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES NO
 #    )
 
-#    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/iOSBundleInfo.plist.template)
+#    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${ATOMIC_SOURCE_DIR}/Build/CMake/Modules/iOSBundleInfo.plist.template)
 
   endif()
 

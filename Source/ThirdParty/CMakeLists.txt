@@ -9,6 +9,16 @@ add_subdirectory(STB)
 add_subdirectory(TurboBadger)
 add_subdirectory(zlib)
 
+include_directories_exported(
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/WebSocketPP/include
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libcurl/include
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D
+    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/ASIO/include)
+
 if (NOT ATOMIC_BUILD_2D)
     add_subdirectory(Bullet)
     add_subdirectory(StanHull)

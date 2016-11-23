@@ -37,9 +37,9 @@
       "resolved": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
     },
     "dts-generator": {
-      "version": "1.7.0",
+      "version": "2.0.0",
       "from": "dts-generator@latest",
-      "resolved": "https://registry.npmjs.org/dts-generator/-/dts-generator-1.7.0.tgz",
+      "resolved": "https://registry.npmjs.org/dts-generator/-/dts-generator-2.0.0.tgz",
       "dependencies": {
         "glob": {
           "version": "7.0.0",
@@ -192,9 +192,9 @@
       "resolved": "https://registry.npmjs.org/tslint/-/tslint-3.2.1.tgz"
     },
     "typescript": {
-      "version": "1.8.10",
-      "from": "typescript@>=1.8.2 <2.0.0",
-      "resolved": "https://registry.npmjs.org/typescript/-/typescript-1.8.10.tgz"
+      "version": "2.0.3",
+      "from": "typescript@>=2.0.0 <2.1.0",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-2.0.3.tgz"
     },
     "underscore.string": {
       "version": "3.1.1",

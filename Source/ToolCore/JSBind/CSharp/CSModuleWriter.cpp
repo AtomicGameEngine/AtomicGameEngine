@@ -203,7 +203,9 @@ String CSModuleWriter::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
         return "int";
     if (ptype->kind_ == JSBPrimitiveType::Float)
         return "float";
-
+    if (ptype->kind_ == JSBPrimitiveType::Char)
+        return "string";  // it technically should return "char", but the
+                          // intent is really to support a string constant
     return "int";
 }
 
@@ -366,7 +368,11 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
                 }
             }
 
-            String line = "public const " + managedType + " " + cname + " = " + value;
+            String line = "public const " + managedType + " " + cname + " = ";
+
+            if (managedType == "string")
+              line = line + "\"" + value + "\"";
+            else line += value;
 
             if (managedType == "float" && !line.EndsWith("f") && IsDigit(line[line.Length()-1]))
                 line += "f";

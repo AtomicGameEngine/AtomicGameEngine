@@ -101,6 +101,7 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeSavedEvent, (ev) => this.saveCode(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.FormatCodeEvent, (ev) => this.formatCode());
     }
 
     /**
@@ -164,6 +165,22 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
                 // Verify that the service contains the appropriate methods and that it can handle the rename
                 if (service.rename) {
                     service.rename(ev);
+                }
+            } catch (e) {
+                alert(`Error detected in extension ${service.name}\n \n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called when the editor code should be formatted
+     */
+    formatCode() {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle the rename
+                if (service.formatCode) {
+                    service.formatCode();
                 }
             } catch (e) {
                 alert(`Error detected in extension ${service.name}\n \n ${e.stack}`);

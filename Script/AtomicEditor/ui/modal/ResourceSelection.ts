@@ -52,6 +52,8 @@ class ResourceSelection extends ModalWindow {
         this.setSize(800, 600);
         this.center();
 
+        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
     }
 
     //adjusted to delete current folderlist and replace with search list if search is activated
