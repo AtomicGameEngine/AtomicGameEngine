@@ -495,8 +495,9 @@ void Engine::RunFrame()
 
 // ATOMIC BEGIN
 
-    if ( exiting_ ) // exit check for script event handlers
-        return;
+    // check for exit again that comes in thru an event handler
+    if ( exiting_ ) // needed to prevent scripts running the 
+        return;     // current frame update with null objects
 
     // If paused, or pause when minimized -mode is in use, stop updates and audio as necessary
     if ((paused_ && !runNextPausedFrame_) ||
