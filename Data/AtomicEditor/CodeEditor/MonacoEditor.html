@@ -106,6 +106,18 @@
                 interop.getInstance().preferencesChanged(prefs);
             });
         }
+
+        function HOST_invokeShortcut(shortcut) {
+            setupEditor.then((interop) => {
+                interop.getInstance().invokeShortcut(shortcut);
+            });
+        }
+
+        function HOST_formatCode() {
+            setupEditor.then((interop) => {
+                interop.getInstance().formatCode();
+            });
+        }
     </script>
 
 </body>

@@ -226,4 +226,19 @@ export default class HostInteropType {
     setEditor(editor: any) {
         editorCommands.setEditor(editor);
     }
+
+    /**
+     * Called when a shortcut should be invoked, coming from the host editor
+     * @param {Editor.EditorShortcutType} shortcut shortcut to be executed
+     */
+    invokeShortcut(shortcut: Editor.EditorShortcutType) {
+       editorCommands.invokeShortcut(shortcut);
+    }
+
+    /**
+     * Format the code inside the editor
+     */
+    formatCode() {
+        editorCommands.formatCode();
+    }
 }

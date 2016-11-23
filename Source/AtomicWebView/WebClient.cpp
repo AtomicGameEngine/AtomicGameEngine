@@ -353,6 +353,8 @@ public:
         browserSettings.file_access_from_file_urls = STATE_ENABLED;
         browserSettings.universal_access_from_file_urls = STATE_ENABLED;
         browserSettings.web_security = WebBrowserHost::GetWebSecurity() ? STATE_ENABLED : STATE_DISABLED;
+        browserSettings.javascript_access_clipboard = STATE_ENABLED;
+        browserSettings.javascript_dom_paste = STATE_ENABLED;
 
         windowInfo.width = width;
         windowInfo.height = height;        
