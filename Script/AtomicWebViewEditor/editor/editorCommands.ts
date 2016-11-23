@@ -56,9 +56,10 @@ export function configure(fileExt: string, filename: string) {
         filename: filename,
         editor: monacoEditor
     });
-    
+
     // Override CMD/CTRL+I since that is going to be used for Format Code and in the editor it is assigned to something else
-    monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I, null, null);
+    const noOpCommand: monaco.editor.ICommandHandler = () => { };
+    monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I, noOpCommand, null);
 
 }
 
