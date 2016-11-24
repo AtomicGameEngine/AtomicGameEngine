@@ -316,22 +316,37 @@ void UI::AddFont(const String& fontFile, const String& name)
 void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd, RenderSurface* renderSurface, bool clearRenderSurface)
 {
     if (batches.Empty())
+    {
+        graphics_->ResetRenderTargets();
         return;
+    }
 
-    Vector2 invScreenSize;
+    IntVector2 size;
     if (renderSurface)
     {
-        invScreenSize.x_ = 1.0f / (float)renderSurface->GetWidth();
-        invScreenSize.y_ = 1.0f / (float)renderSurface->GetHeight();
+        size.x_ = renderSurface->GetWidth();
+        size.y_ = renderSurface->GetHeight();
     }
     else
     {
-        invScreenSize.x_ = 1.0f / (float)graphics_->GetWidth();
-        invScreenSize.y_ = 1.0f / (float)graphics_->GetHeight();
+        size.x_ = graphics_->GetWidth();
+        size.y_ = graphics_->GetHeight();
     }
 
+    IntRect rect(0, 0, size.x_, size.y_);
+    Vector2 invScreenSize(1.0f / (float)size.x_, 1.0f / (float)size.y_);
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
     Vector2 offset(-1.0f, 1.0f);
+
+    // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
+    // as a render texture produced on Direct3D
+#ifdef ATOMIC_OPENGL
+    if (renderSurface)
+    {
+        offset.y_ = -offset.y_;
+        scale.y_  = -scale.y_;
+    }
+#endif
 
     Matrix4 projection(Matrix4::IDENTITY);
     projection.m00_ = scale.x_;
@@ -358,6 +373,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     if (clearRenderSurface)
         graphics_->Clear(Atomic::CLEAR_COLOR);
 
+    graphics_->SetViewport(rect);
     graphics_->SetVertexBuffer(buffer);
 
     ShaderVariation* noTextureVS = graphics_->GetShader(VS, "Basic", "VERTEXCOLOR");
