@@ -315,7 +315,7 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
         SendEvent(E_UIWIDGETFOCUSESCAPED);
     }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#ifndef ATOMIC_PLATFORM_OSX
     if (keycode == KEY_LCTRL || keycode == KEY_RCTRL)
         return;
 #else
@@ -326,7 +326,7 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
     Input* input = GetSubsystem<Input>();
     int qualifiers = input->GetQualifiers();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#ifndef ATOMIC_PLATFORM_OSX
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #else
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
@@ -448,7 +448,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Send Global Shortcut
     Input* input = GetSubsystem<Input>();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#ifndef ATOMIC_PLATFORM_OSX
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
     if (keycode == KEY_LCTRL || keycode == KEY_RCTRL)
         superdown = false;
