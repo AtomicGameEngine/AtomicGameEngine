@@ -172,6 +172,10 @@ bool Project::Load(const String& fullpath)
 
     }
 
+    VariantMap data;
+    data[ProjectBeginLoad::P_PROJECTPATH] = projectFilePath_;
+    data[ProjectBeginLoad::P_PROJECT] = this;
+    SendEvent(E_PROJECTBEGINLOAD, data);
 
     SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
     bool result = pfile->Load(this);
@@ -186,6 +190,7 @@ bool Project::Load(const String& fullpath)
         VariantMap data;
         data[ProjectLoaded::P_PROJECTPATH] = projectFilePath_;
         data[ProjectLoaded::P_PROJECT] = this;
+        data[ProjectLoaded::P_RESULT] = result;
         SendEvent(E_PROJECTLOADED, data);
     }
 
