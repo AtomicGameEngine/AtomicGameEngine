@@ -26,6 +26,7 @@ import WelcomeFrame = require("./WelcomeFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
 import HierarchyFrame = require("./HierarchyFrame");
 import MainToolbar = require("ui//MainToolbar");
+import AnimationToolbar = require("ui//AnimationToolbar");
 
 import UIEvents = require("ui/UIEvents");
 
@@ -174,6 +175,16 @@ class MainFrame extends ScriptWidget {
 
     }
 
+    showAnimationToolbar(asset: ToolCore.Asset) {
+        if (this.animationToolbar != null) {
+            this.animationToolbar.closeViewer();
+            this.animationToolbar = new AnimationToolbar(this.getWidget("animationtoolbarcontainer"), this.getWidget("animationpropertiescontainer"), asset);
+        }
+        else {
+            this.animationToolbar = new AnimationToolbar(this.getWidget("animationtoolbarcontainer"), this.getWidget("animationpropertiescontainer"), asset)
+        }
+    }
+
     projectframe: ProjectFrame;
     resourceframe: ResourceFrame;
     inspectorframe: InspectorFrame;
@@ -181,6 +192,7 @@ class MainFrame extends ScriptWidget {
     welcomeFrame: WelcomeFrame;
     inspectorlayout: Atomic.UILayout;
     mainToolbar: MainToolbar;
+    animationToolbar: AnimationToolbar;
     menu: MainFrameMenu;
 
 }

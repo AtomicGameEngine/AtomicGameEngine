@@ -1,0 +1,38 @@
+TBLayout: axis: y, distribution: gravity, spacing: 10
+	lb: min_width: 750
+	TBLayout:
+		TBLayout:
+			TBButton
+				@include definitions>menubutton
+				TBSkinImage: skin: PlayButton, id: skin_image
+				id play_left
+				tooltip Play Animation
+				lp: width: 30, height: 30
+			TBContainer: skin: AEContainer, gravity: all, id: leftanimcontainer
+			TBButton
+				@include definitions>menubutton
+				TBSkinImage: skin: StepButton, id: skin_image
+				id blend_right
+				tooltip Blend Animation to the Right
+				lp: width: 30, height: 30
+			TBButton
+				@include definitions>menubutton
+				TBSkinImage: skin: StopButton, id: skin_image
+				id stop
+				tooltip Stop Playing all animations
+				lp: width: 34, height: 30
+			TBButton
+				@include definitions>menubutton
+				TBSkinImage: skin: BlendleftButton, id: skin_image
+				id blend_left
+				tooltip Blend Animation to the Left
+				lp: width: 30, height: 30
+			TBContainer: skin: AEContainer, gravity: all, id: rightanimcontainer
+			TBButton
+				@include definitions>menubutton
+				TBSkinImage: skin: PlayButton, id: skin_image
+				id play_right
+				tooltip Play Animation
+				lp: width: 30, height: 30
+	TBLayout: distribution: gravity, axis: x, spacing: 4
+			TBContainer: skin: AEContainer, gravity: all, id: blendcontainer

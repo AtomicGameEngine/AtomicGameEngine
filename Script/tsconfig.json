@@ -71,6 +71,7 @@
         "./AtomicEditor/ui/frames/ResourceFrame.ts",
         "./AtomicEditor/ui/frames/WelcomeFrame.ts",
         "./AtomicEditor/ui/MainToolbar.ts",
+        "./AtomicEditor/ui/AnimationToolbar.ts",
         "./AtomicEditor/ui/modal/About.ts",
         "./AtomicEditor/ui/modal/build/BuildComplete.ts",
         "./AtomicEditor/ui/modal/build/BuildOutput.ts",

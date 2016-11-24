@@ -359,7 +359,8 @@ void TBWidget::AddChildRelative(TBWidget *child, WIDGET_Z_REL z, TBWidget *refer
 
 void TBWidget::RemoveChild(TBWidget *child, WIDGET_INVOKE_INFO info)
 {
-    assert(child->m_parent);
+    if (!child->m_parent)
+        return;
 
     if (info == WIDGET_INVOKE_INFO_NORMAL)
     {

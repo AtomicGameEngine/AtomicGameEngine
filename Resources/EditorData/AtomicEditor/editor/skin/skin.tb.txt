@@ -109,6 +109,9 @@ elements
 	StepButton
 		bitmap step.png
 
+	BlendleftButton
+		bitmap blendleft.png
+
 	PowerOffButton
 		bitmap power_off.png
 

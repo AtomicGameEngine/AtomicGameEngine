@@ -47,6 +47,8 @@ TBLayout: distribution: gravity, axis: y
                         TBWidget: gravity: top bottom
                 TBLayout: distribution: gravity, axis: y
                     TBLayout: gravity: left right, id: maintoolbarcontainer
+                    TBLayout: gravity: left right, id: animationtoolbarcontainer
+                    TBLayout: gravity: left right, id: animationpropertiescontainer
                     TBSeparator: gravity: left right, skin: AESeparator
                     TBLayout: distribution: gravity, id: resourceviewcontainer
                     TBContainer: skin: AEContainer, gravity: left right bottom, id: consolecontainer

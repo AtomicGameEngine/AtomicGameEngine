@@ -21,6 +21,8 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
+import EditorUI = require("ui/EditorUI"); 
+
 
 class InspectorWidget extends ScriptWidget {
 
@@ -152,6 +154,26 @@ class InspectorWidget extends ScriptWidget {
 
       return false;
 
+    }
+
+    createPreviewAnimationButton(asset: ToolCore.Asset): Atomic.UIButton {
+
+        var button = new Atomic.UIButton();
+        button.fontDescription = this.attrFontDesc;
+        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.text = "Preview Animation";
+
+        button.onClick = function () {
+            this.onPreviewAnimation(asset);
+        }.bind(this);
+
+        return button;
+    }
+
+    onPreviewAnimation(asset: ToolCore.Asset) {
+
+        var mainFrame = EditorUI.getMainFrame();
+        mainFrame.showAnimationToolbar(asset);
     }
 
     rootLayout:Atomic.UILayout;
