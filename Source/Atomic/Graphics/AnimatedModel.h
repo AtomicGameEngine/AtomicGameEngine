@@ -94,6 +94,8 @@ public:
     void SetMorphWeight(const String& name, float weight);
     /// Set vertex morph weight by name hash.
     void SetMorphWeight(StringHash nameHash, float weight);
+    /// Set bone creation override. Useful for previewing animations in the editor scene view.
+    void SetBoneCreationOverride(bool enabled) { boneCreationOverride_ = enabled; }
     /// Reset all vertex morphs to zero.
     void ResetMorphWeights();
 
@@ -259,6 +261,8 @@ private:
     bool assignBonesPending_;
     /// Force animation update after becoming visible flag.
     bool forceAnimationUpdate_;
+    /// Override global bone creation flag, locally.
+    bool boneCreationOverride_;
 };
 
 }

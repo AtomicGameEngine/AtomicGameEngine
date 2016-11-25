@@ -295,3 +295,40 @@ export function CreateNewMaterial(resourcePath: string, materialName: string, re
     return true;
 
 }
+
+//TODO - Replace this by creating a temporary scene that cannot be saved
+export function CreateNewAnimationPreviewScene(reportError: boolean = true): boolean {
+
+    var title = "Animation Viewer Error";
+
+    var templateFilename = "AtomicEditor/templates/template_scene.scene";
+    var templateFile = Atomic.cache.getFile(templateFilename);
+
+
+    if (!templateFile) {
+
+        if (reportError)
+            resourceOps.sendEvent(EditorEvents.ModalError, { title: title, message: "Failed to open template scene: " + templateFile });
+        return false;
+
+    }
+
+    var animFilename = "AtomicEditor/templates/animation_viewer.scene";
+    var animFile = Atomic.cache.getFile(animFilename);
+
+    if (!animFile) {
+
+        if (reportError)
+            resourceOps.sendEvent(EditorEvents.ModalError, { title: title, message: "Failed to open animation viewer: " + animFilename });
+        return false;
+
+    }
+
+    //Reset the animation viewer scene to a blank scene
+    animFile = templateFile;
+
+    resourceOps.sendEvent(EditorEvents.EditResource, { path: animFilename });
+
+    return true;
+
+}
