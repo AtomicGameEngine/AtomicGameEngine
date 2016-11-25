@@ -22,34 +22,40 @@
 
 #pragma once
 
-#include <Atomic/Core/Object.h>
+#include "Command.h"
 
 using namespace Atomic;
 
 namespace ToolCore
 {
 
-ATOMIC_EVENT(E_PROJECTBEGINLOAD, ProjectBeginLoad)
+class ProjectCmd: public Command
 {
-    ATOMIC_PARAM(P_PROJECTPATH, ProjectPath);   // string
-    ATOMIC_PARAM(P_PROJECT, Project);           // Project *
-}
+    ATOMIC_OBJECT(ProjectCmd, Command);
 
-ATOMIC_EVENT(E_PROJECTLOADED, ProjectLoaded)
-{
-    ATOMIC_PARAM(P_PROJECTPATH, ProjectPath);   // string
-    ATOMIC_PARAM(P_PROJECT, Project);           // Project *
-    ATOMIC_PARAM(P_RESULT, Result);             // bool
-}
+public:
 
-ATOMIC_EVENT(E_PROJECTUNLOADED, ProjectUnloaded)
-{
-}
+    ProjectCmd(Context* context);
+    virtual ~ProjectCmd();
 
-ATOMIC_EVENT(E_PROJECTUSERPREFSAVED, ProjectUserPrefSaved)
-{
-    ATOMIC_PARAM(P_PREFS, Prefs);    // ProjectUserPrefs
-}
+    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
+    void Run();
+
+    bool RequiresProjectLoad() { return requiresProjectLoad_; }
+
+    const String& GetProjectPath() const { return projectPath_; }
+
+private:
+
+    void HandleProjectBeginLoad(StringHash eventType, VariantMap& eventData);
+    void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
+
+    String projectPath_;
+    String command_;
+    bool requiresProjectLoad_;
+    int options_;
+
+};
 
 }
