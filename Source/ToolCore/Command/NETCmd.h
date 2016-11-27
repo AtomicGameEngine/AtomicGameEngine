@@ -63,7 +63,8 @@ private:
     String assemblyPath_;
 
     // compile
-    String solutionPath_;
+    String       solutionPath_;
+    String       toolVersion_;
     StringVector platforms_;
     StringVector configurations_;
 

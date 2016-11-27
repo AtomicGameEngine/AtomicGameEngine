@@ -45,6 +45,10 @@
 #include "NETBuildSystem.h"
 #include "NETProjectSystem.h"
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#include <Poco/WinRegistryKey.h>
+#endif
+
 namespace ToolCore
 {
 
@@ -441,6 +445,10 @@ namespace ToolCore
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
+        // On Windows, we first check for VS2015, then VS2017 which 
+        // at the time of this comment is in RC, refactor once 
+        // in general release
+
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
         // Query for Visual Studio 2015 path
@@ -453,14 +461,37 @@ namespace ToolCore
             if (!fileSystem->FileExists(idePath_))
                 idePath_.Clear();
         }
+        else
+        {
+            // check for VS2017
+            Poco::WinRegistryKey regKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\SxS\\VS7", true);
+            if (regKey.exists() && regKey.exists("15.0"))
+                idePath_ = regKey.getString("15.0").c_str();
+
+            if (idePath_.Length())
+            {
+                // We have VS2017
+                idePath_ += "Common7\\IDE\\devenv.exe";
+            }
+        }
 
 #elif defined ATOMIC_PLATFORM_OSX
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-        if (fileSystem->DirExists("/Applications/Xamarin Studio.app"))
+        // first look for Visual Studio Mac
+        idePath_ = "/Applications/Visual Studio.app/Contents/MacOS/VisualStudio";
+
+        if (!fileSystem->FileExists(idePath_))
         {
+            // not found, look for Xamarin Studio
             idePath_ = "/Applications/Xamarin Studio.app/Contents/MacOS/XamarinStudio";
+
+            if (!fileSystem->FileExists(idePath_))
+            {
+                idePath_.Clear();
+            }
+
         }
 
 #elif defined ATOMIC_PLATFORM_LINUX

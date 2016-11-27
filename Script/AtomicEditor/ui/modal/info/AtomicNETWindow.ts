@@ -64,13 +64,13 @@ class AtomicNETWindow extends ModalWindow {
 
                 this.hide();
 
-                if ( Atomic.platform == "Windows") 
+                if ( Atomic.platform == "Windows")
                     Atomic.fileSystem.systemOpen( "https://www.visualstudio.com/vs/community/" );
 
-                if ( Atomic.platform == "MacOSX") 
+                if ( Atomic.platform == "MacOSX")
                     Atomic.fileSystem.systemOpen( "https://www.xamarin.com/download/");
 
-                if ( Atomic.platform == "Linux") 
+                if ( Atomic.platform == "Linux")
                     Atomic.fileSystem.systemOpen( "https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Detailed-instructions-for-building-on-Linux");
 
             }
@@ -81,8 +81,8 @@ class AtomicNETWindow extends ModalWindow {
     generateAtomicNETText(): string {
         // start at Atomic.platform == "Windows"
         let ideText:string = "Visual Studio";
-        if ( Atomic.platform == "MacOSX") ideText = "Xamarin Studio";
-        if ( Atomic.platform == "Linux") ideText = "monodevelop";
+        if ( Atomic.platform == "MacOSX") ideText = "Visual Studio for Mac";
+        if ( Atomic.platform == "Linux") ideText = "MonoDevelop";
 
 
         let installText = `Please install ${ideText} with <color #D4FB79>Xamarin.Android</color> and <color #D4FB79>Xamarin.iOS</color>`;
@@ -95,11 +95,9 @@ class AtomicNETWindow extends ModalWindow {
         let text = "";
 
         text += `
-Atomic C# is integrated with <color #D4FB79>Visual Studio</color> and <color #D4FB79>Xamarin Studio</color> and <color #D4FB79>monodevelop</color> to provide a first class editing, debugging, and deployment experience.
+Atomic C# is integrated with <color #D4FB79>Visual Studio</color>, <color #D4FB79>Visual Studio for Mac</color>, and <color #D4FB79>MonoDevelop</color> to provide a first class editing, debugging, and deployment experience.
 
 ${installText}
-
-<color #76D6FF>Visual Studio Code support is also coming soon!</color>
 
 `;
 

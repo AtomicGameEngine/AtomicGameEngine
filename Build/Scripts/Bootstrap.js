@@ -27,10 +27,6 @@ function printHelp() {
     console.log("--with-android  : Build with Android platform support");
     console.log("--with-ios      : Build with iOS platform support");
     console.log("--with-web      : Build with Web platform support");
-if (os.platform() == "win32") {
-    console.log("--opengl        : Enable OpenGL renderer");
-    console.log("--d3d11         : Enable DirectX 11 renderer");
-}
     console.log("--debug         : Build debug version of the editor and associated platform runtimes");
     console.log("--noclean       : Do not clean before building, useful during development");
     console.log("--nonet         : Build without AtomicNET C# scripting support");
@@ -38,6 +34,13 @@ if (os.platform() == "win32") {
     console.log("--noexamples    : Don't include examples with editor");
     console.log("--task=name     : Build the specified task (for development)");
     console.log("--package       : packages the editor to Artifacts/Dist");
+    if (os.platform() == "win32") {
+      console.log("--vs2015        : Build with VS2015");
+      console.log("--vs2017        : Build with VS2017");
+      console.log("--opengl        : Enable OpenGL renderer");
+      console.log("--d3d11         : Enable DirectX 11 renderer");
+    }
+
     console.log("--------------------------")
 
     process.exit(0);

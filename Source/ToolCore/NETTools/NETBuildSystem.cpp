@@ -38,6 +38,10 @@
 #include "NETProjectGen.h"
 #include "NETBuildSystem.h"
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#include <Poco/WinRegistryKey.h>
+#endif
+
 namespace ToolCore
 {
 
@@ -305,11 +309,34 @@ namespace ToolCore
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
-            String cmdToolsPath = Poco::Environment::get("VS140COMNTOOLS", "").c_str();
+            // VS2015
+            String vs2015ToolsPath = Poco::Environment::get("VS140COMNTOOLS", "").c_str();
+
+            // VS2017
+            String vs2017ToolsPath;
+            Poco::WinRegistryKey regKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\SxS\\VS7", true);
+            if (regKey.exists() && regKey.exists("15.0"))
+                vs2017ToolsPath = regKey.getString("15.0").c_str();
+
+            if (vs2017ToolsPath.Length())
+            {
+                vs2017ToolsPath += "Common7\\Tools\\";
+            }
+
+            String cmdToolsPath;
+
+            if (toolVersion_ == "VS2017" && vs2017ToolsPath.Length())
+            {
+                cmdToolsPath = vs2017ToolsPath;
+            }
+            else
+            {
+                cmdToolsPath = vs2015ToolsPath;
+            }
 
             if (!cmdToolsPath.Length())
             {
-                CurrentBuildError("VS140COMNTOOLS environment variable not found, cannot proceed");
+                CurrentBuildError("VS140COMNTOOLS environment variable and VS2017 registry key not found, cannot proceed");
                 return;
             }
 

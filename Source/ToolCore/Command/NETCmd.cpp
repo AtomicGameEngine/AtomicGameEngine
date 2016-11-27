@@ -86,6 +86,11 @@ bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String&
                     configurations_.Push(value);
                     i++;
                 }
+                else if (argument == "toolversion" && !value.Empty())
+                {
+                    toolVersion_ = value;
+                }
+
             }
         }
     }
@@ -174,6 +179,9 @@ void NETCmd::Run()
         
         NETBuildSystem* buildSystem = new NETBuildSystem(context_);
         context_->RegisterSubsystem(buildSystem);
+
+        if (toolVersion_.Length())
+            buildSystem->SetToolVersion(toolVersion_);
 
         NETBuild* build = 0;
 

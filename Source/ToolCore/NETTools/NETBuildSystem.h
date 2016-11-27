@@ -66,8 +66,9 @@ namespace ToolCore
         virtual ~NETBuild() {}
 
     private:
+
         /// .sln or .json configuration file
-        String solutionPath_;
+        String       solutionPath_;
         StringVector configurations_;
         StringVector platforms_;
         StringVector targets_;
@@ -97,6 +98,12 @@ namespace ToolCore
 
         void SetVerbose(bool verbose) { verbose_ = verbose; }
 
+        /// Set compiler tooling version, for example "VS2015", "VS2017", used default for host if undefined
+        void SetToolVersion(const String& toolVersion) { toolVersion_ = toolVersion.ToUpper();  }
+
+        /// Get compiler tooling version
+        const String& GetToolVersion() const { return toolVersion_; }
+
     private:
 
         void CurrentBuildError(String errorText);
@@ -112,6 +119,8 @@ namespace ToolCore
         List<SharedPtr<NETBuild>> builds_;
 
         bool verbose_;
+        // compiler tooling to use, "VS2015/VS2017", default if undefined
+        String toolVersion_;
 
     };
 
