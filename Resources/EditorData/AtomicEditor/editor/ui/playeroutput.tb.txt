@@ -1,7 +1,12 @@
 TBLayout: axis: y, distribution: gravity, position: left
-	TBTextField: text: "Player Output:", id: project_name
+	TBTextField: text: "Player Output: (This log is also available in the Tools menu)", id: project_name
 	TBEditField: multiline: 1, styling: 1, gravity: all, id: output, readonly: 1, adapt-to-content: 0
 		lp: min-width: 640, min-height: 480
 	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout: 
-		TBButton: text: Close, id: closebutton
+	TBLayout:
+		TBClickLabel: text: Close on Player Stop    
+			font: size: 14
+			TBCheckBox: id: closeonstop, value: 1
+		TBButton: text: "  Close  ", id: closebutton
+			font: size: 16
+

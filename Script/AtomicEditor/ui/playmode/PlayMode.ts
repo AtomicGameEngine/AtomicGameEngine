@@ -22,17 +22,20 @@
 
 import EditorEvents = require("../../editor/EditorEvents");
 import PlayerOutput = require("./PlayerOutput");
+import Preferences = require("../../editor/Preferences");
 
 class PlayMode extends Atomic.ScriptObject {
 
     inErrorState: boolean;
+    myPlayer: PlayerOutput;
 
     constructor() {
 
         super();
-
+        this.myPlayer = null;
         this.subscribeToEvent("IPCJSError", (ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev));
         this.subscribeToEvent(EditorEvents.PlayerStarted, (ev) => this.handlePlayerStarted(ev));
+        this.subscribeToEvent(EditorEvents.PlayerStopped, (ev) => this.handlePlayerStopped(ev));
 
     }
 
@@ -40,8 +43,21 @@ class PlayMode extends Atomic.ScriptObject {
 
         this.inErrorState = false;
 
-        new PlayerOutput();
+        if ( this.myPlayer != null ) {
+             this.myPlayer.remove();
+        }
+
+        this.myPlayer = new PlayerOutput();
     }
+
+    handlePlayerStopped(ev) {
+
+        if ( Preferences.getInstance().editorFeatures.closePlayerLog ) {
+             this.myPlayer.remove();
+        }
+
+    }
+
 
     handleIPCJSError(ev: Atomic.IPCJSErrorEvent) {
 

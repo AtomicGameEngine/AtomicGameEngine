@@ -22,10 +22,12 @@
 
 import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
+import Preferences = require("../../editor/Preferences");
 
 class PlayerOutput extends Atomic.UIWindow {
 
     output: Atomic.UIEditField;
+    closeOnStop: Atomic.UICheckBox;
 
     constructor() {
 
@@ -39,6 +41,9 @@ class PlayerOutput extends Atomic.UIWindow {
         this.load("AtomicEditor/editor/ui/playeroutput.tb.txt");
 
         this.output = <Atomic.UIEditField> this.getWidget("output");
+        this.closeOnStop = <Atomic.UICheckBox> this.getWidget("closeonstop");
+        
+        this.closeOnStop.value = Preferences.getInstance().editorFeatures.closePlayerLog ? 1 : 0;
 
         (<Atomic.UIButton>this.getWidget("closebutton")).onClick = () => {
 
@@ -68,7 +73,15 @@ class PlayerOutput extends Atomic.UIWindow {
 
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
-
+    
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+            var id = ev.target.id;
+            if (id == "closeonstop") {
+                Preferences.getInstance().editorFeatures.closePlayerLog = this.closeOnStop.value > 0 ? true : false;
+                Preferences.getInstance().write();
+                return true;
+            }
+        }
     }
 
 }
