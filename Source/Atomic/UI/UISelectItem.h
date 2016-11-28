@@ -80,6 +80,8 @@ public:
 
     void Clear() { items_.Clear(); }
 
+    const String& GetItemStr(int index);
+
     // caller's responsibility to clean up
     virtual tb::TBSelectItemSource* GetTBItemSource();
 

@@ -341,6 +341,7 @@ interface EditorBuildData {
 
 interface EditorFeatures {
     closePlayerLog: boolean;
+    defaultLanguage: string;
 }
 
 class PreferencesFormat {
@@ -396,7 +397,8 @@ class PreferencesFormat {
         };
 
         this.editorFeatures = {
-            closePlayerLog: true
+            closePlayerLog: true,
+            defaultLanguage: "JavaScript"
         };
 
     }
