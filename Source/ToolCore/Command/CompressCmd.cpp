@@ -60,6 +60,7 @@ namespace ToolCore
         }
 
         compressDirectory_ = value.ToLower();
+        this->SetRequiresProjectLoad(false);
 
         return true;
     }
@@ -85,29 +86,26 @@ namespace ToolCore
 
         for (int i = 0; i < pngFiles.Size(); i++)
         {
-            file_ = cache_->GetFile(pngFiles[i], false);
-            CompressFile();
+            CompressFile(cache_->GetFile(pngFiles[i], false));
         }
         for (int i = 0; i < jpgFiles.Size(); i++)
         {
-            file_ = cache_->GetFile(jpgFiles[i], false);
-            CompressFile();
+            CompressFile(cache_->GetFile(jpgFiles[i], false));
         }
         for (int i = 0; i < tgaFiles.Size(); i++)
         {
-            file_ = cache_->GetFile(tgaFiles[i], false);
-            CompressFile();
+            CompressFile(cache_->GetFile(tgaFiles[i], false));
         }
 
         ATOMIC_LOGDEBUG("Texture Compression Complete:" + compressDirectory_);
     }
 
-    void CompressCmd::CompressFile()
+    void CompressCmd::CompressFile(SharedPtr<File> file)
     {
         asset_ = new Asset(context_);
-        asset_->SetPath(file_->GetName());
+        asset_->SetPath(file->GetName());
 
-        String compressedPath = cachePath_ + "DDS/" + asset_->GetRelativePath() + ".dds";
+        String compressedPath = compressDirectory_ + "/Cache/DDS/" + file->GetName() + ".dds";
         if (fileSystem_->FileExists(compressedPath))
             fileSystem_->Delete(compressedPath);
 
@@ -115,12 +113,12 @@ namespace ToolCore
 
         if (!image->IsCompressed())
         {
-            fileSystem_->CreateDirs(cachePath_, "DDS/" + Atomic::GetPath(asset_->GetRelativePath()));
+            fileSystem_->CreateDirs(compressDirectory_, "/Cache/DDS/" + Atomic::GetPath(file->GetName()));
             image->SaveDDS(compressedPath);
         }
 
-        image->SavePNG(cachePath_ + asset_->GetGUID());
+        image->SavePNG(compressDirectory_ + "/Cache/" + asset_->GetGUID());
 
-        image->SavePNG(cachePath_ + asset_->GetGUID() + "_thumbnail.png");
+        image->SavePNG(compressDirectory_ +"/Cache/" + asset_->GetGUID() + "_thumbnail.png");
     }
 }

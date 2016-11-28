@@ -49,11 +49,10 @@ namespace ToolCore
         void Run();
 
     private:
-       void CompressFile();
+       void CompressFile(SharedPtr<File> file);
 
        SharedPtr<AssetDatabase> db_;
        SharedPtr<FileSystem> fileSystem_;
-       SharedPtr<File> file_;
        SharedPtr<ResourceCache> cache_;
        SharedPtr<Asset> asset_;
 
