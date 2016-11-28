@@ -61,9 +61,7 @@ public:
 
     virtual void Cancel() {}
 
-    virtual bool RequiresProjectLoad() { return requiresProjectLoad_; }
-
-    virtual void SetRequiresProjectLoad(bool requiresProjectLoad = true) { requiresProjectLoad_ = requiresProjectLoad; }
+    virtual bool RequiresProjectLoad() { return true; }
 
     virtual const String& GetProjectPath() const { return String::EMPTY; }
 
@@ -72,8 +70,6 @@ public:
 private:
 
     float timeOut_;
-
-    bool requiresProjectLoad_;
 
 };
 

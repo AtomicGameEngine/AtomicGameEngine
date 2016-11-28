@@ -32,6 +32,8 @@
 
 namespace ToolCore
 {
+    const char* COMPRESS_FILETYPES[] = { ".jpg", ".png", ".tga"};
+
     CompressCmd::CompressCmd(Context* context) : Command(context)
     {
 
@@ -60,7 +62,6 @@ namespace ToolCore
         }
 
         compressDirectory_ = value.ToLower();
-        this->SetRequiresProjectLoad(false);
 
         return true;
     }
@@ -77,27 +78,19 @@ namespace ToolCore
 
         fileSystem_ = GetSubsystem<FileSystem>();
 
-        Vector<String> pngFiles;
-        fileSystem_->ScanDir(pngFiles, compressDirectory_, ".png", SCAN_FILES, true);
-        Vector<String> jpgFiles;
-        fileSystem_->ScanDir(jpgFiles, compressDirectory_, ".jpg", SCAN_FILES, true);
-        Vector<String> tgaFiles;
-        fileSystem_->ScanDir(tgaFiles, compressDirectory_, ".tga", SCAN_FILES, true);
-
-        for (int i = 0; i < pngFiles.Size(); i++)
+        for (int i = 0; i < sizeof(COMPRESS_FILETYPES) / sizeof(COMPRESS_FILETYPES[0]); ++i)
         {
-            CompressFile(cache_->GetFile(pngFiles[i], false));
-        }
-        for (int i = 0; i < jpgFiles.Size(); i++)
-        {
-            CompressFile(cache_->GetFile(jpgFiles[i], false));
-        }
-        for (int i = 0; i < tgaFiles.Size(); i++)
-        {
-            CompressFile(cache_->GetFile(tgaFiles[i], false));
+            Vector<String> paths;
+            fileSystem_->ScanDir(paths, compressDirectory_, COMPRESS_FILETYPES[i], SCAN_FILES, true);
+            for (int j = 0; j < paths.Size(); j++)
+            {
+                CompressFile(cache_->GetFile(paths[j], false));
+            }
         }
 
         ATOMIC_LOGDEBUG("Texture Compression Complete:" + compressDirectory_);
+
+        Finished();
     }
 
     void CompressCmd::CompressFile(SharedPtr<File> file)
@@ -105,6 +98,7 @@ namespace ToolCore
         asset_ = new Asset(context_);
         asset_->SetPath(file->GetName());
 
+        // TODO: Handle other compression formats
         String compressedPath = compressDirectory_ + "/Cache/DDS/" + file->GetName() + ".dds";
         if (fileSystem_->FileExists(compressedPath))
             fileSystem_->Delete(compressedPath);
@@ -118,7 +112,6 @@ namespace ToolCore
         }
 
         image->SavePNG(compressDirectory_ + "/Cache/" + asset_->GetGUID());
-
-        image->SavePNG(compressDirectory_ +"/Cache/" + asset_->GetGUID() + "_thumbnail.png");
+        image->SavePNG(compressDirectory_ + "/Cache/" + asset_->GetGUID() + "_thumbnail.png");
     }
 }

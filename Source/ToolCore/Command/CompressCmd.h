@@ -48,16 +48,18 @@ namespace ToolCore
 
         void Run();
 
+        bool RequiresProjectLoad() { return false; }
+
     private:
-       void CompressFile(SharedPtr<File> file);
+        void CompressFile(SharedPtr<File> file);
 
-       SharedPtr<AssetDatabase> db_;
-       SharedPtr<FileSystem> fileSystem_;
-       SharedPtr<ResourceCache> cache_;
-       SharedPtr<Asset> asset_;
+        SharedPtr<AssetDatabase> db_;
+        SharedPtr<FileSystem> fileSystem_;
+        SharedPtr<ResourceCache> cache_;
+        SharedPtr<Asset> asset_;
 
-       String compressDirectory_;
-       String cachePath_;
+        String compressDirectory_;
+        String cachePath_;
     };
 
 }

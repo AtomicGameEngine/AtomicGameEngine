@@ -29,8 +29,7 @@ namespace ToolCore
 {
 
 Command::Command(Context* context) : Object(context),
-    timeOut_(0.0f),
-    requiresProjectLoad_(false)
+    timeOut_(0.0f)
 {
 
 }
