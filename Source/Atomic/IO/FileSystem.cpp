@@ -726,6 +726,13 @@ String FileSystem::GetProgramDir() const
     programDir_ = GetPath(String(exeName));
 #endif
 
+// ATOMIC BEGIN
+
+    // Disabling this on Mac as a possible source of resource issues with app bundles
+    // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1209
+
+#ifndef ATOMIC_PLATFORM_OSX
+
     // If the executable directory does not contain CoreData & Data directories, but the current working directory does, use the
     // current working directory instead
     /// \todo Should not rely on such fixed convention
@@ -733,6 +740,10 @@ String FileSystem::GetProgramDir() const
     if (!DirExists(programDir_ + "CoreData") && !DirExists(programDir_ + "Data") &&
         (DirExists(currentDir + "CoreData") || DirExists(currentDir + "Data")))
         programDir_ = currentDir;
+
+#endif
+
+// ATOMIC END
 
     // Sanitate /./ construct away
     programDir_.Replace("/./", "/");
