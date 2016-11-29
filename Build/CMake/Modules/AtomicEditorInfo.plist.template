@@ -31,12 +31,12 @@
     <key>LSRequiresCarbon</key>
     <true/>
     <key>NSSupportsAutomaticGraphicsSwitching</key>
-  	<true/>    
+  	<true/>
     <key>NSHumanReadableCopyright</key>
     <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
     <key>LSEnvironment</key>
     <dict>
-        <key>URHO3D_PREFIX_PATH</key>
+        <key>ATOMIC_PREFIX_PATH</key>
         <string>../Resources</string>
     </dict>
 </dict>

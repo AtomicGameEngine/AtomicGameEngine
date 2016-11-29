@@ -27,7 +27,7 @@
     <key>CFBundleVersion</key>
     <string>1.32.400</string>
     <key>CFBundleIconFile</key>
-    <string>Atomic</string>    
+    <string>Atomic</string>
     <key>CSResourcesFileMapped</key>
     <true/>
     <key>LSRequiresCarbon</key>
@@ -36,7 +36,7 @@
     <string>Copyright (c) 2015 THUNDERBEAST GAMES LLC</string>
     <key>LSEnvironment</key>
     <dict>
-        <key>URHO3D_PREFIX_PATH</key>
+        <key>ATOMIC_PREFIX_PATH</key>
         <string>../Resources</string>
     </dict>
     <key>NSHighResolutionCapable</key>
