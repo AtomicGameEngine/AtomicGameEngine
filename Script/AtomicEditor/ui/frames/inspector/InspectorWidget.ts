@@ -165,6 +165,9 @@ class InspectorWidget extends ScriptWidget {
 
         button.onClick = function () {
             this.onPreviewAnimation(asset);
+            // button is deleted in callback, so make sure we return
+            // that we're handled
+            return true;
         }.bind(this);
 
         return button;

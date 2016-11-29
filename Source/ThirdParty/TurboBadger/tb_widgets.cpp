@@ -359,8 +359,14 @@ void TBWidget::AddChildRelative(TBWidget *child, WIDGET_Z_REL z, TBWidget *refer
 
 void TBWidget::RemoveChild(TBWidget *child, WIDGET_INVOKE_INFO info)
 {
-    if (!child->m_parent)
+
+// ATOMIC BEGIN
+
+    // this was an assert(child->m_parent)
+    if (child->m_parent != this)
         return;
+
+// ATOMIC END
 
     if (info == WIDGET_INVOKE_INFO_NORMAL)
     {
@@ -1409,12 +1415,24 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
         TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
         captured_widget->OnCaptureChanged(false);
+
+        // ATOMIC BEGIN
+
+        // Atomic's TurboBadger multitouch support is a hack, TurboBadger has since added better support
+        // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1206
+
         captured_widget->InvokeEvent(ev_up);
-        if (!cancel_click && captured_widget->GetHitStatus(x, y))
+
+        if (!cancel_click && captured_widget && captured_widget->GetHitStatus(x, y))
         {
-            captured_widget->InvokeEvent(ev_click);
+            if (captured_widget)
+                captured_widget->InvokeEvent(ev_click);
         }
-        captured_widget->ReleaseCapture();
+
+        if (captured_widget)
+            captured_widget->ReleaseCapture();
+
+        // ATOMIC END
     }
     //restore x and y coords, to use with down_widget
     x = ox;
