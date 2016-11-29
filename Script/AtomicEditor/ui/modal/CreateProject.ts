@@ -331,8 +331,11 @@ class CreateProject extends ModalWindow {
 
                 if ( this.tryProjectCreate() )
                 {
-                    Preferences.getInstance().editorFeatures.defaultLanguage = this.projectLanguageField.text;
-                    Preferences.getInstance().write();
+                    if ( Preferences.getInstance().editorFeatures.defaultLanguage != this.projectLanguageField.text )
+                    {
+                        Preferences.getInstance().editorFeatures.defaultLanguage = this.projectLanguageField.text;
+                        Preferences.getInstance().write();
+                    }
                     this.hide();
                 }
 

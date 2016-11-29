@@ -109,13 +109,13 @@ void UISelectItemSource::RemoveItemWithStr(const String& str)
 
 const String& UISelectItemSource::GetItemStr(int index)
 {
-	int nn = 0;
+    int nn = 0;
     for (List<SharedPtr<UISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
     {
         if ( nn == index) return (*itr)->GetStr();
-		nn++;
+        nn++;
     }
-	return ( String::EMPTY );
+    return ( String::EMPTY );
 }
 
 TBSelectItemSource *UISelectItemSource::GetTBItemSource()
