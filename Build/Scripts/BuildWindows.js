@@ -30,7 +30,7 @@ function copyAtomicEditor() {
     // copy AtomicTool
     fs.copySync(buildDir +  "Source/AtomicTool/" + config["config"] +"/AtomicTool.exe",
     editorAppFolder + "AtomicTool.exe");
-    
+
     // We need some resources to run
     fs.copySync(atomicRoot + "Resources/CoreData",
     editorAppFolder + "Resources/CoreData");
@@ -59,14 +59,34 @@ function copyAtomicEditor() {
 
 namespace('build', function() {
 
+    // get CMake flags for generator, vsver parameter can be VS2017/VS2015, etc
+    function getCMakeFlags(vsver) {
+
+      var flags = "\"";
+
+      // Redistributable editor build
+      flags += "-DATOMIC_DEV_BUILD=0";
+
+      // graphics backend (overrides default DX9)
+      flags += " -DATOMIC_OPENGL=" + (config["opengl"] ? "ON" : "OFF");
+      flags += " -DATOMIC_D3D11=" + (config["d3d11"] ? "ON" : "OFF");
+
+      flags += "\"";
+
+      return flags;
+
+    }
+
     task('atomiceditor_phase2', {
         async: true
     }, function() {
 
         process.chdir(buildDir);
 
+        var vsver = (config["vs2017"] ? "VS2017" : "VS2015");
+
         var cmds = [];
-        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase2.bat " + config["config"]);
+        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase2.bat " + config["config"] + " " + vsver);
 
         jake.exec(cmds, function() {
 
@@ -102,10 +122,13 @@ namespace('build', function() {
 
         process.chdir(buildDir);
 
+        var vsver = (config["vs2017"] ? "VS2017" : "VS2015");
+
         var cmds = [];
 
         // Generate Atomic solution, AtomicTool binary, and script bindings
-        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase1.bat " + config["config"]);
+        cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase1.bat " + config["config"] + " " +
+                  vsver + " " + getCMakeFlags(vsver));
 
         jake.exec(cmds, function() {
 
@@ -128,38 +151,5 @@ namespace('build', function() {
         });
 
     });
-
-    // Generate a Visual Studio 2015 solution
-    task('genvs2015', {
-        async: true
-    }, function(devBuild) {
-        if (devBuild === undefined)
-        devBuild = 1;
-
-        var opengl = config["opengl"] ? "ON" : "OFF"; 
-        var d3d11 = config["d3d11"] ? "ON" : "OFF"; 
-
-        var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
-
-        if (!fs.existsSync(slnRoot)) {
-            jake.mkdirP(slnRoot);
-        }
-
-        process.chdir(slnRoot);
-
-        var cmds = [];
-
-        cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild + " " + opengl + " " + d3d11);
-
-        jake.exec(cmds, function() {
-
-            complete();
-
-        }, {
-            printStdout: true
-        });
-
-    });
-
 
 });// end of build namespace

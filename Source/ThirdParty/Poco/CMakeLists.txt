@@ -178,4 +178,9 @@ set (SOURCE_FILES
     Foundation/src/trees.c
     Foundation/src/zutil.c )
 
+if (MSVC)
+    # Add windows registry key from Utils
+    set (SOURCE_FILES ${SOURCE_FILES} Foundation/src/WinRegistryKey.cpp )
+endif()
+
 add_library(Poco ${SOURCE_FILES})

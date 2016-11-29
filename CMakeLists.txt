@@ -22,12 +22,6 @@ if (ATOMIC_DEV_BUILD)
     add_definitions("-DATOMIC_DEV_BUILD=1")
 endif()
 
-# Disable until https://github.com/AtomicGameEngine/AtomicGameEngine/issues/554 is addressed
-# add_definitions("-DATOMIC_SOURCE_BUILD=1")
-
-# this is here as QtCreator is having trouble picking up #include <Atomic/*> without it
-include_directories(${ATOMIC_SOURCE_DIR}/Source ${ATOMIC_SOURCE_DIR}/Source/AtomicEditor/Source)
-
 add_link_libraries_exported (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL)
 
 if (NOT ATOMIC_BUILD_2D)

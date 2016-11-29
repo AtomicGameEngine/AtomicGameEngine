@@ -64,7 +64,16 @@ namespace('build', function() {
 
         var cmds = [];
 
-        var netCmd = host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platforms + " -config " + config["config"] + " -toolbootstrap";
+        var netCmd = host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platforms + " -config " + config["config"];
+
+        if (os.platform() == 'win32') {
+
+          var vsver = (config["vs2017"] ? "VS2017" : "VS2015");
+          netCmd += " -toolversion " + vsver;
+
+        }
+
+        netCmd += " -toolbootstrap"
 
         console.log(netCmd);
 
