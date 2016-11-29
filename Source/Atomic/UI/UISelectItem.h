@@ -80,6 +80,9 @@ public:
 
     void Clear() { items_.Clear(); }
 
+    /// Returns item string for the index. Returns empty string for invalid indexes.
+    const String& GetItemStr(int index);
+
     // caller's responsibility to clean up
     virtual tb::TBSelectItemSource* GetTBItemSource();
 
