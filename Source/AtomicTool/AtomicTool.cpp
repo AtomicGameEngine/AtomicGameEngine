@@ -65,6 +65,25 @@ void AtomicTool::Setup()
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
 
+    for (unsigned i = 0; i < arguments.Size(); i++)
+    {
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
+        {
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "toolbootstrap")
+            {
+                ToolEnvironment::SetBootstrapping();
+            }
+            else if (argument == "loglevel")
+            {
+                engineParameters_["LogLevel"] = Variant(VariantType::VAR_INT, value);
+                i++;
+            }
+        }
+    }
+
     // no default resources, AtomicTool may be run outside of source tree
     engineParameters_["ResourcePaths"] = "";
 }
@@ -230,26 +249,34 @@ void AtomicTool::Start()
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-        String projectDirectory = cmd->GetProjectPath();
+        String projectPath = cmd->GetProjectPath();
             
         // default to current directly if command doesn't provide the path
-        if (!projectDirectory.Length())
-            projectDirectory = fileSystem->GetCurrentDir();
+        if (!projectPath.Length())
+            projectPath = fileSystem->GetCurrentDir();
 
-        Vector<String> projectFiles;
-        fileSystem->ScanDir(projectFiles, projectDirectory, "*.atomic", SCAN_FILES, false);
-        if (!projectFiles.Size())
+        String projectFile;
+        if (projectPath.EndsWith(".atomic", false))
         {
-            ErrorExit(ToString("No .atomic project file in %s", projectDirectory.CString()));
-            return;
+            projectFile = projectPath;
+            projectPath = GetPath(projectPath);
         }
-        else if (projectFiles.Size() > 1)
+        else
         {
-            ErrorExit(ToString("Multiple .atomic project files found in %s", projectDirectory.CString()));
-            return;
+            Vector<String> projectFiles;
+            fileSystem->ScanDir(projectFiles, projectPath, "*.atomic", SCAN_FILES, false);
+            if (!projectFiles.Size())
+            {
+                ErrorExit(ToString("No .atomic project file in %s", projectPath.CString()));
+                return;
+            }
+            else if (projectFiles.Size() > 1)
+            {
+                ErrorExit(ToString("Multiple .atomic project files found in %s", projectPath.CString()));
+                return;
+            }
+            projectFile = projectPath + "/" + projectFiles[0];
         }
-
-        String projectFile = projectDirectory + "/" + projectFiles[0];
 
         if (!tsystem->LoadProject(projectFile))
         {
@@ -258,7 +285,7 @@ void AtomicTool::Start()
         }
 
         // Set the build path
-        String buildFolder = projectDirectory + "/" + "Build";
+        String buildFolder = projectPath + "/" + "Build";
         buildSystem->SetBuildPath(buildFolder);
 
         if (!fileSystem->DirExists(buildFolder))

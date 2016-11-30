@@ -102,7 +102,8 @@ void ProjectCmd::HandleProjectBeginLoad(StringHash eventType, VariantMap& eventD
         cachePath = AddTrailingSlash(cachePath) + "Cache";
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
-        if (!fileSystem->RemoveDir(cachePath, true))
+        if (fileSystem->DirExists(cachePath) &&
+            !fileSystem->RemoveDir(cachePath, true))
             Error("Cache clean failed");
     }
 }
