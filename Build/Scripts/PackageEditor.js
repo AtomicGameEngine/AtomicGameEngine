@@ -4,6 +4,9 @@ var config = require("./BuildConfig");
 
 namespace('package', function() {
 
+    // TODO: Look into if possible to archive on jenkins with different base dir than workspace
+    var webplayerSrcDir = config.artifactsRoot + "Artifacts/DistGen/Artifacts/AtomicEditor/AtomicEditor.app/Contents/Resources/ToolData/Deployment/Web";
+
     task('windows_editor', {
         async: true
     }, function() {
@@ -13,9 +16,9 @@ namespace('package', function() {
 
         host.cleanCreateDir(dstDir);
 
-        // Copy WebGL artifacts into editor package
-        if (fs.existsSync(atomicRoot + "Artifacts/DistGen/Resources/ToolData/Deployment/Web")) {
-            fs.copySync(atomicRoot + "Artifacts/DistGen/Resources/ToolData/Deployment/Web",
+        // Copy WebGL CI artifacts into editor package
+        if (fs.existsSync(webplayerSrcDir)) {
+            fs.copySync(webplayerSrcDir,
             config.artifactsRoot + "Artifacts/AtomicEditor/Resources/ToolData/Deployment/");
         }
 
@@ -75,9 +78,9 @@ namespace('package', function() {
 
         host.cleanCreateDir(dstDir);
 
-        // Copy WebGL artifacts into editor package
-        if (fs.existsSync(atomicRoot + "Artifacts/DistGen/Resources/ToolData/Deployment/Web")) {
-            fs.copySync(atomicRoot + "Artifacts/DistGen/Resources/ToolData/Deployment/Web",
+        // Copy WebGL CI artifacts into editor package
+        if (fs.existsSync(webplayerSrcDir)) {
+            fs.copySync(webplayerSrcDir,
             config.artifactsRoot + "Artifacts/AtomicEditor/AtomicEditor.app/Contents/Resources/ToolData/Deployment/");
         }
 
