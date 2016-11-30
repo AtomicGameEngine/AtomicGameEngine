@@ -65,6 +65,25 @@ void AtomicTool::Setup()
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
 
+    for (unsigned i = 0; i < arguments.Size(); i++)
+    {
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
+        {
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "toolbootstrap")
+            {
+                ToolEnvironment::SetBootstrapping();
+            }
+            else if (argument == "loglevel")
+            {
+                engineParameters_["LogLevel"] = Variant(VariantType::VAR_INT, value);
+                i++;
+            }
+        }
+    }
+
     // no default resources, AtomicTool may be run outside of source tree
     engineParameters_["ResourcePaths"] = "";
 }
