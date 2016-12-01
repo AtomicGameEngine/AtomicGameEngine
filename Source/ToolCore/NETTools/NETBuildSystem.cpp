@@ -325,7 +325,7 @@ namespace ToolCore
 
             String cmdToolsPath;
 
-            if (toolVersion_ == "VS2017" && vs2017ToolsPath.Length())
+            if (!vs2015ToolsPath.Length() || (toolVersion_ == "VS2017" && vs2017ToolsPath.Length()))
             {
                 cmdToolsPath = vs2017ToolsPath;
             }
