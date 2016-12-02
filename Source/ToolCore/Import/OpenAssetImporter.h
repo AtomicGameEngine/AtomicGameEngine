@@ -61,9 +61,12 @@ public:
     void SetScale(float scale) { scale_ = scale; }
     void SetExportAnimations(bool exportAnimations) { noAnimations_ = !exportAnimations; }
     void SetImportMaterials(bool importMaterials) { importMaterials_ = importMaterials; }
+    void SetIncludeNonSkinningBones(bool includeNonSkinningBones) { includeNonSkinningBones_ = includeNonSkinningBones; }
     void SetVerboseLog(bool verboseLog) { verboseLog_ = verboseLog; }
 
     bool GetImportMaterialsDefault() { return importMaterialsDefault_; }
+
+    bool GetIncludeNonSkinningBones() { return includeNonSkinningBonesDefault_; }
 
     const Vector<AnimationInfo>& GetAnimationInfos() { return animationInfos_; }
 
@@ -121,6 +124,7 @@ private:
     bool noEmptyNodes_;
     bool saveMaterialList_;
     bool includeNonSkinningBones_;
+    bool includeNonSkinningBonesDefault_;
     bool verboseLog_;
     bool emissiveAO_;
     bool noOverwriteMaterial_;

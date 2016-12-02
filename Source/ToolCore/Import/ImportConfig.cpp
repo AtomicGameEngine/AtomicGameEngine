@@ -68,6 +68,8 @@ bool ImportConfig::LoadModelImporterConfig(const JSONValue& jModelImporterConfig
             valueMap_["aiProcess_OptimizeMeshes"] = GetBoolValue(jvalue, true);
         else if (key == "importMaterials")
             valueMap_["ImportMaterials"] = GetBoolValue(jvalue, true);
+        else if (key == "includeNonSkinningBones")
+            valueMap_["IncludeNonSkinningBones"] = GetBoolValue(jvalue, true);
     }
 
     return true;

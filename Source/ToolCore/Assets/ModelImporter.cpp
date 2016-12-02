@@ -63,6 +63,7 @@ void ModelImporter::SetDefaults()
     scale_ = 1.0;
     importAnimations_ = false;
     importMaterials_ = importer->GetImportMaterialsDefault();
+    includeNonSkinningBones_ = importer->GetIncludeNonSkinningBones();
     animationInfo_.Clear();
 
 }
@@ -80,6 +81,7 @@ bool ModelImporter::ImportModel()
     importer->SetExportAnimations(false);
     importer->SetImportNode(importNode_);
     importer->SetImportMaterials(importMaterials_);
+    importer->SetIncludeNonSkinningBones(includeNonSkinningBones_);
 
     if (importer->Load(asset_->GetPath()))
     {
