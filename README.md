@@ -1,13 +1,17 @@
 [AtomicLogo]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/Atomic-Game-Engine-512.png
 ![alt text][AtomicLogo]
 
+Website: <a href="http://www.atomicgameengine.com" target="_blank">http://www.AtomicGameEngine.com</a>
+
+Email: info@atomicgameengine.com
+
 #### Why Atomic?
 
 The Atomic Game Engine is powerful 2D/3D technology developed by industry veterans.  It is available under the MIT license as an alternative to proprietary binaries, excessive fees, and royalties.
 
 Atomic is available to professionals and is being used in production environments.  It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.
 
-If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="/#download-the-atomic-editor">download the Atomic Editor</a> or <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/" target="_blank">fork us on GitHub!</a>
+If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="/#download-the-atomic-editor">download the Atomic Editor</a> or fork us on GitHub!
 
 #### Atomic Technology
 
@@ -48,6 +52,10 @@ The Atomic Game Engine has rolling build milestones at roughly 2 week intervals.
 
 Atomic Backers:  Please see [BACKERS.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/BACKERS.md) for a list of contributors to the [Atomic Development Fund](http://atomicgameengine.com/funding/)
 
+#### Videos
+
+<a href="http://www.atomicgameengine.com" target="_blank">Atomic Game Engine 2016 Demo Reel</a>
+
 #### Screenshots
 
 ##### Atomic Editor
@@ -70,7 +78,7 @@ Atomic Backers:  Please see [BACKERS.md](https://github.com/AtomicGameEngine/Ato
 
 They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript, TypeScript, C#, C++ Examples</a>
 
-### Building the Atomic Editor from Source
+#### Building the Atomic Editor from Source
 
 Please see [Building the Atomic Editor from Source](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-Atomic---The-Quick-and-Easy-Way) for Visual Studio 2015, XCode, and QtCreator build instructions.
 
