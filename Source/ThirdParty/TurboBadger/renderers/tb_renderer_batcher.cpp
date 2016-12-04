@@ -238,7 +238,7 @@ void TBRendererBatcher::AddQuadInternal(const TBRect &dst_rect, const TBRect &sr
 
 #ifdef _MSC_VER
     //Direct3D9 Adjustment
-#ifdef ATOMIC_D3D11
+#if defined(ATOMIC_D3D11) || defined(ATOMIC_OPENGL)
     float posAdjust = 0.0f;
 #else
     float posAdjust = 0.5f;
