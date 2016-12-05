@@ -112,6 +112,7 @@ protected:
     double scale_;
     bool importAnimations_;
     bool importMaterials_;
+    bool includeNonSkinningBones_;
     Vector<SharedPtr<AnimationImportInfo>> animationInfo_;
 
     SharedPtr<Node> importNode_;

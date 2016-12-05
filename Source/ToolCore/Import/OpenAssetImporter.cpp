@@ -66,6 +66,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     noEmptyNodes_(false),
     saveMaterialList_(false),
     includeNonSkinningBones_(false),
+    includeNonSkinningBonesDefault_(false),
     verboseLog_(false),
     emissiveAO_(false),
     noOverwriteMaterial_(true),
@@ -906,6 +907,8 @@ void OpenAssetImporter::SetOveriddenFlags(VariantMap& aiFlagParameters)
             ApplyFlag(aiProcess_OptimizeMeshes, itr->second_.GetBool());
         else if (itr->first_ == "ImportMaterials")
             importMaterialsDefault_ = itr->second_.GetBool();
+        else if (itr->first_ == "IncludeNonSkinningBones")
+            includeNonSkinningBonesDefault_ = itr->second_.GetBool();
 
         itr++;
     }
