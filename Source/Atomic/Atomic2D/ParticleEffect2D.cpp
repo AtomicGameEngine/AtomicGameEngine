@@ -43,7 +43,11 @@ static const int srcBlendFuncs[] =
     0x0302, // GL_SRC_ALPHA
     0x0302, // GL_SRC_ALPHA
     1,      // GL_ONE
-    0x0305  // GL_ONE_MINUS_DST_ALPHA
+    0x0305, // GL_ONE_MINUS_DST_ALPHA
+// ATOMIC_BEGIN
+    1,      // GL_ONE
+    0x0302  // GL_SRC_ALPHA
+// ATOMIC END
 };
 
 static const int destBlendFuncs[] =
@@ -54,7 +58,11 @@ static const int destBlendFuncs[] =
     0x0303, // GL_ONE_MINUS_SRC_ALPHA
     1,      // GL_ONE
     0x0303, // GL_ONE_MINUS_SRC_ALPHA
-    0x0304  // GL_DST_ALPHA
+    0x0304, // GL_DST_ALPHA
+// ATOMIC_BEGIN
+    1,      // GL_ONE
+    1       // GL_ONE
+// ATOMIC END   
 };
 
 ParticleEffect2D::ParticleEffect2D(Context* context) :

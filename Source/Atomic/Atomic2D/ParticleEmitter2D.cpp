@@ -296,8 +296,9 @@ void ParticleEmitter2D::Update(float timeStep)
             --numParticles_;
         }
     }
-
-    if (emissionTime_ >= 0.0f)
+    // ATOMIC BEGIN
+    if (emissionTime_ > 0.0f)
+    // ATOMIC END
     {
         float worldAngle = GetNode()->GetWorldRotation().RollAngle();
 
