@@ -104,6 +104,11 @@ void ParticleEmitter2D::SetEffect(ParticleEffect2D* model)
     emissionTime_ = effect_->GetDuration();
 }
 
+void ParticleEmitter2D::SetEmissionEnabled(bool enable)
+{
+	emissionEnabled_ = enable;
+}
+
 void ParticleEmitter2D::SetSprite(Sprite2D* sprite)
 {
     if (sprite == sprite_)
@@ -134,6 +139,11 @@ void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
     sourceBatches_[0].vertices_.Reserve(maxParticles * 4);
 
     numParticles_ = Min(maxParticles, numParticles_);
+}
+
+bool ParticleEmitter2D::GetEmissionEnabled() const
+{
+	return emissionEnabled_;
 }
 
 ParticleEffect2D* ParticleEmitter2D::GetEffect() const
@@ -323,7 +333,7 @@ void ParticleEmitter2D::Update(float timeStep)
 
 bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
 {
-    if (numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
+    if (!emissionEnabled_ || numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
         return false;
 
     float lifespan = effect_->GetParticleLifeSpan() + effect_->GetParticleLifespanVariance() * Random(-1.0f, 1.0f);

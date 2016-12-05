@@ -88,6 +88,8 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
+	/// Set emission enabled.
+	void SetEmissionEnabled(bool enable);
     /// Set particle effect.
     void SetEffect(ParticleEffect2D* effect);
     /// Set sprite.
@@ -97,6 +99,8 @@ public:
     /// Set max particles.
     void SetMaxParticles(unsigned maxParticles);
 
+	/// Return emission state.
+	bool GetEmissionEnabled() const;
     /// Return particle effect.
     ParticleEffect2D* GetEffect() const;
     /// Return sprite.
@@ -137,6 +141,8 @@ private:
     /// Update particle.
     void UpdateParticle(Particle2D& particle, float timeStep, const Vector3& worldPosition, float worldScale);
 
+	/// Emission enabled.
+	bool emissionEnabled_;
     /// Particle effect.
     SharedPtr<ParticleEffect2D> effect_;
     /// Sprite.
