@@ -30,11 +30,14 @@ If you need excellent, high performance technology which leverages the full migh
 - Available as precompiled binaries or fork on GitHub under the permissive MIT license
 - Backed by software professionals with decades of experience in the technology and game industries
 
-#### Documentation and Downloads
+#### Downloads
 
 **[Download the Atomic Editor](http://atomicgameengine.com/#download-the-atomic-editor)**
 
-**[Documentation Wiki](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki)**
+#### Documentation
+
+<a href="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/">![](http://atomicgameengine.com/images/community/Community_GitHub.png)
+</a>
 
 **API References:** <a href="http://docs.atomicgameengine.com/api/globals.html" target="_blank">JavaScript/TypeScript</a>, *C# (Coming Soon)*, *C++ (Coming Soon)*
 
