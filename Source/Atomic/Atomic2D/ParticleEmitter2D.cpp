@@ -106,7 +106,7 @@ void ParticleEmitter2D::SetEffect(ParticleEffect2D* model)
 
 void ParticleEmitter2D::SetEmissionEnabled(bool enable)
 {
-	emissionEnabled_ = enable;
+    emissionEnabled_ = enable;
 }
 
 void ParticleEmitter2D::SetSprite(Sprite2D* sprite)
@@ -143,7 +143,7 @@ void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
 
 bool ParticleEmitter2D::GetEmissionEnabled() const
 {
-	return emissionEnabled_;
+    return emissionEnabled_;
 }
 
 ParticleEffect2D* ParticleEmitter2D::GetEffect() const
