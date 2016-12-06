@@ -30,7 +30,7 @@ import ModelInspector = require("./ModelInspector");
 import PrefabInspector = require("./PrefabInspector");
 import TextureInspector = require("./TextureInspector");
 import AssemblyInspector = require("./AssemblyInspector");
-
+import ServiceLocator from "../../../hostExtensions/ServiceLocator";
 import SelectionInspector = require("./SelectionInspector");
 // make sure these are hooked in
 import "./SelectionEditTypes";
@@ -231,8 +231,19 @@ class InspectorFrame extends ScriptWidget {
 
         }
 
+        // Check if there are inspector plugins available for unknown asset types.
+        if (asset.importerType == null) {
+
+            ServiceLocator.uiServices.projectAssetClicked(asset);
+        }
     }
 
+    loadCustomInspectorWidget(rootWidget: Atomic.UIWidget) {
+
+        var container = this.getWidget("inspectorcontainer");
+        container.deleteAllChildren();
+        container.addChild(rootWidget);
+    }
 }
 
 export = InspectorFrame;

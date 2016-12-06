@@ -23,6 +23,7 @@
 import * as EditorEvents from "../editor/EditorEvents";
 import * as EditorUI from "../ui/EditorUI";
 import MainFrame = require("../ui/frames/MainFrame");
+import InspectorFrame = require("../ui/frames/inspector/InspectorFrame");
 import ModalOps = require("../ui/modal/ModalOps");
 import ResourceOps = require("../resources/ResourceOps");
 import Editor = require("../editor/Editor");
@@ -327,12 +328,14 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
     }
 
     private mainFrame: MainFrame = null;
+    private inspectorFrame: InspectorFrame = null;
     private modalOps: ModalOps;
 
     init(mainFrame: MainFrame, modalOps: ModalOps) {
         // Only set these once
         if (this.mainFrame == null) {
             this.mainFrame = mainFrame;
+            this.inspectorFrame = this.mainFrame.inspectorframe;
         }
         if (this.modalOps == null) {
             this.modalOps = modalOps;
@@ -409,6 +412,15 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
         this.mainFrame.hierarchyFrame.populate();
     }
 
+    /**
+     * Loads Custom Inspector Widget
+     * @param  {Atomic.UIWidget} customInspector
+     */
+    loadCustomInspector(customInspector: Atomic.UIWidget) {
+        if (this.inspectorFrame) {
+            this.inspectorFrame.loadCustomInspectorWidget(customInspector);
+        }
+    }
     /**
      * Disaplays a modal window
      * @param  {Editor.Modal.ModalWindow} window
@@ -527,7 +539,30 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
             }
         });
     }
+    /**
+ * Called when a project asset in the hierarchy pane has been clicked
+ * @param  {ToolCore.Asset} asset
+ * @type {boolean} return true if handled
+ */
+    projectAssetClicked(asset: ToolCore.Asset):boolean {
 
+        if (!asset) {
+            return false;
+        }
+        // run through and find any services that can handle this.
+        return this.registeredServices.some((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle it
+                if (service.projectAssetClicked) {
+                    if (service.projectAssetClicked(asset)) {
+                        return true;
+                    }
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
     /**
      * Hooks into web messages coming in from web views
      * @param  {[String|Object]} data
