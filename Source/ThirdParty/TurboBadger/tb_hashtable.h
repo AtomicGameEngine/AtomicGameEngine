@@ -51,6 +51,9 @@ public:
         the current number of items. */
     uint32 GetSuitableBucketsCount() const;
 
+    /** Get the number of items in the hash table. */
+    uint32 GetNumItems() const { return m_num_items; }
+
 #ifdef TB_RUNTIME_DEBUG_INFO
     /** Print out some debug info about the hash table. */
     void Debug();
@@ -98,10 +101,10 @@ public:
 template<class T>
 class TBHashTableOf : public TBHashTable
 {
-    // FIX: Don't do public inheritance! Either inherit privately and forward, or use a private member backend!
+// FIX: Don't do public inheritance! Either inherit privately and forward, or use a private member backend!
 public:
     T *Get(uint32 key) const { return (T*) TBHashTable::Get(key); }
-
+    T *Remove(uint32 key) { return (T*) TBHashTable::Remove(key); }
 protected:
     virtual void DeleteContent(void *content) { delete (T*) content; }
 };
@@ -120,6 +123,6 @@ protected:
     virtual void DeleteContent(void *content) { delete (T*) content; }
 };
 
-}; // namespace tb
+} // namespace tb
 
 #endif // TB_HASHTABLE_H

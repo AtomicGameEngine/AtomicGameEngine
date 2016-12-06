@@ -60,7 +60,7 @@ TBImage::~TBImage()
 
 bool TBImage::IsEmpty() const
 {
-    return m_image_rep && m_image_rep->fragment;
+    return !(m_image_rep && m_image_rep->fragment);
 }
 
 int TBImage::Width() const
@@ -171,6 +171,6 @@ void TBImageManager::OnContextRestored()
     // No need to do anything. The bitmaps will be created when drawing.
 }
 
-}; // namespace tb
+} // namespace tb
 
 #endif // TB_IMAGE
