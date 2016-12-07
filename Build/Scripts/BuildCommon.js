@@ -260,11 +260,17 @@ namespace('build', function() {
     if (os.platform() == "win32") {
         cppDoc = "doxygen";  // I dont know what to do here...
     }
-    else
+    else {
+
+        // check for installed doxygen, otherwise use one on path
         cppDoc = "/usr/bin/doxygen";
- 
+        if (!fs.existsSync(cppDoc)) {
+            cppDoc = "doxygen";
+        }
+    }
+
     cmds = [
-      "cd " + atomicRoot + "Source && " + cppDoc + " " + atomicRoot + "Build/Docs/Doxyfile" 
+      "cd " + atomicRoot + "Source && " + cppDoc + " " + atomicRoot + "Build/Docs/Doxyfile"
     ];
 
     jake.exec(cmds, function() {
