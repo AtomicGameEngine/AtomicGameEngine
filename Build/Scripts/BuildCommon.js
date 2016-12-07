@@ -11,6 +11,7 @@ var config = require('./BuildConfig');
 
 var atomicRoot = config.atomicRoot;
 var jsDocFolder = config.artifactsRoot + "Build/JSDoc/";
+var cppDocFolder = config.artifactsRoot + "Build/CPPDocs/";
 
 namespace('build', function() {
 
@@ -240,6 +241,43 @@ namespace('build', function() {
       complete();
 
       console.log( "completed installing API documentation" );
+
+    }, {
+
+      printStdout: true
+
+    });
+
+  });
+
+  task('gendoxygen', {
+    async: true
+    }, function() {
+
+    console.log( "Generating C++ API Documentation..." );
+
+    var cppDoc;
+    if (os.platform() == "win32") {
+        cppDoc = "doxygen";  // I dont know what to do here...
+    }
+    else {
+        // use doxygen on path
+        cppDoc = "doxygen";
+    }
+
+    cmds = [
+      "cd " + atomicRoot + "Source && " + cppDoc + " " + atomicRoot + "Build/Docs/CPlusPlus/Doxyfile"
+    ];
+
+    jake.exec(cmds, function() {
+
+      common.cleanCreateDir( config.toolDataFolder + "Docs/CPPDocs"); // clear destination
+
+      fs.copySync(cppDocFolder, config.toolDataFolder + "Docs/CPPDocs"); // copy into release same place as JSDocs
+
+      complete();
+
+      console.log( "completed installing CPP API documentation" );
 
     }, {
 
