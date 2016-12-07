@@ -27,6 +27,7 @@
 #include "../Core/Object.h"
 #include "../Container/List.h"
 #include "../Input/InputEvents.h"
+#include "../UI/UIButton.h"
 
 // ATOMIC BEGIN
 // #include "../UI/Cursor.h"
@@ -50,6 +51,7 @@ class Graphics;
 class Serializer;
 class UIWidget;
 class XMLFile;
+class UIButton;
 
 const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
@@ -330,6 +332,9 @@ public:
     bool IsMinimized() const;
 
 // ATOMIC BEGIN
+    /// Binds UIButton element to the given button
+    void BindButton(UIButton* touchButton, int button);
+
     void SimulateButtonDown(int button);
     void SimulateButtonUp(int button);
     
