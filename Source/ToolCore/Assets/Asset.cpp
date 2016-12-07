@@ -274,7 +274,7 @@ bool Asset::CreateImporter()
         {
             importer_ = new ModelImporter(context_, this);
         }
-        if (ext == ".ogg" || ext == ".wav")
+        else if (ext == ".ogg" || ext == ".wav")
         {
             importer_ = new AudioImporter(context_, this);
         }
@@ -333,6 +333,10 @@ bool Asset::CreateImporter()
         else if (textureFormats.Contains(ext))
         {
             importer_ = new TextureImporter(context_, this);
+        }
+        else
+        {
+            importer_ = new AssetImporter(context_, this);
         }
 
     }
