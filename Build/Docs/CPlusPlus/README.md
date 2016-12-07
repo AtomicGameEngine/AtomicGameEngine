@@ -35,7 +35,7 @@ Email: info@atomicgameengine.com
 
 **[GitHub Wiki](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/)**
 
-**API References:** <a href="http://docs.atomicgameengine.com/api/globals.html">JavaScript/TypeScript</a>, *C# (Coming Soon)*, <a href="http://docs.atomicgameengine.com/cpp/">C++</a>
+**API References:** <a href="http://docs.atomicgameengine.com/api/modules/atomic.html">JavaScript/TypeScript</a>, <a href="http://docs.atomicgameengine.com/csharp/">C#</a>, <a href="http://docs.atomicgameengine.com/cpp/">C++</a>
 
 #### Atomic Community
 

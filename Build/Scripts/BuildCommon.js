@@ -12,6 +12,7 @@ var config = require('./BuildConfig');
 var atomicRoot = config.atomicRoot;
 var jsDocFolder = config.artifactsRoot + "Build/JSDoc/";
 var cppDocFolder = config.artifactsRoot + "Build/CPPDocs/";
+var csharpDocFolder = config.artifactsRoot + "Build/CSharpDocs/";
 
 namespace('build', function() {
 
@@ -287,6 +288,42 @@ namespace('build', function() {
 
   });
 
+  task('genmdoc', {
+    async: true
+    }, function() {
+
+    console.log( "Generating C# API Documentation..." );
+
+    // mdoc must be on path
+    var mdoc = "mdoc";
+
+    // clear destination
+    common.cleanCreateDir( csharpDocFolder );
+
+    cmds = [
+      "cd " + csharpDocFolder + " && " + mdoc + " update -o docgen -i ../../AtomicNET/Release/Desktop/AtomicNET.xml ../../AtomicNET/Release/Desktop/AtomicNET.dll",
+      "cd " + csharpDocFolder + " && " + mdoc + " export-html -o html docgen --template=../../../Build/Docs/CSharp/atomictemplate.xlst"
+    ];
+
+    jake.exec(cmds, function() {
+
+      // clear destination
+      common.cleanCreateDir( config.toolDataFolder + "Docs/CSharpDocs");
+
+      // copy into release same place as JSDocs
+      fs.copySync(csharpDocFolder, config.toolDataFolder + "Docs/CSharpDocs");
+
+      complete();
+
+      console.log( "completed installing C# API documentation" );
+
+    }, {
+
+      printStdout: true
+
+    });
+
+  });
 
   task('genexamples', {
     async: true
