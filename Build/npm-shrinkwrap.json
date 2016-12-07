@@ -192,9 +192,9 @@
       "resolved": "https://registry.npmjs.org/tslint/-/tslint-3.2.1.tgz"
     },
     "typescript": {
-      "version": "2.0.3",
-      "from": "typescript@>=2.0.0 <2.1.0",
-      "resolved": "https://registry.npmjs.org/typescript/-/typescript-2.0.3.tgz"
+      "version": "2.1.4",
+      "from": "typescript@latest",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-2.1.4.tgz"
     },
     "underscore.string": {
       "version": "3.1.1",
