@@ -2758,6 +2758,10 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
 }
 
 // ATOMIC BEGIN
+void Input::BindButton(UIButton* touchButton, int button)
+{
+    touchButton->SetEmulationButton(button);
+}
 
 void Input::SimulateButtonDown(int button)
 {
