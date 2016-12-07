@@ -261,16 +261,12 @@ namespace('build', function() {
         cppDoc = "doxygen";  // I dont know what to do here...
     }
     else {
-
-        // check for installed doxygen, otherwise use one on path
-        cppDoc = "/usr/bin/doxygen";
-        if (!fs.existsSync(cppDoc)) {
-            cppDoc = "doxygen";
-        }
+        // use doxygen on path
+        cppDoc = "doxygen";
     }
 
     cmds = [
-      "cd " + atomicRoot + "Source && " + cppDoc + " " + atomicRoot + "Build/Docs/Doxyfile"
+      "cd " + atomicRoot + "Source && " + cppDoc + " " + atomicRoot + "Build/Docs/CPlusPlus/Doxyfile"
     ];
 
     jake.exec(cmds, function() {

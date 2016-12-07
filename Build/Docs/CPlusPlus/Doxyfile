@@ -13,7 +13,7 @@
 # TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (\" \").
 
-# Atomic Note - this file is to be executed in the AtomicGameEngine/Source 
+# Atomic Note - this file is to be executed in the AtomicGameEngine/Source
 #   directory, so all pathnames should be relative to that.
 
 #---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "Atomic Game Engine"
+PROJECT_NAME           = ""
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -54,7 +54,7 @@ PROJECT_BRIEF          =
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           =  ../Build/Docs/atomic-theme/assets/images/atomic-icon.png
+PROJECT_LOGO           =  ../Build/Docs/CPlusPlus/Atomic_Logo.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -746,7 +746,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  +=  ../README.md
+INPUT                  +=  ../Build/Docs/CPlusPlus/README.md
 INPUT                  +=  .
 
 # This tag can be used to specify the character encoding of the source files
@@ -883,7 +883,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = ../README.md
+USE_MDFILE_AS_MAINPAGE = ../Build/Docs/CPlusPlus/README.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1039,7 +1039,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            = 
+HTML_HEADER            =
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank doxygen will generate a standard
@@ -1049,7 +1049,7 @@ HTML_HEADER            =
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = ../Build/Docs/atomicfooter.html
+HTML_FOOTER            = ../Build/Docs/CPlusPlus/atomicfooter.html
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
