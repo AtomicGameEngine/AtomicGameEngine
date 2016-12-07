@@ -418,7 +418,7 @@ namespace ToolCore
 
     void NETProjectSystem::HandleAssetMoved(StringHash eventType, VariantMap& eventData)
     {
-        
+
     }
 
     void NETProjectSystem::Initialize()
@@ -445,8 +445,8 @@ namespace ToolCore
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
-        // On Windows, we first check for VS2015, then VS2017 which 
-        // at the time of this comment is in RC, refactor once 
+        // On Windows, we first check for VS2015, then VS2017 which
+        // at the time of this comment is in RC, refactor once
         // in general release
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
@@ -461,7 +461,9 @@ namespace ToolCore
             if (!fileSystem->FileExists(idePath_))
                 idePath_.Clear();
         }
-        else
+
+        // If we didn't find VS2015, look for VS2017
+        if (!idePath_.Length())
         {
             // check for VS2017
             Poco::WinRegistryKey regKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\SxS\\VS7", true);

@@ -312,6 +312,14 @@ namespace ToolCore
             // VS2015
             String vs2015ToolsPath = Poco::Environment::get("VS140COMNTOOLS", "").c_str();
 
+            // validate still installed
+
+            String installCheck = vs2015ToolsPath;
+            installCheck.Replace("Tools\\", "IDE\\devenv.exe");
+
+            if (!fileSystem->FileExists(installCheck))
+                vs2015ToolsPath.Clear();
+
             // VS2017
             String vs2017ToolsPath;
             Poco::WinRegistryKey regKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\SxS\\VS7", true);
