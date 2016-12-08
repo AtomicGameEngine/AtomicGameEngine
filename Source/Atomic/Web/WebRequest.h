@@ -62,7 +62,7 @@ class WebRequest : public Object
 
 public:
     /// Construct with parameters.
-    WebRequest(Context* context, const String& verb, const String& url, double requestContentSize);
+    WebRequest(Context* context, const String& verb, const String& url, double requestContentSize = 0.0);
     /// Destruct. Release the connection.
     ~WebRequest();
 

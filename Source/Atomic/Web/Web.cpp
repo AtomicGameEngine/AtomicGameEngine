@@ -95,15 +95,25 @@ void Web::internalUpdate(StringHash eventType, VariantMap& eventData)
 #endif
 }
 
+#ifndef EMSCRIPTEN
+void Web::setup(WebRequest& webRequest)
+{
+    webRequest.setup(&d->service, d->curlm);
+}
+
+void Web::setup(WebSocket& webSocket)
+{
+    webSocket.setup(&d->service);
+}
+#endif
+
+
 SharedPtr<WebRequest> Web::MakeWebRequest(const String& verb, const String& url, double requestContentSize)
 {
     ATOMIC_PROFILE(MakeWebRequest);
 
     // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<WebRequest> webRequest(new WebRequest(context_, verb, url, requestContentSize));
-#ifndef EMSCRIPTEN
-    webRequest->setup(&d->service, d->curlm);
-#endif
     return webRequest;
 }
 
@@ -113,9 +123,6 @@ SharedPtr<WebSocket> Web::MakeWebSocket(const String& url)
 
   // The initialization of the WebSocket will take time, can not know at this point if it has an error or not
   SharedPtr<WebSocket> webSocket(new WebSocket(context_, url));
-#ifndef EMSCRIPTEN
-  webSocket->setup(&d->service);
-#endif
   return webSocket;
 }
 

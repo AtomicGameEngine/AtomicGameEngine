@@ -25,6 +25,7 @@
 #include "../Core/Profiler.h"
 #include "../IO/BufferQueue.h"
 #include "../IO/Log.h"
+#include "../Web/Web.h"
 #include "../Web/WebSocket.h"
 
 #ifdef EMSCRIPTEN
@@ -152,6 +153,9 @@ WebSocket::WebSocket(Context* context, const String& url) :
 
     is_->c.clear_access_channels(websocketpp::log::alevel::all);
     is_->c.clear_error_channels(websocketpp::log::elevel::all);
+
+    Web* web = GetSubsystem<Web>();
+    web->setup(*this);
 }
 
 void WebSocket::setup(asio::io_service *service)
