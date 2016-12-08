@@ -8,6 +8,7 @@
 /// <reference path="Atomic.d.ts" />
 /// <reference path="Editor.d.ts" />
 /// <reference path="ToolCore.d.ts" />
+/// <reference path="WebView.d.ts" />
 
 declare module Editor.EditorEvents {
 
@@ -342,6 +343,7 @@ declare module Editor.HostExtensions {
     export interface UIServicesEventListener extends Editor.Extensions.ServiceEventListener {
         menuItemClicked?(refid: string): boolean;
         projectContextItemClicked?(asset: ToolCore.Asset, refid: string): boolean;
+        projectAssetClicked?(asset: ToolCore.Asset): boolean;
         hierarchyContextItemClicked?(node: Atomic.Node, refid: string): boolean;
 
         /**
@@ -360,6 +362,7 @@ declare module Editor.HostExtensions {
         createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
         removeProjectContextMenuItemSource(id: string);
         refreshHierarchyFrame();
+        loadCustomInspector(customInspector: Atomic.UIWidget);
         showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
         showModalError(windowText: string, message: string);
         showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args?: any);
