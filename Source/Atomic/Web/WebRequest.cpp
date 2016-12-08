@@ -26,6 +26,7 @@
 #include "../Container/HashMap.h"
 #include "../IO/BufferQueue.h"
 #include "../IO/Log.h"
+#include "../Web/Web.h"
 #include "../Web/WebRequest.h"
 
 #ifdef EMSCRIPTEN
@@ -279,6 +280,8 @@ WebRequest::WebRequest(Context* context, const String& verb, const String& url, 
     is_->isAborted = false;
     is_->isAddedToMulti = false;
 
+    Web* web = GetSubsystem<Web>();
+    web->setup(*this);
 }
 
 WebRequest::~WebRequest()
@@ -400,7 +403,10 @@ void WebRequest::Send()
     {
         is_->es_hold = this;
         curl_easy_setopt(is_->curl, CURLOPT_HTTPHEADER, is_->headers);
-        curl_multi_add_handle(is_->curlm, is_->curl);
+        if (CURLM_OK != curl_multi_add_handle(is_->curlm, is_->curl))
+        {
+            ATOMIC_LOGDEBUG("ERROR SENDING REQUEST!");
+        }
         is_->isAddedToMulti = true;
     }
 }
