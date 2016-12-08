@@ -31,7 +31,7 @@ namespace ToolCore
 
 AssetImporter::AssetImporter(Context* context, Asset *asset) : Object(context),
     asset_(asset),
-    requiresCacheFile_(true)
+    requiresCacheFile_(false)
 {
     SetDefaults();
 }

@@ -36,7 +36,6 @@ namespace ToolCore
 
 SpriterImporter::SpriterImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
-    requiresCacheFile_ = false;
 }
 
 SpriterImporter::~SpriterImporter()

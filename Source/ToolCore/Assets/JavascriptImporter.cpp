@@ -37,7 +37,6 @@ namespace ToolCore
 
 JavascriptImporter::JavascriptImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
-    requiresCacheFile_ = false;
     isComponentFile_ = false;
 }
 

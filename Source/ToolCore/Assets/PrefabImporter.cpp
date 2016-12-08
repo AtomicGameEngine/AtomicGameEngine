@@ -37,6 +37,8 @@ namespace ToolCore
 PrefabImporter::PrefabImporter(Context* context, Asset* asset) : AssetImporter(context, asset),
     lastFileStamp_(0xFFFFFFFF)
 {
+    requiresCacheFile_ = true;
+
     SubscribeToEvent(E_PREFABSAVE, ATOMIC_HANDLER(PrefabImporter, HandlePrefabSave));
 }
 

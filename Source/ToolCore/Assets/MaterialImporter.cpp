@@ -33,7 +33,6 @@ namespace ToolCore
 
 MaterialImporter::MaterialImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
-    requiresCacheFile_ = false;
 }
 
 MaterialImporter::~MaterialImporter()

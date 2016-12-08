@@ -37,7 +37,6 @@ namespace ToolCore
 
 JSONImporter::JSONImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
-    requiresCacheFile_ = false;
 }
 
 JSONImporter::~JSONImporter()
