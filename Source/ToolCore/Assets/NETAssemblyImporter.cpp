@@ -41,7 +41,6 @@ namespace ToolCore
 
     NETAssemblyImporter::NETAssemblyImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
     {
-        requiresCacheFile_ = false;
         resultHandler_ = new NETAssemblyImporterResultHandler(context, this);
     }
 

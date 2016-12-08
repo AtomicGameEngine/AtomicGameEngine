@@ -34,7 +34,6 @@ namespace ToolCore
 
 TypeScriptImporter::TypeScriptImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
-    requiresCacheFile_ = false;
     isComponentFile_ = false;
 }
 

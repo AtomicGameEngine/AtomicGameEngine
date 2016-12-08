@@ -37,7 +37,6 @@ namespace ToolCore
 
     CSharpImporter::CSharpImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
     {
-        requiresCacheFile_ = false;
     }
 
     CSharpImporter::~CSharpImporter()

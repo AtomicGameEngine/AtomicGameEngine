@@ -47,6 +47,8 @@ namespace ToolCore
 /// Node + Model (static or animated)
 ModelImporter::ModelImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
+    requiresCacheFile_ = true;
+
     SetDefaults();
 }
 

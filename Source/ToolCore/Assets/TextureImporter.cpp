@@ -39,6 +39,8 @@ namespace ToolCore
     TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
         compressTextures_(false), compressedSize_(0)
 {
+    requiresCacheFile_ = true;
+
     ApplyProjectImportConfig();
 }
 
