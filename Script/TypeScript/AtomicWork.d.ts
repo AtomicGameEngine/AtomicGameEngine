@@ -26,6 +26,8 @@ declare module Atomic {
 
     // end subsystems
 
+    // Base interface for events
+    export interface NativeEvent { }
 
     export interface PathInfo {
 
@@ -35,7 +37,7 @@ declare module Atomic {
 
     }
 
-    export interface ScreenModeEvent {
+    export interface ScreenModeEvent extends Atomic.NativeEvent {
 
         width: number;
         height: number;
@@ -104,7 +106,7 @@ declare module Atomic {
         subObject: number;
     }
 
-    export interface KeyDownEvent {
+    export interface KeyDownEvent extends NativeEvent {
 
         // keycode
         key: number;
@@ -116,7 +118,7 @@ declare module Atomic {
 
     }
 
-    export interface KeyUpEvent {
+    export interface KeyUpEvent extends NativeEvent {
 
         // keycode
         key: number;
@@ -127,7 +129,7 @@ declare module Atomic {
 
     }
 
-    export interface UIShortcutEvent {
+    export interface UIShortcutEvent extends NativeEvent {
 
         // keycode
         key: number;
@@ -136,14 +138,14 @@ declare module Atomic {
 
     }
 
-    export interface UIListViewSelectionChangedEvent {
+    export interface UIListViewSelectionChangedEvent extends NativeEvent {
 
         refid: string;
         selected: boolean;
 
     }
 
-    export interface NodeAddedEvent {
+    export interface NodeAddedEvent extends NativeEvent {
 
         scene: Atomic.Scene;
         parent: Atomic.Node;
@@ -151,7 +153,7 @@ declare module Atomic {
 
     }
 
-    export interface NodeRemovedEvent {
+    export interface NodeRemovedEvent extends NativeEvent {
 
         scene: Atomic.Scene;
         parent: Atomic.Node;
@@ -159,14 +161,14 @@ declare module Atomic {
 
     }
 
-    export interface NodeNameChangedEvent {
+    export interface NodeNameChangedEvent extends NativeEvent {
 
         scene: Atomic.Scene;
         node: Atomic.Node;
 
     }
 
-    export interface UIWidgetEvent {
+    export interface UIWidgetEvent extends NativeEvent {
 
         handler: UIWidget;
         target: UIWidget;
@@ -183,51 +185,51 @@ declare module Atomic {
         touch: boolean;
     }
 
-    export interface UIWidgetFocusChangedEvent {
+    export interface UIWidgetFocusChangedEvent extends NativeEvent {
         widget: UIWidget;
         focused: boolean;
     }
 
-    export interface UIWidgetEditCompleteEvent {
+    export interface UIWidgetEditCompleteEvent extends NativeEvent {
         widget: UIWidget;
     }
 
-    export interface UIWidgetDeletedEvent {
+    export interface UIWidgetDeletedEvent extends NativeEvent {
 
         widget: UIWidget;
     }
 
-    export interface DragBeginEvent {
+    export interface DragBeginEvent extends NativeEvent {
 
         source: UIWidget;
         dragObject: UIDragObject;
     }
 
-    export interface DragEnterWidgetEvent {
+    export interface DragEnterWidgetEvent extends NativeEvent {
 
         widget: UIWidget;
         dragObject: UIDragObject;
     }
 
-    export interface DragExitWidgetEvent {
+    export interface DragExitWidgetEvent extends NativeEvent {
 
         widget: UIWidget;
         dragObject: UIDragObject;
     }
 
-    export interface DragEndedEvent {
+    export interface DragEndedEvent extends NativeEvent {
 
         target: UIWidget;
         dragObject: UIDragObject;
     }
 
-    export interface TemporaryChangedEvent {
+    export interface TemporaryChangedEvent extends NativeEvent {
 
         serializable: Atomic.Serializable;
 
     }
 
-    export interface ComponentAddedEvent {
+    export interface ComponentAddedEvent extends NativeEvent {
 
         scene: Atomic.Scene;
         node: Atomic.Node;
@@ -235,7 +237,7 @@ declare module Atomic {
 
     }
 
-    export interface ComponentRemovedEvent {
+    export interface ComponentRemovedEvent extends NativeEvent {
 
         scene: Atomic.Scene;
         node: Atomic.Node;
@@ -243,7 +245,7 @@ declare module Atomic {
 
     }
 
-    export interface IPCJSErrorEvent {
+    export interface IPCJSErrorEvent extends NativeEvent {
 
         errorName: string;
         errorMessage: string;
@@ -254,7 +256,7 @@ declare module Atomic {
     }
 
 
-    export interface IPCMessageEvent {
+    export interface IPCMessageEvent extends NativeEvent {
 
         message: string;
         value: number;
@@ -312,21 +314,21 @@ declare module Atomic {
 
 declare module Editor {
 
-    export interface SceneNodeSelectedEvent {
+    export interface SceneNodeSelectedEvent extends Atomic.NativeEvent {
         scene: Atomic.Scene;
         node: Atomic.Node;
         selected: boolean;
         quiet: boolean;
     }
 
-    export interface SceneEditAddRemoveNodesEvent {
+    export interface SceneEditAddRemoveNodesEvent extends Atomic.NativeEvent {
 
         end: boolean;
 
     }
 
 
-    export interface SceneEditNodeAddedEvent {
+    export interface SceneEditNodeAddedEvent extends Atomic.NativeEvent {
 
         scene: Atomic.Scene;
         parent: Atomic.Node;
@@ -334,7 +336,7 @@ declare module Editor {
 
     }
 
-    export interface SceneEditNodeRemovedEvent {
+    export interface SceneEditNodeRemovedEvent extends Atomic.NativeEvent {
 
         scene: Atomic.Scene;
         parent: Atomic.Node;
@@ -342,7 +344,7 @@ declare module Editor {
 
     }
 
-    export interface SceneEditComponentAddedRemovedEvent {
+    export interface SceneEditComponentAddedRemovedEvent extends Atomic.NativeEvent {
 
         scene: Atomic.Scene;
         node: Atomic.Node;
@@ -350,21 +352,21 @@ declare module Editor {
         removed: boolean;
     }
 
-    export interface SceneEditStateChangeEvent {
+    export interface SceneEditStateChangeEvent extends Atomic.NativeEvent {
 
         serializable: Atomic.Serializable;
 
     }
 
-    export interface SceneEditNodeCreatedEvent {
+    export interface SceneEditNodeCreatedEvent extends Atomic.NativeEvent {
         node: Atomic.Node;
     }
 
-    export interface GizmoEditModeChangedEvent {
+    export interface GizmoEditModeChangedEvent extends Atomic.NativeEvent {
         mode: EditMode;
     }
 
-    export interface GizmoAxisModeChangedEvent {
+    export interface GizmoAxisModeChangedEvent extends Atomic.NativeEvent {
         mode: AxisMode;
     }
 
@@ -372,38 +374,38 @@ declare module Editor {
 
 declare module ToolCore {
 
-    export interface ResourceAddedEvent {
+    export interface ResourceAddedEvent extends Atomic.NativeEvent {
 
         guid: string;
 
     }
 
-    export interface ResourceRemovedEvent {
+    export interface ResourceRemovedEvent extends Atomic.NativeEvent {
 
         guid: string;
 
     }
 
-    export interface LicenseDeactivationErrorEvent {
+    export interface LicenseDeactivationErrorEvent extends Atomic.NativeEvent {
 
         message: string;
 
     }
 
-    export interface AssetImportErrorEvent {
+    export interface AssetImportErrorEvent extends Atomic.NativeEvent {
 
         path: string;
         guid: string;
         error: string;
     }
 
-    export interface AssetRenamedEvent {
+    export interface AssetRenamedEvent extends Atomic.NativeEvent {
 
         asset: Asset;
 
     }
 
-    export interface AssetMovedEvent {
+    export interface AssetMovedEvent extends Atomic.NativeEvent {
 
         asset: Asset;
         oldPath: string;
@@ -411,19 +413,19 @@ declare module ToolCore {
     }
 
 
-    export interface PlatformChangedEvent {
+    export interface PlatformChangedEvent extends Atomic.NativeEvent {
 
         platform: ToolCore.Platform;
 
     }
 
-    export interface BuildOutputEvent {
+    export interface BuildOutputEvent extends Atomic.NativeEvent {
 
         text: string;
 
     }
 
-    export interface BuildCompleteEvent {
+    export interface BuildCompleteEvent extends Atomic.NativeEvent {
 
         platformID: number;
         message: string;

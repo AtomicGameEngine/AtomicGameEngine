@@ -63,6 +63,11 @@ String JSBEvent::GetScriptEventName() const
 
 }
 
+unsigned JSBEvent::GetEventHash() const
+{
+    return StringHash(eventName_).Value();
+}
+
 bool JSBEvent::ScanModuleEvents(JSBModule* module)
 {
     const Vector<SharedPtr<JSBHeader>>& headers = module->GetHeaders();

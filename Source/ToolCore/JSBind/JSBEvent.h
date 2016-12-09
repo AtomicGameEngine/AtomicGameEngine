@@ -54,6 +54,7 @@ namespace ToolCore
 
         const String& GetEventID() const { return eventID_; }
         const String& GetEventName() const { return eventName_; }
+        unsigned GetEventHash() const;
         /// Generally this is the EventName + "Event"
         String GetScriptEventName() const;
         const Vector<EventParam>& GetParameters() const { return parameters_;  }

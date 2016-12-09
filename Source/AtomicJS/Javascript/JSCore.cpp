@@ -43,6 +43,8 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         if (duk_is_string(ctx, 0) && duk_is_function(ctx, 1))
         {
             eventType = duk_to_string(ctx, 0);
+        } else if(duk_is_number(ctx, 0) && duk_is_function(ctx, 1)) {
+            eventType = StringHash(duk_to_number(ctx, 0));
         }
     }
     else if (top == 3) // Listen to specific object sender subscribeToEvent(graphics, "ScreenMode", function() {});
@@ -51,6 +53,9 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         {
             sender = js_to_class_instance<Object>(ctx, 0, 0);
             eventType = duk_to_string(ctx, 1);
+        } else if (duk_is_object(ctx, 0) && duk_is_number(ctx, 1) && duk_is_function(ctx, 2)) {
+            sender = js_to_class_instance<Object>(ctx, 0, 0);
+            eventType = StringHash(duk_to_number(ctx, 1));
         }
     }
 

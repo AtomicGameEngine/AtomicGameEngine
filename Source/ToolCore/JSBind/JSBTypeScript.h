@@ -58,6 +58,8 @@ private:
     void ExportModuleConstants(JSBModule*  moduleName);
     void ExportModuleClasses(JSBModule*  moduleName);
 
+    void ExportModuleEvents(JSBModule* module);
+
     void WriteToFile(const String& path);
 
     JSBPackage* package_;

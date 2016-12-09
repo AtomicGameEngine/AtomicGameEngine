@@ -30,6 +30,7 @@
 #include "JSBModule.h"
 #include "JSBFunction.h"
 #include "JSBTypeScript.h"
+#include "JSBEvent.h"
 
 namespace ToolCore
 {
@@ -362,6 +363,104 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
 }
 
+
+void JSBTypeScript::ExportModuleEvents(JSBModule* module)
+{
+
+    String source;
+
+    const Vector<SharedPtr<JSBEvent>>& events = module->GetEvents();
+
+    // First build up the Event Types
+    for (unsigned i = 0; i < events.Size(); i++)
+    {
+        JSBEvent* event = events[i];
+        const String& eventID = event->GetEventID();
+        if (i == 0) {
+            source += "    // this is a partial enum that combines with other definitions of 'NativeEventType'\n";
+            source += "    export const enum NativeEventType {\n";
+        }
+
+        source += ToString("        %s = %d", event->GetEventName().CString(), event->GetEventHash());
+
+        if (i == events.Size() -1) {
+            source += "\n";
+            source += "    }\n\n";
+        } else {
+            source += ",\n";
+        }
+    }
+
+    for (unsigned i = 0; i < events.Size(); i++)
+    {
+        JSBEvent* event = events[i];
+
+        const String& eventID = event->GetEventID();
+
+        source += ToString("    export interface %s extends Atomic.NativeEvent {\n", event->GetScriptEventName().CString());
+
+        // parameters
+
+        const Vector<JSBEvent::EventParam>& params = event->GetParameters();
+
+        for (unsigned j = 0; j < params.Size(); j++)
+        {
+            const JSBEvent::EventParam& p = params[j];
+
+            JSBClass* cls = JSBPackage::GetClassAllPackages(p.typeInfo_);
+
+            String typeName = p.typeInfo_;
+            String enumTypeName = p.enumTypeName_;
+
+            if (!cls)
+                typeName = typeName.ToLower();
+            else
+                typeName = cls->GetName();
+
+            if (typeName == "int" || typeName == "float" || typeName == "unsigned" ||
+                typeName == "bool" || typeName == "string" || typeName == "enum" || cls)
+            {
+
+                bool isEnum = false;
+                if (typeName == "enum")
+                {
+                    isEnum = true;
+                    // Once proper TypeScript enums are in place, uncomment the following.  See: #1268
+                    //if (enumTypeName.Length())
+                    //    typeName = enumTypeName;
+                    //else
+                    typeName = "number";
+                }
+
+                if (typeName == "int" || typeName == "float" || typeName == "unsigned")
+                {
+                    typeName = "number";
+                } else if (typeName == "bool") {
+                    typeName = "boolean";
+                } else if (cls) {
+                    typeName = ToString("%s.%s", cls->GetPackage()->GetName().CString(), typeName.CString());
+                }
+
+                if (isEnum && enumTypeName.Length())
+                {
+                    source += ToString("        /** Enum: %s */\n", enumTypeName.CString());
+                    source += ToString("        %s : %s;\n", p.paramName_.ToLower().CString(), typeName.CString());
+                } else {
+                    source += ToString("        %s : %s;\n", p.paramName_.ToLower().CString(), typeName.CString());
+                }
+            }
+            else
+            {
+                source += ToString("        // Unmapped Native Type:%s \n", typeName.CString());
+                source += ToString("        // %s : any;\n", p.paramName_.ToLower().CString());
+            }
+        }
+
+        source += "    }\n\n";
+    }
+    source_ += source;
+}
+
 void JSBTypeScript::WriteToFile(const String &path)
 {
     File file(package_->GetContext());
@@ -405,6 +504,7 @@ void JSBTypeScript::Emit(JSBPackage* package, const String& path)
         source_ += "// MODULE: " + modules[i]->GetName() + "\n";
         source_ += "//----------------------------------------------------\n\n";
         ExportModuleClasses(modules[i]);
+        ExportModuleEvents(modules[i]);
     }
 
 

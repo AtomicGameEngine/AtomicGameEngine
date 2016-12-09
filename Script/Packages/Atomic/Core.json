@@ -25,7 +25,9 @@
 		"Object" : [
 			"sendEvent(eventType:string, data?:Object);",
 			"subscribeToEvent(eventType:string, callback:(data:any) => void);",
-			"subscribeToEvent(sender:AObject, eventType:string, callback:(data: any) => void);"
+			"subscribeToEvent(sender:AObject, eventType:string, callback:(data: any) => void);",
+			"subscribeToEvent<T extends Atomic.NativeEvent>(sender: AObject, eventType: Atomic.NativeEventType, callback:(data: T) => void);",
+			"subscribeToEvent<T extends Atomic.NativeEvent>(eventType: Atomic.NativeEventType, callback:(data: T) => void);"
 		]
 	},
 	"haxe_decl" : {
