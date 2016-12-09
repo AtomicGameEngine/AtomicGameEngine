@@ -381,7 +381,7 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
             source += "    export const enum NativeEventType {\n";
         }
 
-        source += ToString("        %s = %d", event->GetEventName().CString(), event->GetEventHash());
+        source += ToString("        %s = %u", event->GetEventName().CString(), event->GetEventHash());
 
         if (i == events.Size() -1) {
             source += "\n";
