@@ -115,6 +115,13 @@ ATOMIC_EVENT(E_MASTERMESSAGE, MasterServerMessage)
     ATOMIC_PARAM(P_DATA, Data);                    // Buffer
 }
 
+/// Unhandled master message received.
+ATOMIC_EVENT(E_NETWORKSTRINGMESSAGE, NetworkStringMessage)
+{
+    ATOMIC_PARAM(P_CONNECTION, Connection);      // Connection pointer
+    ATOMIC_PARAM(P_DATA, Data);                  // Buffer
+}
+
 // ATOMIC END
 
 }
