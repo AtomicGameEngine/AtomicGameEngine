@@ -40,6 +40,7 @@
 
 // ATOMIC BEGIN
 #include <kNet/include/kNet.h>
+#include <kNet/include/kNet/EndPoint.h>
 // ATOMIC END
 
 #include "../DebugNew.h"
