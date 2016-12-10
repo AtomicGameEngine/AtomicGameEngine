@@ -131,6 +131,7 @@ private:
     bool noOverwriteTexture_;
     bool noOverwriteNewerTexture_;
     bool checkUniqueModel_;
+    bool useVertexColors_;
     float scale_;
     unsigned maxBones_;
 
