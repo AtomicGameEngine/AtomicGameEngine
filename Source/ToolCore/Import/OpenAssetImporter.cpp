@@ -573,7 +573,6 @@ String OpenAssetImporter::GetMeshMaterialName(aiMesh* mesh)
     aiMaterial* material = scene_->mMaterials[mesh->mMaterialIndex];
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
-
     String matName = SanitateAssetName(FromAIString(matNameStr));
     if (matName.Trimmed().Empty())
         matName = GenerateMaterialName(material);
@@ -912,14 +911,7 @@ void OpenAssetImporter::SetOveriddenFlags(VariantMap& aiFlagParameters)
         else if (itr->first_ == "IncludeNonSkinningBones")
             includeNonSkinningBonesDefault_ = itr->second_.GetBool();
         else if (itr->first_ == "useVertexColors")
-        {
-            PrintLine("*** GOT VERTEX SETTING ***");
-
             useVertexColors_ = itr->second_.GetBool();
-
-            if(useVertexColors_) PrintLine("**** VERTEX TRUE ****");
-                    else PrintLine("**** VERTEX FALSE ****");
-        }
 
         itr++;
     }
@@ -1246,16 +1238,12 @@ bool OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<Strin
 
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
         diffuseTexName = GetFileNameAndExtension(FromAIString(stringVal));
-
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
         normalTexName = GetFileNameAndExtension(FromAIString(stringVal));
-
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
-
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
-
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
         emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
 

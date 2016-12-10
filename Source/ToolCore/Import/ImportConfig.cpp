@@ -101,7 +101,6 @@ bool ImportConfig::LoadDesktopConfig(JSONValue root)
     const JSONValue& jModelImporterConfig = jdesktop["ModelImporter"];
     if (jModelImporterConfig.IsObject())
         LoadModelImporterConfig(jModelImporterConfig);
-
     const JSONValue& jTextureImporterConfig = jdesktop["TextureImporter"];
     if (jTextureImporterConfig.IsObject())
         LoadTextureImporterConfig(jTextureImporterConfig);
