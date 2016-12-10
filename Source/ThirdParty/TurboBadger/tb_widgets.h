@@ -57,10 +57,6 @@ enum EVENT_TYPE {
     EVENT_TYPE_POINTER_MOVE,
     EVENT_TYPE_RIGHT_POINTER_DOWN,
     EVENT_TYPE_RIGHT_POINTER_UP,
-    EVENT_TYPE_TOUCH_DOWN,
-    EVENT_TYPE_TOUCH_UP,
-    EVENT_TYPE_TOUCH_MOVE,
-    EVENT_TYPE_TOUCH_CANCEL,
     EVENT_TYPE_WHEEL,
 
     /** Invoked after changing text in a TBTextField, changing selected item
@@ -90,7 +86,14 @@ enum EVENT_TYPE {
     EVENT_TYPE_TAB_CHANGED,
 
     /** Custom event. Not used internally. ref_id may be used for additional type info. */
-    EVENT_TYPE_CUSTOM
+    EVENT_TYPE_CUSTOM,
+    
+    /** Turbobadger implementation for touch events */
+    EVENT_TYPE_TOUCH_DOWN,
+    EVENT_TYPE_TOUCH_UP,
+    EVENT_TYPE_TOUCH_MOVE,
+    EVENT_TYPE_TOUCH_CANCEL
+
 };
 
 enum MODIFIER_KEYS {
