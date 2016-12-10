@@ -70,6 +70,8 @@ bool ImportConfig::LoadModelImporterConfig(const JSONValue& jModelImporterConfig
             valueMap_["ImportMaterials"] = GetBoolValue(jvalue, true);
         else if (key == "includeNonSkinningBones")
             valueMap_["IncludeNonSkinningBones"] = GetBoolValue(jvalue, true);
+        else if (key == "useVertexColors")
+            valueMap_["useVertexColors"] = GetBoolValue(jvalue, false);
     }
 
     return true;
@@ -99,7 +101,6 @@ bool ImportConfig::LoadDesktopConfig(JSONValue root)
     const JSONValue& jModelImporterConfig = jdesktop["ModelImporter"];
     if (jModelImporterConfig.IsObject())
         LoadModelImporterConfig(jModelImporterConfig);
- 
     const JSONValue& jTextureImporterConfig = jdesktop["TextureImporter"];
     if (jTextureImporterConfig.IsObject())
         LoadTextureImporterConfig(jTextureImporterConfig);

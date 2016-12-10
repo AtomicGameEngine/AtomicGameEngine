@@ -73,6 +73,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     noOverwriteTexture_(true),
     noOverwriteNewerTexture_(true),
     checkUniqueModel_(true),
+    useVertexColors_(false),
     scale_(1.0f),
     maxBones_(64),
     defaultTicksPerSecond_(4800.0f),
@@ -909,6 +910,8 @@ void OpenAssetImporter::SetOveriddenFlags(VariantMap& aiFlagParameters)
             importMaterialsDefault_ = itr->second_.GetBool();
         else if (itr->first_ == "IncludeNonSkinningBones")
             includeNonSkinningBonesDefault_ = itr->second_.GetBool();
+        else if (itr->first_ == "useVertexColors")
+            useVertexColors_ = itr->second_.GetBool();
 
         itr++;
     }
@@ -1285,6 +1288,25 @@ bool OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<Strin
     }
     if (hasAlpha)
         techniqueName += "Alpha";
+
+    // See if any mesh that uses this material has vertex colors
+    // and set the technique accordingly, if enabled
+    for (unsigned i = 0; i < scene_->mNumMeshes && useVertexColors_; i++)
+    {
+        aiMesh* mesh = scene_->mMeshes[i];
+        aiMaterial* mesh_material = scene_->mMaterials[mesh->mMaterialIndex];
+        aiString meshMatNameStr;
+        mesh_material->Get(AI_MATKEY_NAME, meshMatNameStr);
+
+        if(mesh->GetNumColorChannels() > 0)
+        {
+             if(matNameStr == meshMatNameStr)
+             {
+                 techniqueName += "VCol";
+                 break;
+             }
+        }
+    }
 
     XMLElement techniqueElem = materialElem.CreateChild("technique");
     techniqueElem.SetString("name", techniqueName + ".xml");
