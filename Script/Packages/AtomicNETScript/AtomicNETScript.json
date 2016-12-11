@@ -1,5 +1,12 @@
 {
 	"name" : "AtomicNETScript",
 	"sources" : ["Source/AtomicNET/NETScript"],
-	"classes" : ["NETScriptObject", "CSComponent", "CSComponentAssembly"]
+	"classes" : ["NETScriptObject", "CSComponent", "CSComponentAssembly"],
+	"excludes" : {
+		"CSharp" : {
+			"CSComponent" : {
+				"CSComponent" : ["Context"]
+			}
+		}
+	}
 }

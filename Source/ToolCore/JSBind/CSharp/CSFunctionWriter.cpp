@@ -591,9 +591,7 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
     String callSig;
     GenPInvokeCallParameters(callSig);
 
-    source += IndentLine("IntPtr nativeInstanceOverride = NativeCore.NativeContructorOverride;\n");
-
-    line = ToString("nativeInstance = NativeCore.RegisterNative (nativeInstanceOverride != IntPtr.Zero ? nativeInstanceOverride : csb_%s_%s_Constructor_%u(%s), this);\n",
+    line = ToString("nativeInstance = NativeCore.RegisterNative (csb_%s_%s_Constructor_%u(%s), this);\n",
                      package->GetName().CString(), klass->GetName().CString(), function_->GetID(), callSig.CString());
 
     source += IndentLine(line);

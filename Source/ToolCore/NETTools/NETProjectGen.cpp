@@ -74,6 +74,7 @@ namespace ToolCore
     }
 
     NETCSProject::NETCSProject(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen),
+        atomicNETProject_(false),
         genAssemblyDocFile_(false),
         playerApplication_(false),
         androidApplication_(false)
@@ -176,6 +177,24 @@ namespace ToolCore
                 link.Replace('/', '\\');
 
                 compile.CreateChild("Link").SetValue(link);
+
+                // For shared projects, ensure that the folder for the link exists, otherwise VS complains 
+                // with little red x's and Resharper (potentially other tools) have issues
+                if (outputType_ == "Shared")
+                {
+                    String pathName, fileName, extension;
+
+                    SplitPath(link, pathName, fileName, extension);
+
+                    if (extension == ".cs")
+                    {                        
+                        if (!fs->Exists(projectPath_ + pathName))
+                        {
+                            fs->CreateDirs(projectPath_, pathName);
+                        }
+                    }
+
+                }
 
             }
 
@@ -406,8 +425,19 @@ namespace ToolCore
 
         pgroup.CreateChild("Optimize").SetValue("true");
 
+        String config = "Release";
+
+#ifdef ATOMIC_DEV_BUILD
+
+        // If we're a core AtomicNET assembly and a project is included in solution
+        // output to Lib so that development changes will be picked up by project reference
+        if (atomicNETProject_ && projectGen_->GetAtomicProjectPath().Length())
+            config = "Lib";
+
+#endif
+
         String outputPath = assemblyOutputPath_;
-        outputPath.Replace("$ATOMIC_CONFIG$", "Release");
+        outputPath.Replace("$ATOMIC_CONFIG$", config);
 
         if (IsAbsolutePath(outputPath))
         {
@@ -510,11 +540,21 @@ namespace ToolCore
         else
             pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ");
 
-
         pgroup.CreateChild("Optimize").SetValue("false");
 
+        String config = "Debug";
+
+#ifdef ATOMIC_DEV_BUILD
+
+        // If we're a core AtomicNET assembly and a project is included in solution
+        // output to Lib so that development changes will be picked up by project reference
+        if (atomicNETProject_ && projectGen_->GetAtomicProjectPath().Length())
+            config = "Lib";
+
+#endif
+
         String outputPath = assemblyOutputPath_;
-        outputPath.Replace("$ATOMIC_CONFIG$", "Debug");
+        outputPath.Replace("$ATOMIC_CONFIG$", config);
 
         if (IsAbsolutePath(outputPath))
         {
@@ -1306,6 +1346,8 @@ namespace ToolCore
         }
 
         outputType_ = root["outputType"].GetString();
+
+        atomicNETProject_ = root["atomicNET"].GetBool();
 
         androidApplication_ = root["androidApplication"].GetBool();
         playerApplication_ = root["playerApplication"].GetBool();

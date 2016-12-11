@@ -6,6 +6,7 @@
     "projects" : [
         {
             "name": "AtomicNET.Shared",
+            "atomicNET" : true,
             "outputType" : "Shared",
             "projectGuid" : "C74A8ECC-7517-11E6-A1D7-005056C00008",
             "sources" : [
@@ -20,6 +21,7 @@
         },
         {
             "name": "AtomicNET",
+            "atomicNET" : true,
             "outputType" : "Library",
             "rootNamespace" : "AtomicEngine",
             "assemblyName" : "AtomicNET",
@@ -38,6 +40,7 @@
         },
         {
             "name": "AtomicNET.Desktop",
+            "atomicNET" : true,
             "assemblyDocFile" : true,
             "platforms" : ["desktop"],
             "outputType" : "Library",
@@ -60,6 +63,7 @@
         },
         {
             "name": "AtomicNET.Android.SDL",
+            "atomicNET" : true,
             "platforms" : ["android"],
             "outputType" : "Library",
             "rootNamespace" : "AtomicGameEngine",
@@ -80,6 +84,7 @@
         },
         {
             "name": "AtomicNET.Android",
+            "atomicNET" : true,
             "platforms" : ["android"],
             "outputType" : "Library",
             "defineConstants" : ["ATOMIC_ANDROID"],
@@ -104,6 +109,7 @@
         },
         {
             "name": "AtomicNET.iOS",
+            "atomicNET" : true,
             "platforms" : ["ios"],
             "outputType" : "Library",
             "projectTypeGuids" :[ "8FFB629D-F513-41CE-95D2-7ECE97B6EEEC", "FAE04EC0-301F-11D3-BF4B-00C04F79EFBC" ],
@@ -130,6 +136,7 @@
         },
         {
             "name": "AtomicNETService",
+            "atomicNET" : true,
             "platforms" : ["desktop"],
             "outputType" : "Exe",
             "rootNamespace" : "AtomicTools",

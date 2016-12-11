@@ -246,12 +246,17 @@ namespace AtomicEngine
 
             if (!CSComponentCore.componentCache.TryGetValue(e.ClassName, out csinfo))
             {
+                Log.Error("Scene.HandleCSComponentLoad - unable to find CSComponent in cache for classname: " + e.ClassName );
                 return;
             }
 
-            NativeCore.NativeContructorOverride = csnative;
-            var component = (CSComponent)Activator.CreateInstance(csinfo.Type);
-            NativeCore.VerifyNativeContructorOverrideConsumed();
+            var component = CSComponent.LoadCreateInstance(csinfo.Type, csnative);
+
+            if (component == null)
+            {
+                Log.Error("Scene.HandleCSComponentLoad - unable to create CSComponent for classname: " + e.ClassName);
+                return;
+            }
 
             if (fieldValues != IntPtr.Zero)
                 csinfo.ApplyFieldValues(component, fieldValues);

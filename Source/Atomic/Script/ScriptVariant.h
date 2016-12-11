@@ -59,6 +59,10 @@ namespace Atomic
 
         void SetVector3(const Vector3& value) { variant_ = value; }
 
+        Vector4 GetVector4() { return variant_.GetVector4(); }
+
+        void SetVector4(const Vector4& value) { variant_ = value; }
+
         Color GetColor() { return variant_.GetColor(); }
 
         void SetColor(const Color& value) { variant_ = value; }

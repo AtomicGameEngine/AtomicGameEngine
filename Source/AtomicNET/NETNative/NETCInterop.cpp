@@ -11,6 +11,7 @@
 #include <Atomic/Graphics/Light.h>
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/AnimatedModel.h>
+#include <Atomic/Graphics/Material.h>
 
 #include <Atomic/Navigation/NavigationMesh.h>
 #include <Atomic/Navigation/CrowdManager.h>
@@ -18,6 +19,8 @@
 #include <Atomic/Physics/PhysicsWorld.h>
 
 #include <Atomic/Scene/ValueAnimation.h>
+
+#include <AtomicNET/NETScript/CSComponent.h>
 
 #include <Atomic/Input/Controls.h>
 
@@ -591,6 +594,26 @@ namespace Atomic
             bytes += offset;
             return self->Write(bytes, size);
         }
+
+        // Material
+
+        ATOMIC_EXPORT_API void csi_Atomic_Material_SetShaderParameter(Material* self, const char* name, ScriptVariant* variant)
+        {
+
+            if (!self || !variant || !name || !strlen(name))
+                return;
+
+            self->SetShaderParameter(name, variant->GetVariant());
+        }
+
+        // CSComponent
+
+        ATOMIC_EXPORT_API CSComponent* csi_Atomic_CSComponent_Constructor()
+        {
+
+            return new CSComponent(NETCore::GetContext());
+        }
+
 
 
 #ifdef ATOMIC_PLATFORM_IOS
