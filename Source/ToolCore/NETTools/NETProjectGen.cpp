@@ -50,7 +50,7 @@ namespace ToolCore
 
     }
 
-    void NETProjectBase::ReplacePathStrings(String& path)
+    void NETProjectBase::ReplacePathStrings(String& path) const
     {
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
@@ -74,6 +74,7 @@ namespace ToolCore
     }
 
     NETCSProject::NETCSProject(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen),
+        atomicNETProject_(false),
         genAssemblyDocFile_(false),
         playerApplication_(false),
         androidApplication_(false)
@@ -176,6 +177,24 @@ namespace ToolCore
                 link.Replace('/', '\\');
 
                 compile.CreateChild("Link").SetValue(link);
+
+                // For shared projects, ensure that the folder for the link exists, otherwise VS complains 
+                // with little red x's and Resharper (potentially other tools) have issues
+                if (outputType_ == "Shared")
+                {
+                    String pathName, fileName, extension;
+
+                    SplitPath(link, pathName, fileName, extension);
+
+                    if (extension == ".cs")
+                    {                        
+                        if (!fs->Exists(projectPath_ + pathName))
+                        {
+                            fs->CreateDirs(projectPath_, pathName);
+                        }
+                    }
+
+                }
 
             }
 
@@ -395,19 +414,10 @@ namespace ToolCore
             constants.Push("ATOMIC_MOBILE");
     }
 
-    void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
+    String NETCSProject::GetRelativeOutputPath(const String& config) const
     {
-        XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
-
-        if (playerApplication_ && SupportsPlatform("ios"))
-            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|iPhone' ");
-        else
-            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ");
-
-        pgroup.CreateChild("Optimize").SetValue("true");
-
         String outputPath = assemblyOutputPath_;
-        outputPath.Replace("$ATOMIC_CONFIG$", "Release");
+        outputPath.Replace("$ATOMIC_CONFIG$", config);
 
         if (IsAbsolutePath(outputPath))
         {
@@ -422,6 +432,34 @@ namespace ToolCore
                 }
             }
         }
+
+        return outputPath;
+
+    }
+
+    void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
+    {
+        XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
+
+        if (playerApplication_ && SupportsPlatform("ios"))
+            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|iPhone' ");
+        else
+            pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ");
+
+        pgroup.CreateChild("Optimize").SetValue("true");
+
+        String config = "Release";
+
+#ifdef ATOMIC_DEV_BUILD
+
+        // If we're a core AtomicNET assembly and a project is included in solution
+        // output to Lib so that development changes will be picked up by project reference
+        if (atomicNETProject_ && projectGen_->GetAtomicProjectPath().Length())
+            config = "Lib";
+
+#endif
+
+        String outputPath = GetRelativeOutputPath(config);
 
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
 
@@ -510,25 +548,20 @@ namespace ToolCore
         else
             pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ");
 
-
         pgroup.CreateChild("Optimize").SetValue("false");
 
-        String outputPath = assemblyOutputPath_;
-        outputPath.Replace("$ATOMIC_CONFIG$", "Debug");
+        String config = "Debug";
 
-        if (IsAbsolutePath(outputPath))
-        {
-            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
+#ifdef ATOMIC_DEV_BUILD
 
-            if (atomicProjectPath.Length())
-            {
-                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
-                {
-                    ATOMIC_LOGERRORF("NETCSProject::CreateDebugPropertyGroup - unable to get relative output path");
-                }
-            }
+        // If we're a core AtomicNET assembly and a project is included in solution
+        // output to Lib so that development changes will be picked up by project reference
+        if (atomicNETProject_ && projectGen_->GetAtomicProjectPath().Length())
+            config = "Lib";
 
-        }
+#endif
+
+        String outputPath = GetRelativeOutputPath(config);
 
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
 
@@ -849,7 +882,7 @@ namespace ToolCore
 
     }
 
-    bool NETCSProject::GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output)
+    bool NETCSProject::GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output) const
     {
         String path = fromPath;
         ReplacePathStrings(path);
@@ -1240,10 +1273,15 @@ namespace ToolCore
         if (projectGen_->GetProjectSettings())
             projectName = projectGen_->GetProjectSettings()->GetName();
 
+        XMLElement afterBuild;
+
         if (name_ == projectName)
         {
-            XMLElement afterBuild = project.CreateChild("Target");
-            afterBuild.SetAttribute("Name", "AfterBuild");
+            if (afterBuild.IsNull())
+            {
+                afterBuild = project.CreateChild("Target");
+                afterBuild.SetAttribute("Name", "AfterBuild");
+            }
 
             XMLElement copy = afterBuild.CreateChild("Copy");
             copy.SetAttribute("SourceFiles", "$(TargetPath)");
@@ -1261,6 +1299,38 @@ namespace ToolCore
             copy.SetAttribute("DestinationFolder", destPath);
 
         }
+
+#ifdef ATOMIC_DEV_BUILD
+#ifndef ATOMIC_PLATFORM_WINDOWS
+
+        // On xbuild, mdb files for references aren't being copied to output folders for desktop
+        if (platforms_.Size() == 1 && SupportsDesktop() && outputType_.ToLower() == "exe")
+        {
+            if (afterBuild.IsNull())
+            {
+                afterBuild = project.CreateChild("Target");
+                afterBuild.SetAttribute("Name", "AfterBuild");
+            }
+
+            // mdb file item group
+            XMLElement mdbItemGroup = project.CreateChild("ItemGroup");
+            mdbItemGroup.CreateChild("AtomicNETMDBFiles").SetAttribute("Include", "..\\..\\Lib\\Desktop\\**\\*.mdb");
+
+            // Debug
+            XMLElement copyOp = afterBuild.CreateChild("Copy");
+            copyOp.SetAttribute("Condition", "'$(Configuration)' == 'Debug'");
+            copyOp.SetAttribute("SourceFiles", "@(AtomicNETMDBFiles)");
+            copyOp.SetAttribute("DestinationFiles", "@(AtomicNETMDBFiles->'..\\..\\Debug\\Bin\\Desktop\\%(Filename)%(Extension)')");
+
+            // Release
+            copyOp = afterBuild.CreateChild("Copy");
+            copyOp.SetAttribute("Condition", "'$(Configuration)' == 'Release'");
+            copyOp.SetAttribute("SourceFiles", "@(AtomicNETMDBFiles)");
+            copyOp.SetAttribute("DestinationFiles", "@(AtomicNETMDBFiles->'..\\..\\Release\\Bin\\Desktop\\%(Filename)%(Extension)')");
+        }
+
+#endif
+#endif
 
 
         String projectSource = xmlFile_->ToString();
@@ -1306,6 +1376,8 @@ namespace ToolCore
         }
 
         outputType_ = root["outputType"].GetString();
+
+        atomicNETProject_ = root["atomicNET"].GetBool();
 
         androidApplication_ = root["androidApplication"].GetBool();
         playerApplication_ = root["playerApplication"].GetBool();

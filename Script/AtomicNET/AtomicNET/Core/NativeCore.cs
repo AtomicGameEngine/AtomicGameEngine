@@ -428,37 +428,6 @@ namespace AtomicEngine
             return ancestorType;
         }
 
-        static public IntPtr NativeContructorOverride
-        {
-            get
-            {
-                IntPtr value = nativeContructorOverride;
-                nativeContructorOverride = IntPtr.Zero;
-                return value;
-            }
-
-            set
-            {
-                if (nativeContructorOverride != IntPtr.Zero)
-                {
-                    throw new InvalidOperationException("NativeCore.NativeContructorOverride - Previous nativeContructorOverride not consumed");
-                }
-
-                nativeContructorOverride = value;
-            }
-        }
-
-        static public void VerifyNativeContructorOverrideConsumed()
-        {
-            if (nativeContructorOverride != IntPtr.Zero)
-            {
-                throw new InvalidOperationException("NativeCore.VerifyNativeContructorOverrideConsumed -  NativeContructorOverride not consumed");
-            }
-        }
-
-
-        private static IntPtr nativeContructorOverride = IntPtr.Zero;
-
         // weak references here, hold a ref native side
         internal static Dictionary<IntPtr, WeakReference<RefCounted>> nativeLookup = new Dictionary<IntPtr, WeakReference<RefCounted>>();
 

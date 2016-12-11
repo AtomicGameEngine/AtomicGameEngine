@@ -44,7 +44,7 @@ namespace ToolCore
         NETProjectBase(Context* context, NETProjectGen* projectGen);
         virtual ~NETProjectBase();
 
-        void ReplacePathStrings(String& path);
+        void ReplacePathStrings(String& path) const;
 
         void CopyXMLElementRecursive(XMLElement source, XMLElement dest);
 
@@ -80,16 +80,22 @@ namespace ToolCore
         bool SupportsDesktop() const;
         bool SupportsPlatform(const String& platform, bool explicitCheck = true) const;
 
+        /// Returns true if this project is part of core AtomicNET
+        bool GetAtomicNETProject() const { return atomicNETProject_;  }
+
         bool Generate();
 
     private:
+
+        /// Returns true if this project is part of core AtomicNET
+        void SetAtomicNETProject(bool value) { atomicNETProject_ = value; }
 
         // Portable Class Library
         bool GenerateShared();
 
         bool GenerateStandard();
 
-        bool GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output);
+        bool GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output) const;
 
         bool CreateProjectFolder(const String& path);
 
@@ -109,6 +115,8 @@ namespace ToolCore
 
         void ProcessDefineConstants(StringVector& constants);
 
+        /// Return a relative path to the output folder, config can be Release/Debug/Lib
+        String GetRelativeOutputPath(const String& config) const;
 
         String name_;
         String projectGuid_;
@@ -117,6 +125,7 @@ namespace ToolCore
         String assemblyName_;
         String assemblyOutputPath_;
         String assemblySearchPaths_;
+        bool atomicNETProject_;
 
         // project paths
         String projectPath_;
