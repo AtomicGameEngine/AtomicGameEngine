@@ -17,7 +17,17 @@ namespace AtomicEngine
             SetVector3(value);
         }
 
-        public ScriptVariant(Color value) : this()
+		public ScriptVariant(Vector4 value) : this()
+		{
+			SetVector4(value);
+		}
+
+		public ScriptVariant(String value) : this()
+		{
+			SetString(value);
+		}
+
+		public ScriptVariant(Color value) : this()
         {
             SetColor(value);
         }

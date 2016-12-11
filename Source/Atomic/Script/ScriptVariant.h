@@ -67,6 +67,10 @@ namespace Atomic
 
         void SetColor(const Color& value) { variant_ = value; }
 
+        String GetString() { return variant_.GetString(); }
+
+        void SetString(const String& value) { variant_ = value; }
+
     private:
 
         Variant variant_;

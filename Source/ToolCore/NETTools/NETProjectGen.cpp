@@ -50,7 +50,7 @@ namespace ToolCore
 
     }
 
-    void NETProjectBase::ReplacePathStrings(String& path)
+    void NETProjectBase::ReplacePathStrings(String& path) const
     {
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
@@ -414,6 +414,29 @@ namespace ToolCore
             constants.Push("ATOMIC_MOBILE");
     }
 
+    String NETCSProject::GetRelativeOutputPath(const String& config) const
+    {
+        String outputPath = assemblyOutputPath_;
+        outputPath.Replace("$ATOMIC_CONFIG$", config);
+
+        if (IsAbsolutePath(outputPath))
+        {
+
+            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
+
+            if (atomicProjectPath.Length())
+            {
+                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
+                {
+                    ATOMIC_LOGERRORF("NETCSProject::CreateReleasePropertyGroup - unable to get relative output path");
+                }
+            }
+        }
+
+        return outputPath;
+
+    }
+
     void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
     {
         XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
@@ -436,22 +459,7 @@ namespace ToolCore
 
 #endif
 
-        String outputPath = assemblyOutputPath_;
-        outputPath.Replace("$ATOMIC_CONFIG$", config);
-
-        if (IsAbsolutePath(outputPath))
-        {
-
-            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
-
-            if (atomicProjectPath.Length())
-            {
-                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
-                {
-                    ATOMIC_LOGERRORF("NETCSProject::CreateReleasePropertyGroup - unable to get relative output path");
-                }
-            }
-        }
+        String outputPath = GetRelativeOutputPath(config);
 
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
 
@@ -553,22 +561,7 @@ namespace ToolCore
 
 #endif
 
-        String outputPath = assemblyOutputPath_;
-        outputPath.Replace("$ATOMIC_CONFIG$", config);
-
-        if (IsAbsolutePath(outputPath))
-        {
-            String atomicProjectPath = projectGen_->GetAtomicProjectPath();
-
-            if (atomicProjectPath.Length())
-            {
-                if (!GetRelativeProjectPath(outputPath, projectPath_, outputPath))
-                {
-                    ATOMIC_LOGERRORF("NETCSProject::CreateDebugPropertyGroup - unable to get relative output path");
-                }
-            }
-
-        }
+        String outputPath = GetRelativeOutputPath(config);
 
         pgroup.CreateChild("OutputPath").SetValue(outputPath);
 
@@ -889,7 +882,7 @@ namespace ToolCore
 
     }
 
-    bool NETCSProject::GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output)
+    bool NETCSProject::GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output) const
     {
         String path = fromPath;
         ReplacePathStrings(path);
@@ -1280,10 +1273,15 @@ namespace ToolCore
         if (projectGen_->GetProjectSettings())
             projectName = projectGen_->GetProjectSettings()->GetName();
 
+        XMLElement afterBuild;
+
         if (name_ == projectName)
         {
-            XMLElement afterBuild = project.CreateChild("Target");
-            afterBuild.SetAttribute("Name", "AfterBuild");
+            if (afterBuild.IsNull())
+            {
+                afterBuild = project.CreateChild("Target");
+                afterBuild.SetAttribute("Name", "AfterBuild");
+            }
 
             XMLElement copy = afterBuild.CreateChild("Copy");
             copy.SetAttribute("SourceFiles", "$(TargetPath)");
@@ -1301,6 +1299,38 @@ namespace ToolCore
             copy.SetAttribute("DestinationFolder", destPath);
 
         }
+
+#ifdef ATOMIC_DEV_BUILD
+#ifndef ATOMIC_PLATFORM_WINDOWS
+
+        // On xbuild, mdb files for references aren't being copied to output folders for desktop
+        if (platforms_.Size() == 1 && SupportsDesktop() && outputType_.ToLower() == "exe")
+        {
+            if (afterBuild.IsNull())
+            {
+                afterBuild = project.CreateChild("Target");
+                afterBuild.SetAttribute("Name", "AfterBuild");
+            }
+
+            // mdb file item group
+            XMLElement mdbItemGroup = project.CreateChild("ItemGroup");
+            mdbItemGroup.CreateChild("AtomicNETMDBFiles").SetAttribute("Include", "..\\..\\Lib\\Desktop\\**\\*.mdb");
+
+            // Debug
+            XMLElement copyOp = afterBuild.CreateChild("Copy");
+            copyOp.SetAttribute("Condition", "'$(Configuration)' == 'Debug'");
+            copyOp.SetAttribute("SourceFiles", "@(AtomicNETMDBFiles)");
+            copyOp.SetAttribute("DestinationFiles", "@(AtomicNETMDBFiles->'..\\..\\Debug\\Bin\\Desktop\\%(Filename)%(Extension)')");
+
+            // Release
+            copyOp = afterBuild.CreateChild("Copy");
+            copyOp.SetAttribute("Condition", "'$(Configuration)' == 'Release'");
+            copyOp.SetAttribute("SourceFiles", "@(AtomicNETMDBFiles)");
+            copyOp.SetAttribute("DestinationFiles", "@(AtomicNETMDBFiles->'..\\..\\Release\\Bin\\Desktop\\%(Filename)%(Extension)')");
+        }
+
+#endif
+#endif
 
 
         String projectSource = xmlFile_->ToString();

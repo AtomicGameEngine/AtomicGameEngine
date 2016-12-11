@@ -44,7 +44,7 @@ namespace ToolCore
         NETProjectBase(Context* context, NETProjectGen* projectGen);
         virtual ~NETProjectBase();
 
-        void ReplacePathStrings(String& path);
+        void ReplacePathStrings(String& path) const;
 
         void CopyXMLElementRecursive(XMLElement source, XMLElement dest);
 
@@ -95,7 +95,7 @@ namespace ToolCore
 
         bool GenerateStandard();
 
-        bool GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output);
+        bool GetRelativeProjectPath(const String& fromPath, const String& toPath, String& output) const;
 
         bool CreateProjectFolder(const String& path);
 
@@ -115,6 +115,8 @@ namespace ToolCore
 
         void ProcessDefineConstants(StringVector& constants);
 
+        /// Return a relative path to the output folder, config can be Release/Debug/Lib
+        String GetRelativeOutputPath(const String& config) const;
 
         String name_;
         String projectGuid_;
