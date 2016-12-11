@@ -16,7 +16,7 @@ namespace tb {
 // == TBHashTable =======================================================================
 
 TBHashTable::TBHashTable()
-    : m_buckets(0)
+    : m_buckets(nullptr)
     , m_num_buckets(0)
     , m_num_items(0)
 {
@@ -141,6 +141,7 @@ void *TBHashTable::Remove(uint32 key)
                 prev_item->next = item->next;
             else
                 m_buckets[bucket] = item->next;
+            m_num_items--;
             void *content = item->content;
             delete item;
             return content;
@@ -216,4 +217,4 @@ void *TBHashTableIterator::GetNextContent()
     return m_current_item ? m_current_item->content : nullptr;
 }
 
-}; // namespace tb
+} // namespace tb

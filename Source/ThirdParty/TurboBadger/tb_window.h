@@ -12,11 +12,11 @@
 namespace tb {
 
 enum WINDOW_SETTINGS {
-    WINDOW_SETTINGS_NONE			= 0,	///< Chrome less window without any other settings.
-    WINDOW_SETTINGS_TITLEBAR		= 1,	///< Show a title bar that can also move the window.
-    WINDOW_SETTINGS_RESIZABLE		= 2,	///< Show a widget for resizing the window.
-    WINDOW_SETTINGS_CLOSE_BUTTON	= 4,	///< Show a widget for closing the window.
-    WINDOW_SETTINGS_CAN_ACTIVATE	= 8,	///< Can be activated and deactivate other windows.
+    WINDOW_SETTINGS_NONE            = 0,    ///< Chrome less window without any other settings.
+    WINDOW_SETTINGS_TITLEBAR        = 1,    ///< Show a title bar that can also move the window.
+    WINDOW_SETTINGS_RESIZABLE       = 2,    ///< Show a widget for resizing the window.
+    WINDOW_SETTINGS_CLOSE_BUTTON    = 4,    ///< Show a widget for closing the window.
+    WINDOW_SETTINGS_CAN_ACTIVATE    = 8,    ///< Can be activated and deactivate other windows.
 
     WINDOW_SETTINGS_DEFAULT = WINDOW_SETTINGS_TITLEBAR | WINDOW_SETTINGS_RESIZABLE |
     WINDOW_SETTINGS_CLOSE_BUTTON | WINDOW_SETTINGS_CAN_ACTIVATE
@@ -37,7 +37,7 @@ public:
     TBOBJECT_SUBCLASS(TBWindow, TBWidget);
 
     TBWindow();
-    ~TBWindow();
+    virtual ~TBWindow();
 
     /** Close this window.
         Warning: This window will be deleted after this call! */
@@ -69,9 +69,9 @@ public:
 
     /** RESIZE_FIT specifies how ResizeToFitContent should resize the window. */
     enum RESIZE_FIT {
-        RESIZE_FIT_PREFERRED,			///< Fit the preferred size of all content
-        RESIZE_FIT_MINIMAL,				///< Fit the minimal size of all content
-        RESIZE_FIT_CURRENT_OR_NEEDED	///< Fit the minimal or maximum size only if needed. Will keep
+        RESIZE_FIT_PREFERRED,           ///< Fit the preferred size of all content
+        RESIZE_FIT_MINIMAL,             ///< Fit the minimal size of all content
+        RESIZE_FIT_CURRENT_OR_NEEDED    ///< Fit the minimal or maximum size only if needed. Will keep
         ///< the new size as close as possible to the current size.
     };
 
@@ -103,7 +103,7 @@ protected:
     TBMover m_mover;
     TBResizer m_resizer;
     TBTextField m_textfield;
-    TBButton m_close_button;
+    TBWidget m_close_button;
     WINDOW_SETTINGS m_settings;
     TBWidgetSafePointer m_last_focus;
     TBWindow *GetTopMostOtherWindow(bool only_activable_windows);
@@ -111,6 +111,6 @@ protected:
     void DeActivate();
 };
 
-}; // namespace tb
+} // namespace tb
 
 #endif // TB_WINDOW_H

@@ -119,7 +119,13 @@ enum UI_EVENT_TYPE {
     UI_EVENT_TYPE_TAB_CHANGED = 14, // tb::EVENT_TYPE_TAB_CHANGED,
 
     /** Custom event. Not used internally. ref_id may be used for additional type info. */
-    UI_EVENT_TYPE_CUSTOM = 15 // tb::EVENT_TYPE_CUSTOM
+    UI_EVENT_TYPE_CUSTOM = 15, // tb::EVENT_TYPE_CUSTOM
+
+    /** Local Turbobadger touch events */
+    UI_EVENT_TYPE_TOUCH_DOWN,
+    UI_EVENT_TYPE_TOUCH_UP,
+    UI_EVENT_TYPE_TOUCH_MOVE,
+    UI_EVENT_TYPE_TOUCH_CANCEL
 };
 
 /** Defines widget z level relative to another widget, used with TBWidget::AddChildRelative. */

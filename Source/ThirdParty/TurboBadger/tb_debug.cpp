@@ -188,6 +188,10 @@ public:
         case EVENT_TYPE_POINTER_MOVE:	return "POINTER_MOVE";
         case EVENT_TYPE_RIGHT_POINTER_UP: return "RIGHT_POINTER_UP";
         case EVENT_TYPE_RIGHT_POINTER_DOWN:	return "RIGHT_POINTER_DOWN";
+        case EVENT_TYPE_TOUCH_DOWN:		return "TOUCH_DOWN";
+        case EVENT_TYPE_TOUCH_UP:		return "TOUCH_UP";
+        case EVENT_TYPE_TOUCH_MOVE:		return "TOUCH_MOVE";
+        case EVENT_TYPE_TOUCH_CANCEL:	return "TOUCH_CANCEL";
         case EVENT_TYPE_WHEEL:			return "WHEEL";
         case EVENT_TYPE_CHANGED:		return "CHANGED";
         case EVENT_TYPE_KEY_DOWN:		return "KEY_DOWN";
