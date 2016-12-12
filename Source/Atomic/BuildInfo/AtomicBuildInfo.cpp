@@ -53,4 +53,17 @@ bool AtomicBuildInfo::GetDistBuild()
 #endif
 }
 
+#ifndef ATOMIC_BUILD_VENDOR
+static String buildVendor("Unknown Vendor");
+#else
+static String buildVendor(ATOMIC_BUILD_VENDOR);
+#endif
+
+const String& AtomicBuildInfo::GetBuildVendor()
+{
+    return buildVendor;
+}
+
+
+
 }
