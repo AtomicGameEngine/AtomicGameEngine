@@ -412,6 +412,16 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
             String typeName = p.typeInfo_;
             String enumTypeName = p.enumTypeName_;
 
+            String paramName = p.paramName_;
+
+            //TODO: Is there a standard naming module that could handle this?
+            if (paramName == "GUID")
+                paramName = "guid";
+            else if (paramName == "RefID")
+                paramName = "refid"; // do nothing
+            else
+                paramName[0] = tolower(paramName[0]);
+
             if (!cls)
                 typeName = typeName.ToLower();
             else
@@ -444,9 +454,9 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
                 if (isEnum && enumTypeName.Length())
                 {
                     source += ToString("        /** Enum: %s */\n", enumTypeName.CString());
-                    source += ToString("        %s : %s;\n", p.paramName_.ToLower().CString(), typeName.CString());
+                    source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
                 } else {
-                    source += ToString("        %s : %s;\n", p.paramName_.ToLower().CString(), typeName.CString());
+                    source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
                 }
             }
             else
