@@ -39,7 +39,14 @@ If you need excellent, high performance technology which leverages the full migh
 <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/">![](http://atomicgameengine.com/images/community/Community_GitHub.png)
 </a>
 
-**API References:** <a href="http://docs.atomicgameengine.com/api/modules/atomic.html" target="_blank">JavaScript/TypeScript</a>, <a href="http://docs.atomicgameengine.com/csharp/AtomicEngine/" target="_blank">C#</a>, and <a href="http://docs.atomicgameengine.com/cpp" target="_blank">C++</a>
+#### Atomic API References
+
+<a href="http://docs.atomicgameengine.com/api/modules/atomic.html" target="_blank">
+![](http://atomicgameengine.com/images/community/Documentation_JSTS.png)</a>
+<a href="http://docs.atomicgameengine.com/csharp/AtomicEngine/" target="_blank">
+![](http://atomicgameengine.com/images/community/Documentation_CSharp.png)</a>
+<a href="http://docs.atomicgameengine.com/cpp" target="_blank">
+![](http://atomicgameengine.com/images/community/Documentation_CPlusPlus.png)</a>
 
 #### Atomic Community
 
