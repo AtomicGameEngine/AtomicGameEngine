@@ -14,7 +14,7 @@ Atomic is available to professionals and is being used in production environment
 If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="http://atomicgameengine.com/#download-the-atomic-editor">download the Atomic Editor</a> or fork us on GitHub!
 
 #### Atomic Technology
-
+<img align="right" src="http://atomicgameengine.com/images/PlatformBox.png"/>
 - Consistent **2D/3D API** available in **JavaScript, TypeScript, C#, and C++**
 - **Android, iOS, Windows, macOS, Linux, and WebGL** platform deployment
 - High performance native C++ core with single command builds and absolute minimum dependencies
