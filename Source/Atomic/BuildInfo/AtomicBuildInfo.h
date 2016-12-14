@@ -58,6 +58,9 @@ class AtomicBuildInfo : public RefCounted
     /// Get whether this is a distibution/installer binary build
     static bool GetDistBuild();
 
+    /// Get vendor string
+    static const String& GetBuildVendor();
+
 };
 
 

@@ -27,6 +27,7 @@
 #include "../IO/BufferQueue.h"
 #include "../IO/Log.h"
 #include "../Web/Web.h"
+#include "../Web/WebEvents.h"
 #include "../Web/WebRequest.h"
 
 #ifdef EMSCRIPTEN
@@ -48,10 +49,8 @@ namespace Atomic
 
 struct WebRequestInternalState
 {
-    /// The WebRequest external state.
+    /// The WebRequest external state
     WebRequest& es;
-    /// The WebRequest external state to force it to stay around.
-    SharedPtr<WebRequest> es_hold;
     /// The work queue.
     asio::io_service* service;
     /// URL.
@@ -61,9 +60,9 @@ struct WebRequestInternalState
     /// Response headers.
     HashMap<StringHash, Pair<String, String>> responseHeaders;
     /// Upload stream.
-    SharedPtr<Object> upload;
+    SharedPtr<BufferQueue> upload;
     /// Download stream.
-    SharedPtr<Object> download;
+    SharedPtr<BufferQueue> download;
     /// Request Headers.
     curl_slist* headers = NULL;
     /// Connection state.
@@ -80,16 +79,16 @@ struct WebRequestInternalState
     bool isAddedToMulti;
     /// Error string. Empty if no error.
     char error[CURL_ERROR_SIZE];
+    /// String cache of response
+    String response;
 
     WebRequestInternalState(WebRequest &es_) :
         es(es_)
     {
-        ATOMIC_LOGDEBUG("Create WebRequestInternalState");
     }
 
     ~WebRequestInternalState()
     {
-        ATOMIC_LOGDEBUG("Destroy WebRequestInternalState");
     }
 
     static int onProgress(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
@@ -103,12 +102,16 @@ struct WebRequestInternalState
             return CURL_READFUNC_ABORT;
         }
 
+        using namespace WebRequestProgress;
+
         VariantMap eventData;
-        eventData.Insert(MakePair(StringHash("down_total"), Variant((double)dltotal)));
-        eventData.Insert(MakePair(StringHash("down_loaded"), Variant((double)dlnow)));
-        eventData.Insert(MakePair(StringHash("up_total"), Variant((double)ultotal)));
-        eventData.Insert(MakePair(StringHash("up_loaded"), Variant((double)ulnow)));
-        is_->es.SendEvent("progress", eventData);
+        eventData[P_REQUEST] = &is_->es;
+        eventData[P_DOWNLOADTOTAL] = (int) dltotal;
+        eventData[P_DOWNLOADED] = (int) dlnow;
+        eventData[P_UPLOADTOTAL] = (int) ultotal;
+        eventData[P_UPLOADED] = (int) ulnow;
+        is_->es.SendEvent(E_WEBREQUESTPROGRESS, eventData);
+
         return 0;
     }
 
@@ -182,14 +185,16 @@ struct WebRequestInternalState
         size_t real_size(size * nmemb);
 
         // Write the date into the download buffer queue.
-        Serializer* download(dynamic_cast<Serializer*>(is_->download.Get()));
-        download->Write(ptr, (unsigned int)real_size);
+        is_->download->Write(ptr, (unsigned int)real_size);
 
-        // Emit a "download_chunk" event.
+        using namespace WebRequestDownloadChunk;
         VariantMap eventData;
-        eventData.Insert(MakePair(StringHash("download"), Variant(is_->download)));
-        eventData.Insert(MakePair(StringHash("size"), Variant((unsigned int)real_size)));
-        is_->es.SendEvent("download_chunk", eventData);
+
+        eventData[P_REQUEST] = &is_->es;
+        eventData[P_DOWNLOAD] = is_->download;
+        eventData[P_CHUNKSIZE] = (unsigned) real_size;
+
+        is_->es.SendEvent(E_WEBREQUESTDOWNLOADCHUNK, eventData);
 
         return real_size;
     }
@@ -208,32 +213,35 @@ struct WebRequestInternalState
         size_t real_size(size * nitems);
 
         // Read as much as we can from the upload buffer queue.
-        Deserializer* upload(dynamic_cast<Deserializer*>(is_->upload.Get()));
-        size_t size_queued(upload->GetSize());
+        size_t size_queued(is_->upload->GetSize());
         size_t size_left(real_size);
         if ((size_left > 0) && (size_queued > 0))
         {
             size_t read_size(std::min(size_queued, size_left));
-            upload->Read(buffer, (unsigned int)read_size);
+            is_->upload->Read(buffer, (unsigned int)read_size);
             size_left -= read_size;
         }
 
-        // If we still have bytes to fill, then emit a "upload_chunk" event.
+        // If we still have bytes to fill, then emit a E_WEBREQUESTUPLOADCHUNK event.
         if (size_left > 0)
         {
+            using namespace WebRequestUploadChunk;
+
             VariantMap eventData;
-            eventData.Insert(MakePair(StringHash("upload"), Variant(is_->upload)));
-            eventData.Insert(MakePair(StringHash("size"), Variant((unsigned int)size_left)));
-            is_->es.SendEvent("upload_chunk", eventData);
+            eventData[P_REQUEST] = &is_->es;
+            eventData[P_UPLOAD] = is_->upload;
+            eventData[P_BYTESREMAINING] = (unsigned)size_left;
+
+            is_->es.SendEvent(E_WEBREQUESTUPLOADCHUNK, eventData);
         }
 
         // Read as much as we can from the upload buffer queue (again).
-        size_queued = upload->GetSize();
+        size_queued = is_->upload->GetSize();
         size_left = real_size;
         if ((size_left > 0) && (size_queued > 0))
         {
             size_t read_size(std::min(size_queued, size_left));
-            upload->Read(buffer, (unsigned int)read_size);
+            is_->upload->Read(buffer, (unsigned int)read_size);
             size_left -= read_size;
         }
 
@@ -248,20 +256,25 @@ struct WebRequestInternalState
     }
 
     void onEnd(int code)
-    {
+    {       
+        using namespace WebRequestComplete;
         VariantMap eventData;
+
+        eventData[P_REQUEST] = &es;
+
         if (code != CURLE_OK)
         {
             state = HTTP_ERROR;
-            eventData.Insert(MakePair(StringHash("error"), Variant(String(error, (unsigned int)strnlen(error, sizeof(error))))));
+            eventData[P_ERROR] = String(error, (unsigned int)strnlen(error, sizeof(error)));
         }
         else
         {
             state = HTTP_CLOSED;
-            eventData.Insert(MakePair(StringHash("download"), Variant(download)));
-            eventData.Insert(MakePair(StringHash("upload"), Variant(upload)));
+            eventData[P_DOWNLOAD] = download;
+            eventData[P_UPLOAD] = upload;
         }
-        es.SendEvent("complete", eventData);
+
+        es.SendEvent(E_WEBREQUESTCOMPLETE, eventData);
     }
 };
 
@@ -286,8 +299,6 @@ WebRequest::WebRequest(Context* context, const String& verb, const String& url, 
 
 WebRequest::~WebRequest()
 {
-    ATOMIC_LOGDEBUG("Destroy WebRequest");
-
     curl_slist_free_all(is_->headers);
     if (is_->curlm == NULL)
     {
@@ -299,13 +310,9 @@ WebRequest::~WebRequest()
 
 void WebRequest::setup(asio::io_service *service, CURLM *curlm)
 {
-    ATOMIC_LOGDEBUG("Create WebRequest");
-
     is_->service = service;
     is_->curlm = curlm;
     is_->curl = curl_easy_init();
-
-    ATOMIC_LOGDEBUG("HTTP " + is_->verb + " request to URL " + is_->url);
 
     curl_easy_setopt(is_->curl, CURLOPT_ERRORBUFFER, is_->error);
     is_->error[0] = '\0';
@@ -346,11 +353,14 @@ void WebRequest::setup(asio::io_service *service, CURLM *curlm)
 void WebRequest::internalNotify(WebRequest *wr, int code)
 {
     wr->is_->onEnd(code);
+
     if (wr->is_->isAddedToMulti)
     {
         curl_multi_remove_handle(wr->is_->curlm, wr->is_->curl);
         wr->is_->isAddedToMulti = false;
-        wr->is_->es_hold.Reset();
+
+        // release the reference held from the Send method
+        wr->ReleaseRef();
     }
 }
 
@@ -401,11 +411,15 @@ void WebRequest::Send()
 {
     if (!is_->isAddedToMulti && !is_->isAborted)
     {
-        is_->es_hold = this;
+        // Add a reference to ourselves during the Send, this is released
+        // in notifyInternal,  if we're leaking WebRequests check that
+        // this is being called
+        AddRef();
+
         curl_easy_setopt(is_->curl, CURLOPT_HTTPHEADER, is_->headers);
         if (CURLM_OK != curl_multi_add_handle(is_->curlm, is_->curl))
         {
-            ATOMIC_LOGDEBUG("ERROR SENDING REQUEST!");
+            ATOMIC_LOGERROR("WebRequest::Send() - ERROR SENDING REQUEST!");
         }
         is_->isAddedToMulti = true;
     }
@@ -446,6 +460,36 @@ String WebRequest::GetAllResponseHeaders()
     return allHeaders;
 }
 
+void WebRequest::SetPostData(const String& postData)
+{
+    // use the copy post fields option so we don't need to hold onto the string buffer
+    curl_easy_setopt(is_->curl, CURLOPT_COPYPOSTFIELDS, postData.CString());
 }
+
+const String& WebRequest::GetResponse()
+{
+    // use cached response if we have one
+    if (is_->response.Length())
+        return is_->response;
+
+    unsigned size = is_->download->GetSize();
+
+    if (!size)
+        return String::EMPTY;
+
+    SharedArrayPtr<unsigned char> response(new unsigned char[size + 1]);
+
+    // ensure 0 terminated string
+    response[size] = 0;
+
+    is_->download->Read( (void *) &response[0], size);
+    is_->response = (const char*) &response[0];
+
+    return is_->response;
+
+}
+
+}
+
 
 #endif
