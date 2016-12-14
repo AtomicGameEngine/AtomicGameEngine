@@ -29,6 +29,9 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
+#include <Atomic/UI/UIEvents.h>
+#include <Atomic/Input/InputEvents.h>
+
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Assets/AssetEvents.h"
@@ -214,6 +217,7 @@ namespace ToolCore
 
             if (build)
             {
+                build->UnsubscribeFromEvent(E_NETBUILDRESULT); //unsubscribe in case it has been subscribed before
                 build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildResult));
             }
 
@@ -421,6 +425,96 @@ namespace ToolCore
 
     }
 
+    /// handle the results of a recoompile, and auto play the project if successful
+    void NETProjectSystem::HandleNETBuildPlay(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace NETBuildResult;
+        
+        if (eventData[P_SUCCESS].GetBool())
+        {
+            ATOMIC_LOGINFOF("NETBuild Success for project, now playing.");
+            VariantMap shortcutData;  // encode a shortcut even to send a play
+            shortcutData[UIShortcut::P_KEY] = KEY_P;
+            shortcutData[UIShortcut::P_QUALIFIERS] = QUAL_CTRL;
+            SendEvent(E_UISHORTCUT, shortcutData);
+        }
+        else
+        {
+            const String& errorText = eventData[P_ERRORTEXT].GetString();
+
+            ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
+            ATOMIC_LOGERRORF("NETBuild Error for project, will not play.");
+        }
+
+    }
+
+    /// used to ensure the project can be run from the editor
+    bool NETProjectSystem::BuildAndRun()
+    {
+        bool shouldRebuild = CheckForRebuild();
+        if (shouldRebuild) 
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            if (!fileSystem->FileExists(solutionPath_))
+            {
+                if (!GenerateSolution())
+                {
+                    ATOMIC_LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
+                    return false;
+                }
+            }
+
+            Project* project = GetSubsystem<ToolSystem>()->GetProject();
+            NETBuildSystem* buildSystem = GetSubsystem<NETBuildSystem>();
+            if (buildSystem)
+            {
+                NETBuild* build = buildSystem->BuildAtomicProject(project);
+                if (build)
+                {
+                    build->UnsubscribeFromEvent(E_NETBUILDRESULT); //unsubscribe in case it has been subscribed before
+                    build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildPlay));
+                }
+            }       
+        }
+        
+        return shouldRebuild;
+    }
+    
+    /// interrogate sources to see if any are dirty compared to the editor project.dll
+    bool NETProjectSystem::CheckForRebuild() 
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        AssetDatabase* db = GetSubsystem<AssetDatabase>();
+        Project* project = GetSubsystem<ToolSystem>()->GetProject();
+        unsigned dllTimestamp = 0;
+
+        String mydll = project->GetResourcePath() + project->GetProjectSettings()->GetName() + ".dll";
+        Asset* myass = db->GetAssetByPath(mydll);
+        if (myass)
+            dllTimestamp = myass->GetFileTimestamp();  
+        else 
+            return true; // dll not there, needs to be built, or the sources dont compile, or some other error
+        
+        int ii = 0, nn = 0;
+        Asset* filex = NULL;
+        StringVector results;
+        const String searchdir[3] = { "Scripts/", "Modules/", "Components/" }; // only search sanctioned project dirs
+        for ( ii=0; ii<3; ii++)
+        {
+            results.Clear();
+            String tdir = AddTrailingSlash(project->GetResourcePath()) + searchdir[ii];
+            fileSystem->ScanDir(results, tdir, "*.cs", SCAN_FILES, false);
+            for ( nn=0; nn<results.Size(); nn++)
+            {
+                String fn = AddTrailingSlash(project->GetResourcePath()) + searchdir[ii] + results[nn];
+                filex = db->GetAssetByPath(fn);
+                if (filex && filex->GetFileTimestamp() > dllTimestamp )
+                    return true;  // some file is younger or dirtier, dll needs to be rebuilt
+            }
+        }
+        return false; // the dll is up to date, no need to recompile
+    }
+    
     void NETProjectSystem::Initialize()
     {
         Clear();
