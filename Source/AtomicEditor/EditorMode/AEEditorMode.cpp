@@ -60,16 +60,8 @@ EditorMode::~EditorMode()
 
 void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
-    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-
     VariantMap startupData;
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
-
-// BEGIN LICENSE MANAGEMENT
-
-    startupData["license3D"] = licenseSystem->GetLicenseModule3D();
-
-// END LICENSE MANAGEMENT
 
     startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
 

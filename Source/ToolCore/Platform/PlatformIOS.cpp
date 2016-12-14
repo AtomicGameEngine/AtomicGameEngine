@@ -106,9 +106,7 @@ BuildBase* PlatformIOS::NewBuild(Project *project)
 
 bool PlatformIOS::GetLicense()
 {
-// BEGIN LICENSE MANAGEMENT
-    return GetSubsystem<LicenseSystem>()->GetLicenseIOS();
-// END LICENSE MANAGEMENT
+    return true;
 }
 
 
