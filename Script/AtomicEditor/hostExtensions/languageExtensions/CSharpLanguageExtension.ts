@@ -69,9 +69,6 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             menu.addItem(new Atomic.UIMenuItem("Generate Solution", `${this.name}.generatesolution`));
             menu.addItem(new Atomic.UIMenuItem("Package Resources", `${this.name}.packageresources`));
 
-            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
-            menu.addItem(this.compileOnSaveMenuItem);
-
             this.menuCreated = true;
         }
 
@@ -135,15 +132,6 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             this.isNETProject = true;
         }
 
-        const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-
-        if (isCompileOnSave && ToolCore.netProjectSystem) {
-
-            // for now, only support compile on save when not using VS
-            if (!ToolCore.netProjectSystem.iDEAvailable)
-                ToolCore.netProjectSystem.buildAtomicProject();
-        }
-
     }
 
     /*** ProjectService implementation ****/
@@ -204,13 +192,6 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
                     return true;
                 case "packageresources":
                     this.packageResources();
-                    return true;
-                case "compileonsave":
-                    let isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-                    // Toggle
-                    isCompileOnSave = !isCompileOnSave;
-                    this.serviceRegistry.projectServices.setUserPreference(this.name, "CompileOnSave", isCompileOnSave);
-                    this.compileOnSaveMenuItem.string = `Compile on Save: ${isCompileOnSave ? "On" : "Off"}`;
                     return true;
             }
         }

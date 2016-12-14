@@ -68,11 +68,15 @@ namespace ToolCore
         bool GenerateSolution();
         bool GenerateResourcePak();
 
+        /// build csharp dll if sources are dirty and then run
+        bool BuildAndRun();
+        
     private:
 
         void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
         void HandleNETBuildResult(StringHash eventType, VariantMap& eventData);
+        void HandleNETBuildPlay(StringHash eventType, VariantMap& eventData);
 
         void HandleFileChanged(StringHash eventType, VariantMap& eventData);
         void HandleResourceAdded(StringHash eventType, VariantMap& eventData);
@@ -89,6 +93,8 @@ namespace ToolCore
 
         void Clear();
         void Initialize();
+        /// interrogate sources to see if any are younger than the editor dll
+        bool CheckForRebuild();
 
         String idePath_;
 
