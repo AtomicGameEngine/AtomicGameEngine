@@ -31,6 +31,7 @@
 
 #include <Atomic/UI/UIEvents.h>
 #include <Atomic/Input/InputEvents.h>
+#include <AtomicEditor/EditorMode/AEEditorEvents.h>
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
@@ -191,6 +192,19 @@ namespace ToolCore
 
             ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
             ATOMIC_LOGERRORF("NETBuild Error for project");
+            
+            String myerror; // too much error for the dialog! scrape off just the error summary
+            unsigned where = errorText.Find("Errors:", 0, true);
+            if ( where != String::NPOS)
+                myerror = errorText.Substring (where, errorText.Length() - where);
+            else myerror = errorText; // failed to find summary, send the whole text
+            
+            using namespace AtomicEditor;
+            VariantMap errorData;
+            errorData[EditorModal::P_TYPE] = EDITOR_MODALERROR;
+            errorData[EditorModal::P_TITLE] = String("NETBuild Errors");
+            errorData[EditorModal::P_MESSAGE] = myerror;
+            SendEvent(E_EDITORMODAL, errorData);
         }
 
     }
@@ -217,7 +231,6 @@ namespace ToolCore
 
             if (build)
             {
-                build->UnsubscribeFromEvent(E_NETBUILDRESULT); //unsubscribe in case it has been subscribed before
                 build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildResult));
             }
 
@@ -425,7 +438,7 @@ namespace ToolCore
 
     }
 
-    /// handle the results of a recoompile, and auto play the project if successful
+    /// handle the results of a recompile, and auto play the project if successful
     void NETProjectSystem::HandleNETBuildPlay(StringHash eventType, VariantMap& eventData)
     {
         using namespace NETBuildResult;
@@ -433,7 +446,7 @@ namespace ToolCore
         if (eventData[P_SUCCESS].GetBool())
         {
             ATOMIC_LOGINFOF("NETBuild Success for project, now playing.");
-            VariantMap shortcutData;  // encode a shortcut even to send a play
+            VariantMap shortcutData;  // encode a shortcut event to send a play
             shortcutData[UIShortcut::P_KEY] = KEY_P;
             shortcutData[UIShortcut::P_QUALIFIERS] = QUAL_CTRL;
             SendEvent(E_UISHORTCUT, shortcutData);
@@ -444,6 +457,19 @@ namespace ToolCore
 
             ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
             ATOMIC_LOGERRORF("NETBuild Error for project, will not play.");
+           
+            String myerror; // too much error for the dialog! scrape off just the error summary
+            unsigned where = errorText.Find("Errors:", 0, true);
+            if ( where != String::NPOS)
+                myerror = errorText.Substring (where, errorText.Length() - where);
+            else myerror = errorText; // failed to find summary, send the whole text
+            
+            using namespace AtomicEditor;
+            VariantMap errorData;
+            errorData[EditorModal::P_TYPE] = EDITOR_MODALERROR;
+            errorData[EditorModal::P_TITLE] = String("NETBuild Error for project");
+            errorData[EditorModal::P_MESSAGE] = myerror;
+            SendEvent(E_EDITORMODAL, errorData);
         }
 
     }
@@ -471,7 +497,6 @@ namespace ToolCore
                 NETBuild* build = buildSystem->BuildAtomicProject(project);
                 if (build)
                 {
-                    build->UnsubscribeFromEvent(E_NETBUILDRESULT); //unsubscribe in case it has been subscribed before
                     build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildPlay));
                 }
             }       
@@ -489,29 +514,23 @@ namespace ToolCore
         unsigned dllTimestamp = 0;
 
         String mydll = project->GetResourcePath() + project->GetProjectSettings()->GetName() + ".dll";
-        Asset* myass = db->GetAssetByPath(mydll);
-        if (myass)
-            dllTimestamp = myass->GetFileTimestamp();  
+        Asset* myasset = db->GetAssetByPath(mydll);
+        if (myasset)
+            dllTimestamp = myasset->GetFileTimestamp();  
         else 
             return true; // dll not there, needs to be built, or the sources dont compile, or some other error
-        
-        int ii = 0, nn = 0;
+ 
+        int nn=0;
         Asset* filex = NULL;
         StringVector results;
-        const String searchdir[3] = { "Scripts/", "Modules/", "Components/" }; // only search sanctioned project dirs
-        for ( ii=0; ii<3; ii++)
+        String tdir = AddTrailingSlash(project->GetResourcePath());
+        fileSystem->ScanDir(results, tdir, "*.cs", SCAN_FILES, true);
+        for (nn=0; nn<results.Size(); nn++)
         {
-            results.Clear();
-            String tdir = AddTrailingSlash(project->GetResourcePath()) + searchdir[ii];
-            fileSystem->ScanDir(results, tdir, "*.cs", SCAN_FILES, false);
-            for ( nn=0; nn<results.Size(); nn++)
-            {
-                String fn = AddTrailingSlash(project->GetResourcePath()) + searchdir[ii] + results[nn];
-                filex = db->GetAssetByPath(fn);
-                if (filex && filex->GetFileTimestamp() > dllTimestamp )
-                    return true;  // some file is younger or dirtier, dll needs to be rebuilt
-            }
-        }
+            filex = db->GetAssetByPath(tdir + results[nn]);
+            if (filex && filex->GetFileTimestamp() > dllTimestamp )
+                return true;  // some file is younger or dirtier, dll needs to be rebuilt
+         }
         return false; // the dll is up to date, no need to recompile
     }
     
