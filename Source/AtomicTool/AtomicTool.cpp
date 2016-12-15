@@ -146,18 +146,10 @@ void AtomicTool::DoActivation()
 {
     LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
 
-    if (!licenseSystem->ValidateKey(activationKey_))
-    {
-        ErrorExit(ToString("\nProduct key \"%s\" is invalid, keys are in the form ATOMIC-XXXX-XXXX-XXXX-XXXX\n", activationKey_.CString()));
-        return;
-    }
-
     licenseSystem->LicenseAgreementConfirmed();
 
     SubscribeToEvent(E_LICENSE_ACTIVATIONERROR, ATOMIC_HANDLER(AtomicTool, HandleLicenseActivationError));
     SubscribeToEvent(E_LICENSE_ACTIVATIONSUCCESS, ATOMIC_HANDLER(AtomicTool, HandleLicenseActivationSuccess));
-
-    licenseSystem->RequestServerActivation(activationKey_);
 
 }
 
@@ -175,22 +167,6 @@ void AtomicTool::HandleLicenseDeactivationSuccess(StringHash eventType, VariantM
 
 void AtomicTool::DoDeactivation()
 {
-    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-
-    if (!licenseSystem->LoadLicense())
-    {
-        ErrorExit("\nNot activated");
-        return;
-    }
-
-    if (!licenseSystem->Deactivate())
-    {
-        ErrorExit("\nNot activated\n");
-        return;
-    }
-
-    SubscribeToEvent(E_LICENSE_DEACTIVATIONERROR, ATOMIC_HANDLER(AtomicTool, HandleLicenseDeactivationError));
-    SubscribeToEvent(E_LICENSE_DEACTIVATIONSUCCESS, ATOMIC_HANDLER(AtomicTool, HandleLicenseDeactivationSuccess));
 }
 
 void AtomicTool::Start()

@@ -33,7 +33,6 @@
 #include "Platform/PlatformLinux.h"
 
 #include "Assets/AssetDatabase.h"
-#include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
 #include "Subprocess/SubprocessSystem.h"
@@ -53,7 +52,6 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     updateDelta_(0.0f)
 {
     context_->RegisterSubsystem(new AssetDatabase(context_));
-    context_->RegisterSubsystem(new CurlManager(context_));
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));
     context_->RegisterSubsystem(new SubprocessSystem(context_));

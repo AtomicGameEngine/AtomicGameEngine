@@ -183,7 +183,7 @@ String PlatformAndroid::GetAndroidCommand() const
 bool PlatformAndroid::GetLicense()
 {
 // BEGIN LICENSE MANAGEMENT
-    return GetSubsystem<LicenseSystem>()->GetLicenseAndroid();
+    return true;
 // END LICENSE MANAGEMENT
 }
 

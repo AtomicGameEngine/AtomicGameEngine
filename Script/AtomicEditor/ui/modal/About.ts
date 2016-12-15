@@ -114,31 +114,16 @@ class About extends ModalWindow {
         var licenseSystem = ToolCore.licenseSystem;
 
         var installedText = "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> <widget TBSkinImage: skin: 'LogoHTML5-Small'> ";
-        var availableText = "   ";
 
-        if (licenseSystem.licenseAndroid)
-            installedText += "<widget TBSkinImage: skin: 'LogoAndroid-Small'> ";
-        else
-            availableText += "<widget TBSkinImage: skin: 'LogoAndroid-Small'> ";
+        installedText += "<widget TBSkinImage: skin: 'LogoAndroid-Small'> ";
 
-            if (licenseSystem.licenseIOS)
-                installedText += "<widget TBSkinImage: skin: 'LogoIOS-Small'> ";
-            else
-                availableText += "<widget TBSkinImage: skin: 'LogoIOS-Small'> ";
+        installedText += "<widget TBSkinImage: skin: 'LogoIOS-Small'> ";
 
         installedText += "<widget TBSkinImage: skin: 'Module2D-Small'> ";
 
-        if (licenseSystem.licenseModule3D)
-            installedText += "<widget TBSkinImage: skin: 'Module3D-Small'> ";
-        else
-            availableText += "<widget TBSkinImage: skin: 'Module3D-Small'> ";
+        installedText += "<widget TBSkinImage: skin: 'Module3D-Small'> ";
 
         text += installedText + "\n\n\n";
-
-        if (!licenseSystem.licenseIOS || !licenseSystem.licenseAndroid || !licenseSystem.licenseModule3D) {
-          text += "<color #76D6FF>Available platforms and modules:</color>\n\n";
-          text += availableText + "\n\n\n";
-        }
 
         text += "<color #76D6FF>Special Thanks:</color>\n";
         text += "The Urho3D Project (http://urho3d.github.io), Sami Vaarala (http://www.duktape.org)\n";
