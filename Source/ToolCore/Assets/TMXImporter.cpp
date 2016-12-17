@@ -21,7 +21,8 @@
 //
 
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/Resource/Image.h>
+#include <Atomic/Atomic2D/TmxFile2D.h>
+
 
 #include "Asset.h"
 #include "AssetDatabase.h"
@@ -73,5 +74,15 @@ bool TMXImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     return true;
 }
 
+Resource* TMXImporter::GetResource(const String& typeName)
+{
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    TmxFile2D* tmx = cache->GetResource<TmxFile2D>(asset_->GetPath());
+
+    return tmx;
+
+}
 
 }

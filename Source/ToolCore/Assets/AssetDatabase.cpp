@@ -661,6 +661,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Animation"] = "ModelImporter";
 
         resourceTypeToImporterType_["CSComponentAssembly"] = "NETAssemblyImporter";
+        resourceTypeToImporterType_["TmxFile2D"] = "TMXImporter";
 
     }
 
