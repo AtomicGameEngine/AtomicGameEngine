@@ -123,7 +123,7 @@ ATOMIC_EVENT(E_EDITORMODAL, EditorModal)
 
 ATOMIC_EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
 {
-    ATOMIC_PARAM(P_SCENEEDITOR, SceneEditor);
+    ATOMIC_PARAM(P_SCENEEDITOR, SceneEditor);  // SceneEditor3D pointer
 }
 
 

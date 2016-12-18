@@ -21,7 +21,7 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
-import EditorUI = require("ui/EditorUI"); 
+import EditorUI = require("ui/EditorUI");
 
 
 class InspectorWidget extends ScriptWidget {

@@ -145,7 +145,7 @@ export class BuildSettingsWindow extends ModalWindow {
                 var showMessage = function(target, title, message) {
                     var window = new Atomic.UIMessageWindow(target, "modal_error");
                     window.show(title, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
-                }
+                };
 
                 for (var name in this.platformInfo) {
 

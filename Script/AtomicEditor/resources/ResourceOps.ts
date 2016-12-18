@@ -36,7 +36,7 @@ class ResourceOps extends Atomic.ScriptObject {
 
         });
 
-        this.subscribeToEvent(EditorEvents.RequestProjectLoad, (ev: EditorEvents.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); })
+        this.subscribeToEvent(EditorEvents.RequestProjectLoad, (ev: EditorEvents.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); });
 
     }
 
@@ -78,7 +78,7 @@ class ResourceOps extends Atomic.ScriptObject {
 
                 if (projectPath.indexOf(allLanguages[i]) != -1) {
                     language = allLanguages[i];
-                    break
+                    break;
                 }
             }
 
@@ -95,7 +95,7 @@ class ResourceOps extends Atomic.ScriptObject {
                 appDelegateClass : exampleJson.appDelegateClass,
                 namespace : exampleJson.namespace
 
-            }
+            };
 
             var ops = EditorUI.getModelOps();
             ops.showCreateProject(projectDef, projectPath);

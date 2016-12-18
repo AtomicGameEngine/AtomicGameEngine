@@ -183,8 +183,7 @@ class TextureInspector extends InspectorWidget {
 
     }
 
-    onApply()
-    {
+    onApply() {
 
         this.importer.setCompressedImageSize(Number(this.compressionSize.text));
         this.asset.import();
@@ -192,26 +191,22 @@ class TextureInspector extends InspectorWidget {
 
     }
 
-    populateCompressionSizeList()
-    {
+    populateCompressionSizeList() {
         this.compressionSize = new Atomic.UISelectDropdown();
         this.compressionSizeSource = new Atomic.UISelectItemSource();
 
-        for (var i = 0; i < this.compressionSizes.length; i ++)
-        {
+        for (var i = 0; i < this.compressionSizes.length; i ++) {
             var size = new Atomic.UISelectItem();
-            size.setString(this.compressionSizes[i].toString());           
+            size.setString(this.compressionSizes[i].toString());
             this.compressionSizeSource.addItem(size);
         }
 
         this.compressionSize.setSource(this.compressionSizeSource);
 
-        if (this.importer.getCompressedImageSize() != 0)
-        {
+        if (this.importer.getCompressedImageSize() != 0) {
             this.compressionSize.setText(this.importer.getCompressedImageSize().toString());
         }
-        else
-        {
+        else {
             this.compressionSize.setText("NONE");
         }
     }

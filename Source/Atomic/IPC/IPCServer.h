@@ -29,13 +29,13 @@ namespace Atomic
 {
     ATOMIC_EVENT(E_IPCCMD, IPCCmd)
     {
-        ATOMIC_PARAM(P_COMMAND, Command);
+        ATOMIC_PARAM(P_COMMAND, Command); // string
         ATOMIC_PARAM(P_ID, ID); // unsigned
     }
 
     ATOMIC_EVENT(E_IPCCMDRESULT, IPCCmdResult)
     {
-        ATOMIC_PARAM(P_COMMAND, Command);
+        ATOMIC_PARAM(P_COMMAND, Command); // string
         ATOMIC_PARAM(P_ID, ID); // unsigned
     }
 
