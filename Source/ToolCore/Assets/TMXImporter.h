@@ -37,6 +37,7 @@ public:
     virtual ~TMXImporter();
 
     virtual void SetDefaults();
+    Resource* GetResource(const String& typeName);
 
 protected:
 
