@@ -181,7 +181,7 @@ class MainFrame extends ScriptWidget {
             this.animationToolbar = new AnimationToolbar(this.getWidget("animationtoolbarcontainer"), this.getWidget("animationpropertiescontainer"), asset);
         }
         else {
-            this.animationToolbar = new AnimationToolbar(this.getWidget("animationtoolbarcontainer"), this.getWidget("animationpropertiescontainer"), asset)
+            this.animationToolbar = new AnimationToolbar(this.getWidget("animationtoolbarcontainer"), this.getWidget("animationpropertiescontainer"), asset);
         }
     }
 

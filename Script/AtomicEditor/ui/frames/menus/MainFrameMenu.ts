@@ -276,7 +276,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 let logName = refid.indexOf("editor") != -1 ? "AtomicEditor" : "AtomicPlayer";
                 let logFolder = Atomic.fileSystem.getAppPreferencesDir(logName, "Logs");
                 Atomic.fileSystem.systemOpen(logFolder);
-            } 
+            }
 
         } else if (target.id == "menu build popup") {
 
@@ -364,7 +364,7 @@ var toolsItems = {
         "Player Log": ["tools log player"],
         "Editor Log": ["tools log editor"]
     }
-    
+
 
 };
 

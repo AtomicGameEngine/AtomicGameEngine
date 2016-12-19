@@ -41,9 +41,9 @@ class WelcomeFrame extends ScriptWidget {
         this.examplesJavaScript = <Atomic.UIButton>this.getWidget("examples_javascript");
         this.examplesTypeScript = <Atomic.UIButton>this.getWidget("examples_typescript");
 
-        this.examplesCSharp.onClick = () => { this.handleExampleFilter(); }
-        this.examplesJavaScript.onClick = () => { this.handleExampleFilter(); }
-        this.examplesTypeScript.onClick = () => { this.handleExampleFilter(); }
+        this.examplesCSharp.onClick = () => { this.handleExampleFilter(); };
+        this.examplesJavaScript.onClick = () => { this.handleExampleFilter(); };
+        this.examplesTypeScript.onClick = () => { this.handleExampleFilter(); };
 
         this.gravity = Atomic.UI_GRAVITY_ALL;
 

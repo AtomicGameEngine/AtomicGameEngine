@@ -56,7 +56,7 @@ class WebSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
             if ( path.length > 0 )
                 this.faviconName.text = path;
             return true;
-        } 
+        }
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 

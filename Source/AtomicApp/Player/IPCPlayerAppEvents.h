@@ -49,12 +49,12 @@ namespace Atomic
 
     ATOMIC_EVENT(E_IPCPLAYERWINDOWCHANGED, IPCPlayerWindowChanged)
     {
-        ATOMIC_PARAM(P_POSX, PosX);
-        ATOMIC_PARAM(P_POSY, PosY);
-        ATOMIC_PARAM(P_WIDTH, Width);
-        ATOMIC_PARAM(P_HEIGHT, Height);
-        ATOMIC_PARAM(P_MONITOR, Monitor);
-        ATOMIC_PARAM(P_MAXIMIZED, Maximized);
+        ATOMIC_PARAM(P_POSX, PosX);  // int
+        ATOMIC_PARAM(P_POSY, PosY); // int
+        ATOMIC_PARAM(P_WIDTH, Width); // int
+        ATOMIC_PARAM(P_HEIGHT, Height); // int
+        ATOMIC_PARAM(P_MONITOR, Monitor); // int
+        ATOMIC_PARAM(P_MAXIMIZED, Maximized); // bool
     }
 
     ATOMIC_EVENT(E_PLAYERQUIT, PlayerQuit)

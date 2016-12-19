@@ -117,7 +117,7 @@ class CreateProject extends ModalWindow {
         if (platformName != "desktop") {
             var greenplus = new Atomic.UIImageWidget();
             greenplus.image = "AtomicEditor/editor/images/green_plus.png";
-            rect = [size-18, 2, size-2, 18];
+            rect = [size - 18, 2, size - 2, 18];
             greenplus.rect = rect;
             greenplus.visibility = Atomic.UI_WIDGET_VISIBILITY_INVISIBLE;
             button.addChild(greenplus);
@@ -247,7 +247,7 @@ class CreateProject extends ModalWindow {
             var projectSettings = {
                 name : name,
                 platforms : platforms
-            }
+            };
 
             var jsonFile = new Atomic.File(folder + "Settings/Project.json", Atomic.FILE_WRITE);
             if (jsonFile.isOpen()) {
@@ -329,10 +329,8 @@ class CreateProject extends ModalWindow {
             }
             else if (id == "create") {
 
-                if ( this.tryProjectCreate() )
-                {
-                    if ( Preferences.getInstance().editorFeatures.defaultLanguage != this.projectLanguageField.text )
-                    {
+                if ( this.tryProjectCreate() ) {
+                    if ( Preferences.getInstance().editorFeatures.defaultLanguage != this.projectLanguageField.text ) {
                         Preferences.getInstance().editorFeatures.defaultLanguage = this.projectLanguageField.text;
                         Preferences.getInstance().write();
                     }
@@ -381,8 +379,7 @@ class CreateProject extends ModalWindow {
         let csrank = -1;
         let tsrank = -1;
         let ii = 0;
-        for ( ii = 0; ii<this.projectLanguageFieldSource.getItemCount(); ii++ ) // get rankings
-        {
+        for ( ii = 0; ii < this.projectLanguageFieldSource.getItemCount(); ii++ ) { // get rankings
             if ( this.projectLanguageFieldSource.getItemStr( ii ) == "JavaScript" ) jsrank = ii;
             if ( this.projectLanguageFieldSource.getItemStr( ii ) == "CSharp" ) csrank = ii;
             if ( this.projectLanguageFieldSource.getItemStr( ii ) == "TypeScript" ) tsrank = ii;

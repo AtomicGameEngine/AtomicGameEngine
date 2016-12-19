@@ -161,7 +161,7 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
             languages : languages,
             appDelegateClass : exampleJson.appDelegateClass,
             namespace : exampleJson.namespace
-        })
+        });
 
     });
 

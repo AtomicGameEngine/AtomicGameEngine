@@ -42,7 +42,7 @@ class PlayerOutput extends Atomic.UIWindow {
 
         this.output = <Atomic.UIEditField> this.getWidget("output");
         this.closeOnStop = <Atomic.UICheckBox> this.getWidget("closeonstop");
-        
+
         this.closeOnStop.value = Preferences.getInstance().editorFeatures.closePlayerLog ? 1 : 0;
 
         (<Atomic.UIButton>this.getWidget("closebutton")).onClick = () => {
@@ -73,7 +73,7 @@ class PlayerOutput extends Atomic.UIWindow {
 
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
-    
+
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
             var id = ev.target.id;
             if (id == "closeonstop") {

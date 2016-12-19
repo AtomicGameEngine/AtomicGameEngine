@@ -89,9 +89,9 @@ class HierarchyFrame extends Atomic.UIWidget {
         this.subscribeToEvent("KeyUp", () => {
             this.canReparent = true;
         });
-        
+
         this.subscribeToEvent(EditorEvents.ProjectClosed, (ev) => {
-            
+
             this.scene = null;
             this.populate();
 
@@ -202,7 +202,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         if (this.scene)
             this.unsubscribeFromEvents(this.scene);
-        
+
         this.sceneEditor = sceneEditor;
         this.scene = sceneEditor == null ? null : sceneEditor.scene;
 
@@ -235,7 +235,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
 
         }
-        
+
     }
 
     handleEditorResourceClosed(event) {
@@ -245,7 +245,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         }
 
     }
-    
+
     handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
 
         this.setSceneEditor(event.sceneEditor);
