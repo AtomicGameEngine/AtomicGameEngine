@@ -27,6 +27,7 @@ namespace Atomic
 {
 
 FieldMap ScriptComponentFile::emptyFieldMap_;
+FieldTooltipMap ScriptComponentFile::emptyFieldTooltipMap_;
 EnumMap ScriptComponentFile::emptyEnumMap_;
 VariantMap ScriptComponentFile::emptyDefaultValueMap_;
 
@@ -52,10 +53,16 @@ void ScriptComponentFile::AddEnum(const String& enumName, const EnumInfo& enumIn
     enumValues.Push(enumInfo);
 }
 
-void ScriptComponentFile::AddField(const String& fieldName, VariantType variantType, const String &classname)
+void ScriptComponentFile::AddField(const String& fieldName, VariantType variantType, const String &classname, const String& tooltip)
 {
     FieldMap& fields = classFields_[classname];
     fields[fieldName] = variantType;
+
+    if (tooltip.Length())
+    {
+        FieldTooltipMap& tooltips = classFieldTooltips_[classname];
+        tooltips[fieldName] = tooltip;
+    }
 }
 
 void ScriptComponentFile::AddDefaultValue(const String& fieldName, const Variant& value, const String& classname)
@@ -67,6 +74,7 @@ void ScriptComponentFile::AddDefaultValue(const String& fieldName, const Variant
 void ScriptComponentFile::Clear()
 {
     classFields_.Clear();
+    classFieldTooltips_.Clear();
     classDefaultFieldValues_.Clear();
     classEnums_.Clear();
 }
@@ -80,6 +88,18 @@ const FieldMap& ScriptComponentFile::GetFields(const String& classname) const
 
     return emptyFieldMap_;
 }
+
+const FieldTooltipMap& ScriptComponentFile::GetFieldTooltips(const String& classname) const
+{
+    FieldTooltipMap* fieldTooltipMap = classFieldTooltips_[classname];
+
+    if (fieldTooltipMap)
+        return *fieldTooltipMap;
+
+    return emptyFieldTooltipMap_;
+}
+
+
 const VariantMap& ScriptComponentFile::GetDefaultFieldValues(const String& classname) const
 {
     VariantMap *vmap = classDefaultFieldValues_[classname];

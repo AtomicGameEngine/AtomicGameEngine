@@ -94,6 +94,7 @@ namespace Atomic
                 String typeName = jfield.Get("typeName").GetString();
                 String fieldName = jfield.Get("name").GetString();
                 String defaultValue = jfield.Get("defaultValue").GetString();
+                String tooltip;
 
                 if (!defaultValue.Length())
                 {
@@ -102,11 +103,18 @@ namespace Atomic
                         defaultValue = caPos[0].GetString();
                 }
 
+                JSONObject caNamed = jfield.Get("caNamed").GetObject();
+
                 if (!defaultValue.Length())
-                {
-                    JSONObject caNamed = jfield.Get("caNamed").GetObject();
+                {                    
                     if (caNamed.Contains("DefaultValue"))
                         defaultValue = caNamed["DefaultValue"].GetString();
+                }
+
+                // tooltip
+                if (caNamed.Contains("Tooltip"))
+                {
+                    tooltip = caNamed["Tooltip"].GetString();
                 }
 
                 if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(fieldName))
@@ -171,7 +179,7 @@ namespace Atomic
                     AddDefaultValue(fieldName, value, className);
                 }
 
-                AddField(fieldName, varType, className);
+                AddField(fieldName, varType, className, tooltip);
 
             }
 

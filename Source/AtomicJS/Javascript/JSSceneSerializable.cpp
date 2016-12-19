@@ -241,7 +241,8 @@ static int Serializable_GetAttribute(duk_context* ctx)
 
 static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const VariantMap& defaultFieldValues,
                                  const FieldMap& fields,
-                                 const EnumMap& enums)
+                                 const EnumMap& enums, 
+                                 const FieldTooltipMap& tooltips)
 {
     if (fields.Size())
     {
@@ -280,6 +281,12 @@ static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const Varian
 
             duk_push_boolean(ctx, 1);
             duk_put_prop_string(ctx, -2, "dynamic");
+
+            if (tooltips.Contains(itr->first_))
+            {
+                duk_push_string(ctx, tooltips[itr->first_]->CString());
+                duk_put_prop_string(ctx, -2, "tooltip");
+            }
 
             duk_push_array(ctx);
 
@@ -426,9 +433,10 @@ static int Serializable_GetAttributes(duk_context* ctx)
             const String& className = jsc->GetComponentClassName();
             const VariantMap& defaultFieldValues = file->GetDefaultFieldValues(className);
             const FieldMap& fields =  file->GetFields(className);
+            const FieldTooltipMap& fieldTooltips = file->GetFieldTooltips(className);
             const EnumMap& enums = file->GetEnums(className);
 
-            GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
+            GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums, fieldTooltips);
         }
     }
 

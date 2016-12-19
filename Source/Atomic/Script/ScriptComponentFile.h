@@ -41,17 +41,21 @@ struct EnumInfo
     Variant value_;
 };
 
+// TODO: these should be broken out into some class info structs, getting unwieldy
 typedef HashMap<String, VariantType> FieldMap;
 typedef HashMap<String, Vector<EnumInfo>> EnumMap;
+typedef HashMap<String, String> FieldTooltipMap;
 
 typedef HashMap<StringHash, FieldMap> ClassFieldMap;
+typedef HashMap<StringHash, FieldTooltipMap> ClassFieldTooltipMap;
 typedef HashMap<StringHash, EnumMap> ClassEnumMap;
 typedef HashMap<StringHash, VariantMap> ClassDefaultValueMap;
+
 
 /// NET Assembly resource.
 class ATOMIC_API ScriptComponentFile : public Resource
 {
-    ATOMIC_OBJECT(ScriptComponentFile, Resource);
+    ATOMIC_OBJECT(ScriptComponentFile, Resource)
 
 public:
 
@@ -66,6 +70,7 @@ public:
     virtual const Vector<String>& GetClassNames() { return classNames_; }
     const EnumMap& GetEnums(const String& classname = String::EMPTY) const;
     const FieldMap& GetFields(const String& classname = String::EMPTY) const;
+    const FieldTooltipMap& GetFieldTooltips(const String& classname = String::EMPTY) const;
     const VariantMap& GetDefaultFieldValues(const String& classname = String::EMPTY) const;
 
     void GetDefaultFieldValue(const String& name, Variant& v,const String& classname = String::EMPTY) const;
@@ -75,7 +80,7 @@ protected:
     void Clear();
 
     void AddEnum(const String& enumName, const EnumInfo& enumInfo, const String& classname = String::EMPTY);
-    void AddField(const String& fieldName, VariantType variantType, const String& classname = String::EMPTY);
+    void AddField(const String& fieldName, VariantType variantType, const String& classname = String::EMPTY, const String& tooltip = String::EMPTY);
     void AddDefaultValue(const String& fieldName, const Variant& value, const String& classname = String::EMPTY);
 
     // only valid in editor
@@ -84,10 +89,12 @@ protected:
 private:
 
     ClassFieldMap classFields_;
+    ClassFieldTooltipMap classFieldTooltips_;
     ClassDefaultValueMap classDefaultFieldValues_;
     ClassEnumMap classEnums_;
 
     static FieldMap emptyFieldMap_;
+    static FieldTooltipMap emptyFieldTooltipMap_;
     static EnumMap emptyEnumMap_;
     static VariantMap emptyDefaultValueMap_;
 

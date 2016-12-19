@@ -269,7 +269,8 @@ declare module Atomic {
         enumNames: string[];
         resourceTypeName: string;
         dynamic: boolean;
-
+        tooltip: string;
+        
     }
 
     export interface ShaderParameter {
