@@ -29,6 +29,10 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
+#include <Atomic/UI/UIEvents.h>
+#include <Atomic/Input/InputEvents.h>
+#include <AtomicEditor/EditorMode/AEEditorEvents.h>
+
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Assets/AssetEvents.h"
@@ -188,6 +192,19 @@ namespace ToolCore
 
             ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
             ATOMIC_LOGERRORF("NETBuild Error for project");
+            
+            String myerror; // too much error for the dialog! scrape off just the error summary
+            unsigned where = errorText.Find("Errors:", 0, true);
+            if ( where != String::NPOS)
+                myerror = errorText.Substring (where, errorText.Length() - where);
+            else myerror = errorText; // failed to find summary, send the whole text
+            
+            using namespace AtomicEditor;
+            VariantMap errorData;
+            errorData[EditorModal::P_TYPE] = EDITOR_MODALERROR;
+            errorData[EditorModal::P_TITLE] = String("NETBuild Errors");
+            errorData[EditorModal::P_MESSAGE] = myerror;
+            SendEvent(E_EDITORMODAL, errorData);
         }
 
     }
@@ -421,6 +438,102 @@ namespace ToolCore
 
     }
 
+    /// handle the results of a recompile, and auto play the project if successful
+    void NETProjectSystem::HandleNETBuildPlay(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace NETBuildResult;
+        
+        if (eventData[P_SUCCESS].GetBool())
+        {
+            ATOMIC_LOGINFOF("NETBuild Success for project, now playing.");
+            VariantMap shortcutData;  // encode a shortcut event to send a play
+            shortcutData[UIShortcut::P_KEY] = KEY_P;
+            shortcutData[UIShortcut::P_QUALIFIERS] = QUAL_CTRL;
+            SendEvent(E_UISHORTCUT, shortcutData);
+        }
+        else
+        {
+            const String& errorText = eventData[P_ERRORTEXT].GetString();
+
+            ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
+            ATOMIC_LOGERRORF("NETBuild Error for project, will not play.");
+           
+            String myerror; // too much error for the dialog! scrape off just the error summary
+            unsigned where = errorText.Find("Errors:", 0, true);
+            if ( where != String::NPOS)
+                myerror = errorText.Substring (where, errorText.Length() - where);
+            else myerror = errorText; // failed to find summary, send the whole text
+            
+            using namespace AtomicEditor;
+            VariantMap errorData;
+            errorData[EditorModal::P_TYPE] = EDITOR_MODALERROR;
+            errorData[EditorModal::P_TITLE] = String("NETBuild Error for project");
+            errorData[EditorModal::P_MESSAGE] = myerror;
+            SendEvent(E_EDITORMODAL, errorData);
+        }
+
+    }
+
+    /// used to ensure the project can be run from the editor
+    bool NETProjectSystem::BuildAndRun()
+    {
+        bool shouldRebuild = CheckForRebuild();
+        if (shouldRebuild) 
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            if (!fileSystem->FileExists(solutionPath_))
+            {
+                if (!GenerateSolution())
+                {
+                    ATOMIC_LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
+                    return false;
+                }
+            }
+
+            Project* project = GetSubsystem<ToolSystem>()->GetProject();
+            NETBuildSystem* buildSystem = GetSubsystem<NETBuildSystem>();
+            if (buildSystem)
+            {
+                NETBuild* build = buildSystem->BuildAtomicProject(project);
+                if (build)
+                {
+                    build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildPlay));
+                }
+            }       
+        }
+        
+        return shouldRebuild;
+    }
+    
+    /// interrogate sources to see if any are dirty compared to the editor project.dll
+    bool NETProjectSystem::CheckForRebuild() 
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        AssetDatabase* db = GetSubsystem<AssetDatabase>();
+        Project* project = GetSubsystem<ToolSystem>()->GetProject();
+        unsigned dllTimestamp = 0;
+
+        String mydll = project->GetResourcePath() + project->GetProjectSettings()->GetName() + ".dll";
+        Asset* myasset = db->GetAssetByPath(mydll);
+        if (myasset)
+            dllTimestamp = myasset->GetFileTimestamp();  
+        else 
+            return true; // dll not there, needs to be built, or the sources dont compile, or some other error
+ 
+        int nn=0;
+        Asset* filex = NULL;
+        StringVector results;
+        String tdir = AddTrailingSlash(project->GetResourcePath());
+        fileSystem->ScanDir(results, tdir, "*.cs", SCAN_FILES, true);
+        for (nn=0; nn<results.Size(); nn++)
+        {
+            filex = db->GetAssetByPath(tdir + results[nn]);
+            if (filex && filex->GetFileTimestamp() > dllTimestamp )
+                return true;  // some file is younger or dirtier, dll needs to be rebuilt
+         }
+        return false; // the dll is up to date, no need to recompile
+    }
+    
     void NETProjectSystem::Initialize()
     {
         Clear();

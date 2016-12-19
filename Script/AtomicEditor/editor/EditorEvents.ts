@@ -181,3 +181,11 @@ export interface UserPreferencesChangedEvent {
 
 export const WebViewLoadEnd = "WebViewLoadEnd";
 export const WebMessage = "WebMessage";
+
+// interface to pass modal error messages from core modules
+export const EditorModal = "EditorModal";
+export interface EditorModalEvent {
+    uiType: number;     // EDITOR_ERROR_MODAL, etc)
+    title: string;      // for modal errors, title text
+    message: string;    // for modal errors, error text
+}
