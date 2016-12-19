@@ -65,6 +65,10 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
         this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
+        if (this.attrInfo.tooltip) {
+            this.editWidget.tooltip = this.attrInfo.tooltip;
+        }
+
         var attr = this.attrInfo;
         var attrNameLP = AttributeInfoEdit.attrNameLP;
 
@@ -94,6 +98,10 @@ class AttributeInfoEdit extends Atomic.UILayout {
                 name.text = bname;
 
             name.fontDescription = AttributeInfoEdit.fontDesc;
+
+            if (this.attrInfo.tooltip) {
+               name.tooltip = this.attrInfo.tooltip;
+            }
 
             this.addChild(name);
 
