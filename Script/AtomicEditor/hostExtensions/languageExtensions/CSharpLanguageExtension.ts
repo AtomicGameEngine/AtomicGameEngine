@@ -167,7 +167,13 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
                 if (!eventData.success) {
 
                     let errorText = eventData.errorText;
+
+                    // attempt to shave off some of the build text
+                    // xbuild
                     let index = errorText.lastIndexOf("Errors:");
+                    // msbuild
+                    index = index == -1 ? errorText.lastIndexOf("Build FAILED.") : index;
+
                     if (index != -1) {
                         errorText = errorText.substr(index);
                     }
