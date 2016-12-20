@@ -35,6 +35,9 @@
 #include <ToolCore/Project/Project.h>
 #include <ToolCore/Project/ProjectSettings.h>
 
+#include <ToolCore/NETTools/NETProjectSystem.h>
+#include <ToolCore/NETTools/NETBuildSystem.h>
+
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
 #include <Atomic/UI/SystemUI/DebugHud.h>
@@ -49,7 +52,9 @@ namespace AtomicEditor
 {
 
 EditorMode::EditorMode(Context* context) :
-    Object(context)
+    Object(context),
+    playerEnabled_(false),
+    debug_(false)
 {
 
 }
@@ -118,7 +123,55 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
+void EditorMode::HandleNETBuildResult(StringHash eventType, VariantMap& eventData)
+{
+
+    using namespace NETBuildResult;
+
+    if (eventData[P_SUCCESS].GetBool())
+    {
+        NETProjectSystem* netProjectSystem = GetSubsystem<NETProjectSystem>();
+
+        if (!netProjectSystem->GetSolutionAvailable() || netProjectSystem->GetProjectAssemblyDirty())
+        {
+            ATOMIC_LOGERROR("EditorMode::HandleNETBuildResult() - NETBuild was successful, however project still reported as dirty or missing");
+        }
+
+        PlayProjectInternal(additionalArgs_, debug_);
+    }
+
+    additionalArgs_.Clear();
+    debug_ = false;
+
+}
+
 bool EditorMode::PlayProject(String addArgs, bool debug)
+{
+    additionalArgs_ = addArgs;
+    debug_ = debug;
+
+    NETProjectSystem* netProjectSystem = GetSubsystem<NETProjectSystem>();
+
+    // If we're a net project, with a solution, and the project assembly is dirty build before playing
+    if (netProjectSystem && netProjectSystem->GetSolutionAvailable() && netProjectSystem->GetProjectAssemblyDirty())
+    {
+        NETBuild* build = netProjectSystem->BuildAtomicProject();
+
+        if (!build)
+        {
+            ATOMIC_LOGERROR("EditorMode::PlayProject() - Unable to instantiate C# build");
+            return false;
+        }
+
+        SubscribeToEvent(build, E_NETBUILDRESULT, ATOMIC_HANDLER(EditorMode, HandleNETBuildResult));
+
+        return true;
+    }
+
+    return PlayProjectInternal(addArgs, debug);
+}
+
+bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
 {
     if (playerBroker_.NotNull())
         return false;

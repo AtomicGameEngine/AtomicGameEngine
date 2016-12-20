@@ -25,7 +25,6 @@ import EditorUI = require("ui/EditorUI");
 import HierarchyFrame = require("ui/frames/HierarchyFrame");
 import InspectorUtils = require("ui/frames/inspector/InspectorUtils");
 import ResourceOps = require("resources/ResourceOps");
-import ModalOps = require("ui/modal/ModalOps");
 
 class AnimationToolbar extends Atomic.UIWidget {
 
@@ -75,8 +74,6 @@ class AnimationToolbar extends Atomic.UIWidget {
 
         properties.addChild(this.animationPropertiesContainer);
 
-        this.modalOps = new ModalOps();
-
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
@@ -112,7 +109,7 @@ class AnimationToolbar extends Atomic.UIWidget {
                     if (this.animationController.playExclusive(this.rightAnimEditfield.text, 0, true, Number(this.blendSpeed.text)))
                         this.animationController.setSpeed(this.rightAnimEditfield.text, Number(this.animationSpeed.text));
                     else
-                        this.modalOps.showError("Animation Toolbar Warning", "The animation cannot be played. Please make sure the animation you are trying to play exists in the AnimationController Component.");
+                        EditorUI.getModelOps().showError("Animation Toolbar Warning", "The animation cannot be played. Please make sure the animation you are trying to play exists in the AnimationController Component.");
 
                     return true;
                 }
@@ -192,10 +189,9 @@ class AnimationToolbar extends Atomic.UIWidget {
         });
     }
     showAnimationWarning() {
-        this.modalOps.showError("Animation Preview Warning", "The animation cannot be played. Please make sure the animation you are trying to play exists in the AnimationController Component.");
+        EditorUI.getModelOps().showError("Animation Preview Warning", "The animation cannot be played. Please make sure the animation you are trying to play exists in the AnimationController Component.");
     }
 
-    modalOps: ModalOps;
     //Animation Toolbar Widgets
     animationController: Atomic.AnimationController;
     animatedModel: Atomic.AnimatedModel;
@@ -222,5 +218,3 @@ class AnimationToolbar extends Atomic.UIWidget {
 }
 
 export = AnimationToolbar;
-
-

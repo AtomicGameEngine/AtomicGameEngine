@@ -192,7 +192,7 @@ namespace ToolCore
 
     }
 
-    void NETProjectSystem::BuildAtomicProject()
+    NETBuild* NETProjectSystem::BuildAtomicProject()
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -201,7 +201,7 @@ namespace ToolCore
             if (!GenerateSolution())
             {
                 ATOMIC_LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
-                return;
+                return nullptr;
             }
         }
 
@@ -217,7 +217,10 @@ namespace ToolCore
                 build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildResult));
             }
 
+            return build;
         }
+
+        return nullptr;
     }
 
     bool NETProjectSystem::GenerateResourcePak()
@@ -358,8 +361,7 @@ namespace ToolCore
         if (!fileSystem->FileExists(solutionPath_))
             solutionDirty_ = true;
 
-        if (!fileSystem->FileExists(projectAssemblyPath_))
-            projectAssemblyDirty_ = true;
+        CheckProjectAssembly();
 
     }
 
@@ -421,6 +423,71 @@ namespace ToolCore
 
     }
 
+    bool NETProjectSystem::GetProjectAssemblyDirty()
+    {
+        if (projectAssemblyDirty_)
+            return true;
+
+        CheckProjectAssembly();
+
+        return projectAssemblyDirty_;
+
+    }
+    
+    void NETProjectSystem::CheckProjectAssembly()
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+        Project* project = tsystem->GetProject();
+
+        if (!project || !projectAssemblyPath_.Length())
+        {
+            ATOMIC_LOGERROR("NETProjectSystem::CheckProjectAssembly() - Called with no project loaded or an empty project assembly path");
+            projectAssemblyDirty_ = false;
+            return;
+        }
+
+        if (projectAssemblyDirty_)
+            return;
+
+        // If we don't have a project or the project assembly is missing, we must rebuild
+        if (!fileSystem->FileExists(projectAssemblyPath_))
+        {
+            projectAssemblyDirty_ = true;
+            return;
+        }
+
+        StringVector results;
+
+        // timestamps for present assemblies, use the filesystem and not asset db as the later is cached
+        PODVector<unsigned> assemblyTimestamps;
+
+        fileSystem->ScanDir(results, project->GetResourcePath(), "*.dll", SCAN_FILES, true);
+
+        for (unsigned i = 0; i < results.Size(); i++)
+        {
+            assemblyTimestamps.Push(fileSystem->GetLastModifiedTime(project->GetResourcePath() + results[i]));
+        }
+
+        fileSystem->ScanDir(results, project->GetResourcePath(), "*.cs", SCAN_FILES, true);
+
+        for (unsigned i = 0; i < results.Size(); i++)
+        {
+            unsigned timestamp = fileSystem->GetLastModifiedTime(project->GetResourcePath() + results[i]);
+
+            for (unsigned j = 0; j < assemblyTimestamps.Size(); j++)
+            {
+                if (timestamp > assemblyTimestamps[j])
+                {
+                    projectAssemblyDirty_ = true;
+                    return;
+                }
+            }
+
+        }
+
+    }
+    
     void NETProjectSystem::Initialize()
     {
         Clear();
@@ -535,11 +602,8 @@ namespace ToolCore
 
                 if (srcModifiedTime == fileSystem->GetLastModifiedTime(dstFile))
                 {
-                    ATOMIC_LOGDEBUGF("NETProjectSystem::CopyAtomicAssemblies - Skipping AtomicNET %s as %s exists and has same modified time", srcFile.CString(), dstFile.CString());
                     continue;
                 }
-
-                ATOMIC_LOGDEBUGF("NETProjectSystem::CopyAtomicAssemblies - %u %u", srcModifiedTime, fileSystem->GetLastModifiedTime(dstFile));
 
             }
 
@@ -561,7 +625,6 @@ namespace ToolCore
             if (srcModifiedTime)
                 fileSystem->SetLastModifiedTime(dstFile, srcModifiedTime);
 
-            ATOMIC_LOGDEBUGF(" NETProjectSystem::CopyAtomicAssemblies - Copied AtomicNET %s to %s", srcFile.CString(), dstPath.CString());
         }
 
         return true;

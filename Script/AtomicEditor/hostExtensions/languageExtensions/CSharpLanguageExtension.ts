@@ -21,6 +21,7 @@
 //
 
 import * as EditorEvents from "../../editor/EditorEvents";
+import EditorUI = require("ui/EditorUI");
 
 /**
 * Resource extension that supports the web view typescript extension
@@ -39,6 +40,9 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
     private menuCreated = false;
     /** Reference to the compileOnSaveMenuItem */
     private compileOnSaveMenuItem: Atomic.UIMenuItem;
+
+    //** A script object so we can take part in event handling
+    private eventObject = new Atomic.ScriptObject();
 
     /**
     * Determines if the file name/path provided is something we care about
@@ -68,9 +72,6 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
             menu.addItem(new Atomic.UIMenuItem("Generate Solution", `${this.name}.generatesolution`));
             menu.addItem(new Atomic.UIMenuItem("Package Resources", `${this.name}.packageresources`));
-
-            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
-            menu.addItem(this.compileOnSaveMenuItem);
 
             this.menuCreated = true;
         }
@@ -135,15 +136,6 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             this.isNETProject = true;
         }
 
-        const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-
-        if (isCompileOnSave && ToolCore.netProjectSystem) {
-
-            // for now, only support compile on save when not using VS
-            if (!ToolCore.netProjectSystem.iDEAvailable)
-                ToolCore.netProjectSystem.buildAtomicProject();
-        }
-
     }
 
     /*** ProjectService implementation ****/
@@ -166,11 +158,33 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
         };
 
         if (found) {
+
             this.isNETProject = true;
             this.configureNETProjectMenu();
+
+            this.eventObject.subscribeToEvent("NETBuildResult", (eventData:ToolCore.NETBuildResult) => {
+
+                if (!eventData.success) {
+
+                    let errorText = eventData.errorText;
+
+                    // attempt to shave off some of the build text
+                    // xbuild
+                    let index = errorText.lastIndexOf("Errors:");
+                    // msbuild
+                    index = index == -1 ? errorText.lastIndexOf("Build FAILED.") : index;
+
+                    if (index != -1) {
+                        errorText = errorText.substr(index);
+                    }
+
+                    EditorUI.getModelOps().showError("NET Build Error", errorText);
+
+                }
+
+            });
         }
     }
-
 
     /**
     * Called when the project is unloaded
@@ -180,6 +194,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
         this.serviceRegistry.uiServices.removePluginMenuItemSource("AtomicNET");
         this.menuCreated = false;
         this.isNETProject = false;
+        this.eventObject.unsubscribeFromAllEvents();
     }
 
     /*** UIService implementation ***/
@@ -204,13 +219,6 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
                     return true;
                 case "packageresources":
                     this.packageResources();
-                    return true;
-                case "compileonsave":
-                    let isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-                    // Toggle
-                    isCompileOnSave = !isCompileOnSave;
-                    this.serviceRegistry.projectServices.setUserPreference(this.name, "CompileOnSave", isCompileOnSave);
-                    this.compileOnSaveMenuItem.string = `Compile on Save: ${isCompileOnSave ? "On" : "Off"}`;
                     return true;
             }
         }

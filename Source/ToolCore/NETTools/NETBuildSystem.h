@@ -62,6 +62,7 @@ namespace ToolCore
     
     public:
 
+        NETBuild(Context* context, const String& solutionPath = String::EMPTY);
         NETBuild(Context* context, const String& solutionPath, const StringVector& platforms, const StringVector& configurations);
         virtual ~NETBuild() {}
 
