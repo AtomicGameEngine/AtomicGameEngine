@@ -198,7 +198,9 @@ void js_setup_prototype(JSVM* vm, const char* package, const char* classname, co
 }
 
 
-static int js_define_native_event_duk(duk_context* ctx) {
+// When subscribing to native event, this method will be called
+// to provide the event meta data (type and callback)
+static int js_push_native_event_metadata(duk_context* ctx) {
 
     duk_push_current_function(ctx);
 
@@ -214,7 +216,7 @@ static int js_define_native_event_duk(duk_context* ctx) {
 void js_define_native_event(duk_context* ctx, const String& eventType, const String &eventName)
 {
     // push c function which takes 1 argument, the callback
-    duk_push_c_function(ctx, js_define_native_event_duk, 1);
+    duk_push_c_function(ctx, js_push_native_event_metadata, 1);
 
     // store the event type in the function object
     duk_push_string(ctx, eventType.CString());

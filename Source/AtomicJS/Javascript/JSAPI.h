@@ -54,7 +54,7 @@ void js_class_push_propertyobject(JSVM* vm, const char* package, const char* cla
 void js_class_get_prototype(duk_context* ctx, const char* package, const char *classname);
 void js_class_get_constructor(duk_context* ctx, const char* package, const char *classname);
 
-// setups up a native event wrapper on module object at the top of the stack
+// setup a native event wrapper on module object at the top of the stack
 void js_define_native_event(duk_context* ctx, const String& eventType, const String& eventName);
 
 /// Pushes variant value or undefined if can't be pushed
