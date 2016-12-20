@@ -197,6 +197,34 @@ void js_setup_prototype(JSVM* vm, const char* package, const char* classname, co
     assert (top == duk_get_top(ctx));
 }
 
+
+static int js_define_native_event_duk(duk_context* ctx) {
+
+    duk_push_current_function(ctx);
+
+    duk_push_object(ctx);
+    duk_get_prop_string(ctx, -2, "_eventType");
+    duk_put_prop_string(ctx, -2, "_eventType");
+    duk_dup(ctx, 0);
+    duk_put_prop_string(ctx, -2, "_callback");
+
+    return 1;
+}
+
+void js_define_native_event(duk_context* ctx, const String& eventType, const String &eventName)
+{
+    // push c function which takes 1 argument, the callback
+    duk_push_c_function(ctx, js_define_native_event_duk, 1);
+
+    // store the event type in the function object
+    duk_push_string(ctx, eventType.CString());
+    duk_put_prop_string(ctx, -2, "_eventType");
+
+    // store to module object
+    duk_put_prop_string(ctx, -2, eventName.CString());
+
+}
+
 void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
 {
     v.Clear();

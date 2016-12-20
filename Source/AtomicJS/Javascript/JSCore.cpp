@@ -31,12 +31,55 @@ namespace Atomic
 
 static int Object_SubscribeToEvent(duk_context* ctx)
 {
-
     int top = duk_get_top(ctx);
 
     Object* sender = NULL;
 
     StringHash eventType = StringHash::ZERO;
+
+    // if we have a single argument, it is event meta data
+    if (top == 1)
+    {
+        if (duk_is_object(ctx, 0))
+        {
+            duk_get_prop_string(ctx, 0, "_callback");
+            duk_get_prop_string(ctx, 0, "_eventType");
+
+            if (duk_is_string(ctx, -1) && duk_is_function(ctx, -2))
+            {
+                duk_replace(ctx, 0);
+
+                top = duk_get_top(ctx);
+            }
+        }
+
+        if (top != 2)
+        {
+            duk_push_string(ctx, "Object.subscribeToEvent() - Bad meta data");
+            duk_throw(ctx);
+        }
+    }
+
+
+    // unwrap event data
+    if ( top == 2 && duk_is_object(ctx, 0) && duk_is_object(ctx, 1))
+    {
+        duk_get_prop_string(ctx, 1, "_callback");
+        duk_get_prop_string(ctx, 1, "_eventType");
+
+        if (duk_is_string(ctx, -1) && duk_is_function(ctx, -2))
+        {
+            duk_replace(ctx, 1);
+
+            top = duk_get_top(ctx);
+        }
+
+        if (top != 3)
+        {
+            duk_push_string(ctx, "Object.subscribeToEvent() - Bad sender meta data");
+            duk_throw(ctx);
+        }
+    }
 
     if ( top == 2 ) // General notification: subscribeToEvent("ScreenMode", function() {});
     {
@@ -53,7 +96,8 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         {
             sender = js_to_class_instance<Object>(ctx, 0, 0);
             eventType = duk_to_string(ctx, 1);
-        } else if (duk_is_object(ctx, 0) && duk_is_number(ctx, 1) && duk_is_function(ctx, 2)) {
+        }
+        else if (duk_is_object(ctx, 0) && duk_is_number(ctx, 1) && duk_is_function(ctx, 2)) {
             sender = js_to_class_instance<Object>(ctx, 0, 0);
             eventType = StringHash(duk_to_number(ctx, 1));
         }
@@ -95,7 +139,9 @@ static int Object_SubscribeToEvent(duk_context* ctx)
 
     duk_get_prop_string(ctx, -1, "__eventHelperFunctions");
     assert(duk_is_object(ctx, -1));
+
     assert(duk_is_function(ctx, sender ? 2 : 1));
+
     duk_dup(ctx, sender ? 2 : 1);
     duk_put_prop_string(ctx, -2,  eventType.ToString().CString());
     duk_pop(ctx);

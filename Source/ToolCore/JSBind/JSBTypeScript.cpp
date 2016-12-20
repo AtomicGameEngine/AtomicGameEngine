@@ -371,33 +371,12 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
 
     const Vector<SharedPtr<JSBEvent>>& events = module->GetEvents();
 
-    // First build up the Event Types
     for (unsigned i = 0; i < events.Size(); i++)
     {
         JSBEvent* event = events[i];
-        const String& eventID = event->GetEventID();
-        if (i == 0) {
-            source += "    // this is a partial enum that combines with other definitions of 'NativeEventType'\n";
-            source += "    export const enum NativeEventType {\n";
-        }
+        String scriptEventName = event->GetScriptEventName(BINDINGLANGUAGE_JAVASCRIPT);
 
-        source += ToString("        %s = %u", event->GetEventName().CString(), event->GetEventHash());
-
-        if (i == events.Size() -1) {
-            source += "\n";
-            source += "    }\n\n";
-        } else {
-            source += ",\n";
-        }
-    }
-
-    for (unsigned i = 0; i < events.Size(); i++)
-    {
-        JSBEvent* event = events[i];
-
-        const String& eventID = event->GetEventID();
-
-        source += ToString("    export interface %s extends Atomic.NativeEvent {\n", event->GetScriptEventName().CString());
+        source += ToString("    export interface %s extends Atomic.NativeEvent {\n", scriptEventName.CString());
 
         // parameters
 
@@ -467,6 +446,11 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
         }
 
         source += "    }\n\n";
+
+        // Write the event function signature
+
+        source += ToString("\nexport function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
+
     }
     source_ += source;
 }

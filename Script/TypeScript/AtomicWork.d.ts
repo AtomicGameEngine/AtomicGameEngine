@@ -26,8 +26,23 @@ declare module Atomic {
 
     // end subsystems
 
-    // Base interface for events
-    export interface NativeEvent { }
+    // Base interface for events, contains eventType string and callback
+    interface EventMetaData
+    {
+        _eventType: string;
+        _callback: any;
+    }
+
+    interface NativeEvent extends EventMetaData
+    {
+    }
+
+    interface ScriptEvent extends EventMetaData
+    {
+    }
+
+    // typed callback generic
+    type EventCallback<T extends EventMetaData> = (data: T) => void;
 
     export interface PathInfo {
 
@@ -95,10 +110,6 @@ declare module Atomic {
         /** Drawable specific subobject if applicable. */
         subObject: number;
     }
-
-    // TODO: delete these when all references have been changed to the auto-generated name
-    export interface UIWidgetEvent extends Atomic.WidgetEvent {}
-    export interface UIWidgetDeletedEvent extends Atomic.WidgetDeletedEvent {}
 
     export interface AttributeInfo {
 
