@@ -11,7 +11,7 @@
 							 "TextureImporter", "SpriterImporter", "PEXImporter", "CSharpImporter", "NETAssemblyImporter",
 							 "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
-							 "NETProjectSystem",
+							 "NETProjectSystem", "NETBuild",
 						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS", "BuildLinux",
 						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "IOSBuildSettings", "LinuxBuildSettings"],
 	"typescript_decl" : {

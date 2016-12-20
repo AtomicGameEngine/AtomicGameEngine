@@ -21,6 +21,7 @@
 //
 
 import * as EditorEvents from "../../editor/EditorEvents";
+import EditorUI = require("ui/EditorUI");
 
 /**
 * Resource extension that supports the web view typescript extension
@@ -39,6 +40,9 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
     private menuCreated = false;
     /** Reference to the compileOnSaveMenuItem */
     private compileOnSaveMenuItem: Atomic.UIMenuItem;
+
+    //** A script object so we can take part in event handling
+    private eventObject = new Atomic.ScriptObject();
 
     /**
     * Determines if the file name/path provided is something we care about
@@ -154,11 +158,27 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
         };
 
         if (found) {
+
             this.isNETProject = true;
             this.configureNETProjectMenu();
+
+            this.eventObject.subscribeToEvent("NETBuildResult", (eventData:ToolCore.NETBuildResult) => {
+
+                if (!eventData.success) {
+
+                    let errorText = eventData.errorText;
+                    let index = errorText.lastIndexOf("Errors:");
+                    if (index != -1) {
+                        errorText = errorText.substr(index);
+                    }
+
+                    EditorUI.getModelOps().showError("NET Build Error", errorText);
+
+                }
+
+            });
         }
     }
-
 
     /**
     * Called when the project is unloaded
@@ -168,6 +188,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
         this.serviceRegistry.uiServices.removePluginMenuItemSource("AtomicNET");
         this.menuCreated = false;
         this.isNETProject = false;
+        this.eventObject.unsubscribeFromAllEvents();
     }
 
     /*** UIService implementation ***/

@@ -270,7 +270,7 @@ declare module Atomic {
         resourceTypeName: string;
         dynamic: boolean;
         tooltip: string;
-        
+
     }
 
     export interface ShaderParameter {
@@ -430,6 +430,13 @@ declare module ToolCore {
         success: boolean;
         buildFolder: string;
 
+    }
+
+    export interface NETBuildResult {
+
+        success: boolean;
+        build: NETBuild;
+        errorText: string;
     }
 
     export var toolEnvironment: ToolEnvironment;

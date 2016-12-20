@@ -31,6 +31,7 @@ namespace ToolCore
 
     class Project;
     class Subprocess;
+    class NETBuild;
 
     // AtomicProject.dll state (this shouldn't be in resources too)
 
@@ -57,7 +58,7 @@ namespace ToolCore
 
         const String& GetSolutionPath() const { return solutionPath_; }
 
-        void BuildAtomicProject();
+        NETBuild* BuildAtomicProject();
 
         /// Open the solution, if opening a source file, better to call OpenSourceFile as will launch VS instance with source file loaded
         /// otherwise, no guarantee where source file will load when multiple VS instances running
@@ -68,15 +69,14 @@ namespace ToolCore
         bool GenerateSolution();
         bool GenerateResourcePak();
 
-        /// build csharp dll if sources are dirty and then run
-        bool BuildAndRun();
-        
+        /// Get whether the project assembly is dirty and needs to be rebuilt
+        bool GetProjectAssemblyDirty();
+
     private:
 
         void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
         void HandleNETBuildResult(StringHash eventType, VariantMap& eventData);
-        void HandleNETBuildPlay(StringHash eventType, VariantMap& eventData);
 
         void HandleFileChanged(StringHash eventType, VariantMap& eventData);
         void HandleResourceAdded(StringHash eventType, VariantMap& eventData);
@@ -93,8 +93,9 @@ namespace ToolCore
 
         void Clear();
         void Initialize();
-        /// interrogate sources to see if any are younger than the editor dll
-        bool CheckForRebuild();
+
+        /// Checks the status of the project assembly, including if sources files are newer, missing, etc
+        void CheckProjectAssembly();
 
         String idePath_;
 

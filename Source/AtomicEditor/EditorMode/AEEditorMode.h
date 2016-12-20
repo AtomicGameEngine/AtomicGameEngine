@@ -52,6 +52,8 @@ public:
 
 private:
 
+    bool PlayProjectInternal(const String& addArgs, bool debug);
+
     void HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData);
     void HandleIPCJSError(StringHash eventType, VariantMap& eventData);
     void HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData);
@@ -61,9 +63,13 @@ private:
     void HandleIPCPlayerPauseStepRequest(StringHash eventType, VariantMap& eventData);
     void HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData);
 
+    void HandleNETBuildResult(StringHash eventType, VariantMap& eventData);
+
     SharedPtr<IPCBroker> playerBroker_;
 
-    bool playerEnabled_ = false;
+    bool playerEnabled_;
+    String additionalArgs_;
+    bool debug_;
 
 };
 

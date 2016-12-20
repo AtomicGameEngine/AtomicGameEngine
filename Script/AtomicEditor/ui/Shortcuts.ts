@@ -39,12 +39,9 @@ class Shortcuts extends Atomic.ScriptObject {
 
     //this should be moved somewhere else...
     invokePlayOrStopPlayer(debug: boolean = false) {
+
         this.sendEvent(EditorEvents.SaveAllResources);
 
-        if ( ToolCore.netProjectSystem.solutionAvailable)   // are we a csharp project
-            if( ToolCore.netProjectSystem.buildAndRun() )   // do we need to rebuild?
-                return;  // if yes, return, the play event will be reissued after the rebuild
-      
         if (Atomic.editorMode.isPlayerEnabled()) {
             this.sendEvent("IPCPlayerExitRequest");
         } else {
@@ -221,7 +218,7 @@ class Shortcuts extends Atomic.ScriptObject {
     handleUIShortcut(ev: Atomic.UIShortcutEvent) {
 
         var cmdKey = this.cmdKeyDown();
-    
+
         if ( !cmdKey && ev.qualifiers > 0 ) // check the event, the qualifier may have been programmitically set
         {
             cmdKey = ( ev.qualifiers == Atomic.QUAL_CTRL );

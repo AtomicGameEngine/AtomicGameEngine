@@ -44,6 +44,14 @@
 
 namespace ToolCore
 {
+    NETBuild::NETBuild(Context* context, const String& solutionPath) :
+        Object(context),
+        solutionPath_(solutionPath),
+        status_(NETBUILD_PENDING)
+    {
+
+    }
+
 
     NETBuild::NETBuild(Context* context, const String& solutionPath, const StringVector& platforms, const StringVector& configurations) :
         Object(context),
