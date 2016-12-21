@@ -125,6 +125,8 @@ void BuildMac::Build(const String& buildPath)
         return;
     if (!BuildCreateDirectory(buildPath_ + "/Contents/Resources"))
         return;
+    if (!BuildCreateDirectory(buildPath_ + "/Contents/Resources/Settings"))
+        return;
 
     String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
@@ -146,7 +148,7 @@ void BuildMac::Build(const String& buildPath)
     if (fileSystem->FileExists(engineJSON))
     {
 
-        if (!BuildCopyFile(engineJSON, buildPath_ + "/Contents/MacOS/Settings/Engine.json"))
+        if (!BuildCopyFile(engineJSON, buildPath_ + "/Contents/Resources/Settings/Engine.json"))
             return;
 
     }

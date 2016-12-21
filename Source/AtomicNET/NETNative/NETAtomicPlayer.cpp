@@ -119,7 +119,12 @@ namespace Atomic
     void NETAtomicPlayer::ReadEngineConfig()
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+#ifdef ATOMIC_PLATFORM_OSX
+        String filename = fileSystem->GetProgramDir() + "../Resources/Settings/Engine.json";
+#else
         String filename = fileSystem->GetProgramDir() + "Settings/Engine.json";
+#endif
 
         if (!fileSystem->FileExists(filename))
             return;
