@@ -25,7 +25,9 @@
 		"Object" : [
 			"sendEvent(eventType:string, data?:Object);",
 			"subscribeToEvent(eventType:string, callback:(data:any) => void);",
-			"subscribeToEvent(sender:AObject, eventType:string, callback:(data: any) => void);"
+			"subscribeToEvent(sender:AObject, eventType:string, callback:(data: any) => void);",
+			"subscribeToEvent(eventMetaData:Atomic.EventMetaData);",
+			"subscribeToEvent(sender: AObject, eventMetaData:Atomic.EventMetaData);"
 		]
 	},
 	"haxe_decl" : {

@@ -54,13 +54,32 @@ JSBPackage* JSBEvent::GetPackage()
     return module_->GetPackage();
 }
 
-String JSBEvent::GetScriptEventName() const
+String JSBEvent::GetScriptEventName(BindingLanguage language) const
 {
+
+    if (language == BINDINGLANGUAGE_JAVASCRIPT) {
+
+        if (eventName_ == "WidgetEvent")
+        {
+            return "UIWidgetEvent";
+        }
+
+        if (eventName_ == "WidgetDeleted")
+        {
+            return "UIWidgetDeletedEvent";
+        }
+    }
+
     if (eventName_.EndsWith("Event"))
         return eventName_;
 
     return eventName_ + "Event";
 
+}
+
+unsigned JSBEvent::GetEventHash() const
+{
+    return StringHash(eventName_).Value();
 }
 
 bool JSBEvent::ScanModuleEvents(JSBModule* module)

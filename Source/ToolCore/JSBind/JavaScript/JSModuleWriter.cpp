@@ -29,7 +29,7 @@
 #include "../JSBEnum.h"
 #include "../JSBClass.h"
 #include "../JSBFunction.h"
-
+#include "../JSBEvent.h"
 
 #include "JSModuleWriter.h"
 #include "JSClassWriter.h"
@@ -238,6 +238,7 @@ void JSModuleWriter::WriteModulePreInit(String& source)
             itr++;
         }
     }
+
     source += "// constants\n";
 
     Vector<String> constants = module_->constants_.Keys();
@@ -250,6 +251,15 @@ void JSModuleWriter::WriteModulePreInit(String& source)
             source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", constants.At(i).CString());
 
         source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n", constants.At(i).CString());
+    }
+
+    source += "// events\n";
+
+    const Vector<SharedPtr<JSBEvent>>& events = module_->GetEvents();
+
+    for (unsigned i = 0; i < events.Size(); i++)
+    {
+        source.AppendWithFormat("js_define_native_event(ctx, \"%s\", \"%s\");\n", events[i]->GetEventName().CString(), events[i]->GetScriptEventName(BINDINGLANGUAGE_JAVASCRIPT).CString());
     }
 
     source += "duk_pop(ctx);\n";

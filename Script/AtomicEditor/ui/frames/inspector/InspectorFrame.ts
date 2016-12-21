@@ -90,7 +90,7 @@ class InspectorFrame extends ScriptWidget {
 
             for (var i = 0; i < selection.getSelectedNodeCount(); i++) {
 
-                this.handleSceneNodeSelected( { node: selection.getSelectedNode(i),  scene: this.scene, selected: true, quiet: true} );
+                this.handleSceneNodeSelected( <Editor.SceneNodeSelectedEvent> { node: selection.getSelectedNode(i),  scene: this.scene, selected: true, quiet: true} );
 
             }
 

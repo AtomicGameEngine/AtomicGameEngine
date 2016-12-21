@@ -162,7 +162,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             this.isNETProject = true;
             this.configureNETProjectMenu();
 
-            this.eventObject.subscribeToEvent("NETBuildResult", (eventData:ToolCore.NETBuildResult) => {
+            this.eventObject.subscribeToEvent("NETBuildResult", (eventData:ToolCore.NETBuildResultEvent) => {
 
                 if (!eventData.success) {
 

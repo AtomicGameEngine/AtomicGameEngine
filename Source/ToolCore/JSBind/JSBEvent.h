@@ -24,6 +24,8 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "JSBindTypes.h"
+
 using namespace Atomic;
 
 namespace ToolCore
@@ -54,8 +56,9 @@ namespace ToolCore
 
         const String& GetEventID() const { return eventID_; }
         const String& GetEventName() const { return eventName_; }
+        unsigned GetEventHash() const;
         /// Generally this is the EventName + "Event"
-        String GetScriptEventName() const;
+        String GetScriptEventName(BindingLanguage language = BINDINGLANGUAGE_ANY) const;
         const Vector<EventParam>& GetParameters() const { return parameters_;  }
 
 

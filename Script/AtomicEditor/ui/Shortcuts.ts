@@ -30,9 +30,9 @@ class Shortcuts extends Atomic.ScriptObject {
 
         super();
 
-        this.subscribeToEvent("UIShortcut", (ev: Atomic.UIShortcutEvent) => this.handleUIShortcut(ev));
+        this.subscribeToEvent(Atomic.UIShortcutEvent ( (ev) => this.handleUIShortcut(ev)));
 
-        this.subscribeToEvent("KeyDown", (ev: Atomic.KeyDownEvent) => this.handleKeyDown(ev));
+        this.subscribeToEvent(Atomic.KeyDownEvent( (ev) => this.handleKeyDown(ev)));
 
 
     }

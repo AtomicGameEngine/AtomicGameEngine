@@ -30,6 +30,7 @@
 #include "JSBModule.h"
 #include "JSBFunction.h"
 #include "JSBTypeScript.h"
+#include "JSBEvent.h"
 
 namespace ToolCore
 {
@@ -362,6 +363,98 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
 }
 
+
+void JSBTypeScript::ExportModuleEvents(JSBModule* module)
+{
+
+    String source;
+
+    const Vector<SharedPtr<JSBEvent>>& events = module->GetEvents();
+
+    for (unsigned i = 0; i < events.Size(); i++)
+    {
+        JSBEvent* event = events[i];
+        String scriptEventName = event->GetScriptEventName(BINDINGLANGUAGE_JAVASCRIPT);
+
+        source += ToString("    export interface %s extends Atomic.NativeEvent {\n", scriptEventName.CString());
+
+        // parameters
+
+        const Vector<JSBEvent::EventParam>& params = event->GetParameters();
+
+        for (unsigned j = 0; j < params.Size(); j++)
+        {
+            const JSBEvent::EventParam& p = params[j];
+
+            JSBClass* cls = JSBPackage::GetClassAllPackages(p.typeInfo_);
+
+            String typeName = p.typeInfo_;
+            String enumTypeName = p.enumTypeName_;
+
+            String paramName = p.paramName_;
+
+            //TODO: Is there a standard naming module that could handle this?
+            if (paramName == "GUID")
+                paramName = "guid";
+            else if (paramName == "RefID")
+                paramName = "refid"; // do nothing
+            else
+                paramName[0] = tolower(paramName[0]);
+
+            if (!cls)
+                typeName = typeName.ToLower();
+            else
+                typeName = cls->GetName();
+
+            if (typeName == "int" || typeName == "float" || typeName == "unsigned" ||
+                typeName == "bool" || typeName == "string" || typeName == "enum" || cls)
+            {
+
+                bool isEnum = false;
+                if (typeName == "enum")
+                {
+                    isEnum = true;
+                    // Once proper TypeScript enums are in place, uncomment the following.  See: #1268
+                    //if (enumTypeName.Length())
+                    //    typeName = enumTypeName;
+                    //else
+                    typeName = "number";
+                }
+
+                if (typeName == "int" || typeName == "float" || typeName == "unsigned")
+                {
+                    typeName = "number";
+                } else if (typeName == "bool") {
+                    typeName = "boolean";
+                } else if (cls) {
+                    typeName = ToString("%s.%s", cls->GetPackage()->GetName().CString(), typeName.CString());
+                }
+
+                if (isEnum && enumTypeName.Length())
+                {
+                    source += ToString("        /** Enum: %s */\n", enumTypeName.CString());
+                    source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
+                } else {
+                    source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
+                }
+            }
+            else
+            {
+                source += ToString("        // Unmapped Native Type:%s \n", typeName.CString());
+                source += ToString("        // %s : any;\n", p.paramName_.ToLower().CString());
+            }
+        }
+
+        source += "    }\n\n";
+
+        // Write the event function signature
+
+        source += ToString("\nexport function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
+
+    }
+    source_ += source;
+}
+
 void JSBTypeScript::WriteToFile(const String &path)
 {
     File file(package_->GetContext());
@@ -405,6 +498,7 @@ void JSBTypeScript::Emit(JSBPackage* package, const String& path)
         source_ += "// MODULE: " + modules[i]->GetName() + "\n";
         source_ += "//----------------------------------------------------\n\n";
         ExportModuleClasses(modules[i]);
+        ExportModuleEvents(modules[i]);
     }
 
 

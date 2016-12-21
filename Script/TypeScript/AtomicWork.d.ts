@@ -26,22 +26,29 @@ declare module Atomic {
 
     // end subsystems
 
+    // Base interface for events, contains eventType string and callback
+    interface EventMetaData
+    {
+        _eventType: string;
+        _callback: any;
+    }
+
+    interface NativeEvent extends EventMetaData
+    {
+    }
+
+    interface ScriptEvent extends EventMetaData
+    {
+    }
+
+    // typed callback generic
+    type EventCallback<T extends EventMetaData> = (data: T) => void;
 
     export interface PathInfo {
 
         pathName: string;
         fileName: string;
         ext: string;
-
-    }
-
-    export interface ScreenModeEvent {
-
-        width: number;
-        height: number;
-        fullscreen: boolean;
-        resizable: boolean;
-        borderless: boolean;
 
     }
 
@@ -104,162 +111,6 @@ declare module Atomic {
         subObject: number;
     }
 
-    export interface KeyDownEvent {
-
-        // keycode
-        key: number;
-        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
-        qualifiers: number;
-
-        // mouse buttons down
-        buttons: number;
-
-    }
-
-    export interface KeyUpEvent {
-
-        // keycode
-        key: number;
-        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
-        qualifiers: number;
-        // mouse buttons down
-        buttons: number;
-
-    }
-
-    export interface UIShortcutEvent {
-
-        // keycode
-        key: number;
-        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
-        qualifiers: number;
-
-    }
-
-    export interface UIListViewSelectionChangedEvent {
-
-        refid: string;
-        selected: boolean;
-
-    }
-
-    export interface NodeAddedEvent {
-
-        scene: Atomic.Scene;
-        parent: Atomic.Node;
-        node: Atomic.Node;
-
-    }
-
-    export interface NodeRemovedEvent {
-
-        scene: Atomic.Scene;
-        parent: Atomic.Node;
-        node: Atomic.Node;
-
-    }
-
-    export interface NodeNameChangedEvent {
-
-        scene: Atomic.Scene;
-        node: Atomic.Node;
-
-    }
-
-    export interface UIWidgetEvent {
-
-        handler: UIWidget;
-        target: UIWidget;
-        type: number; /*UIWidgetEventType*/
-        x: number;
-        y: number;
-        deltax: number;
-        deltay: number;
-        count: number;
-        key: number;
-        specialkey: number;
-        modifierkeys: number;
-        refid: string;
-        touch: boolean;
-    }
-
-    export interface UIWidgetFocusChangedEvent {
-        widget: UIWidget;
-        focused: boolean;
-    }
-
-    export interface UIWidgetEditCompleteEvent {
-        widget: UIWidget;
-    }
-
-    export interface UIWidgetDeletedEvent {
-
-        widget: UIWidget;
-    }
-
-    export interface DragBeginEvent {
-
-        source: UIWidget;
-        dragObject: UIDragObject;
-    }
-
-    export interface DragEnterWidgetEvent {
-
-        widget: UIWidget;
-        dragObject: UIDragObject;
-    }
-
-    export interface DragExitWidgetEvent {
-
-        widget: UIWidget;
-        dragObject: UIDragObject;
-    }
-
-    export interface DragEndedEvent {
-
-        target: UIWidget;
-        dragObject: UIDragObject;
-    }
-
-    export interface TemporaryChangedEvent {
-
-        serializable: Atomic.Serializable;
-
-    }
-
-    export interface ComponentAddedEvent {
-
-        scene: Atomic.Scene;
-        node: Atomic.Node;
-        component: Atomic.Component;
-
-    }
-
-    export interface ComponentRemovedEvent {
-
-        scene: Atomic.Scene;
-        node: Atomic.Node;
-        component: Atomic.Component;
-
-    }
-
-    export interface IPCJSErrorEvent {
-
-        errorName: string;
-        errorMessage: string;
-        errorFileName: string;
-        errorLineNumber: number;
-        errorStack: string;
-
-    }
-
-
-    export interface IPCMessageEvent {
-
-        message: string;
-        value: number;
-    }
-
     export interface AttributeInfo {
 
         type: VariantType;
@@ -310,134 +161,8 @@ declare module Atomic {
 
 }
 
-declare module Editor {
-
-    export interface SceneNodeSelectedEvent {
-        scene: Atomic.Scene;
-        node: Atomic.Node;
-        selected: boolean;
-        quiet: boolean;
-    }
-
-    export interface SceneEditAddRemoveNodesEvent {
-
-        end: boolean;
-
-    }
-
-
-    export interface SceneEditNodeAddedEvent {
-
-        scene: Atomic.Scene;
-        parent: Atomic.Node;
-        node: Atomic.Node;
-
-    }
-
-    export interface SceneEditNodeRemovedEvent {
-
-        scene: Atomic.Scene;
-        parent: Atomic.Node;
-        node: Atomic.Node;
-
-    }
-
-    export interface SceneEditComponentAddedRemovedEvent {
-
-        scene: Atomic.Scene;
-        node: Atomic.Node;
-        component: Atomic.Component;
-        removed: boolean;
-    }
-
-    export interface SceneEditStateChangeEvent {
-
-        serializable: Atomic.Serializable;
-
-    }
-
-    export interface SceneEditNodeCreatedEvent {
-        node: Atomic.Node;
-    }
-
-    export interface GizmoEditModeChangedEvent {
-        mode: EditMode;
-    }
-
-    export interface GizmoAxisModeChangedEvent {
-        mode: AxisMode;
-    }
-
-}
 
 declare module ToolCore {
-
-    export interface ResourceAddedEvent {
-
-        guid: string;
-
-    }
-
-    export interface ResourceRemovedEvent {
-
-        guid: string;
-
-    }
-
-    export interface LicenseDeactivationErrorEvent {
-
-        message: string;
-
-    }
-
-    export interface AssetImportErrorEvent {
-
-        path: string;
-        guid: string;
-        error: string;
-    }
-
-    export interface AssetRenamedEvent {
-
-        asset: Asset;
-
-    }
-
-    export interface AssetMovedEvent {
-
-        asset: Asset;
-        oldPath: string;
-
-    }
-
-
-    export interface PlatformChangedEvent {
-
-        platform: ToolCore.Platform;
-
-    }
-
-    export interface BuildOutputEvent {
-
-        text: string;
-
-    }
-
-    export interface BuildCompleteEvent {
-
-        platformID: number;
-        message: string;
-        success: boolean;
-        buildFolder: string;
-
-    }
-
-    export interface NETBuildResult {
-
-        success: boolean;
-        build: NETBuild;
-        errorText: string;
-    }
 
     export var toolEnvironment: ToolEnvironment;
     export var toolSystem: ToolSystem;
