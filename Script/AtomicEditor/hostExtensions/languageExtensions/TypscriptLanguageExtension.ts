@@ -37,7 +37,6 @@ const defaultCompilerOptions = {
     inlineSourceMap: false,
     removeComments: false,
     noLib: false,
-    allowNonTsExtensions: true,
     forceConsistentCasingInFileNames: true,
     allowJs: true,
     lib: ["es5"]
@@ -357,24 +356,43 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     }
 
     generateExternalProject () {
-      var projectDir : string = ToolCore.toolSystem.project.projectPath;
+      const projectDir = ToolCore.toolSystem.project.projectPath;
 
       // Create the typings folder in project root
-      var projectDirTypings : string = Atomic.addTrailingSlash(projectDir + "typings/main/ambient/atomicgameengine");
+      const projectDirTypings = Atomic.addTrailingSlash(projectDir + "typings/ambient/atomicgameengine");
       Atomic.getFileSystem().createDir(projectDirTypings);
 
       // Copy the Atomic.d.ts definition file to the typings folder
-      var toolDataDir : string = ToolCore.toolEnvironment.toolDataDir;
-      var typescriptSupportDir : string = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
+      const toolDataDir = ToolCore.toolEnvironment.toolDataDir;
+      const typescriptSupportDir = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
       Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
 
       // Generate a tsconfig.json file
-      var tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
+      const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
       let tsconfig = {
         compilerOptions: defaultCompilerOptions
       };
+
+      // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig
+      tsconfig.compilerOptions["baseUrl"] = "./Resources";
+
       tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
       tsconfigFile.close();
+
+      // Build out the vscode tasks.json
+      const tasks = {
+         "command": "tsc",
+         "isShellCommand": true,
+         "args": ["-p", "."],
+         "showOutput": "always",
+         "problemMatcher": "$tsc"
+     };
+
+     const tasksDir = Atomic.addTrailingSlash(projectDir + ".vscode");
+     Atomic.fileSystem.createDir(tasksDir);
+     const tasksFile = new Atomic.File(tasksDir + "tasks.json", Atomic.FILE_WRITE);
+     tasksFile.writeString(JSON.stringify(tasks, null, 4));
+     tasksFile.close();
 
     }
     /**
