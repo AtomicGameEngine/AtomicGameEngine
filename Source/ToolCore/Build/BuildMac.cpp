@@ -125,6 +125,8 @@ void BuildMac::Build(const String& buildPath)
         return;
     if (!BuildCreateDirectory(buildPath_ + "/Contents/Resources"))
         return;
+    if (!BuildCreateDirectory(buildPath_ + "/Contents/Resources/Settings"))
+        return;
 
     String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
@@ -137,6 +139,16 @@ void BuildMac::Build(const String& buildPath)
 
     if (!BuildCopyFile(appSrcPath + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer"))
         return;
+
+    String engineJSON(GetSettingsDirectory() + "/Engine.json");
+    
+    if (fileSystem->FileExists(engineJSON))
+    {
+
+        if (!BuildCopyFile(engineJSON, buildPath_ + "/Contents/Resources/Settings/Engine.json"))
+            return;
+
+    }
 
 #ifdef ATOMIC_PLATFORM_OSX
     Vector<String> args;

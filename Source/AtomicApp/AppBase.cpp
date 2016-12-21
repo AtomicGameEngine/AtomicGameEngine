@@ -61,7 +61,7 @@ namespace Atomic
 
             arguments_ = GetArguments();
         }
-
+        
     }
 
     AppBase::~AppBase()
@@ -149,6 +149,16 @@ namespace Atomic
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
+        // if we haven't defined any search paths, insert default
+        if (!engineConfigSearchPaths_.Size())
+        {
+#ifdef ATOMIC_PLATFORM_OSX
+        AddEngineConfigSearchPath(fileSystem->GetProgramDir() + "../Resources/Settings/");
+#else
+        AddEngineConfigSearchPath(fileSystem->GetProgramDir() + "Settings/");
+#endif
+        }
+
         for (unsigned i = 0; i < engineConfigSearchPaths_.Size(); i++)
         {
             const String& path = engineConfigSearchPaths_[i];
@@ -158,12 +168,16 @@ namespace Atomic
 
             String filename = AddTrailingSlash(path) + "Engine.json";
 
-            if (!fileSystem->FileExists(filename))
-                return;
-
-            if (EngineConfig::LoadFromFile(context_, filename))
+            // take the 1st Engine.json found in the paths
+            if (fileSystem->FileExists(filename))
             {
-                EngineConfig::ApplyConfig(engineParameters_);
+
+                if (EngineConfig::LoadFromFile(context_, filename))
+                {
+                    EngineConfig::ApplyConfig(engineParameters_);
+                }
+
+                return;
             }
         }
 
