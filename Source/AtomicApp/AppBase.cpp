@@ -61,6 +61,11 @@ namespace Atomic
 
             arguments_ = GetArguments();
         }
+        
+        // Seed the default Settings path
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        String settingspath = fileSystem->GetProgramDir() + "Settings/";
+        AddEngineConfigSearchPath(settingspath);
 
     }
 
@@ -158,12 +163,16 @@ namespace Atomic
 
             String filename = AddTrailingSlash(path) + "Engine.json";
 
-            if (!fileSystem->FileExists(filename))
-                return;
-
-            if (EngineConfig::LoadFromFile(context_, filename))
+            // take the 1st Engine.json found in the paths
+            if (fileSystem->FileExists(filename))
             {
-                EngineConfig::ApplyConfig(engineParameters_);
+
+                if (EngineConfig::LoadFromFile(context_, filename))
+                {
+                    EngineConfig::ApplyConfig(engineParameters_);
+                }
+
+                return;
             }
         }
 
