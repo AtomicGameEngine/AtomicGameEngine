@@ -140,9 +140,6 @@ void BuildMac::Build(const String& buildPath)
     if (!BuildCopyFile(appSrcPath + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer"))
         return;
 
-    if (!BuildCreateDirectory(buildPath_ + "/Contents/MacOS/Settings"))
-        return;
-
     String engineJSON(GetSettingsDirectory() + "/Engine.json");
     
     if (fileSystem->FileExists(engineJSON))
