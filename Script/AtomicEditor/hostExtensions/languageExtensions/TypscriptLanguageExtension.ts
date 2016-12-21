@@ -157,6 +157,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "Atomic.d.ts");
         }
 
+        // set the base url
+        compilerOptions["baseUrl"] = ToolCore.toolSystem.project.resourcePath;
+
         let tsConfig = {
             compilerOptions: compilerOptions,
             files: projectFiles
