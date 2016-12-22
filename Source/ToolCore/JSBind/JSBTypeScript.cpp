@@ -339,10 +339,9 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
     {
         JSBEnum* _enum = *enumIter;
 
-        // can't use a TS enum, so use a type alias
-
-        source_ += "\n   // enum " + _enum->GetName() + "\n";
-        source_ += "   export type " + _enum->GetName() + " = number;\n";
+        source_ += "\n";
+        source_ += "   /** enum " + _enum->GetName() + "*/\n";
+        source_ += "   export const enum " + _enum->GetName() + " {\n";
 
         HashMap<String, String>& values = _enum->GetValues();
 
@@ -351,14 +350,37 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         while (valsIter != values.End())
         {
             String name = (*valsIter).first_;
+            String value = (*valsIter).second_;
 
-            source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
+            // BodyType2D enum order is assigned in RigidBody2D.h in incorrect order
+            if (_enum->GetName() == "BodyType2D")
+            {
+                if (name == "BT_STATIC")
+                    value = "0";
+                else if (name == "BT_KINEMATIC")
+                    value = "1";
+                else if (name == "BT_DYNAMIC")
+                    value = "2";
+            }
+
+            //source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
+            source_ += "       /** For JS Access, use: Atomic." + name + " */\n";
+            if (value != "")
+            {
+                source_ += "       " + name + " = " + value;
+            } else {
+                source_ += "       " + name;
+            }
 
             valsIter++;
+
+            if (valsIter != values.End())
+                source_ += ",";
+
+            source_ += "\n";
         }
-
+        source_ += "    }\n";
         source_ += "\n";
-
     }
 
 }

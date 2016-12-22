@@ -64,7 +64,7 @@ class BuildWindow extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             if (ev.target.id == "cancel") {
                 this.hide();
@@ -85,7 +85,7 @@ class BuildWindow extends ModalWindow {
 
               if (!userPrefs.lastBuildPath.length || !Atomic.fileSystem.dirExists(userPrefs.lastBuildPath)) {
 
-                  new Atomic.UIMessageWindow(this, "modal_error").show("Build Folder", "Please select an existing build folder", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 480, 240);
+                  new Atomic.UIMessageWindow(this, "modal_error").show("Build Folder", "Please select an existing build folder", Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 480, 240);
                   return true;
               }
 

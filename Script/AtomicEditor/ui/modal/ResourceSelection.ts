@@ -123,7 +123,7 @@ class ResourceSelection extends ModalWindow {
             }
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_KEY_UP) {
 
             //Activates the search as the user types
             if (ev.target == this.searchEdit)
@@ -131,7 +131,7 @@ class ResourceSelection extends ModalWindow {
 
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
             var id = ev.target.id;
 
             if (id == "select") {

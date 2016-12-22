@@ -29,7 +29,7 @@ export class MessageModal extends Atomic.ScriptObject {
 
     var mainframe = EditorUI.getMainFrame();
 
-    new Atomic.UIMessageWindow(mainframe, "modal_error").show(title, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
+    new Atomic.UIMessageWindow(mainframe, "modal_error").show(title, message, Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
 
   }
 

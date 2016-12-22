@@ -45,7 +45,7 @@ class WelcomeFrame extends ScriptWidget {
         this.examplesJavaScript.onClick = () => { this.handleExampleFilter(); };
         this.examplesTypeScript.onClick = () => { this.handleExampleFilter(); };
 
-        this.gravity = Atomic.UI_GRAVITY_ALL;
+        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
 
         this.recentList = new Atomic.UIListView();
         this.recentList.rootList.id = "recentList";
@@ -116,9 +116,9 @@ class WelcomeFrame extends ScriptWidget {
 
         var exampleLayout = new Atomic.UILayout();
         exampleLayout.skinBg = "StarCondition";
-        exampleLayout.axis = Atomic.UI_AXIS_Y;
-        exampleLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        exampleLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        exampleLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        exampleLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        exampleLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
 
         // IMAGE BUTTON
 
@@ -149,7 +149,7 @@ class WelcomeFrame extends ScriptWidget {
 
         nameField.rect = nameRect;
 
-        nameField.gravity = Atomic.UI_GRAVITY_BOTTOM;
+        nameField.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_BOTTOM;
 
         image.addChild(nameField);
 
@@ -161,7 +161,7 @@ class WelcomeFrame extends ScriptWidget {
 
         button.layoutParams = lp;
 
-        button.gravity = Atomic.UI_GRAVITY_LEFT;
+        button.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT;
 
         exampleLayout.addChild(button);
 
@@ -217,13 +217,13 @@ class WelcomeFrame extends ScriptWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
             if (ev.target.id == "recentList") {
                 this.openFrameMenu(ev.x, ev.y);
             }
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 

@@ -29,7 +29,7 @@ class ModalWindow extends Atomic.UIWindow {
         super();
 
         if (disableClose)
-          this.settings = Atomic.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
+          this.settings = Atomic.UI_WINDOW_SETTINGS.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
 
         var view = EditorUI.getView();
         view.addChild(this);

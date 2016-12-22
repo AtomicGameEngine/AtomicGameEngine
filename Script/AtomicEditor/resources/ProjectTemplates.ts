@@ -50,7 +50,7 @@ export function getNewProjectTemplateDefinition(projectType: string): ProjectTem
     let exampleInfoDir = env.toolDataDir + "ExampleInfo/";
     var projectTemplateFolder = env.toolDataDir + "ProjectTemplates/";
     var projectTemplateJsonFile = projectTemplateFolder + "ProjectTemplates.json";
-    let jsonFile = new Atomic.File(projectTemplateJsonFile, Atomic.FILE_READ);
+    let jsonFile = new Atomic.File(projectTemplateJsonFile, Atomic.FileMode.FILE_READ);
 
     if (!jsonFile.isOpen()) {
         return null;
@@ -90,7 +90,7 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
     let fileSystem = Atomic.fileSystem;
     let exampleInfoDir = env.toolDataDir + "ExampleInfo/";
     let exampleJsonFile = exampleInfoDir + "Examples.json";
-    let jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
+    let jsonFile = new Atomic.File(exampleJsonFile, Atomic.FileMode.FILE_READ);
 
     if (!jsonFile.isOpen()) {
         return;
@@ -127,7 +127,7 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
             return;
         }
 
-        jsonFile = new Atomic.File(exampleJsonFilename, Atomic.FILE_READ);
+        jsonFile = new Atomic.File(exampleJsonFilename, Atomic.FileMode.FILE_READ);
 
         if (!jsonFile.isOpen()) {
             console.log("Unable to open example json", exampleJsonFilename);
@@ -205,7 +205,7 @@ var atomicNETProjectInfo:AtomicNETProjectInfo;
  */
 function processAtomicNETTemplate(filename:string, templateFilename:string) : boolean {
 
-    let file = new Atomic.File(templateFilename, Atomic.FILE_READ);
+    let file = new Atomic.File(templateFilename, Atomic.FileMode.FILE_READ);
 
     if (!file.isOpen()) {
         console.log("Failed to open: ", templateFilename);
@@ -229,7 +229,7 @@ function processAtomicNETTemplate(filename:string, templateFilename:string) : bo
     text = text.split("$$APPLICATION_APPDELEGATECLASS$$").join(appDelegateClass);
     text = text.split("$$APPLICATION_NAMESPACE$$").join(_namespace);
 
-    let fileOut = new Atomic.File(filename, Atomic.FILE_WRITE);
+    let fileOut = new Atomic.File(filename, Atomic.FileMode.FILE_WRITE);
 
     if (!fileOut.isOpen()) {
         console.log("Failed to open for write: ", filename);

@@ -210,7 +210,7 @@ class ResourceFrame extends ScriptWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
 
             var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
 
@@ -232,7 +232,7 @@ class ResourceFrame extends ScriptWidget {
 
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_UP) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_UP) {
             this.wasClosed = false;
         }
 
@@ -268,7 +268,7 @@ class ResourceFrame extends ScriptWidget {
 
         this.load("AtomicEditor/editor/ui/resourceframe.tb.txt");
 
-        this.gravity = Atomic.UI_GRAVITY_ALL;
+        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
 
         this.resourceViewContainer = <Atomic.UILayout> parent.getWidget("resourceviewcontainer");
         this.tabcontainer = <Atomic.UITabContainer> this.getWidget("tabcontainer");

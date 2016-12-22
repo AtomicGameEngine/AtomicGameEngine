@@ -63,7 +63,7 @@ class ResourceOps extends Atomic.ScriptObject {
                 return;
             }
 
-            var jsonFile = new Atomic.File(exampleInfoPath, Atomic.FILE_READ);
+            var jsonFile = new Atomic.File(exampleInfoPath, Atomic.FileMode.FILE_READ);
 
             if (!jsonFile.isOpen()) {
                 return;
@@ -160,7 +160,7 @@ export function CreateNewComponent(resourcePath: string, componentName: string, 
 
     }
 
-    var out = new Atomic.File(resourcePath, Atomic.FILE_WRITE);
+    var out = new Atomic.File(resourcePath, Atomic.FileMode.FILE_WRITE);
     var success = out.copy(file);
     out.close();
 
@@ -200,7 +200,7 @@ export function CreateNewScript(resourcePath: string, scriptName: string, templa
 
     }
 
-    var out = new Atomic.File(resourcePath, Atomic.FILE_WRITE);
+    var out = new Atomic.File(resourcePath, Atomic.FileMode.FILE_WRITE);
     var success = out.copy(file);
     out.close();
 
@@ -240,7 +240,7 @@ export function CreateNewScene(resourcePath: string, sceneName: string, reportEr
 
     }
 
-    var out = new Atomic.File(resourcePath, Atomic.FILE_WRITE);
+    var out = new Atomic.File(resourcePath, Atomic.FileMode.FILE_WRITE);
     var success = out.copy(file);
     out.close();
 
@@ -280,7 +280,7 @@ export function CreateNewMaterial(resourcePath: string, materialName: string, re
 
     }
 
-    var out = new Atomic.File(resourcePath, Atomic.FILE_WRITE);
+    var out = new Atomic.File(resourcePath, Atomic.FileMode.FILE_WRITE);
     var success = out.copy(file);
     out.close();
 

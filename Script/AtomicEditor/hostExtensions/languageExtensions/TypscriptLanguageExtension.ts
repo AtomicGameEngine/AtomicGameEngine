@@ -115,7 +115,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         if (Atomic.fileSystem.fileExists(tsconfigFn)) {
             // load up the tsconfig file and parse out the files block and compare it to what we have
             // in resources
-            const file = new Atomic.File(tsconfigFn, Atomic.FILE_READ);
+            const file = new Atomic.File(tsconfigFn, Atomic.FileMode.FILE_READ);
             try {
                 const savedTsConfig = JSON.parse(file.readText());
                 if (savedTsConfig["files"]) {
@@ -368,7 +368,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
       Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
 
       // Generate a tsconfig.json file
-      const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FILE_WRITE);
+      const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FileMode.FILE_WRITE);
       let tsconfig = {
         compilerOptions: defaultCompilerOptions
       };
@@ -390,7 +390,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
      const tasksDir = Atomic.addTrailingSlash(projectDir + ".vscode");
      Atomic.fileSystem.createDir(tasksDir);
-     const tasksFile = new Atomic.File(tasksDir + "tasks.json", Atomic.FILE_WRITE);
+     const tasksFile = new Atomic.File(tasksDir + "tasks.json", Atomic.FileMode.FILE_WRITE);
      tasksFile.writeString(JSON.stringify(tasks, null, 4));
      tasksFile.close();
 

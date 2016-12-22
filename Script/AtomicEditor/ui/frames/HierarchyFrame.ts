@@ -49,7 +49,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.load("AtomicEditor/editor/ui/hierarchyframe.tb.txt");
 
-        this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
+        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_TOP_BOTTOM;
 
         this.searchEdit = <Atomic.UIEditField>this.getWidget("filter");
 
@@ -423,7 +423,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         if (!this.scene) return;
 
-        if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+        if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_KEY_UP) {
 
             // activates search while user is typing in search widget
             if (data.target == this.searchEdit) {
@@ -441,7 +441,7 @@ class HierarchyFrame extends Atomic.UIWidget {
                 this.sceneEditor.selection.delete();
             }
 
-        } else if (data.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
+        } else if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN) {
 
             if (data.target == this.hierList.rootList) {
 
@@ -457,7 +457,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             }
 
-        } else if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        } else if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             if (this.menu.handleNodeContextMenu(data.target, data.refid, this.sceneEditor)) {
                 return true;
@@ -505,7 +505,7 @@ class HierarchyFrame extends Atomic.UIWidget {
             }
 
 
-        } else if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
+        } else if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
 
             var id = data.target.id;
             var node: Atomic.Node;

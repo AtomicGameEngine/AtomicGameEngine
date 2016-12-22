@@ -147,7 +147,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type != Atomic.UI_EVENT_TYPE_CLICK)
+        if (ev.type != Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK)
             return;
 
         if (ev.target && ev.target.id == "create component popup") {

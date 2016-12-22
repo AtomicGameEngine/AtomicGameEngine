@@ -37,7 +37,7 @@ class CollisionShapeSectionUI extends SelectionSectionUI {
 
         var button = new Atomic.UIButton();
         button.fontDescription = InspectorUtils.attrFontDesc;
-        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_RIGHT;
         button.text = "Set from StaticModel";
 
         button.onClick = () => {
@@ -70,7 +70,7 @@ class CubemapGeneratorSectionUI extends SelectionSectionUI {
 
         var button = new Atomic.UIButton();
         button.fontDescription = InspectorUtils.attrFontDesc;
-        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_RIGHT;
         button.text = "Render Cubemap";
 
         button.onClick = () => {

@@ -72,19 +72,19 @@ class AttributeInfoEdit extends Atomic.UILayout {
         var attr = this.attrInfo;
         var attrNameLP = AttributeInfoEdit.attrNameLP;
 
-        this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-        if (attr.type == Atomic.VAR_VECTOR3 || attr.type == Atomic.VAR_COLOR ||
-            attr.type == Atomic.VAR_QUATERNION) {
-            this.axis = Atomic.UI_AXIS_Y;
-            this.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        if (attr.type == Atomic.VariantType.VAR_VECTOR3 || attr.type == Atomic.VariantType.VAR_COLOR ||
+            attr.type == Atomic.VariantType.VAR_QUATERNION) {
+            this.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+            this.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
             this.skinBg = "InspectorVectorAttrLayout";
         }
 
         if (!this.hideName) {
 
             var name = new Atomic.UITextField();
-            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
             name.skinBg = "InspectorTextAttrName";
             name.layoutParams = attrNameLP;
             var bname = attr.name;
@@ -210,7 +210,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
             this.editType.onAttributeInfoEdited(this.attrInfo, this.editWidget.value ? true : false);
             this.refresh();
@@ -229,7 +229,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
     createEditWidget() {
 
         var field = new Atomic.UIEditField();
-        field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        field.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         field.skinBg = "TBAttrEditorField";
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
@@ -271,7 +271,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
             return true;
         }
@@ -313,7 +313,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
 
 
             var field = new Atomic.UIEditField();
-            field.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
+            field.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_CENTER;
             field.skinBg = "TBAttrEditorField";
             field.fontDescription = AttributeInfoEdit.fontDesc;
             var lp = new Atomic.UILayoutParams();
@@ -366,12 +366,12 @@ class IntAttributeEdit extends AttributeInfoEdit {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
             return true;
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = this.attrInfo.name + " enum popup";
 
@@ -409,7 +409,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
         var attrInfo = this.attrInfo;
 
         var field = new Atomic.UIEditField();
-        field.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
+        field.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_CENTER;
         field.skinBg = "TBAttrEditorField";
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
@@ -464,7 +464,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
             return true;
         }
@@ -570,7 +570,7 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
             var captured = false;
             for (var i in this.selects) {
@@ -641,9 +641,9 @@ class ColorAttributeEdit extends AttributeInfoEdit {
         var colorWidget = this.colorWidget = o.colorWidget;
         var selectButton = o.selectButton;
 
-        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
 
         var lp = new Atomic.UILayoutParams();
@@ -844,7 +844,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                 this.editField.subscribeToEvent(this.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
 
-                    if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
+                    if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN) {
 
                         resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
 
@@ -887,9 +887,9 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
         var o = InspectorUtils.createAttrEditFieldWithSelectButton("", layout);
         this.editField = o.editField;
 
-        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
@@ -995,12 +995,12 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         var layout = this.layout = new Atomic.UILayout();
 
-        layout.axis = Atomic.UI_AXIS_Y;
+        layout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
         layout.spacing = 2;
-        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 304;
@@ -1081,11 +1081,11 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         var object = this.editType.getFirstObject();
 
         if (!object) {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             return;
         }
 
-        this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
 
         var maxLength = -1;
         var i;
@@ -1104,7 +1104,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         this.sizeEdit.text = maxLength.toString();
 
         if (maxLength == -1) {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             return;
         }
 
@@ -1119,11 +1119,11 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
             var refEdit = this.refEdits[i];
 
             if (i < maxLength) {
-                refEdit.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+                refEdit.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
                 refEdit.refresh();
             }
             else {
-                refEdit.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+                refEdit.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             }
 
         }
@@ -1133,18 +1133,18 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
 
 
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_BOOL] = BoolAttributeEdit;
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_INT] = IntAttributeEdit;
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_FLOAT] = FloatAttributeEdit;
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_STRING] = StringAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_BOOL] = BoolAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_INT] = IntAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_FLOAT] = FloatAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_STRING] = StringAttributeEdit;
 
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_VECTOR2] = Vector2AttributeEdit;
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_VECTOR3] = Vector3AttributeEdit;
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_QUATERNION] = QuaternionAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_VECTOR2] = Vector2AttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_VECTOR3] = Vector3AttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_QUATERNION] = QuaternionAttributeEdit;
 
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_COLOR] = ColorAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_COLOR] = ColorAttributeEdit;
 
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_RESOURCEREF] = ResourceRefAttributeEdit;
-AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_RESOURCEREFLIST] = ResourceRefListAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_RESOURCEREF] = ResourceRefAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_RESOURCEREFLIST] = ResourceRefListAttributeEdit;
 
 export = AttributeInfoEdit;

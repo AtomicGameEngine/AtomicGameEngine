@@ -65,13 +65,13 @@ class PrefabInspector extends InspectorWidget {
         var prefabLayout = this.createSection(rootLayout, "Prefab", 1);
 
         var container = InspectorUtils.createContainer();
-        container.gravity = Atomic.UI_GRAVITY_ALL;
+        container.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
         prefabLayout.addChild(container);
 
         var panel = new Atomic.UILayout();
-        panel.axis = Atomic.UI_AXIS_Y;
-        panel.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
-        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        panel.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        panel.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_PREFERRED;
+        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         container.addChild(panel);
 
         // Name Edit

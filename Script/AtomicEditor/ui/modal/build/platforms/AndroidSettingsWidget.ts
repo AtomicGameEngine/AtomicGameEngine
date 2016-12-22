@@ -69,7 +69,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             if (ev.target.id == "choose_sdk_path") {
 

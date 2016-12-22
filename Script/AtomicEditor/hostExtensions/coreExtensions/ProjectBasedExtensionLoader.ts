@@ -75,7 +75,7 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
                         console.log(`Searching for project based include: ${path}`);
                         // we have a project based require
                         if (Atomic.fileSystem.fileExists(path)) {
-                            let include = new Atomic.File(path, Atomic.FILE_READ);
+                            let include = new Atomic.File(path, Atomic.FileMode.FILE_READ);
                             try {
                                 return include.readText();
                             } finally {

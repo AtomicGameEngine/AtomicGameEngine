@@ -33,9 +33,9 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
     createEditWidget() {
 
         var panel = new Atomic.UILayout();
-        panel.axis = Atomic.UI_AXIS_Y;
-        panel.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
-        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        panel.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        panel.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_PREFERRED;
+        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 180;
@@ -108,7 +108,7 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
             return true;
         }
@@ -239,7 +239,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         o.editField.subscribeToEvent(o.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
 
-            if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
+            if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
 
                 var pathName = materialEdit.pathReference;
                 this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
@@ -255,18 +255,18 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
     createEditWidget() {
 
         var mainLayout = this.mainLayout = new Atomic.UILayout();
-        mainLayout.axis = Atomic.UI_AXIS_Y;
-        mainLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-        mainLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        mainLayout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-        mainLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        mainLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        mainLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        mainLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        mainLayout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        mainLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var cb = InspectorUtils.createAttrCheckBox(this.name, mainLayout);
         this.enabledCheckBox = cb.checkBox;
 
         cb.checkBox.subscribeToEvent(cb.checkBox, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
 
-            if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+            if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
                 var scene: Atomic.Scene;
 
@@ -312,11 +312,11 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
         var object = this.editType.getFirstObject();
 
         if (!object) {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             return;
         }
 
-        this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
 
         var enabled = (<Atomic.StaticModel>object).getGeometryVisible(this.name);
         var mixed = false;
@@ -417,19 +417,19 @@ class SubmeshListAttributeEdit extends AttributeInfoEdit {
 
         var layout = this.layout = new Atomic.UILayout();
 
-        layout.axis = Atomic.UI_AXIS_Y;
+        layout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
         layout.spacing = 2;
-        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        layout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 304;
         layout.layoutParams = lp;
 
         var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         name.skinBg = "InspectorTextAttrName";
         name.layoutParams = AttributeInfoEdit.attrNameLP;
         name.text = "Submeshes";
@@ -449,11 +449,11 @@ class SubmeshListAttributeEdit extends AttributeInfoEdit {
         var object = this.editType.getFirstObject();
 
         if (!object) {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             return;
         }
 
-        this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
 
         var name: string;
         for (var i in editType.objects) {
