@@ -32,6 +32,8 @@
     <true/>
     <key>NSSupportsAutomaticGraphicsSwitching</key>
   	<true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
     <key>NSHumanReadableCopyright</key>
     <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
     <key>LSEnvironment</key>
