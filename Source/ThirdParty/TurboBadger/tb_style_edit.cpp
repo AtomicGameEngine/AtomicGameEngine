@@ -874,7 +874,10 @@ int32 TBBlock::CalculateStringWidth(TBFontFace *font, const char *str, int len) 
 
 int32 TBBlock::CalculateLineHeight(TBFontFace *font) const
 {
-    return font->GetHeight();
+    // ATOMIC BEGIN
+    // Atomic adds a bit of buffer here for better line separation, this could be exposed as a setting
+    return font->GetHeight() + 4;
+    // ATOMIC END
 }
 
 int32 TBBlock::CalculateBaseline(TBFontFace *font) const

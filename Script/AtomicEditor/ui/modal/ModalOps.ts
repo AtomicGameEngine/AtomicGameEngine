@@ -175,11 +175,11 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showNewBuildWindow() {
+    showNewBuildWindow(showCheck:boolean = true) {
 
         if (this.show()) {
 
-            this.opWindow = new NewBuildWindow();
+            this.opWindow = new NewBuildWindow(showCheck);
 
         }
 

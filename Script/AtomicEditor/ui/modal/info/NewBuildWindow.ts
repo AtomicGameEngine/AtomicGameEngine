@@ -26,7 +26,7 @@ import Preferences = require("editor/Preferences");
 
 class NewBuildWindow extends ModalWindow {
 
-    constructor() {
+    constructor(showCheck:boolean = true) {
 
         super();
 
@@ -35,13 +35,19 @@ class NewBuildWindow extends ModalWindow {
         // we're not calling this.init here as it calls resizeToFitContent
         // and center, which screw up the generated About text being resized
 
-        this.text = "New Build Detected";
+        this.text = showCheck ? "New Build Detected" : "Latest Updates";
         this.load("AtomicEditor/editor/ui/newbuildwindow.tb.txt");
 
         this.newbuild_text = <Atomic.UIEditField>this.getWidget("newbuild_text");
         this.newbuild_text.text = this.generateNewBuildText();
 
         this.newBuildCheck = <Atomic.UICheckBox> this.getWidget("newbuild_check");
+
+        if (!showCheck) {
+
+            this.getWidget("newbuild_check_text").visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.newBuildCheck.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        }
 
         this.resizeToFitContent();
         this.center();
@@ -82,27 +88,67 @@ class NewBuildWindow extends ModalWindow {
         // TODO: this needs to be externally generated
         text += `
 <color #D4FB79>Hello and thanks for installing a new build of the Atomic Editor!</color>
-<color #AAAAAA>(Git SHA: ${Atomic.AtomicBuildInfo.getGitSHA()})</color>
 
-<color #76D6FF>Latest Updates:</color>
+Atomic Build 2 - <color #AAAAAA>(Git SHA: ${Atomic.AtomicBuildInfo.getGitSHA()})</color>
 
-• Support for <color #D4FB79>Atomic C#</color> scripting on Windows, macOS, Linux, Android, and iOS
+<color #D4FB79>Closed Issues</color>
 
-• <color #D4FB79>Visual Studio</color> and <color #D4FB79>Xamarin Studio</color> integration (with VSCode support coming soon!)
+<widget TBButton: text: 'https://github.com/AtomicGameEngine/AtomicGameEngine/milestone/1' url: 'https://github.com/AtomicGameEngine/AtomicGameEngine/milestone/1?closed=1' skin: TBButton.link>
 
-• Updated to TypeScript 2.0
+<color #D4FB79>Update Highlights</color>
 
-• Physically Based Rendering (PBR) - Thanks to @dragonCASTjosh
+• <color #D4FB79>[Editor]</color> Custom file resource inspector plugins (with example)
 
-• New examples and project templates
+• <color #D4FB79>[Editor]</color> Added TmxFile2D resource type for inspector fields
 
-• Revamped build targeting JavaScript, TypeScript, C#, and native C++
+• <color #D4FB79>[Docs]</color> Added new C#, C++, and updated JavaScript/TypeScript API references
 
-• Updated to Urho3D 1.6 and SDL 2.0.4 with a great number of platform improvements
+• <color #D4FB79>[Network]</color> Restored functionality for master server and client
 
-• Updated to to Monaco VSCode editor 0.6
+• <color #D4FB79>[Web]</color> Added Web subsystem events and convenience methods for post data and responses
 
-• Bug fixes, improvements, and optimization
+• <color #D4FB79>[C#]</color> Output dev project assemblies to Lib, so when modifying AtomicNET sources, changes are used properly
+
+• <color #D4FB79>[C#]</color> CSComponent cleanups for instantiation from script/serialized from scene (also cleans up nativeOverride hack)
+
+• <color #D4FB79>[C#]</color> Fix for exception when instantiating any RefCounted derived instance during a CSComponent default constructor
+
+• <color #D4FB79>[C#]</color> Better error reporting for CSComponent load issues
+
+• <color #D4FB79>[C#]</color> Added Material.SetShaderParameter API
+
+• <color #D4FB79>[C#]</color> Added Vector4/String to ScriptVariant
+
+• <color #D4FB79>[C#]</color> On demand project assembly compilation from within the Atomic Editor
+
+• <color #D4FB79>[C#]</color> Inspector attribute can now be used to set inspector tooltips
+
+• <color #D4FB79>[TypeScript]</color> Upgraded to TypeScript 2.1
+
+• <color #D4FB79>[TypeScript]</color> Removed deprecated allowNonTsExtensions
+
+• <color #D4FB79>[TypeScript]</color> Automatically generate a tasks.json for VSCode
+
+• <color #D4FB79>[TypeScript]</color> Updated tsconfig with rootUrl properly for non-relative imports
+
+• <color #D4FB79>[TypeScript]</color> Strongly typed native event interfaces and subscription
+
+• <color #D4FB79>[Examples]</color> Fixed exception with virtual dpad in JavaScript examples
+
+• <color #D4FB79>[Desktop]</color> Fixed issues with engine configuration json parsing in deployed applications
+
+• <color #D4FB79>[Windows]</color> Fixed issue with Visual Studio 2017 detection
+
+• <color #D4FB79>[Windows]</color> Fixed UI pixel offset issue when rendering with OpenGL
+
+• <color #D4FB79>[macOS]</color> Added NSHighResolutionCapable flag to Atomic Editor
+
+• <color #D4FB79>[General]</color> Updated About dialog with contributor and build vendor information
+
+• <color #D4FB79>[General]</color> Misc bug fixes and optimizations
+
+• <color #D4FB79>[Maintenance]</color> Removed CurlManager from ToolCore as duplicated Web subsystem
+
 `;
 
         return text;

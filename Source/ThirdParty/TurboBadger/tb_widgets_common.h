@@ -131,6 +131,15 @@ public:
 
     // == TBMessageHandler ==============================================================
     virtual void OnMessageReceived(TBMessage *msg);
+
+    // ATOMIC BEGIN
+
+    /** Set the URL of the button */
+    void SetURL(const char* url) { m_url = url; }
+    const TBStr& GetURL() { return m_url; }
+
+    // ATOMIC END
+
 protected:
     void UpdateTextFieldVisibility();
     class ButtonLayout : public TBLayout
@@ -142,6 +151,10 @@ protected:
     TBTextField m_textfield;
     bool m_auto_repeat_click;
     bool m_toggle_mode;
+
+    // ATOMIC BEGIN
+    TBStr m_url;
+    // ATOMIC END
 };
 
 /** TBClickLabel has a text field in its internal layout by default. Pointer input on the

@@ -265,6 +265,13 @@ public:
     /** Set both min max and preferred height to the given height. */
     void SetHeight(int height) { min_h = max_h = pref_h = height; }
 
+    // ATOMIC BEGIN
+    bool operator == (const LayoutParams &lp) const { return min_w == lp.min_w &&
+                min_h == lp.min_h && max_w == lp.max_w && max_h == lp.max_h &&
+                pref_w == lp.pref_w && pref_h == lp.pref_h; }
+    // ATOMIC END
+
+
     int min_w, min_h;			///< The minimal preferred width and height.
     int max_w, max_h;			///< The maximum preferred width and height.
     int pref_w, pref_h;			///< The preferred width and height.
