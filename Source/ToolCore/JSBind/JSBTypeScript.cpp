@@ -428,40 +428,32 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
             else
                 typeName = cls->GetName();
 
-            if (typeName == "int" || typeName == "float" || typeName == "unsigned" ||
-                typeName == "bool" || typeName == "string" || typeName == "enum" || cls)
+            bool mapped = false;
+
+            if (typeName == "int" || typeName == "float" || typeName == "unsigned" || typeName == "uint")
             {
-
-                bool isEnum = false;
-                if (typeName == "enum")
-                {
-                    isEnum = true;
-                    // Once proper TypeScript enums are in place, uncomment the following.  See: #1268
-                    //if (enumTypeName.Length())
-                    //    typeName = enumTypeName;
-                    //else
+                typeName = "number";
+                mapped = true;
+            } else if (typeName == "bool") {
+                typeName = "boolean";
+                mapped = true;
+            } else if (typeName == "string") {
+                mapped = true;
+            } else if (cls) {
+                typeName = ToString("%s.%s", cls->GetPackage()->GetName().CString(), typeName.CString());
+                mapped = true;
+            } else if (typeName == "enum") {
+                if (enumTypeName.Length())
+                    typeName = enumTypeName;
+                else
                     typeName = "number";
-                }
 
-                if (typeName == "int" || typeName == "float" || typeName == "unsigned")
-                {
-                    typeName = "number";
-                } else if (typeName == "bool") {
-                    typeName = "boolean";
-                } else if (cls) {
-                    typeName = ToString("%s.%s", cls->GetPackage()->GetName().CString(), typeName.CString());
-                }
-
-                if (isEnum && enumTypeName.Length())
-                {
-                    source += ToString("        /** Enum: %s */\n", enumTypeName.CString());
-                    source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
-                } else {
-                    source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
-                }
+                mapped = true;
             }
-            else
-            {
+
+            if (mapped == true) {
+                source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
+            } else {
                 source += ToString("        // Unmapped Native Type:%s \n", typeName.CString());
                 source += ToString("        // %s : any;\n", p.paramName_.ToLower().CString());
             }
@@ -471,7 +463,7 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
 
         // Write the event function signature
 
-        source += ToString("\nexport function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
+        source += ToString("\n    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
 
     }
     source_ += source;
