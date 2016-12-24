@@ -339,7 +339,6 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
     {
         JSBEnum* _enum = *enumIter;
 
-        source_ += "\n";
         source_ += "   /** enum " + _enum->GetName() + "*/\n";
         source_ += "   export const enum " + _enum->GetName() + " {\n";
 
@@ -364,7 +363,7 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
             }
 
             //source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
-            source_ += "       /** For JS Access, use: Atomic." + name + " */\n";
+            source_ += "       /** TypeScript Only - For vanilla JavaScript, use: [[" + package_->GetName() + "." + name + "]] */\n";
             if (value != "")
             {
                 source_ += "       " + name + " = " + value;
@@ -380,6 +379,18 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
             source_ += "\n";
         }
         source_ += "    }\n";
+        source_ += "\n";
+
+        // legacy support
+        source_ += "   // Legacy JS Access for enum:  " + _enum->GetName() + "\n";
+        valsIter = values.Begin();
+        while (valsIter != values.End())
+        {
+            String name = (*valsIter).first_;
+            source_ += "   /** JavaScript Only - For TypeScript, use: [[" + _enum->GetName() + "." + name + "]] */\n";
+            source_ += "   export var " + name + ": number;\n";
+            valsIter++;
+        }
         source_ += "\n";
     }
 
@@ -444,7 +455,7 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
                 mapped = true;
             } else if (typeName == "enum") {
                 if (enumTypeName.Length())
-                    typeName = enumTypeName;
+                    typeName = package_->GetName() + "." + enumTypeName;
                 else
                     typeName = "number";
 
