@@ -144,7 +144,7 @@ class ColorChooser extends Atomic.UIWindow {
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
         let changed = false;
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
             let hsltargets = ["colorwheel", "lslider"];
             let rgbtargets = {
                 "redselect" : 0,
@@ -177,7 +177,7 @@ class ColorChooser extends Atomic.UIWindow {
             }
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             if ( ev.target.id == "history0" || ev.target.id == "history1"
                     || ev.target.id == "history2" || ev.target.id == "history3"

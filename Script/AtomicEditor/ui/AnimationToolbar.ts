@@ -78,7 +78,7 @@ class AnimationToolbar extends Atomic.UIWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
             if (this.animationController != null) {
 
                 if (ev.target.id == "play_left") {

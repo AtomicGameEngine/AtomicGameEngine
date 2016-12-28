@@ -41,12 +41,12 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         var widgetLayout = this.widgetLayout = new Atomic.UILayout();
         var noticeLayout = this.noticeLayout = new Atomic.UILayout();
 
-        this.axis = Atomic.UI_AXIS_Y;
-        widgetLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        noticeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        this.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        widgetLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        noticeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         name.skinBg = "InspectorPrefabTextAttrName";
         name.text = "Prefab";
         name.fontDescription = fd;
@@ -95,13 +95,13 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         });
 
         var noticeName = new Atomic.UITextField();
-        noticeName.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        noticeName.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         noticeName.skinBg = "InspectorTextAttrName";
         noticeName.text = "Prefab";
         noticeName.fontDescription = fd;
 
         var noticeText = new Atomic.UITextField();
-        noticeText.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        noticeText.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         noticeText.skinBg = "InspectorTextAttrName";
         noticeText.text = "Multiple Selection";
         noticeText.fontDescription = fd;
@@ -117,7 +117,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         this.addChild(this.widgetLayout);
         this.addChild(this.noticeLayout);
 
-        this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
 
     }
 
@@ -150,20 +150,20 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         }
 
         if (!hasPrefab) {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             return;
         }
 
-        this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
 
         if (nodes.length > 1) {
-            this.noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
-            this.widgetLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.widgetLayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
             return;
         }
 
-        this.noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
-        this.widgetLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        this.noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
+        this.widgetLayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
         this.node = nodes[0];
 
     }
@@ -179,7 +179,7 @@ class ConfirmPrefabBreak extends Atomic.UIWindow {
 
         this.node = node;
 
-        this.settings = Atomic.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
+        this.settings = Atomic.UI_WINDOW_SETTINGS.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
 
         this.text = "Break Prefab Connection";
         this.load("AtomicEditor/editor/ui/breakprefab.tb.txt");
@@ -198,7 +198,7 @@ class ConfirmPrefabBreak extends Atomic.UIWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 

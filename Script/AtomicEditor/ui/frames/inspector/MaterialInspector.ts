@@ -103,10 +103,10 @@ class MaterialInspector extends ScriptWidget {
         section.value = 1;
         section.fontDescription = this.fd;
 
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
-        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
 
         section.contentRoot.addChild(attrsVerticalLayout);
 
@@ -115,10 +115,10 @@ class MaterialInspector extends ScriptWidget {
         for (var i in params) {
 
             var attrLayout = new Atomic.UILayout();
-            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
             var name = new Atomic.UITextField();
-            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
             name.skinBg = "InspectorTextAttrName";
 
             name.text = params[i].name;
@@ -127,7 +127,7 @@ class MaterialInspector extends ScriptWidget {
             attrLayout.addChild(name);
 
             var field = new Atomic.UIEditField();
-            field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            field.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
             field.skinBg = "TBAttrEditorField";
             field.fontDescription = this.fd;
             var lp = new Atomic.UILayoutParams();
@@ -139,7 +139,7 @@ class MaterialInspector extends ScriptWidget {
 
             field.subscribeToEvent(field, "WidgetEvent", function (ev: Atomic.UIWidgetEvent) {
 
-                if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+                if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
                     var field = <Atomic.UIEditField>ev.target;
                     this.material.setShaderParameter(field.id, field.text);
@@ -233,7 +233,7 @@ class MaterialInspector extends ScriptWidget {
 
             button.subscribeToEvent(button, "WidgetEvent", function (ev: Atomic.UIWidgetEvent) {
 
-                if (ev.type != Atomic.UI_EVENT_TYPE_CLICK)
+                if (ev.type != Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK)
                     return;
 
                 if (ev.target && ev.target.id == "technique popup") {
@@ -334,15 +334,15 @@ class MaterialInspector extends ScriptWidget {
         section.value = 1;
         section.fontDescription = this.fd;
 
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
-        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
 
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR, Atomic.TU_EMISSIVE];
+        var textureUnits = [Atomic.TextureUnit.TU_DIFFUSE, Atomic.TextureUnit.TU_NORMAL, Atomic.TextureUnit.TU_SPECULAR, Atomic.TextureUnit.TU_EMISSIVE];
 
         for (var i in textureUnits) {
 
@@ -351,10 +351,10 @@ class MaterialInspector extends ScriptWidget {
             var tunitName = Atomic.Material.getTextureUnitName(tunit);
 
             var attrLayout = new Atomic.UILayout();
-            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
             var name = new Atomic.UITextField();
-            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
             name.skinBg = "InspectorTextAttrName";
 
             name.text = tunitName;
@@ -513,10 +513,10 @@ class MaterialInspector extends ScriptWidget {
         var materialLayout = new Atomic.UILayout();
         materialLayout.spacing = 4;
 
-        materialLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        materialLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        materialLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        materialLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         materialLayout.layoutParams = mlp;
-        materialLayout.axis = Atomic.UI_AXIS_Y;
+        materialLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
 
         // node attr layout
 
@@ -526,17 +526,17 @@ class MaterialInspector extends ScriptWidget {
         materialSection.fontDescription = this.fd;
         materialLayout.addChild(materialSection);
 
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
-        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_PREFERRED;
 
         // NAME
         var nameLayout = new Atomic.UILayout();
-        nameLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        nameLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         name.skinBg = "InspectorTextAttrName";
 
         name.text = "Name";
@@ -545,7 +545,7 @@ class MaterialInspector extends ScriptWidget {
         nameLayout.addChild(name);
 
         var field = new Atomic.UIEditField();
-        field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        field.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         field.skinBg = "TBAttrEditorField";
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
@@ -561,11 +561,11 @@ class MaterialInspector extends ScriptWidget {
         // TECHNIQUE LAYOUT
 
         var techniqueLayout = new Atomic.UILayout();
-        techniqueLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_GRAVITY;
-        techniqueLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_PREFERRED;
+        techniqueLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_GRAVITY;
+        techniqueLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_PREFERRED;
 
         name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         name.skinBg = "InspectorTextAttrName";
 
         name.text = "Technique";
@@ -586,7 +586,7 @@ class MaterialInspector extends ScriptWidget {
 
         var button = new Atomic.UIButton();
         button.fontDescription = this.fd;
-        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_RIGHT;
         button.text = "Save";
 
         button.onClick = function () {

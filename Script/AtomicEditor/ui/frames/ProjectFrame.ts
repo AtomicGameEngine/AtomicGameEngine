@@ -51,7 +51,7 @@ class ProjectFrame extends ScriptWidget {
 
         this.load("AtomicEditor/editor/ui/projectframe.tb.txt");
 
-        this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
+        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_TOP_BOTTOM;
 
         this.searchEdit = <Atomic.UIEditField>this.getWidget("filter");
 
@@ -167,19 +167,19 @@ class ProjectFrame extends ScriptWidget {
 
         if (!ToolCore.toolSystem.project) return;
 
-        if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+        if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_KEY_UP) {
 
             // Activates search while user is typing in search widget
             if (data.target == this.searchEdit) {
 
-                if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+                if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_KEY_UP) {
                     this.search = true;
                     this.refreshContent(this.currentFolder);
                 }
             }
         }
 
-        if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
+        if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
 
             var id = data.target.id;
             var db = ToolCore.getAssetDatabase();
@@ -200,7 +200,7 @@ class ProjectFrame extends ScriptWidget {
 
         }
 
-        if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = data.target.id;
 
@@ -366,7 +366,7 @@ class ProjectFrame extends ScriptWidget {
             else {
                 var destFilename = Atomic.addTrailingSlash(asset.path);
                 destFilename += node.name + ".prefab";
-                var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
+                var file = new Atomic.File(destFilename, Atomic.FileMode.FILE_WRITE);
                 node.saveXML(file);
                 file.close();
             }
@@ -529,7 +529,7 @@ class ProjectFrame extends ScriptWidget {
         var blayout = new Atomic.UILayout();
         blayout.id = asset.guid;
 
-        blayout.gravity = Atomic.UI_GRAVITY_LEFT;
+        blayout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT;
 
         var spacer = new Atomic.UIWidget();
         spacer.rect = [0, 0, 8, 8];
@@ -561,11 +561,11 @@ class ProjectFrame extends ScriptWidget {
         fd.id = "Vera";
         fd.size = 11;
 
-        button.gravity = Atomic.UI_GRAVITY_LEFT;
+        button.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT;
 
         var image = new Atomic.UISkinImage(bitmapID);
         image.rect = [0, 0, 12, 12];
-        image.gravity = Atomic.UI_GRAVITY_RIGHT;
+        image.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_RIGHT;
         blayout.addChild(image);
         image["asset"] = asset;
 

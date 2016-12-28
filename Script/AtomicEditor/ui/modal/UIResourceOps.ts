@@ -49,7 +49,7 @@ export class ResourceDelete extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 
@@ -97,7 +97,7 @@ export class CreateFolder extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 
@@ -162,7 +162,7 @@ export class CreateComponent extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 
@@ -248,7 +248,7 @@ export class CreateScript extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 
@@ -316,7 +316,7 @@ export class CreateScene extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 
@@ -368,7 +368,7 @@ export class CreateMaterial extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 
@@ -430,7 +430,7 @@ export class RenameAsset extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 

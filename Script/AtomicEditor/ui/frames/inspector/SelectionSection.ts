@@ -75,9 +75,9 @@ abstract class SelectionSection extends Atomic.UISection {
 
         this.suppressed = value;
         if (value) {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
         } else {
-            this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
         }
 
     }
@@ -149,10 +149,10 @@ abstract class SelectionSection extends Atomic.UISection {
 
     createUI() {
 
-        var attrLayout = this.attrLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrLayout = this.attrLayout = new Atomic.UILayout(Atomic.UI_AXIS.UI_AXIS_Y);
         attrLayout.spacing = 3;
-        attrLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        attrLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
 
         this.contentRoot.addChild(attrLayout);
 

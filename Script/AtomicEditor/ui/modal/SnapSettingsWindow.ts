@@ -68,7 +68,7 @@ class SnapSettingsWindow extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
 

@@ -46,7 +46,7 @@ class MainFrame extends ScriptWidget {
 
         this.inspectorlayout = <Atomic.UILayout> this.getWidget("inspectorlayout");
 
-        this.getWidget("consolecontainer").visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        this.getWidget("consolecontainer").visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
 
         this.inspectorframe = new InspectorFrame();
         this.inspectorlayout.addChild(this.inspectorframe);
@@ -96,13 +96,13 @@ class MainFrame extends ScriptWidget {
 
         if (show) {
             this.showInspectorFrame(false);
-            this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
-            this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
         }
         else {
             this.showInspectorFrame(true);
-            this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
-            this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
         }
 
     }
@@ -111,13 +111,13 @@ class MainFrame extends ScriptWidget {
 
         if (show) {
 
-            this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
-            this.inspectorframe.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.inspectorframe.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
 
         } else {
 
-            this.inspectorframe.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
-            this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.inspectorframe.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
+            this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
 
         }
 
@@ -143,13 +143,13 @@ class MainFrame extends ScriptWidget {
     }
 
     disableProjectMenus() {
-        this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
-        this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
+        this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE.UI_WIDGET_STATE_DISABLED);
+        this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE.UI_WIDGET_STATE_DISABLED);
     }
 
     enableProjectMenus() {
-        this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
-        this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
+        this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE.UI_WIDGET_STATE_NONE);
+        this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE.UI_WIDGET_STATE_NONE);
     }
 
     shutdown() {

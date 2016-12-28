@@ -75,15 +75,15 @@ class TextureInspector extends InspectorWidget {
         section.value = 1;
         section.fontDescription = this.fd;
 
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
-        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_CENTER;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_CENTER;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
 
         section.contentRoot.addChild(attrsVerticalLayout);
 
         var attrLayout = new Atomic.UILayout();
-        attrLayout.layoutDistribution = Atomic.UI_LAYOUT_POSITION_CENTER;
+        attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_PREFERRED;
 
         var textureWidget = new Atomic.UITextureWidget();
 
@@ -119,10 +119,10 @@ class TextureInspector extends InspectorWidget {
         var textureLayout = new Atomic.UILayout();
         textureLayout.spacing = 4;
 
-        textureLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        textureLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        textureLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        textureLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         textureLayout.layoutParams = mlp;
-        textureLayout.axis = Atomic.UI_AXIS_Y;
+        textureLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
 
         var textureSection = new Atomic.UISection();
         textureSection.text = "Texture";
@@ -130,17 +130,17 @@ class TextureInspector extends InspectorWidget {
         textureSection.fontDescription = this.fd;
         textureLayout.addChild(textureSection);
 
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
-        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_PREFERRED;
 
         // NAME
         var nameLayout = new Atomic.UILayout();
-        nameLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        nameLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        name.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         name.skinBg = "InspectorTextAttrName";
 
         name.text = "Name";
@@ -149,7 +149,7 @@ class TextureInspector extends InspectorWidget {
         nameLayout.addChild(name);
 
         var field = new Atomic.UIEditField();
-        field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        field.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
         field.skinBg = "TBAttrEditorField";
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
@@ -163,7 +163,7 @@ class TextureInspector extends InspectorWidget {
         attrsVerticalLayout.addChild(nameLayout);
 
         var maxSizeLayout = new Atomic.UILayout();
-        maxSizeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        maxSizeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         //COMPRESSION SIZE
         var maxSize = InspectorUtils.createAttrName("Max Size");

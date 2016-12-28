@@ -28,7 +28,7 @@ class ProgressModal extends Atomic.UIWindow {
 
         super();
 
-        this.settings = Atomic.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
+        this.settings = Atomic.UI_WINDOW_SETTINGS.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
 
         this.text = title;
         this.load("AtomicEditor/editor/ui/progressmodal.tb.txt");

@@ -54,13 +54,13 @@ class AssemblyInspector extends InspectorWidget {
         var assemblyFile = <AtomicNETScript.CSComponentAssembly> asset.importer.getResource();
 
         var container = InspectorUtils.createContainer();
-        container.gravity = Atomic.UI_GRAVITY_ALL;
+        container.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
         assemblyLayout.addChild(container);
 
         var panel = new Atomic.UILayout();
-        panel.axis = Atomic.UI_AXIS_Y;
-        panel.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
-        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        panel.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        panel.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_PREFERRED;
+        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         container.addChild(panel);
 
         var label = InspectorUtils.createAttrName("CSComponents:");

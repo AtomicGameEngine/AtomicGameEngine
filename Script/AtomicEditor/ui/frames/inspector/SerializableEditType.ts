@@ -51,7 +51,7 @@ class SerializableEditType {
                 value = object.getAttribute(attrInfo.name);
                 if (index >= 0) {
 
-                    if (attrInfo.type == Atomic.VAR_RESOURCEREFLIST) {
+                    if (attrInfo.type == Atomic.VariantType.VAR_RESOURCEREFLIST) {
 
                         value = value.resources[index];
 
@@ -64,7 +64,7 @@ class SerializableEditType {
 
                 var value2 = object.getAttribute(attrInfo.name);
                 if (index >= 0) {
-                    if (attrInfo.type == Atomic.VAR_RESOURCEREFLIST) {
+                    if (attrInfo.type == Atomic.VariantType.VAR_RESOURCEREFLIST) {
 
                         value2 = value2.resources[index];
 
@@ -97,7 +97,7 @@ class SerializableEditType {
 
                 var idxValue = object.getAttribute(attrInfo.name);
 
-                if (attrInfo.type == Atomic.VAR_RESOURCEREFLIST) {
+                if (attrInfo.type == Atomic.VariantType.VAR_RESOURCEREFLIST) {
 
                     idxValue.resources[index] = value;
                     object.setAttribute(attrInfo.name, idxValue);

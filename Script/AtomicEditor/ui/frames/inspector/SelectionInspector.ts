@@ -262,25 +262,25 @@ class SelectionInspector extends ScriptWidget {
         var lp = new Atomic.UILayoutParams();
         lp.width = 304;
 
-        mainLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        mainLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        mainLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        mainLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         mainLayout.layoutParams = lp;
-        mainLayout.axis = Atomic.UI_AXIS_Y;
+        mainLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
 
         this.addChild(mainLayout);
 
         var noticeLayout = this.multipleSelectNotice = new Atomic.UILayout();
-        noticeLayout.axis = Atomic.UI_AXIS_Y;
+        noticeLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
         noticeLayout.layoutParams = lp;
         var noticeText = new Atomic.UITextField();
-        noticeText.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
+        noticeText.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_CENTER;
         noticeText.skinBg = "InspectorTextAttrName";
         noticeText.text = "Multiple Selection - Some components are hidden";
         noticeText.fontDescription = SelectionSection.fontDesc;
-        noticeText.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        noticeText.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
         noticeText.layoutParams = lp;
         noticeLayout.addChild(noticeText);
-        noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
         mainLayout.addChild(noticeLayout);
 
         this.createComponentButton = new CreateComponentButton();
@@ -347,7 +347,7 @@ class SelectionInspector extends ScriptWidget {
 
     suppressSections() {
 
-        this.multipleSelectNotice.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        this.multipleSelectNotice.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
 
         for (var i in this.sections) {
 
@@ -368,7 +368,7 @@ class SelectionInspector extends ScriptWidget {
             }
 
             if (suppressed)
-                this.multipleSelectNotice.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+                this.multipleSelectNotice.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
 
             section.suppress(suppressed);
 

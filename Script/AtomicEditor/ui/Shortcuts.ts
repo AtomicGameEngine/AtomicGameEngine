@@ -161,7 +161,7 @@ class Shortcuts extends Atomic.ScriptObject {
         var editor = EditorUI.getCurrentResourceEditor();
 
         if (editor && editor instanceof Editor.SceneEditor3D) {
-            var mode = editor.getGizmo().axisMode ? Editor.AXIS_WORLD : Editor.AXIS_LOCAL;
+            var mode = editor.getGizmo().axisMode ? Editor.AxisMode.AXIS_WORLD : Editor.AxisMode.AXIS_LOCAL;
             this.sendEvent("GizmoAxisModeChanged", { mode: mode });
         }
     }
@@ -184,11 +184,11 @@ class Shortcuts extends Atomic.ScriptObject {
             if (!Atomic.ui.focusedWidget && !this.cmdKeyDown()) {
 
                 if (ev.key == Atomic.KEY_W) {
-                    this.invokeGizmoEditModeChanged(Editor.EDIT_MOVE);
+                    this.invokeGizmoEditModeChanged(Editor.EditMode.EDIT_MOVE);
                 } else if (ev.key == Atomic.KEY_E) {
-                    this.invokeGizmoEditModeChanged(Editor.EDIT_ROTATE);
+                    this.invokeGizmoEditModeChanged(Editor.EditMode.EDIT_ROTATE);
                 } else if (ev.key == Atomic.KEY_R) {
-                    this.invokeGizmoEditModeChanged(Editor.EDIT_SCALE);
+                    this.invokeGizmoEditModeChanged(Editor.EditMode.EDIT_SCALE);
                 } else if (ev.key == Atomic.KEY_X) {
                     this.toggleGizmoAxisMode();
                 } else if (ev.key == Atomic.KEY_F) {
@@ -219,8 +219,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         var cmdKey = this.cmdKeyDown();
 
-        if ( !cmdKey && ev.qualifiers > 0 ) // check the event, the qualifier may have been programmitically set
-        {
+        if ( !cmdKey && ev.qualifiers > 0 ) { // check the event, the qualifier may have been programmitically set
             cmdKey = ( ev.qualifiers == Atomic.QUAL_CTRL );
         }
 

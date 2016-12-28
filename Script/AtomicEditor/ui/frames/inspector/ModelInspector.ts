@@ -125,11 +125,11 @@ class ModelInspector extends InspectorWidget {
 
         animLayout.spacing = 4;
 
-        animLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        animLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        animLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        animLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         animLayout.layoutParams = nlp;
-        animLayout.axis = Atomic.UI_AXIS_Y;
-        animLayout.gravity = Atomic.UI_GRAVITY_ALL;
+        animLayout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        animLayout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
 
         animationLayout.addChild(animLayout);
 

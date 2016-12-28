@@ -34,7 +34,7 @@ class InspectorUtils {
 
     var sep = new Atomic.UISeparator();
 
-    sep.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+    sep.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
     sep.skinBg = "AESeparator";
 
     parent.addChild(sep);
@@ -55,7 +55,7 @@ class InspectorUtils {
   static createAttrName(name:string):Atomic.UITextField {
 
     var nameField = new Atomic.UITextField();
-    nameField.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+    nameField.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
     nameField.skinBg = "InspectorTextAttrName";
     nameField.text = name;
     nameField.fontDescription = InspectorUtils.attrFontDesc;
@@ -72,7 +72,7 @@ class InspectorUtils {
 
     var edit = new Atomic.UIEditField();
     edit.id = "editfield";
-    edit.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+    edit.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_LEFT;
     edit.skinBg = "TBAttrEditorField";
     edit.fontDescription = InspectorUtils.attrFontDesc;
     var lp = new Atomic.UILayoutParams();
@@ -103,9 +103,9 @@ class InspectorUtils {
 
     var attrLayout = new Atomic.UILayout();
 
-    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-    attrLayout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+    attrLayout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
     var _name = InspectorUtils.createAttrName(name);
     attrLayout.addChild(_name);
@@ -123,9 +123,9 @@ class InspectorUtils {
 
     var attrLayout = new Atomic.UILayout();
 
-    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-    attrLayout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+    attrLayout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
     var _name = InspectorUtils.createAttrName(name);
     attrLayout.addChild(_name);
@@ -143,7 +143,7 @@ class InspectorUtils {
   static createAttrEditFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{editField:Atomic.UIEditField, selectButton:Atomic.UIButton} {
 
     var attrLayout = new Atomic.UILayout();
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
 
     if (name) {
       var _name = InspectorUtils.createAttrName(name);
@@ -151,7 +151,7 @@ class InspectorUtils {
     }
 
     var fieldLayout = new Atomic.UILayout();
-    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
 
     var edit = InspectorUtils.createEditField();
 
@@ -172,7 +172,7 @@ class InspectorUtils {
   static createAttrColorFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{colorWidget:Atomic.UIColorWidget, selectButton:Atomic.UIButton} {
 
     var attrLayout = new Atomic.UILayout();
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
 
     if (name) {
       var _name = InspectorUtils.createAttrName(name);
@@ -180,7 +180,7 @@ class InspectorUtils {
     }
 
     var fieldLayout = new Atomic.UILayout();
-    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
 
     var colorWidget = InspectorUtils.createColorWidget();
 

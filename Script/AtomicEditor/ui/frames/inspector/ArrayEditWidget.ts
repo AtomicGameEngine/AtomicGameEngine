@@ -33,12 +33,12 @@ class ArrayEditWidget extends Atomic.UILayout {
 
         this.spacing = 4;
 
-        this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        this.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        this.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
         this.layoutParams = nlp;
-        this.axis = Atomic.UI_AXIS_Y;
+        this.axis = Atomic.UI_AXIS.UI_AXIS_Y;
 
-        this.gravity = Atomic.UI_GRAVITY_ALL;
+        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
 
         var countEdit = this.countEdit = InspectorUtils.createAttrEditField(title, this);
 

@@ -71,7 +71,7 @@ export class BuildSettingsWindow extends ModalWindow {
         lp.maxHeight = myh;
 
         platformSelect.layoutParams = lp;
-        platformSelect.gravity = Atomic.UI_GRAVITY_ALL;
+        platformSelect.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
 
         platformcontainer.addChild(platformSelect);
 
@@ -113,7 +113,7 @@ export class BuildSettingsWindow extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             var toolSystem = ToolCore.toolSystem;
 
@@ -144,7 +144,7 @@ export class BuildSettingsWindow extends ModalWindow {
 
                 var showMessage = function(target, title, message) {
                     var window = new Atomic.UIMessageWindow(target, "modal_error");
-                    window.show(title, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+                    window.show(title, message, Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
                 };
 
                 for (var name in this.platformInfo) {
@@ -158,14 +158,14 @@ export class BuildSettingsWindow extends ModalWindow {
                         // Do we have a C# project?
                         if (ToolCore.netProjectSystem.solutionAvailable) {
 
-                            if (platform.platformID == ToolCore.PLATFORMID_WEB) {
+                            if (platform.platformID == ToolCore.PlatformID.PLATFORMID_WEB) {
 
                                 showMessage(this, "Platform Info", "\nThe web platform is not available when using C# at this time\n\n");
                                 return true;
 
                             }
 
-                            if (platform.platformID == ToolCore.PLATFORMID_IOS || platform.platformID == ToolCore.PLATFORMID_ANDROID) {
+                            if (platform.platformID == ToolCore.PlatformID.PLATFORMID_IOS || platform.platformID == ToolCore.PlatformID.PLATFORMID_ANDROID) {
 
                                 var ide = Atomic.platform == "Windows" ? "Visual Studio" : "Xamarin Studio";
                                 var message = `Please open the following solution in ${ide}:\n\n ${ToolCore.netProjectSystem.solutionPath}\n\n`;
@@ -177,7 +177,7 @@ export class BuildSettingsWindow extends ModalWindow {
 
                         } else {
 
-                            if (platform.platformID == ToolCore.PLATFORMID_IOS) {
+                            if (platform.platformID == ToolCore.PlatformID.PLATFORMID_IOS) {
 
                                 if (Atomic.platform == "Windows") {
 
@@ -244,14 +244,14 @@ export class BuildSettingsWindow extends ModalWindow {
 
         for (var name in this.platformInfo) {
 
-            this.platformInfo[name].widget.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.platformInfo[name].widget.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
 
         }
 
         if (!platform) return;
 
         var info: { widget: Atomic.UIWidget, index: number, logo: string } = this.platformInfo[platform.name];
-        info.widget.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        info.widget.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
         if (this.platformSelect.value != info.index)
             this.platformSelect.value = info.index;
 

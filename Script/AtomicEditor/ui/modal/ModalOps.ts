@@ -260,7 +260,7 @@ class ModalOps extends Atomic.ScriptObject {
     showError(windowText: string, message: string) {
         var view = EditorUI.getView();
         var window = new Atomic.UIMessageWindow(view, "modal_error");
-        window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
+        window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
     }
 
     showExtensionWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {

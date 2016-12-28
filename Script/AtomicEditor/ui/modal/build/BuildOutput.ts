@@ -57,7 +57,7 @@ class BuildOutput extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             if (ev.target.id == "cancel") {
                 this.hide();

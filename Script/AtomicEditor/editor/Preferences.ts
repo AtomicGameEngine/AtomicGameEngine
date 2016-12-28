@@ -67,7 +67,7 @@ class Preferences {
 
     addColorHistory(path: string): void {
         var index = this._prefs.colorHistory.indexOf(path);   // search array for entry
-        if (index >= 0) {                                     // if its in there, 
+        if (index >= 0) {                                     // if its in there,
             this._prefs.colorHistory.splice(index, 1);        // REMOVE it.
         }
         this._prefs.colorHistory.unshift(path);               // now add it to beginning of array
@@ -103,7 +103,7 @@ class Preferences {
         }
 
         //Read file
-        jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
+        jsonFile = new Atomic.File(filePath, Atomic.FileMode.FILE_READ);
 
         var prefs = null;
 
@@ -134,7 +134,7 @@ class Preferences {
 
     write(): boolean {
         var filePath = this.getPreferencesFullPath();
-        var jsonFile = new Atomic.File(filePath, Atomic.FILE_WRITE);
+        var jsonFile = new Atomic.File(filePath, Atomic.FileMode.FILE_WRITE);
         if (!jsonFile.isOpen()) return false;
         jsonFile.writeString(JSON.stringify(this._prefs, null, 2));
     }
@@ -199,7 +199,7 @@ class Preferences {
     loadUserPrefs() {
         const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
         if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_READ);
             try {
                 let prefs = JSON.parse(prefsFile.readText());
                 this._cachedProjectPreferences = prefs;
@@ -246,7 +246,7 @@ class Preferences {
         let prefs = {};
 
         if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_READ);
             try {
                 prefs = JSON.parse(prefsFile.readText());
             } finally {
@@ -257,7 +257,7 @@ class Preferences {
         prefs[settingsGroup] = prefs[settingsGroup] || {};
         prefs[settingsGroup][preferenceName] = value;
 
-        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_WRITE);
         try {
             saveFile.writeString(JSON.stringify(prefs, null, "  "));
         } finally {
@@ -283,7 +283,7 @@ class Preferences {
         let prefs = {};
 
         if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_READ);
             try {
                 prefs = JSON.parse(prefsFile.readText());
             } finally {
@@ -296,7 +296,7 @@ class Preferences {
             prefs[settingsGroup][preferenceName] = groupPreferenceValues[preferenceName];
         }
 
-        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_WRITE);
         try {
             saveFile.writeString(JSON.stringify(prefs, null, "  "));
         } finally {

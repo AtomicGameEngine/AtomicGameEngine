@@ -58,7 +58,7 @@ class WebSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
             return true;
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
 
             if (ev.target.id == "web_dark") {
                 this.settings.pageTheme = 0;
