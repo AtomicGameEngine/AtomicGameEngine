@@ -227,6 +227,11 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
                 added = true;
                 eval = line.Substring(5) + "\n";
             }
+            else if (line.StartsWith("_this.inspectorFields"))
+            {
+                added = true;
+                eval = line.Substring(6) + "\n";
+            }
             else if (line.StartsWith("var inspectorFields"))
             {
                 added = true;
