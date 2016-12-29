@@ -88,11 +88,23 @@ bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
     {
         if (urlEnabled_)
         {
-            String text = GetText();
-            if (text.StartsWith("http://") || text.StartsWith("https://"))
+            // First see if we have a url specified, if not and the button uses the TBButton.link skin try text
+            String url = GetURL();
+            String skinname = widget_->GetSkinBgElement() ? widget_->GetSkinBgElement()->name.CStr() : String::EMPTY;
+            if (!url.Length() && skinname == "TBButton.link")
+            {
+                String text = GetText();
+
+                if (text.StartsWith("http://") || text.StartsWith("https://") || text.StartsWith("file://"))
+                {
+                    url = text;
+                }
+            }
+
+            if (url.Length())
             {
                 FileSystem* fileSystem = GetSubsystem<FileSystem>();
-                fileSystem->SystemOpen(text);
+                fileSystem->SystemOpen(url);
             }
         }
     }
@@ -106,5 +118,26 @@ bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
     }
     return UIWidget::OnEvent(ev);
 }
+
+/// Set the URL which is opened when this button is clicked, this overrides the text attr
+void UIButton::SetURL (const String& url)
+{
+    if (!widget_)
+        return;
+
+    ((TBButton*)widget_)->SetURL(url.CString());
+
+}
+
+/// Get the URL which is opened when this button is clicked
+String UIButton::GetURL()
+{
+    if (!widget_)
+        return String::EMPTY;
+
+    return ((TBButton*)widget_)->GetURL().CStr();
+
+}
+
 
 }

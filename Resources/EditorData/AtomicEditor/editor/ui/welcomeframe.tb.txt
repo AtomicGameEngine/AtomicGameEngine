@@ -21,14 +21,16 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
                 "<color #D4FB79>First Steps</color>\n\n" \
                 "• Try out some of the example projects!\n\n" \
                 "• Create a new project based on a 2D or 3D template.\n\n" \
-                "<color #D4FB79>Getting Started Videos & Javascript API Docs</color>\n" \
-                "<widget TBButton: id: 'getting_started' text: 'http://atomicgameengine.com/learn', skin: TBButton.link>\n\n" \
-                "<color #D4FB79>Atomic Community</color>\n" \
-                "<widget TBButton: id: 'community' text: 'http://atomicgameengine.com/community', skin: TBButton.link>\n\n" \
+                "<color #D4FB79>Atomic Resources</color>\n" \
+                "<widget TBButton: text: 'Documentation Wiki' url: 'https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/' skin: TBButton.link>\n" \
+                "<widget TBButton: text: 'Atomic Q & A' url: 'https://qa.atomicgameengine.com/' skin: TBButton.link>\n" \
+                "<widget TBButton: text: 'Atomic Chat' url: 'https://gitter.im/AtomicGameEngine/AtomicGameEngine/' skin: TBButton.link>\n\n" \
+                "<color #D4FB79>Atomic API References</color>\n" \
+                "<widget TBButton: text: 'JavaScript & TypeScript' url: 'http://docs.atomicgameengine.com/api/modules/atomic.html' skin: TBButton.link>\n" \
+                "<widget TBButton: text: 'C#' url: 'http://docs.atomicgameengine.com/csharp/AtomicEngine/' skin: TBButton.link>\n" \
+                "<widget TBButton: text: 'C++' url: 'http://docs.atomicgameengine.com/cpp' skin: TBButton.link>\n\n" \
                 "<color #D4FB79>Atomic Game Engine on GitHub</color>\n" \
-                "<widget TBButton: id: 'atomic_github' text: 'https://github.com/AtomicGameEngine', skin: TBButton.link>\n\n" \
-                "<color #D4FB79>Atomic Game Engine Funding Information</color>\n" \
-                "<widget TBButton: id: 'atomic_github' text: 'http://atomicgameengine.com/funding', skin: TBButton.link>\n\n"
+                "<widget TBButton: id: 'atomic_github' text: 'https://github.com/AtomicGameEngine/' url: 'https://github.com/AtomicGameEngine/AtomicGameEngine' skin: TBButton.link>\n\n"
         TBLayout: distribution: gravity, axis: y, spacing: 12
             TBLayout: distribution: gravity, size: available
                 TBContainer: gravity: left right

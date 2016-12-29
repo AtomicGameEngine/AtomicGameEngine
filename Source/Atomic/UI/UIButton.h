@@ -45,10 +45,16 @@ public:
 
     void SetEmulationButton(int button);
 
-    /// A button link may be set via the text attribute, if enabled
-    /// a FileSystem open will be called when the button is clicked
+    /// A URL link may be set via the URL value (or the Text value if using TBButton.link skin)
+    /// If enabled, a FileSystem open will be called when the button is clicked
     /// for example a http:// link will open the default browser
     void SetURLEnabled(bool enabled) { urlEnabled_ = enabled; }
+
+    /// Set the URL which is opened when this button is clicked
+    void SetURL (const String& url);
+
+    /// Get the URL which is opened when this button is clicked
+    String GetURL ();
 
     ///Set to true if the button should toggle on and off    
     void SetToggleMode(bool toggle);

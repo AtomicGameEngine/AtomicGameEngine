@@ -2,12 +2,12 @@ TBLayout: axis: y, distribution: gravity
     TBImageWidget: filename: "AtomicEditor/editor/images/newbuilddetected_header.jpg"
         lp: width: 512, height: 167, min-width: 512, min-height: 167
     TBEditField: multiline: 1, styling: 1, gravity: all, id: newbuild_text, readonly: 1, adapt-to-content: 0
-        font: size: 13
-        lp: min-width: 480, min-height: 274
+        font: size: 12
+        lp: min-width: 500, min-height: 300
         text: "..."
     TBLayout:
         TBCheckBox: id: newbuild_check
-        TBTextField: text: "Don't show me again until a new build is installed"
+        TBTextField: id: newbuild_check_text, text: "Don't show me again until a new build is installed"
             font: size: 16
     TBLayout:
         TBButton: text: Ok, id: ok

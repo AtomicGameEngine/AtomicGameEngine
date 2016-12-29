@@ -420,7 +420,12 @@ void TBEditField::OnResized(int old_w, int old_h)
 
 PreferredSize TBEditField::OnCalculatePreferredContentSize(const SizeConstraints &constraints)
 {
-    int font_height = GetFont()->GetHeight();
+    // ATOMIC BEGIN
+    // TurboBadger uses font height here, we add 2 pixels to calculation
+    // as this gives better default breathing room and avoids pixels being cut off
+    int font_height = GetFont()->GetHeight() + 2;
+    // ATOMIC END
+
     PreferredSize ps;
     if (m_adapt_to_content_size)
     {
@@ -669,6 +674,10 @@ int TBEditFieldContentFactory::GetContent(const char *text)
 
 TBTextFragmentContent *TBEditFieldContentFactory::CreateFragmentContent(const char *text, int text_len)
 {
+    // ATOMIC BEGIN
+    // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1297
+    // ATOMIC END
+
     if (strncmp(text, "<widget ", MIN(text_len, 8)) == 0)
     {
         // Create a wrapper for the generated widget.
