@@ -25,6 +25,13 @@
 #include "Atomic/Atomic.h"
 #include "Vector.h"
 
+// ATOMIC BEGIN
+
+#include "../Container/Str.h"
+#include "../Math/StringHash.h"
+
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -43,6 +50,9 @@ class RefCounted;
 // function that is called when ref count goes to 1 or 2+, used for script object lifetime
 typedef void (*RefCountChangedFunction)(RefCounted*, int refCount);
 
+// function callback for when a RefCounted is created
+typedef void(*RefCountedCreatedFunction)(RefCounted*);
+
 // function callback for when a RefCounted is deleted
 typedef void(*RefCountedDeletedFunction)(RefCounted*);
 
@@ -52,7 +62,9 @@ typedef const void* ClassID;
 #define ATOMIC_REFCOUNTED(typeName) \
     public: \
         virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
-        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
+        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; } \
+        virtual const String& GetTypeName() const { return GetTypeNameStatic(); } \
+        static const String& GetTypeNameStatic() { static const String _typeName(#typeName); return _typeName; }
 
 // ATOMIC END
 
@@ -105,6 +117,8 @@ public:
 
     virtual bool IsObject() const { return false; }
 
+    virtual const String& GetTypeName() const = 0;
+
     /// Increment reference count. Do not call any lifetime book keeping
     void AddRefSilent();
 
@@ -120,6 +134,9 @@ public:
 
     static void AddRefCountChangedFunction(RefCountChangedFunction function);
     static void RemoveRefCountChangedFunction(RefCountChangedFunction function);
+
+    static void AddRefCountedCreatedFunction(RefCountedCreatedFunction function);
+    static void RemoveRefCountedCreatedFunction(RefCountedCreatedFunction function);
 
     static void AddRefCountedDeletedFunction(RefCountedDeletedFunction function);
     static void RemoveRefCountedDeletedFunction(RefCountedDeletedFunction function);
@@ -141,6 +158,7 @@ private:
     void* jsHeapPtr_;
 
     static PODVector<RefCountChangedFunction> refCountChangedFunctions_;
+    static PODVector<RefCountedCreatedFunction> refCountedCreatedFunctions_;
     static PODVector<RefCountedDeletedFunction> refCountedDeletedFunctions_;
 
     // ATOMIC END

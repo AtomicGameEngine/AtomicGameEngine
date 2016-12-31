@@ -69,6 +69,11 @@ namespace Atomic
 
     }
 
+    void AppBase::AddArgument(const String& argument)
+    {
+        arguments_.Push(argument);
+    }
+
     void AppBase::ProcessArguments()
     {
         for (unsigned i = 0; i < arguments_.Size(); ++i)

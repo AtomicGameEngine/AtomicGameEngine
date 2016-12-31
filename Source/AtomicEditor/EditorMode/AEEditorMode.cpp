@@ -69,6 +69,7 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
 
     startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
+    startupData["debugHudProfilerMode"] = (unsigned) (debugHud ? debugHud->GetProfilerMode() : DEBUG_HUD_PROFILE_PERFORMANCE);
 
     SendEvent(E_EDITORPLAYREQUEST);
 
@@ -260,6 +261,18 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
 
     if (debug)
         vargs.Insert(0, "--debug");
+
+    // If the debug hud up is up with metrics info, pass the --autometrics to player
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (debugHud)
+    {
+        if (debugHud->GetMode() & Atomic::SystemUI::DEBUGHUD_SHOW_PROFILER)
+        {
+            if (debugHud->GetProfilerMode() == DEBUG_HUD_PROFILE_METRICS)
+                vargs.Insert(0, "--autometrics");
+        }
+    }
 
     if (addArgs.Length() > 0)
         vargs.Insert(0, addArgs.Split(' '));

@@ -25,6 +25,8 @@
 #include "../../Core/Object.h"
 #include "../../Core/Timer.h"
 
+#include "../UIEnums.h"
+
 namespace Atomic
 {
 
@@ -67,6 +69,8 @@ public:
     void SetProfilerMaxDepth(unsigned depth);
     /// Set profiler accumulation interval in seconds.
     void SetProfilerInterval(float interval);
+    /// Set the profiler mode to either performance or metrics
+    void SetProfilerMode(DebugHudProfileMode mode);
     /// Set whether to show 3D geometry primitive/batch count only. Default false.
     void SetUseRendererStats(bool enable);
     /// Toggle elements.
@@ -88,6 +92,9 @@ public:
 
     /// Return currently shown elements.
     unsigned GetMode() const { return mode_; }
+
+    /// Return the profiler mode (performance, metrics, etc)
+    DebugHudProfileMode GetProfilerMode() const { return profilerMode_; }
 
     /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
@@ -128,6 +135,8 @@ private:
     Timer profilerTimer_;
     /// Profiler max block depth.
     unsigned profilerMaxDepth_;
+    /// Profiler mode 
+    DebugHudProfileMode profilerMode_;
     /// Profiler accumulation interval.
     unsigned profilerInterval_;
     /// Show 3D geometry primitive/batch count flag.

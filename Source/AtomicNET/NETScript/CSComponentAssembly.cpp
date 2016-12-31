@@ -137,7 +137,7 @@ namespace Atomic
 
                     while (itr != factories.End())
                     {
-                        if (itr->second_->GetTypeName() == typeName)
+                        if (itr->second_->GetFactoryTypeName() == typeName)
                         {
                             varType = VAR_RESOURCEREF;
                             break;

@@ -92,6 +92,7 @@ namespace AtomicEngine
 
             AtomicAppModule.Initialize();
             ScriptModule.Initialize();
+            MetricsModule.Initialize();
 
             AtomicNETScriptModule.Initialize();
             AtomicNETNativeModule.Initialize();

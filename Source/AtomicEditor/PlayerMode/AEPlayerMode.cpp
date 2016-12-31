@@ -96,7 +96,10 @@ void PlayerMode::HandleIPCInitialize(StringHash eventType, VariantMap& eventData
 
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
     if (debugHud)
+    {
         debugHud->SetMode(eventData["debugHudMode"].GetUInt());
+        debugHud->SetProfilerMode((DebugHudProfileMode) eventData["debugHudProfilerMode"].GetUInt());
+    }
 
 }
 

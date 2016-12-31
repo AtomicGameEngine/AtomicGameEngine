@@ -24,6 +24,12 @@ namespace AtomicPlayer
                     loadedScenes.Remove(e.Scene);
             });
 
+            SubscribeToEvent<PlayerSceneUnloadEvent>(e =>
+            {
+                if (loadedScenes.Contains(e.Scene))
+                    loadedScenes.Remove(e.Scene);
+            });
+
         }
 
 

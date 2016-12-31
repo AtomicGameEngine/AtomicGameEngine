@@ -54,6 +54,12 @@ public:
     /// Show an error message (last log message if empty), terminate the main loop, and set failure exit code.
     void ErrorExit(const String& message = String::EMPTY);
 
+    // ATOMIC BEGIN
+
+    static void SetAutoMetrics(bool value) { autoMetrics_ = value;  }
+
+    // ATOMIC END
+
 protected:
     /// Handle log message.
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
@@ -66,6 +72,12 @@ protected:
     String startupErrors_;
     /// Application exit code.
     int exitCode_;
+
+    // ATOMIC BEGIN
+
+    static bool autoMetrics_;
+
+    // ATOMIC END
 };
 
 // Macro for defining a main function which creates a Context and the application, then runs it
