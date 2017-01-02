@@ -370,7 +370,8 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
       // Generate a tsconfig.json file
       const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FileMode.FILE_WRITE);
       let tsconfig = {
-        compilerOptions: defaultCompilerOptions
+        compilerOptions: defaultCompilerOptions,
+        include: [ "Resources", "typings" ]
       };
 
       // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig
