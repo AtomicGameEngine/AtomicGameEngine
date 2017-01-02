@@ -30,6 +30,7 @@
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/Audio/Audio.h>
 #include <Atomic/UI/UI.h>
+#include <Atomic/Metrics/Metrics.h>
 
 #ifdef ATOMIC_NETWORK
 #include <Atomic/Network/Network.h>
@@ -396,6 +397,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     js_push_class_object_instance(ctx, vm->GetSubsystem<Input>(), "Input");
     duk_put_prop_string(ctx, -2, "input");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Metrics>(), "Metrics");
+    duk_put_prop_string(ctx, -2, "metrics");
 
     duk_push_c_function(ctx, js_atomic_GetFileSystem, 0);
     duk_put_prop_string(ctx, -2, "getFileSystem");

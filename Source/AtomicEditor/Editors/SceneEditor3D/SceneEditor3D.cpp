@@ -121,9 +121,6 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
 
-    // FIXME: This sets the debug hud to render over the scene editor, when a scene is open, which is generally more legible. This should be generalized
-    GetSubsystem<UI>()->SetDebugHudExtents(false, container_->GetContentRoot()->ConvertToRoot(IntVector2(rect.left_, rect.top_)), IntVector2(rect.Width(), rect.Height()));
-
     SubscribeToEvent(E_PROJECTUSERPREFSAVED, ATOMIC_HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
     SubscribeToEvent(scene_, E_SCENEEDITNODECREATED, ATOMIC_HANDLER(SceneEditor3D, HandleSceneEditNodeCreated));

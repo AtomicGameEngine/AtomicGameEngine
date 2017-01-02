@@ -977,6 +977,10 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LogName"] = value;
                 ++i;
             }
+            else if (argument == "-autometrics") // --autometrics
+            {
+                ret["AutoMetrics"] = true;
+            }
             // ATOMIC END
 #ifdef ATOMIC_TESTING
             else if (argument == "timeout" && !value.Empty())

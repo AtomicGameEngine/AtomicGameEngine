@@ -193,7 +193,7 @@ void Text::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& verte
             break;
 
         case TE_SHADOW:
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 2, 2, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
 

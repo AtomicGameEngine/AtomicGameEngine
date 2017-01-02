@@ -39,4 +39,9 @@ namespace AtomicPlayer
         ATOMIC_PARAM(P_SUCCESS, Success);   // bool
     }
 
+    ATOMIC_EVENT(E_PLAYERSCENEUNLOAD, PlayerSceneUnload)
+    {
+        ATOMIC_PARAM(P_SCENE, Scene);       // Scene
+    }
+
 }

@@ -35,8 +35,16 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "../Metrics/Metrics.h"
+// ATOMIC END
+
 namespace Atomic
 {
+
+// ATOMIC BEGIN
+bool Application::autoMetrics_ = false;
+// ATOMIC END
 
 #if defined(IOS) || defined(__EMSCRIPTEN__)
 // Code for supporting SDL_iPhoneSetAnimationCallback() and emscripten_set_main_loop_arg()
@@ -54,6 +62,20 @@ Application::Application(Context* context) :
     exitCode_(EXIT_SUCCESS)
 {
     engineParameters_ = Engine::ParseParameters(GetArguments());
+
+    // ATOMIC BEGIN
+
+    // register metrics subsystem
+    context->RegisterSubsystem(new Metrics(context));
+
+    if (autoMetrics_ || engineParameters_["AutoMetrics"].GetBool())
+    {
+        // ensure autoMetrics reflects state
+        autoMetrics_ = true;
+        context->GetSubsystem<Metrics>()->Enable();
+    }
+
+    // ATOMIC END
 
     // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
     engine_ = new Engine(context);

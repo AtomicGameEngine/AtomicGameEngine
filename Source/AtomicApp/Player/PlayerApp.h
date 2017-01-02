@@ -51,6 +51,8 @@ namespace Atomic
 
     private:
 
+        bool playerMetrics_;
+
     };
 
 }

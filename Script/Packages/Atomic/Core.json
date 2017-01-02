@@ -9,6 +9,9 @@
 		"Object" : {
 			"SendEvent" : ["StringHash"]
 		},
+		"Context" : {
+			"GetTypeName" : ["StringHash"]
+		},
 		"CSharp" : {
 			"Object" : {
 				"UnsubscribeFromAllEvents" : []

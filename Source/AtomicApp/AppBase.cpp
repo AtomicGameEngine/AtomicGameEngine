@@ -69,6 +69,16 @@ namespace Atomic
 
     }
 
+    void AppBase::AddArgument(const String& argument)
+    {
+        if (argument == "--autometrics")
+        {
+            Application::autoMetrics_ = true;
+        }
+
+        arguments_.Push(argument);
+    }
+
     void AppBase::ProcessArguments()
     {
         for (unsigned i = 0; i < arguments_.Size(); ++i)

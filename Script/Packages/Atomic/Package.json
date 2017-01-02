@@ -4,7 +4,7 @@
 	"namespace" : "Atomic",
 	"modules" : ["Container", "Math", "Core", "Scene", "Graphics", "Atomic2D", "Audio",
 		"Physics", "Navigation", "Input", "UI", "Resource", "Network", "IO",
-		"Engine", "Script", "Javascript", "Environment", "Web", "IPC"],
+		"Engine", "Script", "Javascript", "Environment", "Web", "IPC", "Metrics"],
 		"moduleExclude" : {
 			"WEB" : ["Network", "Navigation", "IPC"],
 			"ANDROID" : ["IPC"],

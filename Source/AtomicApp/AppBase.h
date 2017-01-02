@@ -50,7 +50,8 @@ namespace Atomic
 
         virtual void Shutdown() { Stop(); }
 
-        static void AddArgument(const String& argument) { arguments_.Push(argument); }
+        /// Called before initializing application for inserting arguments
+        static void AddArgument(const String& argument);
 
         virtual void ProcessArguments();
 

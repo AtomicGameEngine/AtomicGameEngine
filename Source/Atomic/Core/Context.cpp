@@ -224,9 +224,13 @@ Object* Context::GetEventSender() const
 
 const String& Context::GetTypeName(StringHash objectType) const
 {
+    // ATOMIC BEGIN
+
     // Search factories to find the hash-to-name mapping
     HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
-    return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
+    return i != factories_.End() ? i->second_->GetFactoryTypeName() : String::EMPTY;
+    
+    // ATOMIC END
 }
 
 AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)

@@ -271,6 +271,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
             if (refid == "tools toggle profiler") {
                 Atomic.ui.toggleDebugHud();
                 return true;
+            } if (refid == "tools perf profiler") {                
+                Atomic.ui.debugHudProfileMode = Atomic.DebugHudProfileMode.DEBUG_HUD_PROFILE_PERFORMANCE;
+                Atomic.ui.showDebugHud(true);
+                return true;
+            } else if (refid == "tools metrics profiler") {                
+                Atomic.ui.debugHudProfileMode = Atomic.DebugHudProfileMode.DEBUG_HUD_PROFILE_METRICS;
+                Atomic.ui.showDebugHud(true);
+                return true;
             } else if (refid.indexOf("tools log") != -1) {
 
                 let logName = refid.indexOf("editor") != -1 ? "AtomicEditor" : "AtomicPlayer";
@@ -364,8 +372,11 @@ var editItems = {
 };
 
 var toolsItems = {
-
-    "Toggle Profiler": ["tools toggle profiler"],
+    "Profiler": {
+        "Toggle HUD": ["tools toggle profiler"],
+        "Profile Performance": ["tools perf profiler"],
+        "Profile Metrics": ["tools metrics profiler"]
+    },
     "Logs": {
         "Player Log": ["tools log player"],
         "Editor Log": ["tools log editor"]

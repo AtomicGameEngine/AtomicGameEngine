@@ -13,6 +13,7 @@ file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 file (GLOB WEB_SOURCE Web/*.cpp Web/*.h)
 file (GLOB SCRIPT_SOURCE Script/*.cpp Script/*.h)
+file (GLOB METRICS_SOURCE Metrics/*.cpp Metrics/*.h)
 
 if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
   file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
@@ -60,7 +61,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
                   ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
-                  ${WEB_SOURCE} ${SCRIPT_SOURCE}
+                  ${WEB_SOURCE} ${SCRIPT_SOURCE} ${METRICS_SOURCE}
                   ${PLATFORM_SOURCE})
 
 if (NOT EMSCRIPTEN)
@@ -87,6 +88,7 @@ GroupSources("Scene")
 GroupSources("UI")
 GroupSources("Web")
 GroupSources("Script")
+GroupSources("Metrics")
 GroupSources("BuildInfo")
 
 # Handle Git Revision

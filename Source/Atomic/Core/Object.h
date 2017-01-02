@@ -242,8 +242,14 @@ public:
     /// Return type hash of objects created by this factory.
     StringHash GetType() const { return typeInfo_->GetType(); }
 
+    // ATOMIC BEGIN
+
+    // RefCounted in Atomic carry typename with GetTypeName, so renamed to GetFactoryType
+
     /// Return type name of objects created by this factory.
-    const String& GetTypeName() const { return typeInfo_->GetTypeName(); }
+    const String& GetFactoryTypeName() const { return typeInfo_->GetTypeName(); }
+
+    // ATOMIC END
 
 protected:
     /// Execution context.

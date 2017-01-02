@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/Engine/Application.h>
 
 #include <Atomic/IPC/IPC.h>
 #include <Atomic/IPC/IPCEvents.h>
@@ -69,6 +70,7 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
 
     startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
+    startupData["debugHudProfilerMode"] = (unsigned) (debugHud ? debugHud->GetProfilerMode() : DEBUG_HUD_PROFILE_PERFORMANCE);
 
     SendEvent(E_EDITORPLAYREQUEST);
 
@@ -260,6 +262,24 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
 
     if (debug)
         vargs.Insert(0, "--debug");
+
+    // forward autometrics to player
+    if (Application::GetAutoMetrics())
+    {
+        vargs.Insert(0, "--autometrics");
+    }
+    else
+    {
+        // enabled metrics at app start
+
+        SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
+        if ( debugHud && ( debugHud->GetMode() & Atomic::SystemUI::DEBUGHUD_SHOW_PROFILER) && (debugHud->GetProfilerMode() == DEBUG_HUD_PROFILE_METRICS))
+        {
+            vargs.Insert(0, "--playermetrics");
+        }
+
+    }
 
     if (addArgs.Length() > 0)
         vargs.Insert(0, addArgs.Split(' '));

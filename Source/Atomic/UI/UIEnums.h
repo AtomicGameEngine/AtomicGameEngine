@@ -22,55 +22,12 @@
 
 #pragma once
 
-#include <Atomic/Core/Object.h>
-#include <Atomic/Graphics/Viewport.h>
-#include <Atomic/Scene/Scene.h>
-
-using namespace Atomic;
-
-namespace AtomicPlayer
+namespace Atomic
 {
-
-/// Player subsystem
-class Player : public Object
-{
-    ATOMIC_OBJECT(Player, Object);
-
-public:
-    /// Construct.
-    Player(Context* context);
-    /// Destruct.
-    virtual ~Player();
-
-    /// Load a scene file with optional camera specified
-    Scene* LoadScene(const String& filename, Camera* camera = NULL);
-
-    /// Get the number of currently loaded scenes
-    unsigned GetNumScenes() { return loadedScenes_.Size();  }
-
-    /// Get the scene loaded at specified index 
-    Scene* GetScene(unsigned index) { return loadedScenes_[index]; }
-
-    /// Set the current scene 
-    void SetCurrentScene(Scene* scene, Camera* camera = NULL);
-
-    /// Unload a scene
-    void UnloadScene(Scene* scene);
-
-    /// Unload all loaded scenes
-    void UnloadAllScenes();    
-
-private:
-
-    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
-
-    // Strong reference
-    SharedPtr<Scene> currentScene_;
-
-    Vector<SharedPtr<Scene>> loadedScenes_;
-
-    SharedPtr<Viewport> viewport_;
-
-};
+    enum DebugHudProfileMode
+    {
+        DEBUG_HUD_PROFILE_PERFORMANCE,
+        DEBUG_HUD_PROFILE_METRICS
+    };
 
 }
