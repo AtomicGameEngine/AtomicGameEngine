@@ -107,7 +107,7 @@ String MetricsSnapshot::PrintData(unsigned columns, unsigned minCount)
             column = 0;
         }
 
-        line += entry;
+        line += String(entry);
         column++;
         line += "     ";
 
