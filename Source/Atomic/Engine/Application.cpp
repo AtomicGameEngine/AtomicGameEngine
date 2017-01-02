@@ -70,6 +70,8 @@ Application::Application(Context* context) :
 
     if (autoMetrics_ || engineParameters_["AutoMetrics"].GetBool())
     {
+        // ensure autoMetrics reflects state
+        autoMetrics_ = true;
         context->GetSubsystem<Metrics>()->Enable();
     }
 

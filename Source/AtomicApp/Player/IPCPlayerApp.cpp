@@ -213,11 +213,18 @@ namespace Atomic
     {
         brokerActive_ = true;
 
+        // If the parent application has a profile mode up, sync 
         SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
         if (debugHud)
         {
-            debugHud->SetMode(eventData["debugHudMode"].GetUInt());
-            debugHud->SetProfilerMode((DebugHudProfileMode)eventData["debugHudProfilerMode"].GetUInt());
+            unsigned mode = eventData["debugHudMode"].GetUInt();
+
+            // Only set if we haven't set the mode in player code
+            if (mode && !debugHud->GetMode())
+            {
+                debugHud->SetMode(mode);
+                debugHud->SetProfilerMode((DebugHudProfileMode)eventData["debugHudProfilerMode"].GetUInt());
+            }
         }
 
     }

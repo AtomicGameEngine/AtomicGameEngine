@@ -56,6 +56,7 @@ public:
 
     // ATOMIC BEGIN
 
+    static bool GetAutoMetrics() { return autoMetrics_;  }
     static void SetAutoMetrics(bool value) { autoMetrics_ = value;  }
 
     // ATOMIC END
