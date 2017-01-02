@@ -268,6 +268,19 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
     {
         vargs.Insert(0, "--autometrics");
     }
+    else
+    {
+        // enabled metrics at app start
+
+        SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
+        if ( debugHud && ( debugHud->GetMode() & Atomic::SystemUI::DEBUGHUD_SHOW_PROFILER) && (debugHud->GetProfilerMode() == DEBUG_HUD_PROFILE_METRICS))
+        {
+            vargs.Insert(0, "--playermetrics");
+        }
+
+    }
+
     if (addArgs.Length() > 0)
         vargs.Insert(0, addArgs.Split(' '));
 

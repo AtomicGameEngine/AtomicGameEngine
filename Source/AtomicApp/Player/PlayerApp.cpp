@@ -26,6 +26,8 @@
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Resource/ResourceMapRouter.h>
 #include <Atomic/UI/UI.h>
+#include <Atomic/Metrics/Metrics.h>
+
 #include <AtomicJS/Javascript/Javascript.h>
 
 #include <AtomicPlayer/Player.h>
@@ -42,7 +44,8 @@ namespace Atomic
 
     PlayerApp::PlayerApp(Context* context) :
         AppBase(context),
-        executeJSMain_(true)
+        executeJSMain_(true),
+        playerMetrics_(false)
     {
 
     }
@@ -113,6 +116,17 @@ namespace Atomic
 
         AppBase::Start();
 
+        if (playerMetrics_)
+        {
+            Metrics* metrics = GetSubsystem<Metrics>();
+
+            if (metrics && !metrics->GetEnabled())
+            {
+                metrics->Enable();
+            }
+
+        }
+
         if (executeJSMain_)
         {
 
@@ -171,6 +185,10 @@ namespace Atomic
                 else if (argument == "--maximize")
                 {
                     engineParameters_["WindowMaximized"] = true;
+                }
+                else if (argument == "--playermetrics")
+                {
+                    playerMetrics_ = true;
                 }
             }
         }
