@@ -8,7 +8,8 @@
 	"excludes" : {
 		"Scene" : {
 			"GetComponent" : ["unsigned"],
-			"MarkReplicationDirty" : ["Node"]
+			"MarkReplicationDirty" : ["Node"],
+			"GetRequiredPackageFiles" : []
 		}
 	},
 	"overloads" : {

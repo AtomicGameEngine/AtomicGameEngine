@@ -1,11 +1,16 @@
 {
 	"name" : "Resource",
 	"sources" : ["Source/Atomic/Resource"],
+	"includes" : ["<Atomic/IO/PackageFile.h>"],
 	"classes" : ["Resource", "ResourceCache", "XMLFile", "PListFile", "JSONFile", "Image", "ResourceNameIterator"],
 	"overloads": {
 		"Image": {
 			"GetPixel": ["int", "int"],
 			"SetSize": ["int", "int", "int", "unsigned"]
+		},
+		"ResourceCache": {
+			"AddPackageFile": ["String", "unsigned"],
+			"RemovePackageFile": ["String", "bool", "bool"]
 		}
 	},
 	"typescript_decl" : {
