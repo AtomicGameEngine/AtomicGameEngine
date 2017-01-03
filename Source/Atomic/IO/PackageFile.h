@@ -87,10 +87,10 @@ public:
 
     // ATOMIC BEGIN
 
-    /// Return a file name in the package, for scripting use ( GetEntryNames is not bindable? )
+    /// Return a file name in the package at the specified index
     const String& GetEntryName(unsigned index) const 
     {
-        unsigned nn = 0;  // .Begin() + index syntax not supported on HashMap
+        unsigned nn = 0;
         for (HashMap<String, PackageEntry>::ConstIterator j = entries_.Begin(); j != entries_.End(); ++j)
         {
             if (nn == index) return j->first_;
