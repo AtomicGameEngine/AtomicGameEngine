@@ -86,7 +86,20 @@ public:
     const Vector<String> GetEntryNames() const { return entries_.Keys(); }
 
     // ATOMIC BEGIN
-    
+
+    /// Return a file name in the package, for scripting use ( GetEntryNames is not bindable? )
+    const String& GetEntryName(unsigned index) const 
+    {
+        unsigned nn = 0;  // .Begin() + index syntax not supported on HashMap
+        for (HashMap<String, PackageEntry>::ConstIterator j = entries_.Begin(); j != entries_.End(); ++j)
+        {
+            if (nn == index) return j->first_;
+            nn++;
+        }
+        return String::EMPTY; 
+    }
+
+
     /// Scan package for specified files.
     void Scan(Vector<String>& result, const String& pathName, const String& filter, bool recursive) const;
     
