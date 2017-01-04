@@ -37,24 +37,46 @@ namespace('package', function() {
 
         var pfxFile = process.env.ATOMIC_PFX_FILE;
         var pfxPW = process.env.ATOMIC_PFX_PW;
+        var certSubjectName = process.env.ATOMIC_CERT_SUBJECTNAME;
+        var codesign = false;
 
-        var signBaseCmd = "signtool.exe sign /f " + pfxFile;
-        signBaseCmd += " /p " + pfxPW;
-        signBaseCmd += " /t http://timestamp.verisign.com/scripts/timestamp.dll";
-        signBaseCmd += " /v ";
+        if (certSubjectName || (pfxFile && pfxPW)) {
+          codesign = true;
+        }
+
+        var signBaseCmd = "signtool.exe sign";
+
+        if (certSubjectName.indexOf(" ") != -1) {
+          var original = certSubjectName;
+          certSubjectName = certSubjectName.split(" ")[0];
+          console.log("CodeSign: ATOMIC_CERT_SUBJECTNAME: \"" + original + "\" contains a space, changed to " +
+                       certSubjectName + " to avoid jake.exec quote issue on Windows");
+        }
+
+        if (certSubjectName) {
+          signBaseCmd += " /tr http://timestamp.digicert.com /td sha256 /fd sha256";
+          signBaseCmd += " /n " + certSubjectName + " ";
+        } else {
+
+          signBaseCmd += " /f " + pfxFile;
+          signBaseCmd += " /p " + pfxPW;
+          signBaseCmd += " /t http://timestamp.verisign.com/scripts/timestamp.dll";
+          signBaseCmd += " /v ";
+
+        }
 
         var signEditorCmd = signBaseCmd + config.artifactsRoot + "AtomicEditor/AtomicEditor.exe";
         var signInstallerCmd = signBaseCmd + installerPath;
 
         var cmds = [];
 
-        if (pfxFile && pfxPW) {
+        if (codesign) {
             cmds.push(signEditorCmd);
         }
 
         cmds.push(makeNSISCmd);
 
-        if (pfxFile && pfxPW) {
+        if (codesign) {
             cmds.push(signInstallerCmd);
         }
 
