@@ -23,7 +23,7 @@
 import * as HostExtensionServices from "./HostExtensionServices";
 import * as EditorUI from "../ui/EditorUI";
 import ProjectBasedExtensionLoader from "./coreExtensions/ProjectBasedExtensionLoader";
-import TypescriptLanguageExtension from "./languageExtensions/TypscriptLanguageExtension";
+import TypescriptLanguageExtension from "./languageExtensions/TypescriptLanguageExtension";
 import CSharpLanguageExtension from "./languageExtensions/CSharpLanguageExtension";
 
 /**

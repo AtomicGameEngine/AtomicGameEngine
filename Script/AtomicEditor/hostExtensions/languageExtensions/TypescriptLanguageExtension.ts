@@ -47,7 +47,7 @@ const defaultCompilerOptions = {
  */
 export default class TypescriptLanguageExtension implements Editor.HostExtensions.ResourceServicesEventListener, Editor.HostExtensions.ProjectServicesEventListener {
     name: string = "HostTypeScriptLanguageExtension";
-    description: string = "This service supports the typscript webview extension.";
+    description: string = "This service supports the typescript webview extension.";
 
     /**
      * Indicates if this project contains typescript files.
@@ -285,7 +285,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     /*** ProjectService implementation ****/
 
     /**
-     * Called when the project is being loaded to allow the typscript language service to reset and
+     * Called when the project is being loaded to allow the typescript language service to reset and
      * possibly compile
      */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
@@ -370,8 +370,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
       // Generate a tsconfig.json file
       const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FileMode.FILE_WRITE);
       let tsconfig = {
-        compilerOptions: defaultCompilerOptions,
-        include: [ "Resources", "typings" ]
+        compilerOptions: defaultCompilerOptions
       };
 
       // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig

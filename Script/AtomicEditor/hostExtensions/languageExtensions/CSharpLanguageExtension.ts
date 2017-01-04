@@ -141,7 +141,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
     /*** ProjectService implementation ****/
 
     /**
-    * Called when the project is being loaded to allow the typscript language service to reset and
+    * Called when the project is being loaded to allow the typescript language service to reset and
     * possibly compile
     */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
