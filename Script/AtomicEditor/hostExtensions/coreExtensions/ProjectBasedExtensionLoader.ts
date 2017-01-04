@@ -94,7 +94,7 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
         })(Duktape.modSearch);
     }
     /**
-     * Called when the project is being loaded to allow the typscript language service to reset and
+     * Called when the project is being loaded to allow the typescript language service to reset and
      * possibly compile
      */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {

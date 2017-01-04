@@ -31,7 +31,7 @@
         "./AtomicEditor/hostExtensions/coreExtensions/ProjectBasedExtensionLoader.ts",
         "./AtomicEditor/hostExtensions/HostExtensionServices.ts",
         "./AtomicEditor/hostExtensions/languageExtensions/CSharpLanguageExtension.ts",
-        "./AtomicEditor/hostExtensions/languageExtensions/TypscriptLanguageExtension.ts",
+        "./AtomicEditor/hostExtensions/languageExtensions/TypescriptLanguageExtension.ts",
         "./AtomicEditor/hostExtensions/ServiceLocator.ts",
         "./AtomicEditor/main.ts",
         "./AtomicEditor/resources/ProjectTemplates.ts",
