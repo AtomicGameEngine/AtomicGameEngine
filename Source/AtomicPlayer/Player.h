@@ -48,7 +48,10 @@ public:
     /// Get the number of currently loaded scenes
     unsigned GetNumScenes() { return loadedScenes_.Size();  }
 
-    /// Get the scene loaded at specified index 
+    /// Get the current scene
+    Scene* GetCurrentScene() { return currentScene_; }
+
+    /// Get the scene loaded at specified index
     Scene* GetScene(unsigned index) { return loadedScenes_[index]; }
 
     /// Set the current scene 
