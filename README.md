@@ -34,28 +34,21 @@ If you need excellent, high performance technology which leverages the full migh
 
 **[Download the Atomic Editor](http://atomicgameengine.com/#download-the-atomic-editor)**
 
-#### Documentation
+#### Atomic Resources
 
-<a href="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/">![](http://atomicgameengine.com/images/community/Community_GitHub.png)
-</a>
+##### Community
 
-#### Atomic API References
+<a href="https://discourse.atomicgameengine.com/">![](http://atomicgameengine.com/images/community/CommunitySupportPortal.png)</a>
+<a href="https://gitter.im/AtomicGameEngine/AtomicGameEngine/">![](http://atomicgameengine.com/images/community/Community_Chat.png)</a>
+<a href="http://atomicgameengine.com/blog/">![](http://atomicgameengine.com/images/community/Community_Blog.png)</a>
 
-<a href="http://docs.atomicgameengine.com/api/modules/atomic.html" target="_blank">
-![](http://atomicgameengine.com/images/community/Documentation_JSTS.png)</a>
-<a href="http://docs.atomicgameengine.com/csharp/AtomicEngine/" target="_blank">
-![](http://atomicgameengine.com/images/community/Documentation_CSharp.png)</a>
-<a href="http://docs.atomicgameengine.com/cpp" target="_blank">
-![](http://atomicgameengine.com/images/community/Documentation_CPlusPlus.png)</a>
+##### Documentation
 
-#### Atomic Community
+<a href="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/">![](http://atomicgameengine.com/images/community/Community_GitHub.png)</a>  
 
-<a href="https://qa.atomicgameengine.com/" target="_blank">![](http://atomicgameengine.com/images/community/Community_QA.png)
-</a> <a href="https://www.facebook.com/groups/AtomicGameEngine/" target="_blank">
-![](http://atomicgameengine.com/images/community/Community_FB.png)
-</a> <a href="https://gitter.im/AtomicGameEngine/AtomicGameEngine" target="_blank">
-![](http://atomicgameengine.com/images/community/Community_Chat.png)
-</a>
+<a href="http://docs.atomicgameengine.com/api/modules/atomic.html">![](http://atomicgameengine.com/images/community/Documentation_JSTS.png)</a>
+<a href="http://docs.atomicgameengine.com/csharp/AtomicEngine/">![](http://atomicgameengine.com/images/community/Documentation_CPlusPlus.png)</a>
+<a href="http://docs.atomicgameengine.com/cpp">![](http://atomicgameengine.com/images/community/Documentation_CPlusPlus.png)</a>
 
 #### Videos
 
