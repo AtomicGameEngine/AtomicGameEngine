@@ -78,6 +78,8 @@ private:
     bool GetChangingCameraSpeed();
     void ToggleGrid();
 
+    void TogglePlayCamera();
+
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
     void UpdateDragNode(int mouseX, int mouseY);
@@ -116,6 +118,9 @@ private:
     bool enabled_;
     bool gridEnabled_;
 
+    //Checks if we are in play camera mode
+    bool isOnPlayCamera_;
+    bool lookCamera_;
     // Checks whether your switching from an orthographic view
     bool fromOrthographic_;
 
@@ -126,6 +131,8 @@ private:
     Vector3 cameraMoveTarget_;
 
     SharedPtr<Camera> camera_;
+    SharedPtr<Node> activeCameraNode_;
+    SharedPtr<Node> defaultCameraNode_;
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
 
