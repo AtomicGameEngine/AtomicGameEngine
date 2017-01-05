@@ -51,6 +51,7 @@ function processOptions(config) {
 
     config.pfxFile = process.env.ATOMIC_PFX_FILE ? process.env.ATOMIC_PFX_FILE : "";
     config.pfxPW = process.env.ATOMIC_PFX_PW ? process.env.ATOMIC_PFX_PW : "";
+    config.certSubjectName = process.env.ATOMIC_CERT_SUBJECTNAME ? process.env.ATOMIC_CERT_SUBJECTNAME : "";
 
     return config;
 }
