@@ -86,4 +86,4 @@ THUNDERBEAST GAMES began developing the Atomic Game Engine on November 12th, 201
 
 #### Atomic Development Fund
 
-Atomic Backers:  Please see [BACKERS.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/BACKERS.md) for a list of contributors to the [Atomic Development Fund](http://atomicgameengine.com/#sponsors--development-fund/)
+Atomic Backers:  Please see [BACKERS.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/BACKERS.md) for a list of contributors to the [Atomic Development Fund](http://atomicgameengine.com/#sponsors--development-fund)
