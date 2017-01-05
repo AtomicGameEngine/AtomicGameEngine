@@ -182,6 +182,11 @@ bool SceneView3D::GetChangingCameraSpeed()
     return MouseInView() && input->GetMouseMoveWheel() && input->GetMouseButtonDown(MOUSEB_RIGHT);
 }
 
+float SceneView3D::GetMovingCameraSensitivity()
+{
+    return (sceneEditor_->GetGizmo()->GetGizmoNode()->GetPosition() - cameraNode_->GetPosition()).Length() * ( cameraMoveSpeed_ / 100.0f);
+}
+
 void SceneView3D::CheckCameraSpeedBounds()
 {
     const float MAX_CAMERA_SPEED = 80.0f;
@@ -320,6 +325,36 @@ void SceneView3D::MoveCamera(float timeStep)
         {
             SetFocus();
             cameraNode_->Translate(Vector3::DOWN * cameraMoveSpeed_ * timeStep);
+        }
+    }
+
+    //Move the camera up, downd, left and right with the middle mouse button
+    if (!orbitting && mouseInView && input->GetMouseButtonDown(MOUSEB_MIDDLE)) {
+        // Determinate the mouse direcction
+        // Use the Translate() function (default local space) to move relative to the node's orientation.
+        IntVector2 mouseMove = input->GetMouseMove();
+        float Sensitivity = GetMovingCameraSensitivity();
+        //up and down
+        if (mouseMove.y_ >= 1) {
+            SetFocus();
+            cameraNode_->Translate(Vector3::UP * Sensitivity * mouseMove.y_ * timeStep);
+        }
+        else if (mouseMove.y_ <= -1) {
+            SetFocus();
+            //* -1 to flip mouseMove.y_ to positive
+            cameraNode_->Translate(Vector3::DOWN * Sensitivity * mouseMove.y_ *-1 * timeStep);
+        }
+
+        //left and right
+        if (mouseMove.x_ >= 1) {
+            SetFocus();
+            cameraNode_->Translate(Vector3::LEFT * Sensitivity * mouseMove.x_ * timeStep);
+        }
+        else if (mouseMove.x_ <= -1)
+        {
+            SetFocus();
+            //* -1 to flip mouseMove.x_ to positive
+            cameraNode_->Translate(Vector3::RIGHT * Sensitivity * mouseMove.x_ *-1 * timeStep);
         }
     }
 
