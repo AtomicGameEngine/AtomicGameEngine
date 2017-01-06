@@ -458,6 +458,11 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
+        if (!prefs.editorFeatures.defaultPath) {
+            prefs.editorFeatures.defaultPath = this.editorFeatures.defaultPath;
+            updatedMissingDefaults = true;
+        }
+
         return updatedMissingDefaults;
     }
 
