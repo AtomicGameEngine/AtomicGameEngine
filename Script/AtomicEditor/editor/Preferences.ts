@@ -341,6 +341,7 @@ interface EditorBuildData {
 
 interface EditorFeatures {
     closePlayerLog: boolean;
+    defaultPath: string;
     defaultLanguage: string;
 }
 
@@ -396,8 +397,14 @@ class PreferencesFormat {
             lastEditorBuildSHA: "Unversioned Build"
         };
 
+        var fileSystem = Atomic.getFileSystem();
+        var userDocuments = fileSystem.userDocumentsDir;
+        if (Atomic.platform == "MacOSX") userDocuments += "Documents/";
+        userDocuments += "AtomicProjects";
+
         this.editorFeatures = {
             closePlayerLog: true,
+            defaultPath: userDocuments,
             defaultLanguage: "JavaScript"
         };
 
@@ -448,6 +455,11 @@ class PreferencesFormat {
 
         if (!prefs.editorFeatures) {
             prefs.editorFeatures = this.editorFeatures;
+            updatedMissingDefaults = true;
+        }
+
+        if (!prefs.editorFeatures.defaultPath) {
+            prefs.editorFeatures.defaultPath = this.editorFeatures.defaultPath;
             updatedMissingDefaults = true;
         }
 

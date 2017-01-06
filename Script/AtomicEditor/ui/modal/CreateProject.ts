@@ -35,7 +35,8 @@ class CreateProject extends ModalWindow {
 
         this.projectPath = projectPath;
         this.projectTemplate = projectTemplate;
-        this.defaultLang = Preferences.getInstance().editorFeatures.defaultLanguage;
+        this.defaultPath = Preferences.getInstance().editorFeatures.defaultPath;
+        this.defaultLanguage = Preferences.getInstance().editorFeatures.defaultLanguage;
 
         this.init("Create Project", "AtomicEditor/editor/ui/createproject.tb.txt");
 
@@ -56,27 +57,13 @@ class CreateProject extends ModalWindow {
         else
             this.image.image = projectTemplate.screenshot;
 
-        var fileSystem = Atomic.getFileSystem();
-
-        var userDocuments = fileSystem.userDocumentsDir;
-
-        if (Atomic.platform == "MacOSX") {
-
-            userDocuments += "Documents/AtomicProjects";
-
-        } else {
-
-            userDocuments += "AtomicProjects";
-
-        }
-
         // If we're specifying where to put the project (initially), then we are opening
         // an example directly so use the same name
         if (projectPath) {
             this.projectNameField.text = projectTemplate.name;
         }
 
-        this.projectPathField.text = projectPath ? projectPath : userDocuments;
+        this.projectPathField.text = (projectPath) ? projectPath : this.defaultPath;
         this.populateLanguageSelectionList();
 
         // Need to manually set the focus so the contents get auto-selected
@@ -385,9 +372,9 @@ class CreateProject extends ModalWindow {
             if ( this.projectLanguageFieldSource.getItemStr( ii ) == "TypeScript" ) tsrank = ii;
         }
 
-        if ( this.defaultLang == "JavaScript" ) defrank = jsrank; // which is the default language
-        if ( this.defaultLang == "CSharp" ) defrank = csrank;
-        if ( this.defaultLang == "TypeScript" ) defrank = tsrank;
+        if ( this.defaultLanguage == "JavaScript" ) defrank = jsrank; // which is the default language
+        if ( this.defaultLanguage == "CSharp" ) defrank = csrank;
+        if ( this.defaultLanguage == "TypeScript" ) defrank = tsrank;
 
         if ( defrank > -1 ) this.projectLanguageField.value = defrank;  // the default language is present
         else if ( jsrank > -1 ) this.projectLanguageField.value = jsrank;  // js is present
@@ -410,7 +397,8 @@ class CreateProject extends ModalWindow {
     // if we have specified a projectPath, the dest will not be the combination of path + name
     projectPath: string;
     projectTemplate: ProjectTemplates.ProjectTemplateDefinition;
-    defaultLang: string;
+    defaultPath: string;
+    defaultLanguage: string;
 }
 
 
