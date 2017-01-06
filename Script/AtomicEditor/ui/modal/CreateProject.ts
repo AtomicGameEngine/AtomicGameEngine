@@ -315,12 +315,18 @@ class CreateProject extends ModalWindow {
                 return true;
             }
             else if (id == "create") {
-
-                if ( this.tryProjectCreate() ) {
-                    if ( Preferences.getInstance().editorFeatures.defaultLanguage != this.projectLanguageField.text ) {
-                        Preferences.getInstance().editorFeatures.defaultLanguage = this.projectLanguageField.text;
-                        Preferences.getInstance().write();
+                if (this.tryProjectCreate()) {
+                    let needsWrite = false;
+                    let prefs = Preferences.getInstance();
+                    if (prefs.editorFeatures.defaultLanguage != this.projectLanguageField.text) {
+                        prefs.editorFeatures.defaultLanguage = this.projectLanguageField.text;
+                        needsWrite = true;
                     }
+                    if (prefs.editorFeatures.defaultPath != this.projectPathField.text) {
+                        prefs.editorFeatures.defaultPath = this.projectPathField.text;
+                        needsWrite = true;
+                    }
+                    if (needsWrite) prefs.write();
                     this.hide();
                 }
 
