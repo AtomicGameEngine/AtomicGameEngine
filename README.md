@@ -7,9 +7,7 @@ Email: info@atomicgameengine.com
 
 #### Why Atomic?
 
-The Atomic Game Engine is powerful 2D/3D technology developed by industry veterans.  It is available under the MIT license as an alternative to proprietary binaries, excessive fees, and royalties.
-
-Atomic is available to professionals and is being used in production environments.  It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.
+The Atomic Game Engine is powerful 2D/3D technology developed by industry veterans. Atomic is available to professionals and is being used in production environments. It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.
 
 If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="http://atomicgameengine.com/#download-the-atomic-editor">download the Atomic Editor</a> or fork us on GitHub!
 
