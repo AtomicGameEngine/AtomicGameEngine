@@ -61,7 +61,7 @@ Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and schedule
 ### How to Help
 <img align="right" src="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/atomic/wecandoit.jpg" style="margin-left:20px;"/>
 - Let others know about the Atomic Game Engine!
-- Answer questions and provide feedback in the [Atomic Community Support forums](https://discourse.atomicgameengine.com/c/atomic-community-support) and [Atomic Chat](https://gitter.im/AtomicGameEngine/AtomicGameEngine)
+- Answer questions and provide feedback in the [Atomic Community Support Forum](https://discourse.atomicgameengine.com/c/atomic-community-support) and [Atomic Chat](https://gitter.im/AtomicGameEngine/AtomicGameEngine)
 
 - Help maintain current and write new [Atomic Wiki](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki) documentation articles
 
