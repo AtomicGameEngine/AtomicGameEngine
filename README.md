@@ -52,6 +52,21 @@ If you need excellent, high performance technology which leverages the full migh
 <a href="http://docs.atomicgameengine.com/csharp/AtomicEngine/">![](http://atomicgameengine.com/images/community/Documentation_CSharp.png)</a>
 <a href="http://docs.atomicgameengine.com/cpp">![](http://atomicgameengine.com/images/community/Documentation_CPlusPlus.png)</a>
 
+### How to Help
+<img align="right" src="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/atomic/wecandoit.jpg" style="margin-left:20px;"/>
+- Let others know about the Atomic Game Engine!
+- Answer questions and provide feedback in the [Atomic Community Support forums](https://discourse.atomicgameengine.com/c/atomic-community-support) and [Atomic Chat](https://gitter.im/AtomicGameEngine/AtomicGameEngine)
+
+- Help maintain current and write new [Atomic Wiki](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki) documentation articles
+
+- Fork [AtomicGameEngine/AtomicExamples](https://github.com/AtomicGameEngine/AtomicExamples) and submit a pull request with current example improvements or a new example
+
+- Help with issues marked **```unassigned: help wanted```** in the [current build milestone](https://github.com/AtomicGameEngine/AtomicGameEngine/milestones)
+
+- Inform us of other ways to help that should be added here :)  
+
+
+
 #### Videos
 
 <a href="http://www.atomicgameengine.com" target="_blank">Atomic Game Engine 2016 Demo Reel</a>
