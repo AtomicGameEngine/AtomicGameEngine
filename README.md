@@ -30,7 +30,7 @@ If you need excellent, high performance technology which leverages the full migh
 - Available as precompiled binaries or fork on GitHub under the permissive MIT license
 - Backed by software professionals with decades of experience in the technology and game industries
 
-#### Downloads
+### Downloads
 
 **[Download the Atomic Editor](http://atomicgameengine.com/#download-the-atomic-editor)**
 
@@ -65,8 +65,6 @@ If you need excellent, high performance technology which leverages the full migh
 
 - Inform us of other ways to help that should be added here :)  
 
-
-
 #### Videos
 
 <a href="http://www.atomicgameengine.com" target="_blank">Atomic Game Engine 2016 Demo Reel</a>
@@ -89,18 +87,6 @@ If you need excellent, high performance technology which leverages the full migh
 [AndroidBuildSettings]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/AndroidBuildSettings.png
 ![alt text][AndroidBuildSettings]
 
-#### Looking for Examples?
-
-They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript, TypeScript, C#, C++ Examples</a>
-
-#### Building the Atomic Editor from Source
-
-Please see [Building the Atomic Editor from Source](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-Atomic---The-Quick-and-Easy-Way) for Visual Studio 2015, XCode, and QtCreator build instructions.
-
 #### Atomic History
 
-THUNDERBEAST GAMES began developing the Atomic Game Engine on November 12th, 2014 by forking Urho3D.  It was released under the permissive MIT license during GDC 2016.  Atomic is now being used in production environments, <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/graphs/contributors" target="_blank">has 26 contributors</a>, and we’re just getting started!
-
-#### Atomic Development Fund
-
-Atomic Backers:  Please see [BACKERS.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/BACKERS.md) for a list of contributors to the [Atomic Development Fund](http://atomicgameengine.com/#sponsors--development-fund)
+THUNDERBEAST GAMES began developing the Atomic Game Engine on November 12th, 2014 by forking Urho3D.  It was released under the permissive MIT license during GDC 2016.  Atomic is now being used in production environments, <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/graphs/contributors" target="_blank">has 27 contributors</a>, and runs on Windows, macOS, Android, iOS, Linux, and WebGL!
