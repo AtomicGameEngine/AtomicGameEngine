@@ -30,6 +30,8 @@ If you need excellent, high performance technology which leverages the full migh
 - Available as precompiled binaries or fork on GitHub under the permissive MIT license
 - Backed by software professionals with decades of experience in the technology and game industries
 
+---
+
 ### Downloads
 
 **[Download the Atomic Editor](http://atomicgameengine.com/#download-the-atomic-editor)**
@@ -52,6 +54,8 @@ If you need excellent, high performance technology which leverages the full migh
 <a href="http://docs.atomicgameengine.com/csharp/AtomicEngine/">![](http://atomicgameengine.com/images/community/Documentation_CSharp.png)</a>
 <a href="http://docs.atomicgameengine.com/cpp">![](http://atomicgameengine.com/images/community/Documentation_CPlusPlus.png)</a>
 
+---
+
 ### How to Help
 <img align="right" src="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/atomic/wecandoit.jpg" style="margin-left:20px;"/>
 - Let others know about the Atomic Game Engine!
@@ -64,6 +68,8 @@ If you need excellent, high performance technology which leverages the full migh
 - Help with issues marked **```unassigned: help wanted```** in the [current build milestone](https://github.com/AtomicGameEngine/AtomicGameEngine/milestones)
 
 - Inform us of other ways to help that should be added here :)  
+
+---
 
 #### Videos
 
