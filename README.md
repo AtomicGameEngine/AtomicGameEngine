@@ -34,6 +34,8 @@ If you need excellent, high performance technology which leverages the full migh
 
 ### Downloads
 
+Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and scheduled as rolling build <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/milestones" target="_blank">milestones.</a>
+
 **[Download the Atomic Editor](http://atomicgameengine.com/#download-the-atomic-editor)**
 
 #### Atomic Resources
