@@ -917,6 +917,16 @@ void UI::SetDebugHudExtents(bool useRootExtent, const IntVector2& position, cons
 
 }
 
+void UI::CycleDebugHudMode()
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (!hud)
+        return;
+
+    hud->CycleMode();
+}
+
 void UI::SetDebugHudProfileMode(DebugHudProfileMode mode)
 {
     SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
