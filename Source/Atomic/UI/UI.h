@@ -100,7 +100,7 @@ public:
     void ShowDebugHud(bool value);
     void ToggleDebugHud();
 
-    // Cycle debug HUD between showing primitive stats, current mode, profiler data, all three or none
+    /// Cycle debug HUD between showing primitive stats, current mode, profiler data, all three or none
     void CycleDebugHudMode();
 
     void SetDebugHudProfileMode(DebugHudProfileMode mode);
