@@ -100,6 +100,8 @@ public:
     void ShowDebugHud(bool value);
     void ToggleDebugHud();
 
+    void CycleDebugHudMode();
+
     void SetDebugHudProfileMode(DebugHudProfileMode mode);
 
     void SetDebugHudExtents(bool useRootExtents = true, const IntVector2& position = IntVector2::ZERO, const IntVector2& size = IntVector2::ZERO);
