@@ -217,6 +217,26 @@ static int js_atomic_script(duk_context* ctx)
     return 1;
 }
 
+static int js_atomic_ScriptEvent(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+
+    duk_push_current_function(ctx);
+
+    if (duk_get_top(ctx) == 2)
+    {
+        String eventType = duk_get_string(ctx, 0);
+
+        duk_push_object(ctx);
+        duk_push_string(ctx, eventType.CString());
+        duk_put_prop_string(ctx, -2, "_eventType");
+        duk_dup(ctx, 1);
+        duk_put_prop_string(ctx, -2, "_callback");
+    }
+
+    return 1;
+}
+
 static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = false)
 {
 
@@ -434,6 +454,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_destroy, 1);
     duk_put_prop_string(ctx, -2, "destroy");
+
+    duk_push_c_function(ctx, js_atomic_ScriptEvent, 1);
+    duk_put_prop_string(ctx, -2, "ScriptEvent");
 
 
     duk_pop(ctx);
