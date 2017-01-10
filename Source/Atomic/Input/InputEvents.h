@@ -420,7 +420,6 @@ static const int KEY_DOLLAR = SDLK_DOLLAR;
 static const int KEY_EJECT = SDLK_EJECT;
 static const int KEY_EQUALS = SDLK_EQUALS;
 static const int KEY_EXCLAIM = SDLK_EXCLAIM;
-static const int KEY_EXECUTE = SDLK_EXECUTE;
 static const int KEY_EXSEL = SDLK_EXSEL;
 static const int KEY_FIND = SDLK_FIND;
 static const int KEY_GREATER = SDLK_GREATER;
