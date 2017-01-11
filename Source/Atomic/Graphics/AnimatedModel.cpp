@@ -823,6 +823,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         if ((createBones && !dontCreateBonesHack)|| boneCreationOverride_)
         {
 // ATOMIC END
+            //Remove this tag once new prefabs no longer depend on the temporary flag
+            String tempTag = "Atomic_Temporary";
 
             for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
@@ -832,6 +834,14 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
                 // Copy the model component's temporary status
                 boneNode->SetTemporary(IsTemporary());
+
+                //Rather mark the nodes as temporary once new prefabs no longer depend on the temporary flag
+                if (boneCreationOverride_)
+                {
+                    if(boneNode->GetScene() != NULL)
+                        boneNode->AddTag(tempTag);
+                }
+
                 i->node_ = boneNode;
             }
 
