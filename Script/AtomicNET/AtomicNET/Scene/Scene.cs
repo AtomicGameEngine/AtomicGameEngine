@@ -14,7 +14,7 @@ namespace AtomicEngine
             {
                 //Log.Info($"Node ADDED: {e.Node.Name}");
 
-                // The NodeRemoved event is generated when adding a node as a child
+                // The NodeAdded event is generated when adding a node as a child
 
                 e.Node.GetComponents<CSComponent>(componentVector);
 
