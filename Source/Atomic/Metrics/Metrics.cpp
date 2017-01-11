@@ -24,6 +24,11 @@
 
 #include "../Metrics/Metrics.h"
 
+#ifdef ATOMIC_PLATFORM_WEB
+#include <stdio.h>
+#include <stdlib.h>
+#endif
+
 
 namespace Atomic
 {
