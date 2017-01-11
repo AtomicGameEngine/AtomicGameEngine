@@ -14,7 +14,16 @@ namespace AtomicEngine
             {
                 //Log.Info($"Node ADDED: {e.Node.Name}");
 
-                // TODO: How to handle adding components on existing node?
+                // The NodeAdded event is generated when adding a node as a child
+
+                e.Node.GetComponents<CSComponent>(componentVector);
+
+                for (uint i = 0; i < componentVector.Size; i++)
+                {
+                    AddCSComponent(componentVector[i]);
+                }
+
+                componentVector.Clear();
 
             });
 
@@ -292,17 +301,16 @@ namespace AtomicEngine
 
             cslist.Add(csc);
 
-            if (cscomponentStart.Contains(csc))
+            if (!csc.started)
             {
-                throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already added to start list");
-            }
+                if (cscomponentStart.Contains(csc))
+                {
+                    throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already added to start list");
+                }
 
-            if (csc.started)
-            {
-                throw new InvalidOperationException("Scene.HandleComponentAdded CSComponent already started");
-            }
 
-            cscomponentStart.Add(csc);
+                cscomponentStart.Add(csc);
+            }
 
         }
 
