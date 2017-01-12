@@ -822,7 +822,9 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         // Create scene nodes for the bones
         if ((createBones && !dontCreateBonesHack)|| boneCreationOverride_)
         {
-// ATOMIC END
+            // Remove "atomic_temporary" once prefabs no longer depend on the temporary flag (prefabs 2.0)
+            // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/780
+            const String tempTag = "atomic_temporary";
 
             for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
@@ -832,6 +834,15 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
                 // Copy the model component's temporary status
                 boneNode->SetTemporary(IsTemporary());
+
+                // Rather mark the nodes as temporary, remove for prefabs 2.0
+                if (boneCreationOverride_)
+                {
+                    if(boneNode->GetScene() != NULL)
+                        boneNode->AddTag(tempTag);
+                }
+// ATOMIC END
+
                 i->node_ = boneNode;
             }
 
