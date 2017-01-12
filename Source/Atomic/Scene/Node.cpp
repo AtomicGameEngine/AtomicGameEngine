@@ -218,9 +218,15 @@ bool Node::SaveXML(XMLElement& dest) const
         Node* node = children_[i];
         if (node->IsTemporary())
             continue;
+
+// ATOMIC BEGIN
+
         // Can remove this check once bone nodes use temporary flag instead and new prefabs no longer use temporary flag.
-        if (node->HasTag("Atomic_Temporary"))
+        // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/780
+        if (node->HasTag("atomic_temporary"))
             continue;
+
+// ATOMIC END
 
         XMLElement childElem = dest.CreateChild("node");
         if (!node->SaveXML(childElem))
