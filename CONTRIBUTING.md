@@ -5,7 +5,6 @@ Please see this documentation on Atomic Build milestones, code style guides, bra
 
 https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Atomic-Developers
 
-If something is missing, please consider adding it.
 
 Contribution Copyrights and Licensing
 ------------------------
