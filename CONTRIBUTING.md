@@ -1,6 +1,11 @@
 Contributing to the Atomic Game Engine
 =======================
 
+Please see this documentation on Atomic Build milestones, code style guides, branch naming conventions, and other developer information:  
+https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Atomic-Developers
+
+If something is missing, please consider adding it.
+
 Contribution Copyrights and Licensing
 ------------------------
 
@@ -13,7 +18,7 @@ To make a code contribution to the Atomic Game Engine
 
 * Test your changes as thoroughly as possible.
 
-* Ensure your code follows the general code style of the engine and scripts.  There needs to be an explicit style guide, in the meantime try to follow the general style in the code base.  Check that your diff looks as clean and minimal as possible.
+* Please follow the code style for the language you are working in and try to match the general structure of Atomic code.  Check that your diff looks as clean and minimal as possible.
 
 * Add yourself to the end of the "Contributors" list in `AUTHORS.md` if you're not already on the list.  `By doing this you confirm that`:
 
