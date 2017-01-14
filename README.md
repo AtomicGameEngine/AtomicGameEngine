@@ -16,19 +16,19 @@ If you need excellent, high performance technology which leverages the full migh
 #### Atomic Technology
 <img align="right" src="http://atomicgameengine.com/images/PlatformBox.png"/>
 - Consistent **2D/3D API** available in **JavaScript, TypeScript, C#, and C++**
+- Built-in Monaco JavaScript/TypeScript editor and support for **VSCode** and **Atom**
+- C# IDE integration with **Visual Studio**, **Xamarin Studio**, and **MonoDevelop**
 - **Android, iOS, Windows, macOS, Linux, and WebGL** platform deployment
 - High performance native C++ core with single command builds and absolute minimum dependencies
 - Node based scene graph with access to low level graphics API for custom rendering on D3D 9/11, OpenGL 2/3/ES2, and WebGL
 - Modular component system including C#, JavaScript, TypeScript, and C++ logic components with networking
 - Drag and drop standard 2D/3D format import, including Autodesk FBX, Collada, Blender, Spriter, Tiled, and more
-- C# IDE integration with Visual Studio, Xamarin Studio, and MonoDevelop
-- Built-in Monaco JavaScript/TypeScript editor with support for VSCode and Atom
 - Innovative preview mode runs in subprocess for editor stability, reduced memory fragmentation, and is the foundation for future previewing on device
 - Chromium WebView for E-Commerce payments, accessing Facebook social graph, video streaming, and many more use cases
 - Automated script binding generation of native C++ subsystems
 - Best in class third party integrations including Box2D/Bullet physics, Recast/Detour pathfinding, TurboBadger UI, CEF3, duktape VM, SDL2
 - Available as precompiled binaries or fork on GitHub under the permissive MIT license
-- Backed by software professionals with decades of experience in the technology and game industries
+- **Backed by professionals with decades of experience in the technology and game industries**
 
 ---
 
