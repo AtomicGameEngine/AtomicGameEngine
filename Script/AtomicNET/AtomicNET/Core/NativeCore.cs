@@ -204,7 +204,11 @@ namespace AtomicEngine
                     scriptMap = svm[svmDepth++];
                     scriptMap.CopyVariantMap(eventData);
                     nativeEventData = NativeEvents.GetNativeEventData(eventType, scriptMap);
-                    nativeEventData.sourceEventData = eventData;
+
+                    // This check can be removed once ATOMIC-1381 is resolved
+                    // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1381
+                    if (nativeEventData != null)
+                        nativeEventData.sourceEventData = eventData;
                 }
 
                 receiver.HandleEvent(eventType, scriptMap, nativeEventData);
