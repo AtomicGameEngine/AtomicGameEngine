@@ -304,7 +304,12 @@ ALSA_PlayDevice(_THIS)
 
     while ( frames_left > 0 && this->enabled ) {
         /* !!! FIXME: This works, but needs more testing before going live */
-        /* ALSA_snd_pcm_wait(this->hidden->pcm_handle, -1); */
+        /* ATOMIC BEGIN */
+#if defined(__LINUX__)
+        ALSA_snd_pcm_wait(this->hidden->pcm_handle, -1);  /* was commented out, fixes high cpu usage */
+#endif
+        /* ATOMIC END */
+
         status = ALSA_snd_pcm_writei(this->hidden->pcm_handle,
                                      sample_buf, frames_left);
 
@@ -644,7 +649,11 @@ ALSA_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->hidden->mixlen);
 
     /* Switch to blocking mode for playback */
-    ALSA_snd_pcm_nonblock(pcm_handle, 0);
+    /* ATOMIC BEGIN */
+#ifndef __LINUX__
+    ALSA_snd_pcm_nonblock(pcm_handle, 0);  /* out for linux, in for everything else, fixes high cpu usage */
+#endif
+    /* ATOMIC END */
 
     /* We're ready to rock and roll. :-) */
     return 0;
