@@ -553,3 +553,26 @@ elements
 	TBCheckBox.uilistview_selected
 		bitmap arrow_down_dark.png
 		type Image
+
+	# == ToggleButton skins ====================================================================================
+
+	TBToggleButton
+		text-color #2c2c2c
+		bitmap button.png
+		cut 17
+		expand 7
+		padding 6 8
+		overrides
+			element TBButtonInGroup
+				condition: target: parent, property: skin, value: button_group
+				condition: target: parent, property: axis, value: x
+			element TBToggleButton.pressed
+				state pressed
+	TBToggleButton.pressed
+		text-color #2c2c2c
+		bitmap buttontoggle_pressed.png
+		cut 17
+		expand 7
+		content-ofs-x 1
+		content-ofs-y 1
+
