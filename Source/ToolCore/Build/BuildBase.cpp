@@ -515,7 +515,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
             json->Load(*file);
             file->Close();
 
-            JSONValue root = json->GetRoot();
+            JSONValue& root = json->GetRoot();
             int test = root.Get("version").GetInt();
             assert(root.Get("version").GetInt() == ASSET_VERSION);
 

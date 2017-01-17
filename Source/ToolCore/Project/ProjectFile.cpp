@@ -47,7 +47,7 @@ void ProjectFile::WriteNewProject(const String& fullpath)
 {
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->GetRoot();
+    JSONValue& root = jsonFile->GetRoot();
 
     root.Set("version", PROJECTFILE_VERSION);
 
@@ -71,7 +71,7 @@ void ProjectFile::Save(Project* project)
 
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->GetRoot();
+    JSONValue& root = jsonFile->GetRoot();
 
     root.Set("version", PROJECTFILE_VERSION);
 
@@ -104,7 +104,7 @@ bool ProjectFile::Load(Project* project)
         if (!jsonFile->BeginLoad(*file))
             return false;
 
-        JSONValue root = jsonFile->GetRoot();
+        JSONValue& root = jsonFile->GetRoot();
 
         int version = root.Get("version").GetInt();
 

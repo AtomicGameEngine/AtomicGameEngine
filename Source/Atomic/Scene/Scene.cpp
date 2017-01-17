@@ -481,7 +481,7 @@ bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        JSONValue rootVal = json->GetRoot();
+        JSONValue& rootVal = json->GetRoot();
 
         // Preload resources if appropriate
         if (mode != LOAD_SCENE)
@@ -1371,6 +1371,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
 
 void Scene::PreloadResourcesXML(const XMLElement& element)
 {
+
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef ATOMIC_THREADING
     ResourceCache* cache = GetSubsystem<ResourceCache>();

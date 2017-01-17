@@ -144,7 +144,7 @@ void JSBModule::ProcessOverloads()
 {
     // overloads
 
-    JSONValue root = moduleJSON_->GetRoot();
+    JSONValue& root = moduleJSON_->GetRoot();
 
     JSONValue overloads = root.Get("overloads");
 
@@ -256,7 +256,7 @@ void JSBModule::ProcessExcludes()
 {
     // excludes
 
-    JSONValue root = moduleJSON_->GetRoot();
+    JSONValue& root = moduleJSON_->GetRoot();
 
     JSONValue excludes = root.Get("excludes");
 
@@ -268,7 +268,7 @@ void JSBModule::ProcessExcludes()
 
 void JSBModule::ProcessClassExcludes()
 {
-    JSONValue root = moduleJSON_->GetRoot();
+    JSONValue& root = moduleJSON_->GetRoot();
 
     JSONValue excludes = root.Get("classExcludes");
 
@@ -302,7 +302,7 @@ void JSBModule::ProcessTypeScriptDecl()
 {
     // TypeScript declarations
 
-    JSONValue root = moduleJSON_->GetRoot();
+    JSONValue& root = moduleJSON_->GetRoot();
 
     JSONValue decl = root.Get("typescript_decl");
 
@@ -335,7 +335,7 @@ void JSBModule::ProcessHaxeDecl()
 {
     // Haxe declarations
 
-    JSONValue root = moduleJSON_->GetRoot();
+    JSONValue& root = moduleJSON_->GetRoot();
 
     JSONValue decl = root.Get("haxe_decl");
 
@@ -689,7 +689,7 @@ bool JSBModule::Load(const String& jsonFilename)
         return false;
     }
 
-    JSONValue root = moduleJSON_->GetRoot();
+    JSONValue& root = moduleJSON_->GetRoot();
 
     name_ = root.Get("name").GetString();
 

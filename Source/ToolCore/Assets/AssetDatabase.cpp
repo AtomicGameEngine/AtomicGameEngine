@@ -441,7 +441,7 @@ void AssetDatabase::Scan()
             json->Load(*file);
             file->Close();
 
-            JSONValue root = json->GetRoot();
+            JSONValue& root = json->GetRoot();
 
             assert(root.Get("version").GetInt() == ASSET_VERSION);
 

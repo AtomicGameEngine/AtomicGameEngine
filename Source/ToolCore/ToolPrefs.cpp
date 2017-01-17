@@ -88,7 +88,7 @@ void ToolPrefs::Load()
     if (!result)
         return;
 
-    JSONValue root = jsonFile->GetRoot();
+    JSONValue& root = jsonFile->GetRoot();
     if (!root.IsObject())
         return;
 

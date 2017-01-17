@@ -116,7 +116,7 @@ namespace ToolCore
             return false;
         }
 
-        JSONValue root = jsonFile->GetRoot();
+        JSONValue& root = jsonFile->GetRoot();
         if (!root.IsObject())
         {
             ATOMIC_LOGERRORF("No root object in platform settings: %s", path.CString());

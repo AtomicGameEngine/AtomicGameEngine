@@ -241,7 +241,7 @@ bool ProjectBuildSettings::Load(const String& path)
     if (!result)
         return false;
 
-    JSONValue root = jsonFile->GetRoot();
+    JSONValue& root = jsonFile->GetRoot();
     if (!root.IsObject())
         return false;
 
