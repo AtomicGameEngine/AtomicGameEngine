@@ -20,22 +20,22 @@ public:
     // For safe typecasting
     TBOBJECT_SUBCLASS(TBTabLayout, TBLayout);
 
-	TBTabLayout(TBTabContainer *tabContainer) 
-		: tabContainer_(tabContainer) {}
+    TBTabLayout(TBTabContainer *tabContainer) 
+        : tabContainer_(tabContainer) {}
 
     virtual void OnChildAdded(TBWidget *child);
-	virtual void OnChildRemove(TBWidget *child);
+    virtual void OnChildRemove(TBWidget *child);
 
     virtual PreferredSize OnCalculatePreferredContentSize(const SizeConstraints &constraints);
 private:
-	TBTabContainer *tabContainer_;
+    TBTabContainer *tabContainer_;
 };
 
 /** TBTabContainer - A container with tabs for multiple pages. */
 
 class TBTabContainer : public TBWidget
 {
-	friend class TBTabLayout;
+    friend class TBTabLayout;
 public:
     // For safe typecasting
     TBOBJECT_SUBCLASS(TBTabContainer, TBWidget);
