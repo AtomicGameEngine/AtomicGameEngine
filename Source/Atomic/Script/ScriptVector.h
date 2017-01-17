@@ -20,7 +20,10 @@
 // THE SOFTWARE.
 //
 
+#include "../Atomic/IO/Log.h"
+
 #include "ScriptSystem.h"
+#include "ScriptVariant.h"
 
 #pragma once
 
@@ -88,6 +91,47 @@ public:
         return refVector_.Size();
     }
 
+    void Resize(unsigned size) 
+    {
+        return refVector_.Resize(size);
+    }
+
+    bool AdaptFromVector(const VariantVector& vectorIn)
+    {
+        // copy to temporary vector, so refs we hold aren't deleted, before they can be set
+        // also allows us to save some instantiations
+        Vector<SharedPtr<RefCounted>> keepAlive = refVector_;
+
+        refVector_.Clear();
+
+        for (unsigned i = 0; i < vectorIn.Size(); i++)
+        {
+            if (i < keepAlive.Size())
+            {
+                const SharedPtr<RefCounted>& item = keepAlive[i];
+
+                if (item.Null() || item->GetClassID() != ScriptVariant::GetClassIDStatic())
+                {
+                    ATOMIC_LOGERROR("ScriptVector::AdaptFromVector(VariantVector) - item == null or item class != ScriptVariant");
+                    return false;
+                }
+
+                ScriptVariant* scriptVariant = static_cast<ScriptVariant*>(item.Get());
+                scriptVariant->SetVariant(vectorIn[i]);
+                refVector_.Push(item);
+
+            }
+            else
+            {
+                refVector_.Push(SharedPtr<RefCounted>(new ScriptVariant(vectorIn[i])));
+            }
+
+        }
+
+        return true;
+    }
+
+
     template <class T>
     bool AdaptFromVector(PODVector<T> vectorIn)
     {
@@ -151,6 +195,30 @@ public:
         return true;
 
     }
+
+    bool AdaptToVector(VariantVector& vectorOut, const Variant& defaultValue = Variant::EMPTY)
+    {
+        vectorOut.Clear();
+
+        for (unsigned i = 0; i < refVector_.Size(); i++)
+        {
+            const SharedPtr<RefCounted>& item = refVector_[i];
+
+            if (item.Null() || item->GetClassID() != ScriptVariant::GetClassIDStatic())
+            {
+                vectorOut.Push(defaultValue);
+                continue;
+            }
+
+            ScriptVariant* scriptVariant = static_cast<ScriptVariant*>(item.Get());
+
+            vectorOut.Push(scriptVariant->GetVariant());
+        }
+
+        return true;
+
+    }
+
 
     template <class T>
     bool AdaptToVector(PODVector<T> vectorOut)

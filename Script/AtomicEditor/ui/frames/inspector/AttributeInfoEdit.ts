@@ -36,6 +36,8 @@ class AttributeInfoEdit extends Atomic.UILayout {
     nameOverride: string;
     hideName: boolean = false;
 
+    arrayIndex:number = -1;
+
     constructor() {
 
         super();
@@ -74,7 +76,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
         this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-        if (attr.type == Atomic.VariantType.VAR_VECTOR3 || attr.type == Atomic.VariantType.VAR_COLOR ||
+        if (attr.type == Atomic.VariantType.VAR_VECTOR3  ||
             attr.type == Atomic.VariantType.VAR_QUATERNION) {
             this.axis = Atomic.UI_AXIS.UI_AXIS_Y;
             this.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
@@ -121,7 +123,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
     }
 
-    static createAttrEdit(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): AttributeInfoEdit {
+    static createAttrEdit(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo, nameOverride:string=undefined, typeOverride:Atomic.VariantType = undefined ): AttributeInfoEdit {
 
         var type: typeof AttributeInfoEdit;
         var customTypes = AttributeInfoEdit.customAttrEditTypes[editType.typeName];
@@ -131,16 +133,22 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
         }
 
+        if (typeOverride)
+            type = AttributeInfoEdit.standardAttrEditTypes[typeOverride];
+
+        if (!type && attrInfo.isArray) {
+            type = ArrayAttributeEdit;
+        }
+
         if (!type) {
-
             type = AttributeInfoEdit.standardAttrEditTypes[attrInfo.type];
-
         }
 
         if (!type)
             return null;
 
         var attrEdit = new type();
+        attrEdit.nameOverride = nameOverride;
         if (!attrEdit.initialize(editType, attrInfo))
             return null;
 
@@ -195,7 +203,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
             var object = this.editType.getFirstObject();
             this.editWidget.skinBg = "TBCheckBox";
             if (object) {
-                var value = object.getAttribute(this.attrInfo.name);
+                var value = object.getAttribute(this.attrInfo.name, this.arrayIndex);
                 this.editWidget.value = (value ? 1 : 0);
             }
 
@@ -212,7 +220,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
 
         if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
-            this.editType.onAttributeInfoEdited(this.attrInfo, this.editWidget.value ? true : false);
+            this.editType.onAttributeInfoEdited(this.attrInfo, this.editWidget.value ? true : false, -1, true, this.arrayIndex);
             this.refresh();
 
             return true;
@@ -248,7 +256,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
         if (uniform) {
             var object = this.editType.getFirstObject();
             if (object) {
-                var value = object.getAttribute(this.attrInfo.name);
+                var value = object.getAttribute(this.attrInfo.name, this.arrayIndex);
                 this.editWidget.text = value;
             }
 
@@ -262,7 +270,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
 
     handleUIWidgetEditCompleteEvent(ev) {
 
-        this.editType.onAttributeInfoEdited(this.attrInfo, this.editWidget.text);
+        this.editType.onAttributeInfoEdited(this.attrInfo, this.editWidget.text, -1, true, this.arrayIndex);
         this.refresh();
 
     }
@@ -332,7 +340,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
         if (uniform) {
             var object = this.editType.getFirstObject();
             if (object) {
-                var value = object.getAttribute(this.attrInfo.name);
+                var value = object.getAttribute(this.attrInfo.name, this.arrayIndex);
 
                 var widget = this.editWidget;
                 var attrInfo = this.attrInfo;
@@ -356,7 +364,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
     handleUIWidgetEditCompleteEvent(ev) {
 
         // non-enum
-        this.editType.onAttributeInfoEdited(this.attrInfo, Number(this.editWidget.text));
+        this.editType.onAttributeInfoEdited(this.attrInfo, Number(this.editWidget.text), -1, true, this.arrayIndex);
         this.refresh();
 
     }
@@ -375,7 +383,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
 
             if (ev.target.id == id) {
 
-                this.editType.onAttributeInfoEdited(this.attrInfo, Number(ev.refid) - 1);
+                this.editType.onAttributeInfoEdited(this.attrInfo, Number(ev.refid) - 1, -1, true, this.arrayIndex);
                 this.refresh();
 
             }
@@ -430,14 +438,14 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
                 var widget = this.editWidget;
                 var attrInfo = this.attrInfo;
-                var value = object.getAttribute(attrInfo.name);
+                var value = object.getAttribute(attrInfo.name, this.arrayIndex);
 
                 if (value == undefined) {
 
                     console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
                     widget.text = "???";
 
-                } else {
+                } else {                    
                     widget.text = parseFloat(value.toFixed(5)).toString();
                 }
 
@@ -453,7 +461,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
     handleUIWidgetEditCompleteEvent(ev) {
 
-        this.editType.onAttributeInfoEdited(this.attrInfo, Number(this.editWidget.text));
+        this.editType.onAttributeInfoEdited(this.attrInfo, Number(this.editWidget.text), -1, true, this.arrayIndex);
         this.refresh();
 
     }
@@ -541,7 +549,7 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
                 if (object) {
 
-                    var value = object.getAttribute(this.attrInfo.name);
+                    var value = object.getAttribute(this.attrInfo.name, this.arrayIndex);
                     select.value = parseFloat(value[i].toFixed(5));
 
                 }
@@ -560,7 +568,7 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
     handleUIWidgetEditCompleteEvent(ev: Atomic.UIWidgetEditCompleteEvent) {
 
         var index = Number(ev.widget.id) - 1;
-        this.editType.onAttributeInfoEdited(this.attrInfo, ev.widget.value, index);
+        this.editType.onAttributeInfoEdited(this.attrInfo, ev.widget.value, index, true, this.arrayIndex);
         this.refresh();
 
     }
@@ -583,7 +591,7 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
             if (captured) {
 
                 var index = Number(ev.target.id) - 1;
-                this.editType.onAttributeInfoEdited(this.attrInfo, ev.target.value, index, false);
+                this.editType.onAttributeInfoEdited(this.attrInfo, ev.target.value, index, false, this.arrayIndex);
 
             }
 
@@ -633,7 +641,11 @@ class ColorAttributeEdit extends AttributeInfoEdit {
     createLayout() {
 
         var layout = new Atomic.UILayout();
-        var o = InspectorUtils.createAttrColorFieldWithSelectButton(this.attrInfo.name, layout);
+        let name = this.attrInfo.name;
+        if (this.nameOverride) {
+            name = this.nameOverride;
+        }
+        var o = InspectorUtils.createAttrColorFieldWithSelectButton(name, layout);
 
         var colorWidget = this.colorWidget = o.colorWidget;
         var selectButton = o.selectButton;
@@ -642,9 +654,9 @@ class ColorAttributeEdit extends AttributeInfoEdit {
         layout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
         layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
+        lp.height = 24;
         colorWidget.layoutParams = lp;
 
         this.editWidget = layout;
@@ -658,7 +670,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
             let object = this.editType.getFirstObject();
 
             if (object) {
-                color = object.getAttribute(this.attrInfo.name);
+                color = object.getAttribute(this.attrInfo.name, this.arrayIndex);
             }
 
             colorWidget.color = color;
@@ -694,7 +706,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
 
                     if (color[i] != newColor[i]) {
 
-                        this.editType.onAttributeInfoEdited(this.attrInfo, newColor);
+                        this.editType.onAttributeInfoEdited(this.attrInfo, newColor, -1, true, this.arrayIndex);
                         this.refresh();
                         committed = true;
                         break;
@@ -730,8 +742,11 @@ class ColorAttributeEdit extends AttributeInfoEdit {
         let object = this.editType.getFirstObject();
 
         if (object) {
-            this.colorWidget.color = object.getAttribute(this.attrInfo.name);
+            let color = object.getAttribute(this.attrInfo.name, this.arrayIndex);
+            this.colorWidget.color = color;
         }
+
+        
     }
 
     // updates color on selection without committing to undo/redo for preview
@@ -742,7 +757,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
         for (var i in this.editType.objects) {
 
             let object = this.editType.objects[i];
-            object.setAttribute(this.attrInfo.name, rgba );
+            object.setAttribute(this.attrInfo.name, rgba, this.arrayIndex);
 
         }
 
@@ -1126,6 +1141,170 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
     }
 }
 
+
+class ArrayAttributeEdit extends AttributeInfoEdit {
+
+    layout: Atomic.UILayout;
+    indexEdits: AttributeInfoEdit[] = [];
+    sizeEdit: Atomic.UIEditField;
+
+    initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
+
+        return super.initialize(editType, attrInfo);
+
+    }
+
+    createIndexEdit(index: number) {
+
+        var indexEdit = AttributeInfoEdit.createAttrEdit(this.editType, this.attrInfo, index.toString(), this.attrInfo.type);
+        indexEdit.arrayIndex = index;
+
+        this.layout.addChild(indexEdit);
+
+        this.indexEdits.push(indexEdit);        
+
+    }
+
+    createEditWidget() {
+
+        this.spacing = 0;
+
+        var layout = this.layout = new Atomic.UILayout();
+
+        layout.axis = Atomic.UI_AXIS.UI_AXIS_Y;
+        layout.spacing = 2;
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION.UI_LAYOUT_POSITION_LEFT_TOP;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 304;
+        layout.layoutParams = lp;
+
+        var name = this.attrInfo.name + " Size";
+        if (name == "AnimationResources Size")
+            name = "Animations";
+
+        var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
+
+        lp = new Atomic.UILayoutParams();
+        lp.width = 160;
+        sizeEdit.layoutParams = lp;
+
+        sizeEdit.subscribeToEvent(sizeEdit, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+
+        this.editWidget = layout;
+
+    }
+
+    createLayout() {
+
+        this.createEditWidget();
+
+        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
+        this.addChild(this.editWidget);
+
+    }
+
+    handleUIWidgetEditCompleteEvent(ev) {
+
+        var size = Number(this.sizeEdit.text);
+
+        if (size > 128 || size < 0)
+            return;
+
+        var editType = this.editType;
+
+        var refresh = false;
+
+        for (var i in editType.objects) {
+
+            var object = editType.objects[i];
+
+            var vector = <Atomic.ScriptVector>(object.getAttribute(this.attrInfo.name));
+
+            if (vector.size != size) {
+
+                vector.resize(size);
+                object.setAttribute(this.attrInfo.name, vector);
+
+                // record for undo/redo
+                let scene = this.editType.getEditScene();
+                if (scene) {
+                    scene.sendEvent("SceneEditEnd");
+                    scene.sendEvent("ComponentEditEnd");                    
+                }
+
+                refresh = true;
+            } 
+
+        }
+
+        if (refresh)
+            this.refresh();
+        
+    }
+
+    refresh() {
+
+        var editType = this.editType;
+
+        var object = this.editType.getFirstObject();
+
+        if (!object) {
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
+            return;
+        }
+
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
+
+        var maxLength = -1;
+        var i;
+        for (i in editType.objects) {
+
+            object = editType.objects[i];
+
+            var vector = <Atomic.ScriptVector>(object.getAttribute(this.attrInfo.name));
+
+            if (vector.size > maxLength) {
+
+                maxLength = vector.size;
+            }
+
+        }
+
+        this.sizeEdit.text = maxLength.toString();
+
+        if (maxLength == -1) {
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
+            return;
+        }
+
+        for (i = this.indexEdits.length; i < maxLength; i++) {
+
+            this.createIndexEdit(i);
+
+        }
+
+        for (i = 0; i < this.indexEdits.length; i++) {
+
+            var indexEdit = this.indexEdits[i];
+
+            if (i < maxLength) {
+                indexEdit.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_VISIBLE;
+                indexEdit.refresh();
+            }
+            else {
+                indexEdit.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
+            }
+
+        }
+
+    }
+
+}
 
 
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VariantType.VAR_BOOL] = BoolAttributeEdit;

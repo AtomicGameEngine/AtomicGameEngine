@@ -162,6 +162,12 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
+
+    // ATOMIC BEGIN
+    if (geometryDisabled_)
+        UpdateBatchesHideGeometry();
+    // ATOMIC END
+
 }
 
 Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
@@ -584,6 +590,32 @@ const VariantVector& StaticModel::GetGeometryEnabledAttr() const
     }
 
     return geometryEnabled_;
+}
+
+void StaticModel::UpdateBatchesHideGeometry()
+{
+    if (!geometryDisabled_ || !batches_.Size())
+        return;
+
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+    {
+        SourceBatch* batch = &batches_[i];
+        StaticModelGeometryData* data = &geometryData_[i];
+
+        if (batch->geometry_)
+            data->batchGeometry_ = batch->geometry_;
+
+        if (data->enabled_ && !batch->geometry_)
+        {
+            batch->geometry_ = data->batchGeometry_;
+        }
+        else if (!data->enabled_ && batch->geometry_)
+        {
+            data->batchGeometry_ = batch->geometry_;
+            batch->geometry_ = 0;
+        }
+    }
+
 }
 
 // ATOMIC END

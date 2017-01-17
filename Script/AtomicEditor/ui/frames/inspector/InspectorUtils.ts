@@ -143,7 +143,7 @@ class InspectorUtils {
   static createAttrEditFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{editField:Atomic.UIEditField, selectButton:Atomic.UIButton} {
 
     var attrLayout = new Atomic.UILayout();
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
+    attrLayout.layoutDistributionPosition = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
 
     if (name) {
       var _name = InspectorUtils.createAttrName(name);
@@ -151,7 +151,7 @@ class InspectorUtils {
     }
 
     var fieldLayout = new Atomic.UILayout();
-    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
+    fieldLayout.layoutDistributionPosition = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
 
     var edit = InspectorUtils.createEditField();
 
@@ -172,7 +172,7 @@ class InspectorUtils {
   static createAttrColorFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{colorWidget:Atomic.UIColorWidget, selectButton:Atomic.UIButton} {
 
     var attrLayout = new Atomic.UILayout();
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
+    attrLayout.layoutDistributionPosition = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
 
     if (name) {
       var _name = InspectorUtils.createAttrName(name);
@@ -180,7 +180,7 @@ class InspectorUtils {
     }
 
     var fieldLayout = new Atomic.UILayout();
-    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_AVAILABLE;
+    fieldLayout.layoutDistributionPosition = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
 
     var colorWidget = InspectorUtils.createColorWidget();
 

@@ -238,7 +238,7 @@ class CSComponentSection extends ComponentSection {
         if (object) {
             var value = object.getAttribute("Class");
             if (value)
-                this.text = value;
+                this.text = value + " - C#";
         }
     }
 

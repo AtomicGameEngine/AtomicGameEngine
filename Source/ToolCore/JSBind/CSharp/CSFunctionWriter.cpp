@@ -59,9 +59,14 @@ void CSFunctionWriter::GenNativeCallParameters(String& sig)
 
     Vector<String> args;
 
-    if (parameters.Size())
+    unsigned numParams = parameters.Size();
+
+    if (function_->HasMutatedReturn())
+        numParams--;
+
+    if (numParams)
     {
-        for (unsigned int i = 0; i < parameters.Size(); i++)
+        for (unsigned int i = 0; i < numParams; i++)
         {
             JSBFunctionType* ptype = parameters.At(i);
 
@@ -129,6 +134,14 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
     source += "\n";
 
+    if (function_->HasMutatedReturn())
+    {
+        line = ToString("if (!__retValue) return;\n");
+        source += IndentLine(line);
+        line = ToString("VariantVector __retValueVector;\n");
+        source += IndentLine(line);
+    }
+
     // vector marshal
 
     bool hasVectorMarshal = false;
@@ -137,6 +150,10 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     for (unsigned i = 0; i < fparams.Size(); i++)
     {
         JSBFunctionType* ftype = fparams[i];
+
+        // skip mutated input param
+        if (function_->HasMutatedReturn() && i == fparams.Size() - 1)
+            break;
 
         // Interface        
         JSBClass* interface = 0;
@@ -166,7 +183,19 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
         hasVectorMarshal = true;
 
-        if (vtype->isPODVector_)
+        if (vtype->isVariantVector_)
+        {
+            const String& pname = ftype->name_;
+
+            // TODO: handle early out with return value
+            if (!function_->returnType_)
+                source += IndentLine(ToString("if (!%s) return;\n", pname.CString()));
+
+            source += IndentLine(ToString("VariantVector %s__vector;\n", pname.CString()));
+            source += IndentLine(ToString("%s->AdaptToVector(%s__vector);\n", pname.CString(), pname.CString()));
+
+        }
+        else if (vtype->isPODVector_)
         {
             const String& pname = ftype->name_;
             source += IndentLine(ToString("PODVector<%s*> %s__vector;\n", className.CString(), pname.CString()));
@@ -241,7 +270,17 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
         }
         else
         {
-            line = ToString("%sself->%s(%s);\n", returnStatement.CString(), function_->GetName().CString(), callSig.CString());
+            if (function_->hasMutatedReturn_)
+            {
+                // this handles VariantVector case now, can be expanded
+                line = ToString("__retValueVector = self->%s(%s);\n", function_->GetName().CString(), callSig.CString());
+            }
+            else
+            {
+                line = ToString("%sself->%s(%s);\n", returnStatement.CString(), function_->GetName().CString(), callSig.CString());
+            }
+
+
         }
 
     }
@@ -276,6 +315,12 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
         if (!vtype)
             continue;
+
+        if (function_->HasMutatedReturn() && i == fparams.Size() - 1)
+        {
+            source += IndentLine("__retValue->AdaptFromVector(__retValueVector);\n");
+            break;
+        }
 
         JSBClassType* classType = vtype->vectorType_->asClassType();
 

@@ -179,7 +179,9 @@ bool JSClassWriter::OmitFunction(JSBFunction* function)
     {
         JSBFunctionType* ptype = parameters[i];
 
-        if (ptype->type_->asVectorType())
+        JSBVectorType* vtype = ptype->type_->asVectorType();
+
+        if (vtype && !vtype->isVariantVector_)
         {
             if (!ptype->isConst_ || ptype->type_->asVectorType()->isPODVector_)
             {

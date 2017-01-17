@@ -85,7 +85,11 @@ class SerializableEditType {
 
     }
 
-    onAttributeInfoEdited(attrInfo: Atomic.AttributeInfo, value: any, index: number = -1, genEdit: boolean = true) {
+    /**
+     * Updates selected object attribute on edit, index parameter is for the edit type (for example NumberArrayAttributeEdit)
+     * attrArrayIndex is for setting which array index to set for array AttributeInfo types
+     */
+    onAttributeInfoEdited(attrInfo: Atomic.AttributeInfo, value: any, index: number = -1, genEdit: boolean = true, attrArrayIndex: number = -1) {
 
         let editTypeName = this.objects.length > 0 ? this.objects[0].typeName : "";
 
@@ -95,23 +99,23 @@ class SerializableEditType {
 
             if (index >= 0) {
 
-                var idxValue = object.getAttribute(attrInfo.name);
+                var idxValue = object.getAttribute(attrInfo.name, attrArrayIndex);
 
                 if (attrInfo.type == Atomic.VariantType.VAR_RESOURCEREFLIST) {
 
                     idxValue.resources[index] = value;
-                    object.setAttribute(attrInfo.name, idxValue);
+                    object.setAttribute(attrInfo.name, idxValue, attrArrayIndex);
 
                 } else {
 
                     idxValue[index] = value;
-                    object.setAttribute(attrInfo.name, idxValue);
+                    object.setAttribute(attrInfo.name, idxValue, attrArrayIndex);
 
                 }
 
             } else {
 
-                object.setAttribute(attrInfo.name, value);
+                object.setAttribute(attrInfo.name, value, attrArrayIndex);
 
             }
 
@@ -120,6 +124,25 @@ class SerializableEditType {
         if (!genEdit)
             return;
 
+        let scene = this.getEditScene();
+
+        if (scene) {
+
+            scene.sendEvent("SceneEditEnd");
+
+            if (editTypeName != "Node") {
+
+                scene.sendEvent("ComponentEditEnd");
+                
+            }
+        }
+            
+
+
+    }
+
+    getEditScene():Atomic.Scene {
+
         var node: Atomic.Node = null;
         if (this.nodes.length) {
             node = this.nodes[0];
@@ -127,14 +150,10 @@ class SerializableEditType {
             node = <Atomic.Node>this.objects[0];
         }
 
-        if (node) {
-            node.scene.sendEvent("SceneEditEnd");
+        if (node)
+            return node.scene;
 
-            if (editTypeName != "Node") {
-                node.scene.sendEvent("ComponentEditEnd");
-            }
-        }
-
+        return null;        
     }
 
     compareTypes(otherType: SerializableEditType, multiSelect:boolean = false): boolean {

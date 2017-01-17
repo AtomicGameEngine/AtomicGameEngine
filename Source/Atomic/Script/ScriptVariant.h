@@ -42,34 +42,67 @@ namespace Atomic
 
         }
 
+        ScriptVariant(const Variant& source) : RefCounted()
+        {
+            variant_ = source;
+        }
+
         virtual ~ScriptVariant()
         {
 
         }
 
-        const Variant& GetVariant() { return variant_; }
+        const Variant& GetVariant() const { return variant_; }
 
         void SetVariant(const Variant& value) { variant_ = value; }
 
-        Vector2 GetVector2() { return variant_.GetVector2(); }
+        bool GetBool() const { return variant_.GetBool(); }
+
+        void SetBool(bool value) { variant_ = value; }
+
+        int GetInt() const { return variant_.GetInt(); }
+
+        void SetInt(int value) { variant_ = value; }
+
+        unsigned GetUInt() const { return variant_.GetUInt(); }
+
+        void SetUInt(unsigned value) { variant_ = value; }
+
+        float GetFloat() const { return variant_.GetFloat(); }
+
+        void SetFloat(float value) { variant_ = value; }
+
+        const Vector2& GetVector2() const { return variant_.GetVector2(); }
 
         void SetVector2(const Vector2& value) { variant_ = value; }
 
-        Vector3 GetVector3() { return variant_.GetVector3(); }
+        const Vector3& GetVector3() const { return variant_.GetVector3(); }
 
         void SetVector3(const Vector3& value) { variant_ = value; }
 
-        Vector4 GetVector4() { return variant_.GetVector4(); }
+        const Quaternion& GetQuaternion() const { return variant_.GetQuaternion(); }
+
+        void SetQuaternion(const Quaternion& value) { variant_ = value; }
+
+        const Vector4& GetVector4() const { return variant_.GetVector4(); }
 
         void SetVector4(const Vector4& value) { variant_ = value; }
 
-        Color GetColor() { return variant_.GetColor(); }
+        const Color& GetColor() const { return variant_.GetColor(); }
 
         void SetColor(const Color& value) { variant_ = value; }
 
-        String GetString() { return variant_.GetString(); }
+        const String& GetString() const { return variant_.GetString(); }
 
         void SetString(const String& value) { variant_ = value; }
+
+        const VariantVector& GetVariantVector() const { return variant_.GetVariantVector(); }
+
+        void SetVariantVector(const VariantVector& value) { variant_ = value; }
+
+        const VariantMap& GetVariantMap() const { return variant_.GetVariantMap(); }
+
+        void SetVariantMap(const VariantMap& value) { variant_ = value; }
 
     private:
 

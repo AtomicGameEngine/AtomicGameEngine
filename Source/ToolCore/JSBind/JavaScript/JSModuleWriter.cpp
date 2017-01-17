@@ -313,6 +313,7 @@ void JSModuleWriter::GenerateSource()
     }
 
     source += "#include <Duktape/duktape.h>\n";
+    source += "#include <Atomic/Script/ScriptVector.h>\n";
     source += "#include <AtomicJS/Javascript/JSVM.h>\n";
     source += "#include <AtomicJS/Javascript/JSAPI.h>\n";
 

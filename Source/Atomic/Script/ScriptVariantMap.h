@@ -147,6 +147,20 @@ public:
 
     }
 
+    const VariantVector& GetVariantVector(StringHash key) const
+    {
+        static VariantVector empty;
+
+        Variant* variant = vmap_[key];
+
+        if (!variant)
+            return empty;
+
+        return variant->GetVariantVector();
+
+    }
+
+
     VariantType GetVariantType(StringHash key) const
     {
         Variant* variant = vmap_[key];

@@ -116,6 +116,9 @@ public:
     /// Hide a named submesh
     void HideGeometry(const String& name);
 
+    /// Returns true if any geometry is hidden in the model
+    bool GetGeometryHidden() const { return geometryDisabled_; }
+
     void SetGeometryEnabledAttr(const VariantVector& value);
     const VariantVector& GetGeometryEnabledAttr() const;
 
@@ -145,6 +148,10 @@ protected:
     mutable ResourceRefList materialsAttr_;
 
     // ATOMIC BEGIN
+
+    // Apply geometry hiding when updating batches
+    void UpdateBatchesHideGeometry();
+
     mutable VariantVector geometryEnabled_;
     /// true if any geometry has been disabled
     mutable bool geometryDisabled_;

@@ -196,10 +196,20 @@ void JSFunctionWriter::WriteParameterMarshal(String& source)
             }
             else if (ptype->type_->asVectorType())
             {
-                // read only vector arguments
-                if (ptype->isConst_)
+                JSBVectorType* vtype = ptype->type_->asVectorType();
+
+                if (vtype->isVariantVector_)
                 {
-                    JSBVectorType* vtype = ptype->type_->asVectorType();
+                    // variant vector arguments
+                    source.AppendWithFormat("VariantVector __arg%i;\nScriptVector* __scriptVectorArg%i = js_to_class_instance<ScriptVector>(ctx, %i, 0);\n", cparam, cparam, cparam);
+                    if (!function_->HasMutatedReturn())
+                        source.AppendWithFormat("__scriptVectorArg%i->AdaptToVector(__arg%i);\n", cparam, cparam);
+                }
+                else if (ptype->isConst_)
+                {                    
+                    // JS/TS side needs work for vector parameters, right now we support const (read only)
+                    // Vector of String/StringHash
+
                     source.AppendWithFormat("%s __arg%i;\n", vtype->ToString().CString(), cparam);
 
                     source.AppendWithFormat("if (duk_get_top(ctx) >= %i)\n{\n", cparam + 1);
@@ -222,7 +232,6 @@ void JSFunctionWriter::WriteParameterMarshal(String& source)
 
                 }
             }
-
         }
     }
 }
@@ -437,22 +446,34 @@ void JSFunctionWriter::WriteFunction(String& source)
 
     }
 
+    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
     if (function_->IsStatic())
     {
         source.AppendWithFormat("%s::%s(", klass->GetNativeName().CString(), function_->name_.CString());
     }
     else
     {
-        source.AppendWithFormat("native->%s(", function_->name_.CString());
-    }
+        if (function_->HasMutatedReturn())
+        {
+            source.AppendWithFormat("__arg%i = native->%s(", parameters.Size() - 1, function_->name_.CString());
+        }
+        else
+        {
+            source.AppendWithFormat("native->%s(", function_->name_.CString());
+        }
 
-    const Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+    }    
 
-    for (unsigned int i = 0; i < parameters.Size(); i++)
+    unsigned numParams = parameters.Size();
+    if (numParams && function_->HasMutatedReturn())
+        numParams--;
+
+    for (unsigned int i = 0; i < numParams; i++)
     {
         source.AppendWithFormat("__arg%i",  i);
 
-        if (i != parameters.Size() - 1)
+        if (i != numParams - 1)
         {
             source += ", ";
         }
@@ -460,7 +481,17 @@ void JSFunctionWriter::WriteFunction(String& source)
 
     source += ");\n";
 
-    if (returnDeclared)
+    if (!returnDeclared)
+    {
+        if (function_->HasMutatedReturn())
+        {
+            // this handles the VariantVector case currently, can be expanded
+            source.AppendWithFormat("__scriptVectorArg%i->AdaptFromVector(__arg%i);\n", parameters.Size() - 1,  parameters.Size() - 1);
+        }
+
+        source += "return 0;\n";
+    }
+    else
     {
         if (returnType->type_->asStringType())
         {
@@ -534,10 +565,6 @@ void JSFunctionWriter::WriteFunction(String& source)
 
 
         source += "return 1;\n";
-    }
-    else
-    {
-        source += "return 0;\n";
     }
 
     source.Append("}\n");

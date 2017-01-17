@@ -324,26 +324,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 
     // Handle mesh hiding
     if (geometryDisabled_)
-    {
-        for (unsigned i = 0; i < batches_.Size(); ++i)
-        {
-            SourceBatch* batch = &batches_[i];
-            StaticModelGeometryData* data = &geometryData_[i];
-
-            if (batch->geometry_)
-                data->batchGeometry_ = batch->geometry_;
-
-            if (data->enabled_ && !batch->geometry_)
-            {
-                batch->geometry_ = data->batchGeometry_;
-            }
-            else if (!data->enabled_ && batch->geometry_)
-            {
-                data->batchGeometry_ = batch->geometry_;
-                batch->geometry_ = 0;
-            }
-        }
-    }
+        UpdateBatchesHideGeometry();
 
     // ATOMIC END
 

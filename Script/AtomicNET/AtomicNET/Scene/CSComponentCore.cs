@@ -55,10 +55,58 @@ namespace AtomicEngine
 
         }
 
+#if ATOMIC_DESKTOP || ATOMIC_MOBILE
+        public void SetFieldValue(object o, FieldInfo field)
+        {
+            var fieldType = field.FieldType;
+            var typeCode = Type.GetTypeCode(fieldType);
+
+            // FIXME: This will need to be optimized, specifically to use uint key hashes for value lookup
+            switch (typeCode)
+            {
+                case TypeCode.Boolean:
+                    field.SetValue(o, fieldMap.GetBool(field.Name));
+                    break;
+
+                case TypeCode.Int32:
+                    field.SetValue(o, fieldMap.GetInt(field.Name));
+                    break;
+
+                case TypeCode.Single:
+                    field.SetValue(o, fieldMap.GetFloat(field.Name));
+                    break;
+
+                case TypeCode.String:
+                    field.SetValue(o, fieldMap.GetString(field.Name));
+                    break;
+
+                default:
+
+                    if (fieldType == typeof(Vector3))
+                    {
+                        field.SetValue(o, fieldMap.GetVector3(field.Name));
+                    }
+                    else if (fieldType == typeof(Quaternion))
+                    {
+                        field.SetValue(o, fieldMap.GetQuaternion(field.Name));
+                    }
+                    else if (fieldType.IsSubclassOf(typeof(Resource)))
+                    {
+                        field.SetValue(o, fieldMap.GetResourceFromRef(field.Name));
+                    }
+                    else if (fieldType.IsSubclassOf(typeof(RefCounted)))
+                    {
+                        field.SetValue(o, fieldMap.GetPtr(field.Name));
+                    }
+
+                    break;
+            }
+
+        }
+#endif
+
         public void ApplyFieldValues(CSComponent component, IntPtr fieldValuePtr)
         {
-            // FIXME: This will need to be optimized, specifically to use uint key hashes for value lookup
-
 #if ATOMIC_DESKTOP || ATOMIC_MOBILE
 
             fieldMap.CopyVariantMap(fieldValuePtr);
@@ -66,7 +114,7 @@ namespace AtomicEngine
             foreach (var field in InspectorFields)
             {
                 if (fieldMap.Contains(field.Name))
-                {
+                {                   
                     var fieldType = field.FieldType;
 
                     if (fieldType.IsEnum)
@@ -75,50 +123,77 @@ namespace AtomicEngine
                         continue;
                     }
 
-                    switch (Type.GetTypeCode(fieldType))
+                    if (!fieldType.IsArray)
                     {
-                        case TypeCode.Boolean:
-                            field.SetValue(component, fieldMap.GetBool(field.Name));
-                            break;
+                        SetFieldValue(component, field); 
+                    }
+                    else
+                    {   
+                        fieldMap.GetVariantVector(field.Name, arrayMarshal);
 
-                        case TypeCode.Int32:
-                            field.SetValue(component, fieldMap.GetInt(field.Name));
-                            break;
+                        var elementType = fieldType.GetElementType();
+                        uint sz = arrayMarshal.Size;
+                        Array array = Array.CreateInstance(elementType, sz);
 
-                        case TypeCode.Single:
-                            field.SetValue(component, fieldMap.GetFloat(field.Name));
-                            break;
+                        var typeCode = Type.GetTypeCode(elementType);
 
-                        case TypeCode.String:
-                            field.SetValue(component, fieldMap.GetString(field.Name));
-                            break;
+                        for (uint i = 0; i < sz; i++)
+                        {
+                            var variant = arrayMarshal[i];
 
-                        default:
-
-                            if (fieldType == typeof(Vector3))
+                            // FIXME: This will need to be optimized, specifically to use uint key hashes for value lookup
+                            switch (typeCode)
                             {
-                                field.SetValue(component, fieldMap.GetVector3(field.Name));
-                            }
-                            else if (fieldType == typeof(Quaternion))
-                            {
-                                field.SetValue(component, fieldMap.GetQuaternion(field.Name));
-                            }
-                            else if (fieldType.IsSubclassOf(typeof(Resource)))
-                            {
-                                field.SetValue(component, fieldMap.GetResourceFromRef(field.Name));
-                            }
-                            else if (fieldType.IsSubclassOf(typeof(RefCounted)))
-                            {
-                                field.SetValue(component, fieldMap.GetPtr(field.Name));
-                            }
+                                case TypeCode.Boolean:
+                                    array.SetValue((bool) variant.GetBool(), i);
+                                    break;
 
-                            break;
+                                case TypeCode.Int32:
+                                    array.SetValue(variant.GetInt(), i);
+                                    break;
+
+                                case TypeCode.UInt32:
+                                    array.SetValue(variant.GetUInt(), i);
+                                    break;
+
+                                case TypeCode.Single:
+                                    array.SetValue(variant.GetFloat(), i);
+                                    break;
+
+                                case TypeCode.String:
+                                    array.SetValue(variant.GetString(), i);
+                                    break;
+
+                                default:
+
+                                    if (elementType == typeof(Vector3))
+                                    {
+                                         array.SetValue(variant.GetVector3(), i);
+                                    }
+                                    else if (elementType == typeof(Vector2))
+                                    {
+                                         array.SetValue(variant.GetVector2(), i);
+                                    }
+                                    else if (elementType == typeof(Quaternion))
+                                    {
+                                         array.SetValue(variant.GetQuaternion(), i);
+                                    }
+                                    else if (elementType == typeof(Color))
+                                    {
+                                         array.SetValue(variant.GetColor(), i);
+                                    }
+
+                                    break;
+                            }                            
+                    
+                        }
+
+                        field.SetValue(component, array);
+
                     }
                 }
             }
-
 #endif
-
         }
 
         public FieldInfo[] InspectorFields;
@@ -140,6 +215,8 @@ namespace AtomicEngine
         ScriptVariantMap fieldMap = new ScriptVariantMap();
 
         public Dictionary<uint, FieldInfo> fieldLookup = new Dictionary<uint, FieldInfo>();
+
+        private Vector<ScriptVariant> arrayMarshal = new Vector<ScriptVariant>();
     }
 
     public class CSComponentCore : NETScriptObject

@@ -53,10 +53,11 @@ void ScriptComponentFile::AddEnum(const String& enumName, const EnumInfo& enumIn
     enumValues.Push(enumInfo);
 }
 
-void ScriptComponentFile::AddField(const String& fieldName, VariantType variantType, const String &classname, const String& tooltip)
+void ScriptComponentFile::AddField(const String& fieldName, VariantType variantType, bool isArray, const String &classname, const String& tooltip)
 {
     FieldMap& fields = classFields_[classname];
-    fields[fieldName] = variantType;
+    FieldInfo finfo(fieldName, variantType, isArray);
+    fields[fieldName] = finfo;
 
     if (tooltip.Length())
     {
@@ -145,11 +146,17 @@ void ScriptComponentFile::GetDefaultFieldValue(const String& name, Variant& v,co
     if (!fieldMap)
         return;
 
-    const VariantType* variantType = (*fieldMap)[name];
+    const FieldInfo* finfo = (*fieldMap)[name];
+
+    if (!finfo || finfo->isArray_)
+        return;
+
+    VariantType variantType = finfo->variantType_;
+
     if (!variantType)
         return;
 
-    switch (*variantType)
+    switch (variantType)
     {
     case VAR_BOOL:
         v = false;

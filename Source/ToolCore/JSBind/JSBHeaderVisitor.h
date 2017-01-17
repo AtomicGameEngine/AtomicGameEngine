@@ -92,7 +92,15 @@ public:
             if (classname.StartsWith("Atomic::"))
                 classname.Replace("Atomic::", "");
 
-            if (classname == "Vector" || classname == "PODVector")
+            if (classname == "VariantVector")
+            {
+                JSBClass* jclass = JSBPackage::GetClassAllPackages("ScriptVariant");
+                assert(jclass);
+
+                jtype = new JSBVectorType(new JSBClassType(jclass), false, true);
+
+            }
+            else if (classname == "Vector" || classname == "PODVector")
             {
                 PODVector<TemplateType> types;
                 unwrapTemplateType(fst, types);

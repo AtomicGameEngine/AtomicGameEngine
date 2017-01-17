@@ -21,7 +21,6 @@
 //
 
 import InspectorWidget = require("./InspectorWidget");
-import ArrayEditWidget = require("./ArrayEditWidget");
 import InspectorUtils = require("./InspectorUtils");
 
 class PrefabInspector extends InspectorWidget {
