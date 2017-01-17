@@ -172,7 +172,7 @@ bool Asset::Load()
     json_->Load(*file);
     file->Close();
 
-    JSONValue root = json_->GetRoot();
+    JSONValue& root = json_->GetRoot();
 
     assert(root.Get("version").GetInt() == ASSET_VERSION);
 

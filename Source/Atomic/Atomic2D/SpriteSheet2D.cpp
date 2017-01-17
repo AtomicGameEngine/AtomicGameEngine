@@ -282,7 +282,7 @@ bool SpriteSheet2D::BeginLoadFromJSONFile(Deserializer& source)
 
     SetMemoryUse(source.GetSize());
 
-    JSONValue rootElem = loadJSONFile_->GetRoot();
+    JSONValue& rootElem = loadJSONFile_->GetRoot();
     if (rootElem.IsNull())
     {
         ATOMIC_LOGERROR("Invalid sprite sheet");
@@ -310,7 +310,7 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
         return false;
     }
 
-    JSONValue rootVal = loadJSONFile_->GetRoot();
+    JSONValue& rootVal = loadJSONFile_->GetRoot();
     JSONArray subTextureArray = rootVal.Get("subtextures").GetArray();
 
     for (unsigned i = 0; i < subTextureArray.Size(); i++)

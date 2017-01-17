@@ -226,7 +226,7 @@ bool JSBPackage::Load(const String& packageFolder)
         return false;
     }
 
-    JSONValue root = packageJSON->GetRoot();
+    JSONValue& root = packageJSON->GetRoot();
 
     // first load dependencies
     JSONValue deps = root.Get("dependencies");

@@ -481,7 +481,7 @@ bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        JSONValue rootVal = json->GetRoot();
+        JSONValu& rootVal = json->GetRoot();
 
         // Preload resources if appropriate
         if (mode != LOAD_SCENE)
