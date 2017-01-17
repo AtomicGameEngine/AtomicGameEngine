@@ -181,6 +181,34 @@ public:
     Plane planes_[NUM_FRUSTUM_PLANES];
     /// Frustum vertices.
     Vector3 vertices_[NUM_FRUSTUM_VERTICES];
+
+    // ATOMIC BEGIN
+    /// Construct from a float array for bindings
+    explicit Frustum(const float* data)
+    {
+        // unpack planes
+        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        {
+            planes_[i].normal_ = Vector3(data);
+            data += 3;
+            planes_[i].absNormal_ = Vector3(data);
+            data += 3;
+            planes_[i].d_ = *data;
+            data++;
+        }
+
+        // unpack vertices
+        for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
+        {
+            vertices_[i] = Vector3(data);
+            data += 3;
+        }
+
+    }
+
+    /// Return float data for bindings
+    const float* Data() const { return (float*) &planes_; }
+    // ATOMIC END
 };
 
 }

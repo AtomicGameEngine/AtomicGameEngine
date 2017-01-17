@@ -45,18 +45,38 @@ namespace AtomicEngine
 
             appDelegate = (AppDelegate)Activator.CreateInstance(appDelegateType);
 
-            appDelegate.Start();
-
-            // Managed code in charge of main loop
-            while (app.RunFrame())
+            try
             {
-                appDelegate.PostFrame();
+
+
+                appDelegate.Start();
+
+                // Managed code in charge of main loop
+                while (app.RunFrame())
+                {
+                    appDelegate.PostFrame();
+                }
+
+                appDelegate.Shutdown();
+
+                // Shut 'er down
+                app.Shutdown();
             }
-
-            appDelegate.Shutdown();
-
-            // Shut 'er down
-            app.Shutdown();
+            catch (Exception e)
+            {
+                if (e.InnerException != null)
+                {
+                    Log.Error(e.InnerException.StackTrace);
+                    // rethrow inner exception
+                    throw e.InnerException;
+                }
+                else
+                {
+                    Log.Error(e.StackTrace);
+                    // rethrow
+                    throw e;
+                }
+            }
 
             return 0;
         }

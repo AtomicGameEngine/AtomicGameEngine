@@ -40,5 +40,12 @@ namespace AtomicEngine
             AbsNormal = new Vector3(Math.Abs(plane.X), Math.Abs(plane.Y), Math.Abs(plane.Z));
             D = plane.W;
         }
+
+        /// Return signed distance to a point.
+        public float Distance(Vector3 point)  
+        { 
+            return Vector3.Dot(Normal, point) + D; 
+        }
+
     }
 }

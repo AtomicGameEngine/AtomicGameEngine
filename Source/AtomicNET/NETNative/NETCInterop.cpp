@@ -607,6 +607,69 @@ namespace Atomic
             return new CSComponent(NETCore::GetContext());
         }
 
+        // Frustum
+
+        ATOMIC_EXPORT_API void csi_Atomic_Frustum_Define(Frustum* self, float fov, float aspectRatio, float zoom, float nearZ, float farZ, Vector3* position, Quaternion* rotation)
+        {
+            if (!self || !position || !rotation)
+            {
+                return;
+            }
+
+            self->Define(fov, aspectRatio, zoom, nearZ, farZ, Matrix3x4(*position, *rotation, 1.0f));
+
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Frustum_DefineOrtho(Frustum* self, float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, Vector3* position, Quaternion* rotation)
+        {
+            if (!self || !position || !rotation)
+            {
+                return;
+            }
+
+            self->DefineOrtho(orthoSize, aspectRatio, zoom, nearZ, farZ, Matrix3x4(*position, *rotation, 1.0f));
+
+        }
+
+        ATOMIC_EXPORT_API Intersection csi_Atomic_Frustum_IsInside_Vector3(Frustum* self, Vector3* point)
+        {
+            if (!self || !point)
+            {
+                return OUTSIDE;
+            }
+
+            return self->IsInside(*point);
+        }
+
+        ATOMIC_EXPORT_API Intersection csi_Atomic_Frustum_IsInside_BoundingBox(Frustum* self, BoundingBox* bbox)
+        {
+            if (!self || !bbox)
+            {
+                return OUTSIDE;
+            }
+
+            return self->IsInside(*bbox);
+        }
+
+        ATOMIC_EXPORT_API Intersection csi_Atomic_Frustum_IsInsideFast_BoundingBox(Frustum* self, BoundingBox* bbox)
+        {
+            if (!self || !bbox)
+            {
+                return OUTSIDE;
+            }
+
+            return self->IsInsideFast(*bbox);
+        }
+
+        ATOMIC_EXPORT_API float csi_Atomic_Frustum_Distance(Frustum* self, Vector3* point)
+        {
+            if (!self || !point)
+            {
+                return 0.0f;
+            }
+
+            return self->Distance(*point);
+        }
 
 
 #ifdef ATOMIC_PLATFORM_IOS

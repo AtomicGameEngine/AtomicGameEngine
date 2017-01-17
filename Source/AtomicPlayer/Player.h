@@ -63,6 +63,9 @@ public:
     /// Unload all loaded scenes
     void UnloadAllScenes();    
 
+    /// Get the player default viewport
+    Viewport* GetViewport() const { return viewport_; }
+
 private:
 
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
