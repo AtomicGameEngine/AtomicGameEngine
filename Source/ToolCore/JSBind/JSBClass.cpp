@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <Atomic/Math/Plane.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
@@ -159,6 +160,13 @@ JSBClass::JSBClass(Context* context, JSBModule *module, const String& name, cons
     {
         numberArrayElements_ = 2;
         arrayElementType_ = "int";
+    }
+    else if (name_ == "Frustum")
+    {
+        // NUM_FRUSTUM_PLANES = 6;
+        numberArrayElements_ = (int) ((sizeof(Plane) * 6) / sizeof(float));
+        // NUM_FRUSTUM_VERTICES = 8;
+        numberArrayElements_ += (int) ((sizeof(Vector3) * 8) / sizeof(float));
     }
 
 }

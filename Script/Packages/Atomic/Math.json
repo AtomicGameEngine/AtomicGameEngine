@@ -1,5 +1,5 @@
 {
 	"name" : "Math",
 	"sources" : ["Source/Atomic/Math"],
-	"classes" : ["Color", "Vector2", "Vector3", "Vector4", "Quaternion", "BoundingBox", "Rect", "IntRect", "IntVector2"]
+	"classes" : ["Color", "Vector2", "Vector3", "Vector4", "Quaternion", "BoundingBox", "Rect", "IntRect", "IntVector2", "Frustum"]
 }
