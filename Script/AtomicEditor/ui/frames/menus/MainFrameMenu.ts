@@ -320,7 +320,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 "help api js" : "http://docs.atomicgameengine.com/api/modules/atomic.html",
                 "help api csharp" : "http://docs.atomicgameengine.com/csharp/AtomicEngine/",
                 "help api cplusplus" : "http://docs.atomicgameengine.com/cpp",
-                "help q_and_a" : "https://qa.atomicgameengine.com/",
+                "help support" : "https://discourse.atomicgameengine.com/",
                 "help github" : "https://github.com/AtomicGameEngine/AtomicGameEngine/"
             };
 
@@ -423,18 +423,18 @@ var fileItems = {
 
 var helpItems = {
 
-    "What's New": "help what new",
-    "Documentation Wiki": "help doc wiki",
+    "Atomic Community Support": ["help support"],
+    "Atomic Chat": ["help chat"],
     "-1": null,
+    "Documentation Wiki": "help doc wiki",
     "API References": {
         "JavaScript & TypeScript": ["help api js"],
         "C#": ["help api csharp"],
         "C++": ["help api cplusplus"]
     },
     "-2": null,
-    "Atomic Q & A": ["help q_and_a"],
-    "Atomic Chat": ["help chat"],
-    "-3": null,
     "Atomic Game Engine on GitHub": ["help github"],
+    "-3": null,
+    "What's New": "help what new",
     "About Atomic Editor": "about atomic editor"
 };
