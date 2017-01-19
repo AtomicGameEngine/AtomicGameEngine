@@ -23,7 +23,7 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
                 "• Create a new project based on a 2D or 3D template.\n\n" \
                 "<color #D4FB79>Atomic Resources</color>\n" \
                 "<widget TBButton: text: 'Documentation Wiki' url: 'https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/' skin: TBButton.link>\n" \
-                "<widget TBButton: text: 'Atomic Q & A' url: 'https://qa.atomicgameengine.com/' skin: TBButton.link>\n" \
+                "<widget TBButton: text: 'Atomic Community Support' url: 'https://discourse.atomicgameengine.com/' skin: TBButton.link>\n" \
                 "<widget TBButton: text: 'Atomic Chat' url: 'https://gitter.im/AtomicGameEngine/AtomicGameEngine/' skin: TBButton.link>\n\n" \
                 "<color #D4FB79>Atomic API References</color>\n" \
                 "<widget TBButton: text: 'JavaScript & TypeScript' url: 'http://docs.atomicgameengine.com/api/modules/atomic.html' skin: TBButton.link>\n" \
