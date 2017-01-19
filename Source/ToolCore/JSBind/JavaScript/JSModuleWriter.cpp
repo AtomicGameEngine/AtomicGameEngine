@@ -234,7 +234,7 @@ void JSModuleWriter::WriteModulePreInit(String& source)
         while (itr != values.End())
         {
             String name = (*itr).first_;
-            source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", name.CString());
+            source.AppendWithFormat("duk_push_number(ctx, %s);\n", name.CString());
             source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",name.CString());
             itr++;
         }
@@ -247,7 +247,7 @@ void JSModuleWriter::WriteModulePreInit(String& source)
         while (itr != values.End())
         {
             String name = (*itr).first_;
-            source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", name.CString());
+            source.AppendWithFormat("duk_push_number(ctx, %s);\n", name.CString());
             source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",name.CString());
             itr++;
         }
