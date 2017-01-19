@@ -230,13 +230,28 @@ void JSModuleWriter::WriteModulePreInit(String& source)
 
         HashMap<String, String>::ConstIterator itr = values.Begin();
 
+        // Legacy mode - this should be removed at some point
         while (itr != values.End())
         {
             String name = (*itr).first_;
-            source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", name.CString());
+            source.AppendWithFormat("duk_push_number(ctx, %s);\n", name.CString());
             source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",name.CString());
             itr++;
         }
+
+        // Preferred way - built-in enum
+        itr = values.Begin();
+        source.Append("duk_push_object(ctx);\n");
+        source.Append("duk_dup(ctx, -1);\n");
+        source.AppendWithFormat("duk_put_prop_string(ctx, -3, \"%s\");\n", jenum->GetName().CString());
+        while (itr != values.End())
+        {
+            String name = (*itr).first_;
+            source.AppendWithFormat("duk_push_number(ctx, %s);\n", name.CString());
+            source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",name.CString());
+            itr++;
+        }
+        source.Append("duk_pop(ctx);\n");
     }
 
     source += "// constants\n";

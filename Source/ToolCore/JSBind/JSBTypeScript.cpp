@@ -340,7 +340,7 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         JSBEnum* _enum = *enumIter;
 
         source_ += "   /** enum " + _enum->GetName() + "*/\n";
-        source_ += "   export const enum " + _enum->GetName() + " {\n";
+        source_ += "   export enum " + _enum->GetName() + " {\n";
 
         HashMap<String, String>& values = _enum->GetValues();
 
@@ -349,28 +349,8 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         while (valsIter != values.End())
         {
             String name = (*valsIter).first_;
-            String value = (*valsIter).second_;
 
-            // BodyType2D enum order is assigned in RigidBody2D.h in incorrect order
-            if (_enum->GetName() == "BodyType2D")
-            {
-                if (name == "BT_STATIC")
-                    value = "0";
-                else if (name == "BT_KINEMATIC")
-                    value = "1";
-                else if (name == "BT_DYNAMIC")
-                    value = "2";
-            }
-
-            //source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
-            source_ += "       /** TypeScript Only - For vanilla JavaScript, use: [[" + package_->GetName() + "." + name + "]] */\n";
-            if (value != "")
-            {
-                source_ += "       " + name + " = " + value;
-            } else {
-                source_ += "       " + name;
-            }
-
+            source_ += "       " + name;
             valsIter++;
 
             if (valsIter != values.End())
@@ -381,13 +361,13 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         source_ += "    }\n";
         source_ += "\n";
 
-        // legacy support
+        // legacy support - This should be removed in a couple releases
         source_ += "   // Legacy JS Access for enum:  " + _enum->GetName() + "\n";
         valsIter = values.Begin();
         while (valsIter != values.End())
         {
             String name = (*valsIter).first_;
-            source_ += "   /** JavaScript Only - For TypeScript, use: [[" + _enum->GetName() + "." + name + "]] */\n";
+            source_ += "   /** Deprecated - use: [[" + _enum->GetName() + "." + name + "]]\n@deprecated */\n";
             source_ += "   export var " + name + ": number;\n";
             valsIter++;
         }

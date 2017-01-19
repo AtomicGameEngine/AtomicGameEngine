@@ -45,8 +45,8 @@ class NewBuildWindow extends ModalWindow {
 
         if (!showCheck) {
 
-            this.getWidget("newbuild_check_text").visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
-            this.newBuildCheck.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.getWidget("newbuild_check_text").visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
+            this.newBuildCheck.visibility = Atomic.UI_WIDGET_VISIBILITY.UI_WIDGET_VISIBILITY_GONE;
         }
 
         this.resizeToFitContent();
