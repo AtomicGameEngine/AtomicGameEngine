@@ -336,6 +336,32 @@ namespace Atomic
 
                             VariantVector* vector = vptr->GetVariantVectorPtr();
 
+                            if (finfo->fixedArraySize_)
+                            {
+                                if (vector->Size() != finfo->fixedArraySize_)
+                                {
+                                    if (vector->Size() < finfo->fixedArraySize_)
+                                    {
+                                        Variant value;
+                                        js_get_default_variant(finfo->variantType_, value);
+
+                                        unsigned oldSize = vector->Size();
+                                        vector->Resize(finfo->fixedArraySize_);
+
+                                        for (unsigned i = oldSize; i < finfo->fixedArraySize_; i++)
+                                        {
+                                            (*vector)[i] = value;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // truncate
+                                        vector->Resize(finfo->fixedArraySize_);
+                                    }
+                                    
+                                }
+                            }
+
                             if (arrayIndex >= vector->Size())
                             {
                                 duk_push_undefined(ctx);
@@ -347,7 +373,8 @@ namespace Atomic
                             if (current.GetType() != finfo->variantType_)
                             {
                                 Variant value;
-                                js_push_default_variant(ctx, finfo->variantType_, value);
+                                js_get_default_variant(finfo->variantType_, value);
+                                js_push_variant(ctx, value);
                                 (*vector)[arrayIndex] = value;
                             }
                             else
@@ -369,23 +396,36 @@ namespace Atomic
                             if (arrayIndex < 0)
                             {
                                 SharedPtr<ScriptVector> vector(new ScriptVector());
+
+                                if (finfo->fixedArraySize_)
+                                {
+                                    
+                                    VariantVector init(finfo->fixedArraySize_);
+                                    init.Resize(finfo->fixedArraySize_);
+                                    Variant value;
+                                    js_get_default_variant(finfo->variantType_, value);
+                                    
+                                    for (unsigned i = 0; i < finfo->fixedArraySize_; i++)
+                                    {
+                                        init[i] = value;
+                                    }
+
+                                    jsc->GetFieldValues()[finfo->name_] = init;
+
+                                    vector->AdaptFromVector(init);
+
+                                    
+
+                                }
+
                                 js_push_class_object_instance(ctx, vector);
                                 return 1;
                             }
                             else
                             {
-                                Variant value;
-                                js_push_default_variant(ctx, finfo->variantType_, value);
-
-                                VariantVector newVector;
-
-                                if (arrayIndex >= newVector.Size())
-                                {
-                                    newVector.Resize(arrayIndex + 1);
-                                }
-
-                                jsc->GetFieldValues()[name] = newVector;
-
+                                // we don't have the variant in the fieldmap
+                                ATOMIC_LOGERROR("Serializable_GetAttribute - indexing uninitialized array");
+                                duk_push_undefined(ctx);
                                 return 1;
                             }
                         }
@@ -460,6 +500,9 @@ namespace Atomic
 
                 duk_push_boolean(ctx, itr->second_.isArray_ ? 1 : 0);
                 duk_put_prop_string(ctx, -2, "isArray");
+
+                duk_push_number(ctx, itr->second_.fixedArraySize_);
+                duk_put_prop_string(ctx, -2, "fixedArraySize");
 
                 if (tooltips.Contains(itr->first_))
                 {

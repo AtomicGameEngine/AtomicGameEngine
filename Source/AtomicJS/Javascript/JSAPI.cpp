@@ -304,7 +304,7 @@ namespace Atomic
         return true;
     }
 
-    void js_push_default_variant(duk_context* ctx, VariantType variantType, Variant& value)
+    void js_get_default_variant(VariantType variantType, Variant& value)
     {
         value = Variant::EMPTY;
         
@@ -370,8 +370,7 @@ namespace Atomic
         default:
             break;
         }
-
-        js_push_variant(ctx, value);
+        
     }
 
     void js_to_variant(duk_context* ctx, int variantIdx, Variant &v, VariantType variantType)

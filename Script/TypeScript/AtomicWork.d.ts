@@ -122,6 +122,7 @@ declare module Atomic {
         dynamic: boolean;
         tooltip: string;
         isArray:boolean;
+        fixedArraySize:number;
     }
 
     export interface ShaderParameter {

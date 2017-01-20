@@ -1182,11 +1182,15 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
         lp.width = 304;
         layout.layoutParams = lp;
 
-        var name = this.attrInfo.name + " Size";
-        if (name == "AnimationResources Size")
+        var name = this.attrInfo.name;
+        if (name == "AnimationResources")
             name = "Animations";
 
         var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
+
+        if (this.attrInfo.fixedArraySize) {
+            sizeEdit.disable();
+        }
 
         lp = new Atomic.UILayoutParams();
         lp.width = 160;

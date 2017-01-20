@@ -20,3 +20,35 @@
 // THE SOFTWARE.
 //
 
+#include "ScriptVariant.h"
+
+namespace Atomic
+
+{
+
+Resource* ScriptVariant::GetResource() const
+{
+    if (variant_.GetType() == VAR_RESOURCEREF)
+    {
+        const ResourceRef& ref = variant_.GetResourceRef();
+
+        if (!ref.name_.Length() || !ref.type_)
+            return 0;
+
+        ResourceCache* cache = ScriptSystem::GetContext()->GetSubsystem<ResourceCache>();
+
+        return cache->GetResource(ref.type_, ref.name_);       
+    }
+}
+
+void ScriptVariant::SetResource(Resource* resource)
+{
+    if (!resource)
+    {
+        variant_ = ResourceRef();
+        return;
+    }
+    variant_ = ResourceRef(resource->GetType(), resource->GetName());
+}
+
+}

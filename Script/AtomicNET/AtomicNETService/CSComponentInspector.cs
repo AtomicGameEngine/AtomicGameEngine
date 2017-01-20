@@ -317,8 +317,8 @@ namespace AtomicTools
 
                 var typeCode = argsReader.ReadSerializationTypeCode();
 
-                // support string custom attr for now to simplify things
-                if (typeCode != SerializationTypeCode.String)
+                // support string/int custom attr for now to simplify things
+                if (typeCode != SerializationTypeCode.String && typeCode != SerializationTypeCode.Int32)
                     return false;
 
                 string name;
@@ -326,12 +326,23 @@ namespace AtomicTools
                 if (!CrackStringInAttributeValue(out name, ref argsReader))
                     return false;
 
-                string value;
+                if (typeCode == SerializationTypeCode.Int32)
+                {
+                    int value;
+                    value = argsReader.ReadInt32();
+                    inspectorField.CustomAttrNamedArgs[name] = value.ToString();
+                }
+                else
+                {
+                    string value;
 
-                if (!CrackStringInAttributeValue(out value, ref argsReader))
-                    return false;
+                    if (!CrackStringInAttributeValue(out value, ref argsReader))
+                        return false;
 
-                inspectorField.CustomAttrNamedArgs[name] = value;
+                    inspectorField.CustomAttrNamedArgs[name] = value;
+                }
+
+                
 
             }
 

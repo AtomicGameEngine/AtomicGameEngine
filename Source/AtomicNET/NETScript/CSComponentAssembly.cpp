@@ -93,6 +93,7 @@ namespace Atomic
 
                 bool isEnum = jfield.Get("isEnum").GetBool();
                 bool isArray = jfield.Get("isArray").GetBool();
+                unsigned fixedArraySize = 0;
                 String typeName = jfield.Get("typeName").GetString();
                 String resourceTypeName;
                 String fieldName = jfield.Get("name").GetString();
@@ -119,6 +120,13 @@ namespace Atomic
                 {
                     tooltip = caNamed["Tooltip"].GetString();
                 }
+
+                // fixed array size
+                if (caNamed.Contains("ArraySize"))
+                {
+                    fixedArraySize = (unsigned)ToInt(caNamed["ArraySize"].GetString().CString());
+                }
+
 
                 if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(fieldName))
                 {
@@ -186,7 +194,7 @@ namespace Atomic
                     }
                 }
 
-                AddField(fieldName, varType, resourceTypeName, isArray, className, tooltip);
+                AddField(fieldName, varType, resourceTypeName, isArray, fixedArraySize, className, tooltip);
 
             }
 
