@@ -37,18 +37,24 @@ struct FieldInfo
         name_ = "UNINITIALIZED_FIELDINFO";
         variantType_ = VAR_NONE;
         isArray_ = false;
+        fixedArraySize_ = 0;
     }
 
-    FieldInfo(const String& name, VariantType variantType, bool isArray = false)
+    FieldInfo(const String& name, VariantType variantType, const String& resourceTypeName = String::EMPTY, bool isArray = false, unsigned fixedArraySize = 0)
     {
-        name_ = name;
+        name_ = name;        
         variantType_ = variantType;
+        resourceTypeName_ = resourceTypeName;
         isArray_ = isArray;
+        fixedArraySize_ = fixedArraySize;
     }
 
     String name_;
     VariantType variantType_;
+    // for resource ref variants
+    String resourceTypeName_;
     bool isArray_;
+    unsigned fixedArraySize_;
 };
 
 struct EnumInfo
@@ -102,7 +108,7 @@ protected:
     void Clear();
 
     void AddEnum(const String& enumName, const EnumInfo& enumInfo, const String& classname = String::EMPTY);
-    void AddField(const String& fieldName, VariantType variantType, bool isArray, const String& classname = String::EMPTY, const String& tooltip = String::EMPTY);
+    void AddField(const String& fieldName, VariantType variantType, const String& resourceTypeName = String::EMPTY, bool isArray = false, unsigned fixedArraySize = 0, const String& classname = String::EMPTY, const String& tooltip = String::EMPTY);
     void AddDefaultValue(const String& fieldName, const Variant& value, const String& classname = String::EMPTY);
 
     // only valid in editor

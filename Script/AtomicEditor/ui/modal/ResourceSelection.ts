@@ -159,7 +159,7 @@ class ResourceSelection extends ModalWindow {
         var id = this.folderList.selectedItemID;
 
         if (id == "") {
-            this.sendEvent(EditorEvents.RemoveCurrentAssetAssigned);
+            this.callback(null, this.args);
             this.hide();
             return true;
         }

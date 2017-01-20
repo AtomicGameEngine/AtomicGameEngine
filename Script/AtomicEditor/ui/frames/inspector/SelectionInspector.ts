@@ -165,6 +165,10 @@ class JSComponentSection extends ComponentSection {
         let jsc = this.editType.getFirstObject() as Atomic.JSComponent;
         if (jsc && jsc.componentFile) {
             this.text = jsc.componentFile.name.split("/").pop();
+            let jscf = <Atomic.JSComponentFile> jsc.componentFile;
+            if (jscf.typeScriptClass) {
+                this.text = this.text.replace(".js", ".ts");
+            }            
         }
     }
 

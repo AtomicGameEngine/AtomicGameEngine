@@ -182,7 +182,10 @@ namespace AtomicEngine
                                     {
                                          array.SetValue(variant.GetColor(), i);
                                     }
-
+                                    else if (elementType.IsSubclassOf(typeof(Resource)))
+                                    {
+                                        array.SetValue(variant.GetResource(), i);
+                                    }
                                     break;
                             }                            
                     

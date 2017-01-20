@@ -78,6 +78,10 @@ namespace Atomic
 
         const Vector3& GetVector3() const { return variant_.GetVector3(); }
 
+        Resource* GetResource() const;
+
+        void SetResource(Resource* resource);
+
         void SetVector3(const Vector3& value) { variant_ = value; }
 
         const Quaternion& GetQuaternion() const { return variant_.GetQuaternion(); }

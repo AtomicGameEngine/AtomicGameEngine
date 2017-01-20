@@ -13,7 +13,20 @@ namespace AtomicEngine
 
         public readonly string DefaultValue;
 
-        // Tooltip which will be displayed in editor
+        /// <summary>
+        ///Specify a fixed array size for field 
+        /// </summary>
+        public int ArraySize
+        {
+            get { return arraySize; }
+            set { arraySize = value; }
+        }
+
+        private int arraySize = 0;
+
+        /// <summary>
+        /// Tooltip which will be displayed in editor 
+        /// </summary>
         public string Tooltip
         {
             get { return tooltip; }

@@ -36,7 +36,8 @@ namespace Atomic
 
 JSComponentFile::JSComponentFile(Context* context) :
     ScriptComponentFile(context),
-    scriptClass_(false)
+    scriptClass_(false),
+    typescriptClass_(false)
 {
 }
 
@@ -181,6 +182,8 @@ bool JSComponentFile::InitModule()
 
 bool JSComponentFile::BeginLoad(Deserializer& source)
 {
+    typescriptClass_ = false;
+
     if (!InitModule())
         return false;
 
@@ -210,6 +213,10 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
     for (unsigned i = 0; i < lines.Size(); i++)
     {
         String line = lines[i];
+
+        // TODO: better TS detection
+        if (line.Contains("function __() { this.constructor = d; }"))
+            typescriptClass_ = true;
 
         bool added = false;
 
@@ -415,7 +422,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
                     if (variantType != VAR_NONE)
                     {
-                        AddField(name, variantType, false);
+                        AddField(name, variantType);
                     }
 
                     duk_pop_2(ctx);  // pop key value

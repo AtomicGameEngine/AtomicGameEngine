@@ -54,6 +54,9 @@ public:
 
     bool GetScriptClass() { return scriptClass_; }
 
+    /// Returns true is this component file containes a TypeScript class
+    bool GetTypeScriptClass() { return typescriptClass_; }
+
     SharedPtr<JSComponent> CreateJSComponent();
     bool PushModule();
 
@@ -62,6 +65,7 @@ private:
     bool InitModule();
 
     bool scriptClass_;
+    bool typescriptClass_;
 
 };
 
