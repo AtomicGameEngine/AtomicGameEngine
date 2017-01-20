@@ -32,7 +32,8 @@ JSBFunction::JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
                                   isConstructor_(false), isDestructor_(false),
                                   isGetter_(false), isSetter_(false),
                                   isOverload_(false), skip_(false),
-                                  isVirtual_(false), isStatic_(false)
+                                  isVirtual_(false), isStatic_(false),
+                                  hasMutatedReturn_(false)
 {
     id_ = idCounter_++;
 }
@@ -45,10 +46,28 @@ void JSBFunction::Process()
         return;
     }
 
+    // methods that return a VariantVector are mutated to take a ScriptVector argument
+    if (!hasMutatedReturn_ && returnType_ && returnType_->type_->asVectorType())
+    {
+        JSBVectorType* vtype = returnType_->type_->asVectorType();
+
+        if (vtype->isVariantVector_)
+        {
+            // mark up as mutated
+            hasMutatedReturn_ = true;
+            JSBFunctionType* ftype = new JSBFunctionType(returnType_->type_);
+            ftype->name_ = "__retValue";
+            parameters_.Push(ftype);
+            returnType_ = 0;
+        }
+    }
+
     // only setup properties for methods which weren't skipped for JS, for example overloads
 
     if (GetSkipLanguage(BINDINGLANGUAGE_JAVASCRIPT))
         return;
+
+
 
     // if not already marked as a getter
     if (!isGetter_)

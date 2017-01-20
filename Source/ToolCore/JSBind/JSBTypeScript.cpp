@@ -82,7 +82,10 @@ String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
 
     if (ftype->type_->asVectorType())
     {
-        scriptType = "string[]";
+        if (ftype->type_->asVectorType()->isVariantVector_)
+            scriptType = "ScriptVector";
+        else
+            scriptType = "string[]";
     }
 
     return scriptType;
@@ -147,6 +150,13 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
             continue;
 
         String name = ftype->name_;
+
+        if (function->HasMutatedReturn() && i == parameters.Size() - 1)
+        {
+            // TODO: would be great to type this as Vector<ScriptVariant> somehow
+            scriptType = "ScriptVector";
+            name = "outVector";
+        }
 
         // TS doesn't like arguments named arguments
         if (name == "arguments")

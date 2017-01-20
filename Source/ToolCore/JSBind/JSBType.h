@@ -222,41 +222,6 @@ public:
 
 };
 
-class JSBVectorType : public JSBType
-{
-
-public:
-
-    JSBVectorType(JSBType* vtype, bool podVector = false) : vectorType_(vtype),
-        vectorTypeIsWeakPtr_(false),
-        vectorTypeIsSharedPtr_(false),
-        isPODVector_(podVector) {}
-
-    virtual JSBVectorType* asVectorType() { return this; }
-
-    String ToString();
-
-    virtual bool Match (JSBType* other)
-    {
-        if (!other)
-            return false;
-
-        JSBVectorType* pother = other->asVectorType();
-
-        if (!pother || !vectorType_->Match(pother->vectorType_))
-            return false;
-
-        return true;
-    }
-
-    JSBType* vectorType_;
-    bool vectorTypeIsWeakPtr_;
-    bool vectorTypeIsSharedPtr_;
-    bool isPODVector_;
-
-};
-
-
 
 class JSBClassType : public JSBType
 {
@@ -291,5 +256,42 @@ public:
 
 
 };
+
+class JSBVectorType : public JSBType
+{
+
+public:
+
+    JSBVectorType(JSBType* vtype, bool podVector = false, bool variantVector = false) : vectorType_(vtype),
+        vectorTypeIsWeakPtr_(false),
+        vectorTypeIsSharedPtr_(false),
+        isPODVector_(podVector),
+        isVariantVector_(variantVector) {}
+
+    virtual JSBVectorType* asVectorType() { return this; }
+
+    String ToString();
+
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        JSBVectorType* pother = other->asVectorType();
+
+        if (!pother || !vectorType_->Match(pother->vectorType_))
+            return false;
+
+        return true;
+    }
+
+    JSBType* vectorType_;
+    bool vectorTypeIsWeakPtr_;
+    bool vectorTypeIsSharedPtr_;
+    bool isPODVector_;
+    bool isVariantVector_;
+
+};
+
 
 }

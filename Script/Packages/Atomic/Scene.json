@@ -31,8 +31,8 @@
 
 		"Serializable" : [
 			"getAttributes():AttributeInfo[];",
-			"getAttribute(name:string):any;",
-			"setAttribute(name:string, value:any):void;"
+			"getAttribute(name:string, index?:number):any;",
+			"setAttribute(name:string, value:any, index?:number):void;"
 		],
 		"Node" : [
 			"saveXML(file:File):boolean;",

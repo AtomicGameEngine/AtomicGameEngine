@@ -155,6 +155,9 @@ public:
     bool IsStatic() const { return isStatic_; }
     bool IsInterface() const { return isInterface_; }
 
+    // true if return value has been mutated to be passed in at end of parameters (optimization)
+    bool HasMutatedReturn() const { return hasMutatedReturn_; }
+
     bool Skip(BindingLanguage language = BINDINGLANGUAGE_ANY) const
     {
         if (skip_ || language == BINDINGLANGUAGE_ANY)
@@ -301,7 +304,8 @@ private:
     bool isOverload_;
     bool isVirtual_;
     bool isStatic_;
-    bool skip_;
+    bool hasMutatedReturn_;
+    bool skip_;    
     PODVector<BindingLanguage> skipLanguages_;
 };
 

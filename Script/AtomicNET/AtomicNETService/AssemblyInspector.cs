@@ -228,6 +228,7 @@ namespace AtomicTools
             var dict = new Dictionary<string, object>();
 
             dict["isEnum"] = IsEnum;
+            dict["isArray"] = IsArray;
             dict["typeName"] = TypeName;
             dict["name"] = Name;
             dict["defaultValue"] = DefaultValue;
@@ -240,6 +241,7 @@ namespace AtomicTools
         }
 
         public bool IsEnum = false;
+        public bool IsArray = false;
 
         public string TypeName;
 

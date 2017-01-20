@@ -190,7 +190,7 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
             {
                 Variant& v = fieldValues_[itr->first_];
 
-                if (v.GetType() == itr->second_)
+                if (v.GetType() == itr->second_.variantType_)
                 {
                     js_push_variant(ctx, v);
                     duk_put_prop_string(ctx, -2, itr->first_.CString());

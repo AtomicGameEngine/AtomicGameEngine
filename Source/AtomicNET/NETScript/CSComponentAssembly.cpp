@@ -61,6 +61,7 @@ namespace Atomic
         typeMap_["Vector4"] = VAR_VECTOR4;
         typeMap_["Quaternion"] = VAR_QUATERNION;
         typeMap_["IntVector2"] = VAR_INTVECTOR2;
+        typeMap_["Color"] = VAR_COLOR;
 
     }
 
@@ -91,7 +92,8 @@ namespace Atomic
                 VariantType varType = VAR_NONE;
 
                 bool isEnum = jfield.Get("isEnum").GetBool();
-                String typeName = jfield.Get("typeName").GetString();
+                bool isArray = jfield.Get("isArray").GetBool();
+                String typeName = jfield.Get("typeName").GetString();               
                 String fieldName = jfield.Get("name").GetString();
                 String defaultValue = jfield.Get("defaultValue").GetString();
                 String tooltip;
@@ -156,30 +158,33 @@ namespace Atomic
 
                 }
 
-                if (!defaultValue.Length() && varType == VAR_RESOURCEREF)
+                if (!isArray)
                 {
-                    // We still need a default value for ResourceRef's so we know the classtype
-                    AddDefaultValue(fieldName, ResourceRef(typeName), className);
-                }
-                else
-                {
-                    Variant value;
-
-                    if (varType == VAR_RESOURCEREF)
+                    if (!defaultValue.Length() && varType == VAR_RESOURCEREF)
                     {
-                        ResourceRef rref(typeName);
-                        rref.name_ = defaultValue;
-                        value = rref;
+                        // We still need a default value for ResourceRef's so we know the classtype
+                        AddDefaultValue(fieldName, ResourceRef(typeName), className);
                     }
                     else
                     {
-                        value.FromString(varType, defaultValue);
-                    }
+                        Variant value;
 
-                    AddDefaultValue(fieldName, value, className);
+                        if (varType == VAR_RESOURCEREF)
+                        {
+                            ResourceRef rref(typeName);
+                            rref.name_ = defaultValue;
+                            value = rref;
+                        }
+                        else
+                        {
+                            value.FromString(varType, defaultValue);
+                        }
+
+                        AddDefaultValue(fieldName, value, className);
+                    }
                 }
 
-                AddField(fieldName, varType, className, tooltip);
+                AddField(fieldName, varType, isArray, className, tooltip);
 
             }
 

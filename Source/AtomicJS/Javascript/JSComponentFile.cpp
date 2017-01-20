@@ -415,7 +415,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
                     if (variantType != VAR_NONE)
                     {
-                        AddField(name, variantType);
+                        AddField(name, variantType, false);
                     }
 
                     duk_pop_2(ctx);  // pop key value

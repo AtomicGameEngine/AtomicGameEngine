@@ -58,9 +58,13 @@ void js_class_get_constructor(duk_context* ctx, const char* package, const char 
 void js_define_native_event(duk_context* ctx, const String& eventType, const String& eventName);
 
 /// Pushes variant value or undefined if can't be pushed
-void js_push_variant(duk_context* ctx, const Variant &v);
+void js_push_variant(duk_context* ctx, const Variant &v, int arrayIndex = -1);
 void js_push_variantmap(duk_context* ctx, const VariantMap &vmap);
 
+// Push a default value for the given variant type and set variantOut to the pushed value
+void js_push_default_variant(duk_context* ctx, VariantType variantType, Variant& variantOut);
+
+/// Sets a variant value from the duktape stack
 void js_to_variant(duk_context* ctx, int variantIdx, Variant &v, VariantType variantType = VAR_NONE);
 
 void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);

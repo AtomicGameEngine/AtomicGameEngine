@@ -8,6 +8,16 @@ namespace AtomicTools
     {
         public static void Main(string[] args)
         {
+            for (uint i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "--debugassembly" && i + 1 < args.Length)
+                {
+                    var assemblyJSON = AtomicTools.InspectAssembly(args[i + 1]);
+                    Console.WriteLine(assemblyJSON);
+                    return;
+                }
+            }
+
             // create the service
             var app = NETServiceApplication.Create();
 
