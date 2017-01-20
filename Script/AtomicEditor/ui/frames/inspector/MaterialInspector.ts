@@ -92,7 +92,6 @@ class MaterialInspector extends ScriptWidget {
         this.fd.id = "Vera";
         this.fd.size = 11;
 
-        this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => this.createTextureRemoveButtonCallback(this.tunit, this.textureWidget));
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.refreshTechniquesPopup());
     }
 
@@ -270,18 +269,21 @@ class MaterialInspector extends ScriptWidget {
 
     openTextureSelectionBox(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
-        var inspector = this;
-
         EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", "Texture2D", function (asset: ToolCore.Asset, args: any) {
 
+            if (asset == null) {
+                this.createTextureRemoveButtonCallback(this.tunit, this.textureWidget);
+                return;
+            }
+            
             var texture = <Atomic.Texture2D>Atomic.cache.getResource("Texture2D", asset.path);
 
             if (texture) {
-                inspector.material.setTexture(textureUnit, texture);
-                textureWidget.texture = inspector.getTextureThumbnail(texture);
+                this.material.setTexture(textureUnit, texture);
+                textureWidget.texture = this.getTextureThumbnail(texture);
             }
 
-        });
+        }.bind(this));
 
     }
 

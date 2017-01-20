@@ -146,20 +146,20 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
         this.name = name;
         this.hideName = true;
 
-        this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => {
-
-            this.editType.onAttributeInfoEdited(this.attrInfo, null, this.matIndex);
-            this.refresh();
-        });
-
 
     }
 
     openResourceSelectionBox(materialIndex: number, resourceTypeName: string, importerName: string) {
 
         this.matIndex = materialIndex;
-
+        
         EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function (retObject: any) {
+
+            if (retObject == null) {
+                this.editType.onAttributeInfoEdited(this.attrInfo, null, this.matIndex);
+                this.refresh();
+                return;
+            }
 
             var resource: Atomic.Resource = null;
 

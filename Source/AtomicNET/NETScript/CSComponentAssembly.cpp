@@ -93,7 +93,8 @@ namespace Atomic
 
                 bool isEnum = jfield.Get("isEnum").GetBool();
                 bool isArray = jfield.Get("isArray").GetBool();
-                String typeName = jfield.Get("typeName").GetString();               
+                String typeName = jfield.Get("typeName").GetString();
+                String resourceTypeName;
                 String fieldName = jfield.Get("name").GetString();
                 String defaultValue = jfield.Get("defaultValue").GetString();
                 String tooltip;
@@ -142,6 +143,7 @@ namespace Atomic
                         if (itr->second_->GetFactoryTypeName() == typeName)
                         {
                             varType = VAR_RESOURCEREF;
+                            resourceTypeName = typeName;
                             break;
                         }
 
@@ -184,7 +186,7 @@ namespace Atomic
                     }
                 }
 
-                AddField(fieldName, varType, isArray, className, tooltip);
+                AddField(fieldName, varType, resourceTypeName, isArray, className, tooltip);
 
             }
 

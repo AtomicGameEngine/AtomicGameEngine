@@ -363,6 +363,10 @@ namespace Atomic
             value = 0.0f;
             break;
 
+        case VAR_RESOURCEREF:            
+            value = ResourceRef();
+            break;
+
         default:
             break;
         }

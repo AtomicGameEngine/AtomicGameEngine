@@ -831,9 +831,9 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 // for cached resources, use the asset name, otherwise use the resource path name
                 var resource: Atomic.Resource;
                 if (this.refListIndex != -1) {
-                    resource = object.getAttribute(this.attrInfo.name).resources[this.refListIndex];
+                    resource = object.getAttribute(this.attrInfo.name).resources[this.refListIndex, this.arrayIndex];
                 } else {
-                    resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+                    resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name, this.arrayIndex);
                 }
 
                 var text = "";
@@ -857,7 +857,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                     if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN) {
 
-                        resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+                        resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name, this.arrayIndex);
 
                         if (resource instanceof Atomic.JSComponentFile) {
 
@@ -930,7 +930,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-                this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
+                this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex, true, this.arrayIndex);
                 this.onResourceChanged(resource);
                 this.refresh();
 
@@ -961,7 +961,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                     var resource = asset.getResource(resourceTypeName);
 
-                    this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
+                    this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex, true, this.arrayIndex);
                     this.onResourceChanged(resource);
                     this.refresh();
 

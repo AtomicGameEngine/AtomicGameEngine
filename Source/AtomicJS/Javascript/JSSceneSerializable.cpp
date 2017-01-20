@@ -97,10 +97,9 @@ namespace Atomic
         }
 
 
-        Variant v;
-        js_to_variant(ctx, 1, v, variantType);
-
-        ScriptComponent* jsc = NULL;
+        ScriptComponent* jsc = 0;
+        FieldInfo *fieldInfo = 0;
+        const HashMap<String, Vector<EnumInfo>>* enums = 0;
 
         // check dynamic
         if (!isAttr)
@@ -118,30 +117,36 @@ namespace Atomic
                     const FieldMap& fields = file->GetFields(className);
                     const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums(className);
 
-                    if (FieldInfo *finfo = fields[name])
+                    if (fieldInfo = fields[name])
                     {
-                        variantType = finfo->variantType_;
+                        variantType = fieldInfo->variantType_;
 
-                        if (finfo->isArray_)
+                        if (fieldInfo->isArray_)
                         {
                             arrayVariantType = variantType;
                             variantType = VAR_VARIANTVECTOR;
-                        }
-                        else if (enums.Contains(name))
-                        {
-                            int idx = (int)v.GetFloat();
-
-                            if (idx > 0 && idx < enums[name]->Size())
-                            {
-                                VariantMap& values = jsc->GetFieldValues();
-                                values[name] = enums[name]->At(idx).value_;
-                                return 0;
-                            }
                         }
                     }
                 }
             }
         }
+
+        Variant v;
+        js_to_variant(ctx, 1, v, variantType);
+
+        if (enums && enums->Contains(name))
+        {
+            int idx = (int)v.GetFloat();
+
+            if (idx > 0 && idx < (*enums)[name]->Size())
+            {
+                VariantMap& values = jsc->GetFieldValues();
+                values[name] = (*enums)[name]->At(idx).value_;
+                return 0;
+            }
+        }
+
+
 
         if (variantType == VAR_NONE)
             return 0;
@@ -178,12 +183,18 @@ namespace Atomic
                 v = ResourceRef(resource->GetType(), resource->GetName());
 
             }
+            else
+            {
+                v = ResourceRef();
+            }
 
         }
         else if (variantType == VAR_VARIANTVECTOR)
         {
             if (arrayIndex >= 0)
             {
+                assert(fieldInfo);
+
                 const VariantMap& values = jsc->GetFieldValues();
                 Variant *v2 = values[name];
 
@@ -194,7 +205,29 @@ namespace Atomic
                     {
                         VariantVector* vector = v2->GetVariantVectorPtr();
 
-                        if (v.GetType() == VAR_VECTOR4)
+                        if (arrayVariantType == VAR_RESOURCEREF)
+                        {
+                            RefCounted* ref = v.GetPtr();
+
+                            if (ref && ref->IsObject())
+                            {
+                                Object* o = (Object*)ref;
+
+                                // TODO: calling code must ensure we are a resource, can this be done here?
+                                Resource* resource = (Resource*)o;
+
+                                if (resource->GetType() == StringHash(fieldInfo->resourceTypeName_))
+                                    v = ResourceRef(resource->GetType(), resource->GetName());
+                                else
+                                    v = ResourceRef();
+                            }
+                            else
+                            {
+                                v = ResourceRef();
+                            }
+
+                        }
+                        else if (v.GetType() == VAR_VECTOR4)
                         {
                             if (arrayVariantType == VAR_COLOR)
                             {
@@ -207,8 +240,7 @@ namespace Atomic
                                 v = Quaternion(v4.w_, v4.x_, v4.y_, v4.z_);
                             }
                         }
-
-                        if (v.GetType() == VAR_FLOAT)
+                        else if (v.GetType() == VAR_FLOAT)
                         {
                             if (arrayVariantType == VAR_INT)
                                 v = (int)v.GetFloat();
@@ -386,18 +418,30 @@ namespace Atomic
                 duk_push_number(ctx, (double)itr->second_.variantType_);
                 duk_put_prop_string(ctx, -2, "type");
 
-                if (itr->second_.variantType_ == VAR_RESOURCEREF && defaultFieldValues.Contains(itr->first_))
+                const FieldInfo& fieldInfo = itr->second_;
+
+                if (fieldInfo.variantType_ == VAR_RESOURCEREF)
                 {
-                    if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
+                    if (fieldInfo.resourceTypeName_.Length())
                     {
-                        const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
-                        const String& typeName = JSVM::GetJSVM(ctx)->GetContext()->GetTypeName(ref.type_);
-
-                        if (typeName.Length())
+                        duk_push_string(ctx, fieldInfo.resourceTypeName_.CString());
+                        duk_put_prop_string(ctx, -2, "resourceTypeName");
+                    }
+                    else if (defaultFieldValues.Contains(fieldInfo.name_) && defaultFieldValues[fieldInfo.name_]->GetType() == VAR_RESOURCEREF)
+                    {       
+                        if (const Variant* value = defaultFieldValues[fieldInfo.name_])
                         {
-                            duk_push_string(ctx, typeName.CString());
-                            duk_put_prop_string(ctx, -2, "resourceTypeName");
+                            if (value->GetType() == VAR_RESOURCEREF)
+                            {
+                                const ResourceRef& ref = value->GetResourceRef();
+                                const String& typeName = JSVM::GetJSVM(ctx)->GetContext()->GetTypeName(ref.type_);
 
+                                if (typeName.Length())
+                                {
+                                    duk_push_string(ctx, typeName.CString());
+                                    duk_put_prop_string(ctx, -2, "resourceTypeName");
+                                }
+                            }
                         }
                     }
                 }
