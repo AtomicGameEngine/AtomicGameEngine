@@ -103,7 +103,8 @@ class About extends ModalWindow {
         let contributors = ["JoshEngebretson", "shaddockh", "rsredsq", "JimMarlowe", "mattbenic",
         "Type1J", "weinandvv", "JohnnyWahib", "raheelx", "CTrauma", "eugenegous", "christoffersch", "GarethNN",
         "LaraEngebretson", "bitonator", "rokups", "honigbeutler123", "benwolf", "jonaspm",
-        "keithjohnston", "darrylryan", "Alan-FGR", "marynate", "Sleaker", "Tarik-B", "flyover", "buresu"];
+        "keithjohnston", "darrylryan", "Alan-FGR", "marynate", "Sleaker", "Tarik-B", "flyover", "buresu",
+        "rosshadden", "bparvanov" ];
 
         contributors.sort();
 
