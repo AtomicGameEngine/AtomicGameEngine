@@ -20,6 +20,13 @@ void TBTabLayout::OnChildAdded(TBWidget *child)
     }
 }
 
+void TBTabLayout::OnChildRemove(TBWidget *child)
+{
+    int index = GetIndexFromChild(child);
+    if (index < tabContainer_->m_current_page)
+        --tabContainer_->m_current_page;
+}
+
 PreferredSize TBTabLayout::OnCalculatePreferredContentSize(const SizeConstraints &constraints)
 {
     PreferredSize ps = TBLayout::OnCalculatePreferredContentSize(constraints);
@@ -39,6 +46,7 @@ TBTabContainer::TBTabContainer()
     : m_need_page_update(true)
     , m_current_page(-1)
     , m_align(TB_ALIGN_TOP)
+    , m_tab_layout(this)
 {
     AddChild(&m_root_layout);
     // Put the tab layout on top of the content in Z order so their skin can make
