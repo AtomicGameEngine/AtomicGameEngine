@@ -93,61 +93,45 @@ Atomic Build 2 - <color #AAAAAA>(Git SHA: ${Atomic.AtomicBuildInfo.getGitSHA()})
 
 <color #D4FB79>Closed Issues</color>
 
-<widget TBButton: text: 'https://github.com/AtomicGameEngine/AtomicGameEngine/milestone/1' url: 'https://github.com/AtomicGameEngine/AtomicGameEngine/milestone/1?closed=1' skin: TBButton.link>
+<widget TBButton: text: 'https://github.com/AtomicGameEngine/AtomicGameEngine/milestone/3' url: 'https://github.com/AtomicGameEngine/AtomicGameEngine/milestone/3?closed=1' skin: TBButton.link>
 
 <color #D4FB79>Update Highlights</color>
 
-• <color #D4FB79>[Editor]</color> Custom file resource inspector plugins (with example)
+• <color #D4FB79>[Profiling]</color> Added Object memory metrics profiling subsystem
 
-• <color #D4FB79>[Editor]</color> Added TmxFile2D resource type for inspector fields
+• <color #D4FB79>[C#]</color> CSComponent inspector support for dynamic/fixed size array members
 
-• <color #D4FB79>[Docs]</color> Added new C#, C++, and updated JavaScript/TypeScript API references
+• <color #D4FB79>[Player]</color> Player subsystem Scene handling improvements 
 
-• <color #D4FB79>[Network]</color> Restored functionality for master server and client
+• <color #D4FB79>[Wiki]</color> Many additions and improvements to the Atomic Wiki!
 
-• <color #D4FB79>[Web]</color> Added Web subsystem events and convenience methods for post data and responses
+• <color #D4FB79>[Script]</color> Exposed VariantVector, Frustum, PackageFile, and UI::CycleDebugHudMode to script
 
-• <color #D4FB79>[C#]</color> Output dev project assemblies to Lib, so when modifying AtomicNET sources, changes are used properly
+• <color #D4FB79>[Script]</color> Improvements to ScriptVector and ScriptVariant
 
-• <color #D4FB79>[C#]</color> CSComponent cleanups for instantiation from script/serialized from scene (also cleans up nativeOverride hack)
+• <color #D4FB79>[TypeScript]</color> Updated to use generated native enum values
 
-• <color #D4FB79>[C#]</color> Fix for exception when instantiating any RefCounted derived instance during a CSComponent default constructor
+• <color #D4FB79>[TypeScript]</color> Constants converted to enums where possible 
 
-• <color #D4FB79>[C#]</color> Better error reporting for CSComponent load issues
+• <color #D4FB79>[Platform]</color> Added additional SDL key mappings
 
-• <color #D4FB79>[C#]</color> Added Material.SetShaderParameter API
+• <color #D4FB79>[Editor]</color> Project load/save now remembers the last folder used
 
-• <color #D4FB79>[C#]</color> Added Vector4/String to ScriptVariant
+• <color #D4FB79>[Editor]</color> Updated Welcome screen and help menu with new Atomic Support forums
 
-• <color #D4FB79>[C#]</color> On demand project assembly compilation from within the Atomic Editor
+• <color #D4FB79>[Linux]</color> Fixed issue with Pulse audio CPU usage and possible black screen
 
-• <color #D4FB79>[C#]</color> Inspector attribute can now be used to set inspector tooltips
+• <color #D4FB79>[C#]</color> Fixed issue with custom C# script events
 
-• <color #D4FB79>[TypeScript]</color> Upgraded to TypeScript 2.1
+• <color #D4FB79>[C#]</color> Fixed issue with reparenting C# nodes and component updates
 
-• <color #D4FB79>[TypeScript]</color> Removed deprecated allowNonTsExtensions
+• <color #D4FB79>[Editor]</color> Fixed issue with multiple selected resource tabs
 
-• <color #D4FB79>[TypeScript]</color> Automatically generate a tasks.json for VSCode
+• <color #D4FB79>[Editor]</color> Improved contrast on example language toggle button states 
 
-• <color #D4FB79>[TypeScript]</color> Updated tsconfig with rootUrl properly for non-relative imports
+• <color #D4FB79>[ToolCore]</color> Fixed issues with JSONFile::GetRoot in assets
 
-• <color #D4FB79>[TypeScript]</color> Strongly typed native event interfaces and subscription
-
-• <color #D4FB79>[Examples]</color> Fixed exception with virtual dpad in JavaScript examples
-
-• <color #D4FB79>[Desktop]</color> Fixed issues with engine configuration json parsing in deployed applications
-
-• <color #D4FB79>[Windows]</color> Fixed issue with Visual Studio 2017 detection
-
-• <color #D4FB79>[Windows]</color> Fixed UI pixel offset issue when rendering with OpenGL
-
-• <color #D4FB79>[macOS]</color> Added NSHighResolutionCapable flag to Atomic Editor
-
-• <color #D4FB79>[General]</color> Updated About dialog with contributor and build vendor information
-
-• <color #D4FB79>[General]</color> Misc bug fixes and optimizations
-
-• <color #D4FB79>[Maintenance]</color> Removed CurlManager from ToolCore as duplicated Web subsystem
+• <color #D4FB79>[Deployment]</color> Removed some UI psd assets that were in deployments 
 
 `;
 
