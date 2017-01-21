@@ -1,3 +1,7 @@
+definitions
+	menubutton
+		lp: height: 28, width: 28
+		skin TBButton.uniformflat
 TBLayout: axis: y, distribution: gravity, spacing: 10
 	lb: min_width: 750
 	TBLayout:
@@ -35,4 +39,4 @@ TBLayout: axis: y, distribution: gravity, spacing: 10
 				tooltip Play Animation
 				lp: width: 30, height: 30
 	TBLayout: distribution: gravity, axis: x, spacing: 4
-			TBContainer: skin: AEContainer, gravity: all, id: blendcontainer
+#	TBContainer: skin: AEContainer, gravity: all, id: blendcontainer
