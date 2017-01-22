@@ -9,7 +9,7 @@
 								"UISelectList", "UIListView", "UIMessageWindow", "UILayoutParams", "UIFontDescription",
 								"UISkinImage", "UITabContainer", "UISceneView", "UIPreferredSize", "UIDragObject",
 								"UIContainer", "UISection", "UIInlineSelect", "UITextureWidget", "UIColorWidget", "UIColorWheel",
-								"UIScrollContainer", "UISeparator", "UIDimmer", "UISelectDropdown", "UISlider"],
+								"UIScrollContainer", "UISeparator", "UIDimmer", "UISelectDropdown", "UISlider", "UIBargraph"],
 	"overloads" : {
 	},
 	"typescript_decl" : {

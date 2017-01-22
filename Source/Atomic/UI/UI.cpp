@@ -87,6 +87,7 @@ using namespace tb;
 #include "UISlider.h"
 #include "UIColorWidget.h"
 #include "UIColorWheel.h"
+#include "UIBargraph.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -792,6 +793,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBCheckBox>())
     {
         UICheckBox* nwidget = new UICheckBox(context_, false);
+        nwidget->SetWidget(widget);
+        WrapWidget(nwidget, widget);
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBBarGraph>())
+    {
+        UIBargraph* nwidget = new UIBargraph(context_, false);
         nwidget->SetWidget(widget);
         WrapWidget(nwidget, widget);
         return nwidget;

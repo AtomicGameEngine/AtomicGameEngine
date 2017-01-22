@@ -106,6 +106,35 @@ public:
 };
 
 
+// simple bargraph, plots 0.0 to 100.0 in the selected color
+class TBBarGraph : public TBWidget
+{
+public:
+    TBOBJECT_SUBCLASS(TBBarGraph, TBWidget); // For safe typecasting
+
+    TBBarGraph();
+
+    void SetColor ( const char * );
+    void SetColor (float r, float g, float b, float a);
+    const TBColor& GetColor() const { return color_; }
+
+    virtual void OnInflate(const INFLATE_INFO &info);
+    virtual void OnPaint(const PaintProps &paint_props);
+
+    virtual void SetValueDouble(double value);
+    virtual double GetValueDouble() { return m_value; }
+    virtual void SetValue(int value) { SetValueDouble(value); }
+    virtual int GetValue() { return (int) GetValueDouble(); }
+    virtual void SetAxis(AXIS axis);
+    virtual AXIS GetAxis() const { return m_axis; }
+
+private:
+	TBColor color_;
+    double m_value;
+    AXIS m_axis;
+};
+
+
 }; // namespace tb
 
 #endif // TB_ATOMIC_WIDGETS_H
