@@ -217,12 +217,42 @@ static int js_atomic_script(duk_context* ctx)
     return 1;
 }
 
-static int js_atomic_ScriptEvent(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
+// When subscribing to script event, this method will be called
+// to provide the event meta data (type and callback)
+static int js_push_script_event_metadata(duk_context* ctx) {
 
     duk_push_current_function(ctx);
 
+    duk_push_object(ctx);
+    duk_get_prop_string(ctx, -2, "_eventType");
+    duk_put_prop_string(ctx, -2, "_eventType");
+    duk_dup(ctx, 0);
+    duk_put_prop_string(ctx, -2, "_callback");
+
+    return 1;
+}
+
+static int js_atomic_ScriptEvent(duk_context* ctx)
+{
+    String eventName = duk_to_string(ctx, 0);
+
+    // push c function which takes 1 argument, the callback
+    duk_push_c_function(ctx, js_push_script_event_metadata, 2);
+
+    // store the event type in the function object
+     duk_push_string(ctx, eventName.CString());
+     duk_put_prop_string(ctx, -2, "_eventType");
+
+    // store to module object
+    //duk_put_prop_string(ctx, -2, "ScriptEvent");
+
+
+    //js_define_native_event(ctx, "ScriptEvent", "ScriptEvent");//eventName.CString());
+
+   // JSVM* vm = JSVM::GetJSVM(ctx);
+
+    //duk_push_current_function(ctx);
+/*
     if (duk_get_top(ctx) == 2)
     {
         String eventType = duk_get_string(ctx, 0);
@@ -233,6 +263,7 @@ static int js_atomic_ScriptEvent(duk_context* ctx)
         duk_dup(ctx, 1);
         duk_put_prop_string(ctx, -2, "_callback");
     }
+    */
 
     return 1;
 }
