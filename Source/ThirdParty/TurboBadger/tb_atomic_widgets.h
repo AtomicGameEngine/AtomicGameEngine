@@ -127,11 +127,14 @@ public:
     virtual int GetValue() { return (int) GetValueDouble(); }
     virtual void SetAxis(AXIS axis);
     virtual AXIS GetAxis() const { return m_axis; }
+    virtual void SetMargin(unsigned margin) { m_margin = margin; }
+    virtual unsigned GetMargin() const { return m_margin; }
 
 private:
 	TBColor color_;
     double m_value;
     AXIS m_axis;
+	unsigned m_margin;
 };
 
 
