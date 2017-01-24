@@ -170,12 +170,14 @@ class AnimationToolbar extends Atomic.UIWidget {
 
         this.animatedModel = <Atomic.AnimatedModel>modelNode.getComponent("AnimatedModel");
         this.animationController = <Atomic.AnimationController>modelNode.getComponent("AnimationController");
-        var model = this.animatedModel.model;
-        this.animatedModel.setBoneCreationOverride(true);
-        this.animatedModel.setModel(model, true);
+        if ( this.animatedModel != null && this.animationController != null ) {
+            var model = this.animatedModel.model;
+            this.animatedModel.setBoneCreationOverride(true);
+            this.animatedModel.setModel(model, true);
 
-        var animComp = new Atomic.AnimatedModel();
-        var animContComp = new Atomic.AnimationController();
+            var animComp = new Atomic.AnimatedModel();
+            var animContComp = new Atomic.AnimationController();
+        }
     }
 
     openAnimationSelectionBox(animationWidget: Atomic.UIEditField, animationSlot: Atomic.Animation) {
