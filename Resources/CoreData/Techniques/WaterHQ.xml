@@ -1,0 +1,10 @@
+<!-- 
+This technique is based on Water technique, however this will require to expose depth to the refract pass
+Meaning that it can only be used with a render path rendering depth
+Also it's using the normal buffer from the G-buffer in deferred rendering,
+if you're using forward you might want to put a default black texture. 
+-->
+<technique vs="WaterHQ" ps="WaterHQ">
+    <pass name="refract" />
+    <pass name="litalpha" vsdefines="LIGHTING" psdefines="LIGHTING" depthwrite="false" blend="addalpha" />
+</technique>
