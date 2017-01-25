@@ -496,4 +496,5 @@ class SubmeshListAttributeEdit extends AttributeInfoEdit {
 
 AttributeInfoEdit.registerCustomAttr("AnimatedModel", "Material", SubmeshListAttributeEdit);
 AttributeInfoEdit.registerCustomAttr("StaticModel", "Material", SubmeshListAttributeEdit);
+AttributeInfoEdit.registerCustomAttr("Skybox", "Material", SubmeshListAttributeEdit);
 AttributeInfoEdit.registerCustomAttr("Light", "CSM Splits", LightCascadeAttributeEdit);
