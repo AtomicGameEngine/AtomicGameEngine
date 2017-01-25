@@ -112,6 +112,17 @@ namespace AtomicEngine
 
                 file.Write(buffer, offset, count);
             }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (file != null)
+                {
+                    file.Close();
+                    file = null;
+                }
+
+                base.Dispose(disposing);
+            }
         }
 
         public System.IO.Stream ToStream()
