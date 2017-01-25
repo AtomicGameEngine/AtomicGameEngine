@@ -7,13 +7,19 @@ Email: info@atomicgameengine.com
 
 #### Why Atomic?
 
-The Atomic Game Engine is powerful 2D/3D technology developed by industry veterans and contributors from around the world.
+The Atomic Game Engine is powerful 2D/3D technology developed by industry veterans and contributors from around the world.  
 
-Atomic is available to professionals and is being used in production environments. It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.
+Atomic is lean, full source, technology for mobile and desktop.  It has a powerful core API with access to raw, down to the metal, native performance.  Atomic technology leverages **industry standard languages and tooling** for use in games, education/training, serious applications, and new growth areas such as AR/VR.
+
+<img align="right" src="http://atomicgameengine.com/images/home/WorldInstallMapHome.png"/>
+The Atomic Editor is **installed in over 75 countries** and is being used in production environments.  It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.  
 
 If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="http://atomicgameengine.com/#download-the-atomic-editor">download the Atomic Editor</a> or fork us on GitHub!
 
 #### Atomic Technology
+
+<img src="http://atomicgameengine.com/images/home/RoboBeach2017.png"/>
+
 <img align="right" src="http://atomicgameengine.com/images/PlatformBox.png"/>
 - Consistent **2D/3D API** available in **JavaScript, TypeScript, C#, and C++**
 - Built-in Monaco JavaScript/TypeScript editor and support for **VSCode** and **Atom**
@@ -78,10 +84,6 @@ Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and schedule
 <a href="http://www.atomicgameengine.com" target="_blank">Atomic Game Engine 2016 Demo Reel</a>
 
 #### Screenshots
-
-##### Atomic Editor
-[RoboBeach]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/RoboBeach.png
-![alt text][RoboBeach]
 
 ##### Atomic Examples
 [DevSnapshot]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/DevSnapshot2116.png
