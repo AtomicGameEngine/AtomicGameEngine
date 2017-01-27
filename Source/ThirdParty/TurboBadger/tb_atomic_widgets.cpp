@@ -41,8 +41,8 @@ TBColorWidget::TBColorWidget() : color_(), alpha_ ( 1.0f)
 
 void TBColorWidget::SetColor ( const char *name )
 {
-	if ( name )
-  	 color_.SetFromString(name, strlen(name));
+    if ( name )
+        color_.SetFromString(name, strlen(name));
      
     InvalidateSkinStates();
     Invalidate();
@@ -181,8 +181,8 @@ void TBColorWheel::SetMarkerY ( int value )
 
 void TBColorWheel::SetMarkerColor ( const char *name )
 {
- 	if ( name )
-  	 markercolor_.SetFromString(name, strlen(name));
+    if ( name )
+        markercolor_.SetFromString(name, strlen(name));
      
     Invalidate();
 }
@@ -206,8 +206,8 @@ TBBarGraph::TBBarGraph() : color_(255,255,255,255), m_value (0.0), m_axis(AXIS_X
 
 void TBBarGraph::SetColor ( const char *name )
 {
-	if ( name )
-  	 color_.SetFromString(name, strlen(name));
+    if ( name )
+        color_.SetFromString(name, strlen(name));
      
     InvalidateSkinStates();
     Invalidate();
@@ -243,10 +243,10 @@ void TBBarGraph::OnPaint(const PaintProps &paint_props)
         local_rect.y = local_rect.h - (int)h1;
         local_rect.h = (int)h1;
         if ( m_margin > 0 && m_margin < (local_rect.w/2)-2 )
-		{
+        {
             local_rect.w -= (m_margin*2);
             local_rect.x += m_margin;
-		}
+        }
     }
     g_renderer->DrawRectFill(local_rect, color_);
 }

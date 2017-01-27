@@ -56,7 +56,7 @@ public:
 
 private:
 
-	TBColor color_;
+    TBColor color_;
     float alpha_;
 };
 
@@ -85,7 +85,7 @@ private:
 
     int markerx_;
     int markery_; // where we clicked, put a box there
-	TBColor markercolor_; // what color box, default = black
+    TBColor markercolor_; // what color box, default = black
     float hue_;   // varies with the angle
     float saturation_; // varies with the radius.
 
@@ -106,7 +106,7 @@ public:
 };
 
 
-// simple bargraph, plots 0.0 to 100.0 in the selected color
+/// TBBarGraph a simple bargraph, plots 0.0 to 100.0 in the selected color
 class TBBarGraph : public TBWidget
 {
 public:
@@ -131,10 +131,10 @@ public:
     virtual unsigned GetMargin() const { return m_margin; }
 
 private:
-	TBColor color_;
+    TBColor color_;
     double m_value;
     AXIS m_axis;
-	unsigned m_margin;
+    unsigned m_margin;
 };
 
 
