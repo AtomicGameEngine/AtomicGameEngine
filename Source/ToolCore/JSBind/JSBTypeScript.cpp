@@ -450,9 +450,12 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
 
         source += "    }\n\n";
 
+        // Write the event name
+        source += ToString("    export var %sName : string;\n", scriptEventName.CString());
         // Write the event function signature
+        source += ToString("    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
 
-        source += ToString("\n    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
+        source += "\n\n";
 
     }
     source_ += source;
