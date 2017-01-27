@@ -25,23 +25,120 @@
 using namespace tb;
 
 #include "../Core/Timer.h"
+#include "../Graphics/Graphics.h"
+#include "../IO/Log.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 
 #include "UI.h"
 #include "UIEvents.h"
+#include "UIOffscreenView.h"
 
 namespace Atomic
 {
 
-static MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
+MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
 {
     MODIFIER_KEYS code = TB_MODIFIER_NONE;
-    if (qualifiers & QUAL_ALT)    code |= TB_ALT;
-    if (qualifiers & QUAL_CTRL)    code |= TB_CTRL;
-    if (qualifiers & QUAL_SHIFT)    code |= TB_SHIFT;
-    if (superKey)    code |= TB_SUPER;
+    if (qualifiers & QUAL_ALT)   code |= TB_ALT;
+    if (qualifiers & QUAL_CTRL)  code |= TB_CTRL;
+    if (qualifiers & QUAL_SHIFT) code |= TB_SHIFT;
+    if (superKey)                code |= TB_SUPER;
     return code;
+}
+
+SPECIAL_KEY GetSpecialKey(int keycode)
+{
+    SPECIAL_KEY specialKey;
+
+    switch (keycode)
+    {
+    case KEY_RETURN:
+    case KEY_RETURN2:
+    case KEY_KP_ENTER:
+        specialKey = TB_KEY_ENTER;
+        break;
+    case KEY_F1:
+        specialKey = TB_KEY_F1;
+        break;
+    case KEY_F2:
+        specialKey = TB_KEY_F2;
+        break;
+    case KEY_F3:
+        specialKey = TB_KEY_F3;
+        break;
+    case KEY_F4:
+        specialKey = TB_KEY_F4;
+        break;
+    case KEY_F5:
+        specialKey = TB_KEY_F5;
+        break;
+    case KEY_F6:
+        specialKey = TB_KEY_F6;
+        break;
+    case KEY_F7:
+        specialKey = TB_KEY_F7;
+        break;
+    case KEY_F8:
+        specialKey = TB_KEY_F8;
+        break;
+    case KEY_F9:
+        specialKey = TB_KEY_F9;
+        break;
+    case KEY_F10:
+        specialKey = TB_KEY_F10;
+        break;
+    case KEY_F11:
+        specialKey = TB_KEY_F11;
+        break;
+    case KEY_F12:
+        specialKey = TB_KEY_F12;
+        break;
+    case KEY_LEFT:
+        specialKey = TB_KEY_LEFT;
+        break;
+    case KEY_UP:
+        specialKey = TB_KEY_UP;
+        break;
+    case KEY_RIGHT:
+        specialKey = TB_KEY_RIGHT;
+        break;
+    case KEY_DOWN:
+        specialKey = TB_KEY_DOWN;
+        break;
+    case KEY_PAGEUP:
+        specialKey = TB_KEY_PAGE_UP;
+        break;
+    case KEY_PAGEDOWN:
+        specialKey = TB_KEY_PAGE_DOWN;
+        break;
+    case KEY_HOME:
+        specialKey = TB_KEY_HOME;
+        break;
+    case KEY_END:
+        specialKey = TB_KEY_END;
+        break;
+    case KEY_INSERT:
+        specialKey = TB_KEY_INSERT;
+        break;
+    case KEY_TAB:
+        specialKey = TB_KEY_TAB;
+        break;
+    case KEY_DELETE:
+        specialKey = TB_KEY_DELETE;
+        break;
+    case KEY_BACKSPACE:
+        specialKey = TB_KEY_BACKSPACE;
+        break;
+    case KEY_ESCAPE:
+        specialKey = TB_KEY_ESC;
+        break;
+    default:
+        specialKey = TB_KEY_UNDEFINED;
+        break;
+    }
+
+    return specialKey;
 }
 
 
@@ -51,6 +148,56 @@ static int toupr_ascii(int ascii)
     if (ascii >= 'a' && ascii <= 'z')
         return ascii + 'A' - 'a';
     return ascii;
+}
+
+UIOffscreenView* UI::GetOffscreenViewAtScreenPosition(const IntVector2& screenPos, IntVector2& viewPos)
+{
+    for (HashSet<UIOffscreenView*>::Iterator it = offscreenViews_.Begin(); it != offscreenViews_.End(); ++it)
+    {
+        UIOffscreenView* osView = *it;
+        IntRect rect = osView->inputRect_;
+        Camera* camera = osView->inputCamera_;
+        Octree* octree = osView->inputOctree_;
+        Drawable* drawable = osView->inputDrawable_;
+        bool rectIsDefault = rect == IntRect::ZERO;
+
+        if (!camera || !octree || !drawable || (!rectIsDefault && !rect.IsInside(screenPos)))
+            continue;
+
+        Vector2 normPos(screenPos.x_ - rect.left_, screenPos.y_ - rect.top_);
+        normPos /= rectIsDefault ? Vector2(graphics_->GetWidth(), graphics_->GetHeight()) : Vector2(rect.Width(), rect.Height());
+
+        Ray ray(camera->GetScreenRay(normPos.x_, normPos.y_));
+        PODVector<RayQueryResult> queryResultVector;
+        RayOctreeQuery query(queryResultVector, ray, RAY_TRIANGLE_UV, M_INFINITY, DRAWABLE_GEOMETRY, DEFAULT_VIEWMASK);
+
+        octree->RaycastSingle(query);
+
+        if (queryResultVector.Empty())
+            continue;
+
+        RayQueryResult& queryResult(queryResultVector.Front());
+
+        if (queryResult.drawable_ != drawable)
+            continue;
+
+        Vector2& uv = queryResult.textureUV_;
+        viewPos = IntVector2(uv.x_ * osView->GetWidth(), uv.y_ * osView->GetHeight());
+
+        return osView;
+    }
+
+    return nullptr;
+}
+
+tb::TBWidget* UI::GetInternalWidgetProjectedPosition(const IntVector2& screenPos, IntVector2& viewPos)
+{
+    UIOffscreenView* osView = GetOffscreenViewAtScreenPosition(screenPos, viewPos);
+    if (osView)
+        return osView->GetInternalWidget();
+
+    viewPos = screenPos;
+    return rootWidget_;
 }
 
 void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
@@ -88,12 +235,15 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         counter = 1;
 
     last_time = time;
+
+
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
     if (button == MOUSEB_RIGHT)
-        rootWidget_->InvokeRightPointerDown(pos.x_, pos.y_, counter, mod);
+        widget->InvokeRightPointerDown(viewPos.x_, viewPos.y_, counter, mod);
     else
-        rootWidget_->InvokePointerDown(pos.x_, pos.y_, counter, mod, false);
-
-
+        widget->InvokePointerDown(viewPos.x_, viewPos.y_, counter, mod, false);
 }
 
 
@@ -120,10 +270,15 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
 
 
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
     if (button == MOUSEB_RIGHT)
-        rootWidget_->InvokeRightPointerUp(pos.x_, pos.y_, mod);
+        widget->InvokeRightPointerUp(viewPos.x_, viewPos.y_, mod);
     else
-        rootWidget_->InvokePointerUp(pos.x_, pos.y_, mod, false);
+        widget->InvokePointerUp(viewPos.x_, viewPos.y_, mod, false);
+
+    // InvokePointerUp() seems to do the right thing no mater which root widget gets the call.
 }
 
 
@@ -134,10 +289,13 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     if (inputDisabled_ || consoleVisible_)
         return;
 
-    int px = eventData[P_X].GetInt();
-    int py = eventData[P_Y].GetInt();
+    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
 
-    rootWidget_->InvokePointerMove(px, py, tb::TB_MODIFIER_NONE, false);
+
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
+    widget->InvokePointerMove(viewPos.x_, viewPos.y_, tb::TB_MODIFIER_NONE, false);
 
     tooltipHoverTime_ = 0;
 }
@@ -151,11 +309,14 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     using namespace MouseWheel;
 
     int delta = eventData[P_WHEEL].GetInt();
-
     Input* input = GetSubsystem<Input>();
+    IntVector2 pos(input->GetMousePosition().x_, input->GetMousePosition().y_);
 
-    rootWidget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, -delta, tb::TB_MODIFIER_NONE);
 
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
+    widget->InvokeWheel(viewPos.x_, viewPos.y_, 0, -delta, tb::TB_MODIFIER_NONE);
 }
 
 //Touch Input
@@ -165,11 +326,10 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         return;
 
     using namespace TouchBegin;
-    
+
     int touchId = eventData[P_TOUCHID].GetInt();
-    int px = eventData[P_X].GetInt();
-    int py = eventData[P_Y].GetInt();
-    
+    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
+
     static double last_time = 0;
     static int counter = 1;
 
@@ -182,22 +342,29 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         counter = 1;
 
     last_time = time;
-    
-    rootWidget_->InvokePointerDown(px, py, counter, TB_MODIFIER_NONE, true, touchId);
+
+
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
+    widget->InvokePointerDown(viewPos.x_, viewPos.y_, counter, TB_MODIFIER_NONE, true, touchId);
 }
 
 void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_ || consoleVisible_)
         return;
-    
-    using namespace TouchMove;
-    
-    int touchId = eventData[P_TOUCHID].GetInt();
-    int px = eventData[P_X].GetInt();
-    int py = eventData[P_Y].GetInt();
 
-    rootWidget_->InvokePointerMove(px, py, TB_MODIFIER_NONE, true, touchId);
+    using namespace TouchMove;
+
+    int touchId = eventData[P_TOUCHID].GetInt();
+    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
+
+
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
+    widget->InvokePointerMove(viewPos.x_, viewPos.y_, TB_MODIFIER_NONE, true, touchId);
 }
 
 void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
@@ -208,10 +375,13 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     using namespace TouchEnd;
 
     int touchId = eventData[P_TOUCHID].GetInt();
-    int px = eventData[P_X].GetInt();
-    int py = eventData[P_Y].GetInt();
+    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
 
-    rootWidget_->InvokePointerUp(px, py, TB_MODIFIER_NONE, true, touchId);
+
+    IntVector2 viewPos;
+    tb::TBWidget* widget = UI::GetInternalWidgetProjectedPosition(pos, viewPos);
+
+    widget->InvokePointerUp(viewPos.x_, viewPos.y_, TB_MODIFIER_NONE, true, touchId);
 }
 
 static bool InvokeShortcut(UI* ui, int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool down)
@@ -298,12 +468,27 @@ static bool InvokeShortcut(UI* ui, int key, SPECIAL_KEY special_key, MODIFIER_KE
     return true;
 }
 
-static bool InvokeKey(UI* ui, TBWidget* root, unsigned int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool keydown)
+bool UI::InvokeKey(unsigned key, unsigned special_key, unsigned modifierkeys, bool keydown)
 {
-    if (InvokeShortcut(ui, key, special_key, modifierkeys, keydown))
+    if (InvokeShortcut(this, key, SPECIAL_KEY(special_key), MODIFIER_KEYS(modifierkeys), keydown))
         return true;
-    root->InvokeKey(key, special_key, modifierkeys, keydown);
-    return true;
+
+    for (HashSet<UIOffscreenView*>::Iterator it = offscreenViews_.Begin(); it != offscreenViews_.End(); ++it)
+    {
+        UIOffscreenView* osView = *it;
+        IntRect rect = osView->inputRect_;
+        Camera* camera = osView->inputCamera_;
+        Octree* octree = osView->inputOctree_;
+        Drawable* drawable = osView->inputDrawable_;
+
+        if (!camera || !octree || !drawable)
+            continue;
+
+        if (osView->GetInternalWidget()->InvokeKey(key, SPECIAL_KEY(special_key), MODIFIER_KEYS(modifierkeys), keydown))
+            return true;
+    }
+
+    return rootWidget_->InvokeKey(key, SPECIAL_KEY(special_key), MODIFIER_KEYS(modifierkeys), keydown);
 }
 
 
@@ -333,104 +518,19 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
 #endif
     MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
 
-    SPECIAL_KEY specialKey = TB_KEY_UNDEFINED;
-
-    switch (keycode)
-    {
-    case KEY_RETURN:
-    case KEY_RETURN2:
-    case KEY_KP_ENTER:
-        specialKey =  TB_KEY_ENTER;
-        break;
-    case KEY_F1:
-        specialKey = TB_KEY_F1;
-        break;
-    case KEY_F2:
-        specialKey = TB_KEY_F2;
-        break;
-    case KEY_F3:
-        specialKey = TB_KEY_F3;
-        break;
-    case KEY_F4:
-        specialKey = TB_KEY_F4;
-        break;
-    case KEY_F5:
-        specialKey = TB_KEY_F5;
-        break;
-    case KEY_F6:
-        specialKey = TB_KEY_F6;
-        break;
-    case KEY_F7:
-        specialKey = TB_KEY_F7;
-        break;
-    case KEY_F8:
-        specialKey = TB_KEY_F8;
-        break;
-    case KEY_F9:
-        specialKey = TB_KEY_F9;
-        break;
-    case KEY_F10:
-        specialKey = TB_KEY_F10;
-        break;
-    case KEY_F11:
-        specialKey = TB_KEY_F11;
-        break;
-    case KEY_F12:
-        specialKey = TB_KEY_F12;
-        break;
-    case KEY_LEFT:
-        specialKey = TB_KEY_LEFT;
-        break;
-    case KEY_UP:
-        specialKey = TB_KEY_UP;
-        break;
-    case KEY_RIGHT:
-        specialKey = TB_KEY_RIGHT;
-        break;
-    case KEY_DOWN:
-        specialKey = TB_KEY_DOWN;
-        break;
-    case KEY_PAGEUP:
-        specialKey = TB_KEY_PAGE_UP;
-        break;
-    case KEY_PAGEDOWN:
-        specialKey = TB_KEY_PAGE_DOWN;
-        break;
-    case KEY_HOME:
-        specialKey = TB_KEY_HOME;
-        break;
-    case KEY_END:
-        specialKey = TB_KEY_END;
-        break;
-    case KEY_INSERT:
-        specialKey = TB_KEY_INSERT;
-        break;
-    case KEY_TAB:
-        specialKey = TB_KEY_TAB;
-        break;
-    case KEY_DELETE:
-        specialKey = TB_KEY_DELETE;
-        break;
-    case KEY_BACKSPACE:
-        specialKey = TB_KEY_BACKSPACE;
-        break;
-    case KEY_ESCAPE:
-        specialKey =  TB_KEY_ESC;
-        break;
-    }
+    SPECIAL_KEY specialKey = GetSpecialKey(keycode);
 
     if (specialKey == TB_KEY_UNDEFINED)
     {
         if (mod & TB_SUPER)
         {
-            InvokeKey(this, rootWidget_, keycode, TB_KEY_UNDEFINED, mod, keydown);
+            InvokeKey(keycode, TB_KEY_UNDEFINED, mod, keydown);
         }
     }
     else
     {
-        InvokeKey(this, rootWidget_, 0, specialKey, mod, keydown);
+        InvokeKey(0, specialKey, mod, keydown);
     }
-
 }
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -467,7 +567,6 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     shortcutData[UIShortcut::P_QUALIFIERS] = eventData[P_QUALIFIERS].GetInt();
 
     SendEvent(E_UISHORTCUT, shortcutData);
-
 }
 
 void UI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
@@ -481,7 +580,6 @@ void UI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
     int scancode = eventData[P_SCANCODE].GetInt();
 
     HandleKey(false, keycode, scancode);
-
 }
 
 void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
@@ -495,9 +593,8 @@ void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 
     for (unsigned i = 0; i < text.Length(); i++)
     {
-        InvokeKey(this, rootWidget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, true);
-        InvokeKey(this, rootWidget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, false);
+        InvokeKey(text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, true);
+        InvokeKey(text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, false);
     }
-
 }
 }

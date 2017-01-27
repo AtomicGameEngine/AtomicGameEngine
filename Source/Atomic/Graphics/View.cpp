@@ -48,7 +48,9 @@
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
-#include "../UI/UI.h"
+// ATOMIC BEGIN
+#include "../UI/SystemUI/SystemUI.h"
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -1659,7 +1661,9 @@ void View::ExecuteRenderPathCommands()
             case CMD_RENDERUI:
                 {
                     SetRenderTargets(command);
-                    GetSubsystem<UI>()->Render(false);
+                    // ATOMIC BEGIN
+                    GetSubsystem<SystemUI::SystemUI>()->Render(false);
+                    // ATOMIC END
                 }
                 break;
 
