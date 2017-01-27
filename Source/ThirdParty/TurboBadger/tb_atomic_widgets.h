@@ -56,7 +56,7 @@ public:
 
 private:
 
-	TBColor color_;
+    TBColor color_;
     float alpha_;
 };
 
@@ -85,7 +85,7 @@ private:
 
     int markerx_;
     int markery_; // where we clicked, put a box there
-	TBColor markercolor_; // what color box, default = black
+    TBColor markercolor_; // what color box, default = black
     float hue_;   // varies with the angle
     float saturation_; // varies with the radius.
 
@@ -103,6 +103,38 @@ public:
         Note, if returning true, other global listeners will still also be notified. */
     virtual bool OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev) { return true; } 
     
+};
+
+
+/// TBBarGraph a simple bargraph, plots 0.0 to 100.0 in the selected color
+class TBBarGraph : public TBWidget
+{
+public:
+    TBOBJECT_SUBCLASS(TBBarGraph, TBWidget); // For safe typecasting
+
+    TBBarGraph();
+
+    void SetColor ( const char * );
+    void SetColor (float r, float g, float b, float a);
+    const TBColor& GetColor() const { return color_; }
+
+    virtual void OnInflate(const INFLATE_INFO &info);
+    virtual void OnPaint(const PaintProps &paint_props);
+
+    virtual void SetValueDouble(double value);
+    virtual double GetValueDouble() { return m_value; }
+    virtual void SetValue(int value) { SetValueDouble(value); }
+    virtual int GetValue() { return (int) GetValueDouble(); }
+    virtual void SetAxis(AXIS axis);
+    virtual AXIS GetAxis() const { return m_axis; }
+    virtual void SetMargin(unsigned margin) { m_margin = margin; }
+    virtual unsigned GetMargin() const { return m_margin; }
+
+private:
+    TBColor color_;
+    double m_value;
+    AXIS m_axis;
+    unsigned m_margin;
 };
 
 

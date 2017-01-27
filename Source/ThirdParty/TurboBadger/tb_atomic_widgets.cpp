@@ -41,8 +41,8 @@ TBColorWidget::TBColorWidget() : color_(), alpha_ ( 1.0f)
 
 void TBColorWidget::SetColor ( const char *name )
 {
-	if ( name )
-  	 color_.SetFromString(name, strlen(name));
+    if ( name )
+        color_.SetFromString(name, strlen(name));
      
     InvalidateSkinStates();
     Invalidate();
@@ -181,8 +181,8 @@ void TBColorWheel::SetMarkerY ( int value )
 
 void TBColorWheel::SetMarkerColor ( const char *name )
 {
- 	if ( name )
-  	 markercolor_.SetFromString(name, strlen(name));
+    if ( name )
+        markercolor_.SetFromString(name, strlen(name));
      
     Invalidate();
 }
@@ -196,5 +196,91 @@ void TBColorWheel::OnInflate(const INFLATE_INFO &info)
 
 TB_WIDGET_FACTORY(TBColorWheel, TBValue::TYPE_FLOAT, WIDGET_Z_TOP) {}
 
+
+// == TBBarGraph =======================================
+
+TBBarGraph::TBBarGraph() : color_(255,255,255,255), m_value (0.0), m_axis(AXIS_X), m_margin(0)
+{
+    SetSkinBg(TBIDC("background_solid"), WIDGET_INVOKE_INFO_NO_CALLBACKS);
+}
+
+void TBBarGraph::SetColor ( const char *name )
+{
+    if ( name )
+        color_.SetFromString(name, strlen(name));
+     
+    InvalidateSkinStates();
+    Invalidate();
+}
+
+void TBBarGraph::SetColor(float r, float g, float b, float a)
+{
+    color_.Set(TBColor(r, g, b, a));
+
+    InvalidateSkinStates();
+    Invalidate();
+}
+
+void TBBarGraph::OnPaint(const PaintProps &paint_props)
+{
+    TBRect local_rect = GetRect();
+    local_rect.x = 0;
+    local_rect.y = 0;
+    
+    if ( m_axis == AXIS_X ) // horizontal bar
+    {
+        double w1 = (double)local_rect.w * ( m_value / 100.0 );
+        local_rect.w = (int)w1;
+        if ( m_margin > 0 && m_margin < (local_rect.h/2)-2)
+        {
+            local_rect.h -= (m_margin *2);
+            local_rect.y += m_margin;
+        }
+    }
+    else if ( m_axis == AXIS_Y ) // vertical bar
+    {
+        double h1 = (double)local_rect.h * ( m_value / 100.0 );
+        local_rect.y = local_rect.h - (int)h1;
+        local_rect.h = (int)h1;
+        if ( m_margin > 0 && m_margin < (local_rect.w/2)-2 )
+        {
+            local_rect.w -= (m_margin*2);
+            local_rect.x += m_margin;
+        }
+    }
+    g_renderer->DrawRectFill(local_rect, color_);
+}
+
+void TBBarGraph::OnInflate(const INFLATE_INFO &info)
+{
+    if (const char *colr = info.node->GetValueString("color", nullptr))
+        SetColor(colr);
+    if ( const char *axis = info.node->GetValueString("axis", "x") )
+        SetAxis(*axis == 'x' ? AXIS_X : AXIS_Y);
+    if (info.sync_type == TBValue::TYPE_FLOAT)
+        SetValueDouble(info.node->GetValueFloat("value", 0));
+    SetMargin( (unsigned)info.node->GetValueInt("margin", 0 ) );
+    TBWidget::OnInflate(info);
+}
+
+void TBBarGraph::SetValueDouble(double value)
+{
+    value = CLAMP(value, 0.0, 100.0);
+    if (value == m_value)
+        return;
+    m_value = value;
+
+    InvalidateSkinStates();
+    Invalidate();
+}
+
+void TBBarGraph::SetAxis(AXIS axis) 
+{ 
+    m_axis = axis; 
+    InvalidateSkinStates();
+    Invalidate();
+}
+
+TB_WIDGET_FACTORY(TBBarGraph, TBValue::TYPE_FLOAT, WIDGET_Z_TOP) {}
 
 }; // namespace tb
