@@ -370,18 +370,6 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         }
         source_ += "    }\n";
         source_ += "\n";
-
-        // legacy support - This should be removed in a couple releases
-        source_ += "   // Legacy JS Access for enum:  " + _enum->GetName() + "\n";
-        valsIter = values.Begin();
-        while (valsIter != values.End())
-        {
-            String name = (*valsIter).first_;
-            source_ += "   /** Deprecated - use: [[" + _enum->GetName() + "." + name + "]]\n@deprecated */\n";
-            source_ += "   export var " + name + ": number;\n";
-            valsIter++;
-        }
-        source_ += "\n";
     }
 
 }
