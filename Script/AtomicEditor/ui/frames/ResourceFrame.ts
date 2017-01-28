@@ -73,7 +73,7 @@ class ResourceFrame extends ScriptWidget {
         }
     }
 
-    handleSaveAllResources(data) {
+    handleSaveAllResources() {
 
         for (var i in this.editors) {
             this.editors[i].save();
@@ -278,17 +278,17 @@ class ResourceFrame extends ScriptWidget {
         this.resourceEditorProvider = new ResourceEditorProvider(this);
         this.resourceEditorProvider.loadStandardEditors();
 
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
-        this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
-        this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
-        this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));
-        this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
-        this.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev));
-        this.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => this.handleDeleteResource(data));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(EditorEvents.EditResourceEvent((data) => this.handleEditResource(data)));
+        this.subscribeToEvent(EditorEvents.SaveResourceEvent((data) => this.handleSaveResource(data)));
+        this.subscribeToEvent(EditorEvents.SaveAllResourcesEvent((data) => this.handleSaveAllResources()));
+        this.subscribeToEvent(EditorEvents.EditorResourceCloseEvent((ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev)));
+        this.subscribeToEvent(EditorEvents.RenameResourceNotificationEvent((ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev)));
+        this.subscribeToEvent(EditorEvents.DeleteResourceNotificationEvent((data) => this.handleDeleteResource(data)));
 
-        this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
+        this.subscribeToEvent(UIEvents.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
-        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

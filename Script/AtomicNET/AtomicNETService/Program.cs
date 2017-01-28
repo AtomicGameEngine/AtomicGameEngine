@@ -54,7 +54,7 @@ namespace AtomicTools
                     // exit service
                     case "exit":
 
-                        app.SendEvent("ExitRequested");
+                        app.SendEvent(Atomic.ExitRequestedEventName);
                         break;
 
                 }

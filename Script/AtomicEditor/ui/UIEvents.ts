@@ -20,5 +20,17 @@
 // THE SOFTWARE.
 //
 
-export const MessageModalEvent = "MessageModalEvent";
+export const MessageModalEventName = "MessageModalEvent";
+export function MessageModalEvent(callback: Atomic.EventCallback<MessageModalEvent>) {
+    return Atomic.ScriptEvent(MessageModalEventName, callback);
+}
+export interface MessageModalEvent extends Atomic.EventMetaData {
+    type : string;
+    title : string;
+    message : string;
+}
+
 export const ResourceEditorChanged = "ResourceEditorChanged";
+export function ResourceEditorChangedEvent(callback : Atomic.EventCallback<null>) {
+    return Atomic.ScriptEvent(ResourceEditorChanged, callback);
+}

@@ -39,9 +39,9 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("hierarchy create items", createItems);
         this.contextMenuItemSource = MenuItemSources.createMenuItemSource("node context general", nodeGeneralContextItems);
 
-        this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
+        this.subscribeToEvent(EditorEvents.ContentFolderChangedEvent((ev: EditorEvents.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
-        });
+        }));
 
     }
 
@@ -74,7 +74,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
             }
 
             if (child) {
-                child.scene.sendEvent("SceneEditNodeCreated", { node: child });
+                child.scene.sendEvent(Editor.SceneEditNodeCreatedEventName, { node: child });
             }
 
             return true;
@@ -101,10 +101,10 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                     return;
 
                 var scene = node.scene;
-                scene.sendEvent("SceneEditAddRemoveNodes", { end: false });
-                scene.sendEvent("SceneEditNodeRemoved", { node: node, parent: node.parent, scene: scene });
+                scene.sendEvent(Editor.SceneEditAddRemoveNodesEventName, { end: false });
+                scene.sendEvent(Editor.SceneEditNodeRemovedEventName, { node: node, parent: node.parent, scene: scene });
                 node.remove();
-                scene.sendEvent("SceneEditAddRemoveNodes", { end: true });
+                scene.sendEvent(Editor.SceneEditAddRemoveNodesEventName, { end: true });
 
                 editor.selection.delete();
 
@@ -116,7 +116,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                     return;
 
                 var newnode = node.clone();
-                node.scene.sendEvent("SceneEditNodeCreated", { node: newnode });
+                node.scene.sendEvent(Editor.SceneEditNodeCreatedEventName, { node: newnode });
 
                 return true;
             }

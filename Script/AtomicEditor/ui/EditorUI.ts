@@ -89,11 +89,11 @@ class EditorUI extends Atomic.ScriptObject {
 
     this.editor = editor;
 
-    this.subscribeToEvent("ScreenMode", (ev:Atomic.ScreenModeEvent) => {
+    this.subscribeToEvent(Atomic.ScreenModeEvent((ev:Atomic.ScreenModeEvent) => {
 
       this.mainframe.setSize(ev.width, ev.height);
 
-    });
+    }));
 
     // set initial size
     this.mainframe.setSize(graphics.width, graphics.height);
@@ -107,13 +107,13 @@ class EditorUI extends Atomic.ScriptObject {
       this.modalOps);
     ServiceLocator.subscribeToEvents(this.mainframe);
 
-    this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {
+    this.subscribeToEvent(EditorEvents.ModalErrorEvent((event:EditorEvents.ModalErrorEvent) => {
       this.showModalError(event.title, event.message);
-    });
-    
-    this.subscribeToEvent(EditorEvents.EditorModal, (event:EditorEvents.EditorModalEvent) => {
+    }));
+
+    this.subscribeToEvent(EditorEvents.EditorModalEvent((event:EditorEvents.EditorModalEvent) => {
       this.showModalError(event.title, event.message);
-    });
+    }));
 
   }
 

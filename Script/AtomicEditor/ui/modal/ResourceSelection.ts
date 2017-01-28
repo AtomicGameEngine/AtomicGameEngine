@@ -52,7 +52,7 @@ class ResourceSelection extends ModalWindow {
         this.setSize(800, 600);
         this.center();
 
-        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.searchEdit.subscribeToEvent(this.searchEdit, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

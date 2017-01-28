@@ -68,27 +68,27 @@ class ProjectFrame extends ScriptWidget {
         foldercontainer.addChild(folderList);
 
         // events
-        this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
-        this.subscribeToEvent("DragEnded", (data: Atomic.DragEndedEvent) => this.handleDragEnded(data));
+        this.subscribeToEvent(EditorEvents.ProjectLoadedEvent((data) => this.handleProjectLoaded(data)));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(Atomic.DragEndedEvent((data: Atomic.DragEndedEvent) => this.handleDragEnded(data)));
 
-        this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
-        this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
-        this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
-        this.subscribeToEvent(EditorEvents.InspectorProjectReference, (ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path); });
+        this.subscribeToEvent(ToolCore.ResourceAddedEvent((ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev)));
+        this.subscribeToEvent(ToolCore.ResourceRemovedEvent((ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev)));
+        this.subscribeToEvent(ToolCore.AssetRenamedEvent((ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev)));
+        this.subscribeToEvent(EditorEvents.InspectorProjectReferenceEvent((ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path); }));
 
-        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.searchEdit.subscribeToEvent(this.searchEdit, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
-        folderList.subscribeToEvent("UIListViewSelectionChanged", (event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event));
+        folderList.subscribeToEvent(Atomic.UIListViewSelectionChangedEvent((event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event)));
 
         // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
         // this uses FileWatcher which doesn't catch subfolder creation
-        this.subscribeToEvent("FileChanged", (data) => {
+        this.subscribeToEvent(Atomic.FileChangedEvent((data) => {
 
             // console.log("File CHANGED! ", data.fileName);
 
-        });
+        }));
 
     }
 

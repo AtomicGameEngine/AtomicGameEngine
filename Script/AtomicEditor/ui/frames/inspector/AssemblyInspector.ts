@@ -29,7 +29,7 @@ class AssemblyInspector extends InspectorWidget {
 
         super();
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

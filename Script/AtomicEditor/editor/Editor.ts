@@ -61,14 +61,14 @@ class Editor extends Atomic.ScriptObject {
 
         Atomic.getResourceCache().autoReloadResources = true;
 
-        this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
-        this.subscribeToEvent(EditorEvents.CloseProject, (data) => this.handleEditorCloseProject(data));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => {
+        this.subscribeToEvent(EditorEvents.LoadProjectEvent((data) => this.handleEditorLoadProject(data)));
+        this.subscribeToEvent(EditorEvents.CloseProjectEvent((data) => this.handleEditorCloseProject(data)));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => {
             Atomic.graphics.windowTitle = "AtomicEditor";
             this.handleProjectUnloaded(data);
-        });
+        }));
 
-        this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {
+        this.subscribeToEvent(Atomic.ScriptEvent("IPCPlayerWindowChanged", /*AtomicApp.IPCPlayerWindowChangedEvent(*/ (data: AtomicApp.IPCPlayerWindowChangedEvent) => {
             var playerWindow = Preferences.getInstance().playerWindow;
             //if player window is maximized, then we want keep the window size from the previous state
             if (data.maximized) {
@@ -80,25 +80,25 @@ class Editor extends Atomic.ScriptObject {
                 playerWindow = {x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized};
             }
             Preferences.getInstance().savePlayerWindowData(playerWindow);
-        });
+        }));
 
-        this.subscribeToEvent("ScreenMode", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
-        this.subscribeToEvent("WindowPos", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
+        this.subscribeToEvent(Atomic.ScreenModeEvent((data) => this.saveWindowPreferences()));
+        this.subscribeToEvent(Atomic.WindowPosEvent((data) => this.saveWindowPreferences()));
 
-        this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
+        this.subscribeToEvent(Atomic.ExitRequestedEvent((data) => this.handleExitRequested(data)));
 
-        this.subscribeToEvent("ProjectLoaded", (data) => {
+        this.subscribeToEvent(ToolCore.ProjectLoadedEvent((data) => {
             Atomic.graphics.windowTitle = "AtomicEditor - " + data.projectPath;
             Preferences.getInstance().registerRecentProject(data.projectPath);
-        });
+        }));
 
-        this.subscribeToEvent("EditorResourceCloseCanceled", (data) => {
+        this.subscribeToEvent(EditorEvents.EditorResourceCloseCanceledEvent((data) => {
             //if user canceled closing the resource, then user has changes that he doesn't want to lose
             //so cancel exit/project close request and unsubscribe from event to avoid closing all the editors again
             this.exitRequested = false;
             this.projectCloseRequested = false;
             this.unsubscribeFromEvent(EditorEvents.EditorResourceClose);
-        });
+        }));
 
         this.parseArguments();
     }
@@ -112,7 +112,7 @@ class Editor extends Atomic.ScriptObject {
         ui.setDefaultFont(uiData.fontName, uiData.fontSize);
     }
 
-    saveWindowPreferences(data: Atomic.ScreenModeEvent): boolean {
+    saveWindowPreferences(): boolean {
         var graphics = Atomic.getGraphics();
         if (!graphics) return false;
 
@@ -192,7 +192,7 @@ class Editor extends Atomic.ScriptObject {
         var system = ToolCore.getToolSystem();
         if (system.project) {
 
-            this.sendEvent(UIEvents.MessageModalEvent,
+            this.sendEvent(UIEvents.MessageModalEventName,
                 { type: "error", title: "Project already loaded", message: "Project already loaded" });
 
             return false;
@@ -219,9 +219,9 @@ class Editor extends Atomic.ScriptObject {
           return;
         }
         //wait when we close resource editor to check another resource editor for unsaved changes and close it
-        this.subscribeToEvent(EditorEvents.EditorResourceClose, (data) => {
+        this.subscribeToEvent(EditorEvents.EditorResourceCloseEvent((data) => {
             this.closeAllResourceEditors();
-        });
+        }));
         editor.requestClose();
     }
 
@@ -232,7 +232,7 @@ class Editor extends Atomic.ScriptObject {
     }
 
     closeProject() {
-        this.sendEvent("IPCPlayerExitRequest");
+        this.sendEvent("IPCPlayerExitRequest" /*AtomicApp.IPCPlayerExitRequestEventName*/);
         var system = ToolCore.getToolSystem();
 
         if (system.project) {

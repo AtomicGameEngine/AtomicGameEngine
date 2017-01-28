@@ -63,7 +63,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         this.refreshWidgets();
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
 
     }
 
@@ -136,7 +136,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         platform.refreshAndroidTargets();
 
-        this.subscribeToEvent(platform, "AndroidTargetsRefreshed", (ev) => {
+        this.subscribeToEvent(platform, ToolCore.AndroidTargetsRefreshedEvent((ev) => {
 
             this.sdkTargetSource.clear();
 
@@ -153,7 +153,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             this.sdkTargetSelect.value = -1;
             this.sdkTargetSelect.value = 0;
 
-        });
+        }));
 
     }
 

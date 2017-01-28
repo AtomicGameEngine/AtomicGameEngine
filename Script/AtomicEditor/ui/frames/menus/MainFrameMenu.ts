@@ -140,7 +140,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu file popup") {
             if (refid == "quit") {
 
-                this.sendEvent("ExitRequested");
+                this.sendEvent(Atomic.ExitRequestedEventName);
                 return true;
 
             }
@@ -175,12 +175,12 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 if (ToolCore.toolSystem.project) {
 
-                    this.subscribeToEvent(EditorEvents.ProjectClosed, () => {
+                    this.subscribeToEvent(EditorEvents.ProjectClosedEvent(() => {
 
                         this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
                         requestProjectLoad();
 
-                    });
+                    }));
 
                     this.sendEvent(EditorEvents.CloseProject);
 
@@ -271,11 +271,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
             if (refid == "tools toggle profiler") {
                 Atomic.ui.toggleDebugHud();
                 return true;
-            } if (refid == "tools perf profiler") {                
+            } if (refid == "tools perf profiler") {
                 Atomic.ui.debugHudProfileMode = Atomic.DebugHudProfileMode.DEBUG_HUD_PROFILE_PERFORMANCE;
                 Atomic.ui.showDebugHud(true);
                 return true;
-            } else if (refid == "tools metrics profiler") {                
+            } else if (refid == "tools metrics profiler") {
                 Atomic.ui.debugHudProfileMode = Atomic.DebugHudProfileMode.DEBUG_HUD_PROFILE_METRICS;
                 Atomic.ui.showDebugHud(true);
                 return true;

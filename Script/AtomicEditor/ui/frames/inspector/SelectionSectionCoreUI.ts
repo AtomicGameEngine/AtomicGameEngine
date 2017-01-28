@@ -87,20 +87,20 @@ class CubemapGeneratorSectionUI extends SelectionSectionUI {
 
                     scene = gen.scene;
 
-                    this.subscribeToEvent(scene, "CubemapRenderBegin", () => {
+                    this.subscribeToEvent(scene, Editor.CubemapRenderBeginEvent(() => {
 
                         count++;
 
-                    });
+                    }));
 
-                    this.subscribeToEvent(scene, "CubemapRenderEnd", () => {
+                    this.subscribeToEvent(scene, Editor.CubemapRenderEndEvent(() => {
 
                         count--;
 
                         if (!count)
                             progressModal.hide();
 
-                    });
+                    }));
 
 
                 }

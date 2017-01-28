@@ -51,8 +51,8 @@ class PlayerOutput extends Atomic.UIWindow {
 
         };
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
-        this.subscribeToEvent(EditorEvents.PlayerLog, (ev: EditorEvents.PlayerLogEvent) => this.handlePlayerLog(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
+        this.subscribeToEvent(EditorEvents.PlayerLogEvent((ev: EditorEvents.PlayerLogEvent) => this.handlePlayerLog(ev)));
 
         this.resizeToFitContent();
         this.center();

@@ -81,10 +81,18 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
      * Subscribe to an event and provide a callback.  This can be used by services to subscribe to custom events
      * @param  {string} eventType
      * @param  {any} callback
+     * or
+     * @param {Atomic.EventMetaData} wrappedEvent A Atomic pre-wrapped event object
      */
-    subscribeToEvent(eventType: string, callback: (data: any) => void) {
+    subscribeToEvent(eventType: string, callback: (data: any) => void);
+    subscribeToEvent(wrappedEvent: Atomic.EventMetaData);
+    subscribeToEvent(eventTypeOrWrapped: any, callback?: any) {
         if (this.eventDispatcher) {
-            this.eventDispatcher.subscribeToEvent(eventType, callback);
+            if (callback) {
+                this.eventDispatcher.subscribeToEvent(eventTypeOrWrapped, callback);
+            } else {
+                this.eventDispatcher.subscribeToEvent(eventTypeOrWrapped);
+            }
         }
     }
 }

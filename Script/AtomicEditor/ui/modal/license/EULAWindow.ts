@@ -63,7 +63,7 @@ class EULAWindow extends ModalWindow {
 
             if (id == "quit") {
 
-                this.sendEvent("ExitRequested");
+                this.sendEvent(Atomic.ExitRequestedEventName);
                 return true;
 
             } else if (id == "ok") {
@@ -78,7 +78,7 @@ class EULAWindow extends ModalWindow {
                 var licenseSystem = ToolCore.getLicenseSystem();
                 licenseSystem.licenseAgreementConfirmed();
 
-                this.sendEvent("LicenseEulaAccepted");
+                this.sendEvent(ToolCore.LicenseEulaAcceptedEventName);
 
                 return true;
             }

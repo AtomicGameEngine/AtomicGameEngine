@@ -40,9 +40,9 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
         this.contextMenuItemSource = MenuItemSources.createMenuItemSource("asset context general", assetGeneralContextItems);
         MenuItemSources.createMenuItemSource("project create items", createItems);
 
-        this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
+        this.subscribeToEvent(EditorEvents.ContentFolderChangedEvent((ev: EditorEvents.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
-        });
+        }));
 
     }
 

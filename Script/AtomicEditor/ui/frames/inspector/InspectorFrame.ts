@@ -54,10 +54,10 @@ class InspectorFrame extends ScriptWidget {
 
         var container = this.getWidget("inspectorcontainer");
 
-        this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
+        this.subscribeToEvent(EditorEvents.EditResourceEvent((data) => this.handleEditResource(data)));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
 
-        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
+        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
 
     }
 
@@ -83,7 +83,7 @@ class InspectorFrame extends ScriptWidget {
 
         if (this.scene) {
 
-            this.subscribeToEvent(this.scene, "SceneNodeSelected", (event: Editor.SceneNodeSelectedEvent) => this.handleSceneNodeSelected(event));
+            this.subscribeToEvent(this.scene, Editor.SceneNodeSelectedEvent((event: Editor.SceneNodeSelectedEvent) => this.handleSceneNodeSelected(event)));
 
             // add the current selection
             var selection = this.sceneEditor.selection;

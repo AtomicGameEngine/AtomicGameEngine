@@ -71,9 +71,9 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
-        eventDispatcher.subscribeToEvent(EditorEvents.LoadProjectNotification, (ev) => this.projectLoaded(ev));
-        eventDispatcher.subscribeToEvent(EditorEvents.CloseProject, (ev) => this.projectUnloaded(ev));
-        eventDispatcher.subscribeToEvent(EditorEvents.PlayerStartRequest, () => this.playerStarted());
+        eventDispatcher.subscribeToEvent(EditorEvents.LoadProjectNotificationEvent((ev) => this.projectLoaded(ev)));
+        eventDispatcher.subscribeToEvent(EditorEvents.CloseProjectEvent((ev) => this.projectUnloaded(ev)));
+        eventDispatcher.subscribeToEvent(EditorEvents.PlayerStartRequestEvent(() => this.playerStarted()));
     }
 
     /**
@@ -177,10 +177,10 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
-        eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.saveResource(ev));
-        eventDispatcher.subscribeToEvent(EditorEvents.DeleteResourceNotification, (ev) => this.deleteResource(ev));
-        eventDispatcher.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev) => this.renameResource(ev));
-        eventDispatcher.subscribeToEvent(EditorEvents.EditResource, (ev) => this.editResource(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotificationEvent((ev) => this.saveResource(ev)));
+        eventDispatcher.subscribeToEvent(EditorEvents.DeleteResourceNotificationEvent((ev) => this.deleteResource(ev)));
+        eventDispatcher.subscribeToEvent(EditorEvents.RenameResourceNotificationEvent((ev) => this.renameResource(ev)));
+        eventDispatcher.subscribeToEvent(EditorEvents.EditResourceEvent((ev) => this.editResource(ev)));
 
     }
 
@@ -277,8 +277,8 @@ export class SceneServicesProvider extends ServicesProvider<Editor.HostExtension
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
-        eventDispatcher.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (ev) => this.activeSceneEditorChange(ev));
-        eventDispatcher.subscribeToEvent(EditorEvents.SceneClosed, (ev) => this.sceneClosed(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.ActiveSceneEditorChangeEvent((ev) => this.activeSceneEditorChange(ev)));
+        eventDispatcher.subscribeToEvent(EditorEvents.SceneClosedEvent((ev) => this.sceneClosed(ev)));
     }
 
     /**
@@ -567,7 +567,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * Hooks into web messages coming in from web views
      * @param  {[String|Object]} data
      */
-    handleWebMessage(data) {
+    handleWebMessage(data: EditorEvents.WebMessageEvent) {
         let messageType;
         let messageObject;
 
@@ -598,6 +598,6 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
         // Placeholder for when UI events published by the editor need to be listened for
-        eventDispatcher.subscribeToEvent(EditorEvents.WebMessage, (ev) => this.handleWebMessage(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.WebMessageEvent((ev) => this.handleWebMessage(ev)));
     }
 }

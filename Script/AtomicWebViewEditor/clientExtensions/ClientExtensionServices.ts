@@ -43,11 +43,20 @@ export class EventDispatcher implements Editor.Extensions.EventDispatcher {
         });
     }
 
-    subscribeToEvent(eventType, callback) {
-        this.subscriptions.push({
-            eventName: eventType,
-            callback: callback
-        });
+    subscribeToEvent(eventType: string, callback: (...params) => any);
+    subscribeToEvent(wrapped: Atomic.EventMetaData);
+    subscribeToEvent(eventTypeOrWrapped: any, callback?: any) {
+        if (callback) {
+            this.subscriptions.push({
+                eventName: eventTypeOrWrapped,
+                callback: callback
+            });
+        } else {
+            this.subscriptions.push({
+                eventName: eventTypeOrWrapped._eventType,
+                callback: eventTypeOrWrapped._callback
+            });
+        }
     }
 }
 

@@ -28,8 +28,10 @@ declare module Atomic {
 
     // Base interface for events, contains eventType string and callback
     interface EventMetaData {
-        _eventType: string;
-        _callback: any;
+        /**@internal*/
+        _eventType?: string;
+        /**@internal*/
+        _callback?: (...params) => any;
     }
 
     interface NativeEvent extends EventMetaData { }

@@ -162,7 +162,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             this.isNETProject = true;
             this.configureNETProjectMenu();
 
-            this.eventObject.subscribeToEvent("NETBuildResult", (eventData:ToolCore.NETBuildResultEvent) => {
+            this.eventObject.subscribeToEvent(ToolCore.NETBuildResultEvent((eventData:ToolCore.NETBuildResultEvent) => {
 
                 if (!eventData.success) {
 
@@ -182,7 +182,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
 
                 }
 
-            });
+            }));
         }
     }
 

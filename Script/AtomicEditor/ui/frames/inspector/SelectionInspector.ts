@@ -48,7 +48,7 @@ class NodeSection extends SelectionSection {
         this.transformEdits.push(this.attrEdits["Rotation"]);
         this.transformEdits.push(this.attrEdits["Scale"]);
 
-        this.subscribeToEvent("Update", (ev) => this.handleUpdate(ev));
+        this.subscribeToEvent(Atomic.UpdateEvent((ev) => this.handleUpdate(ev)));
 
     }
 
@@ -129,12 +129,6 @@ class SceneSection extends SelectionSection {
 
 }
 
-interface AttributeEditResourceChangedEvent {
-
-    attrInfoEdit: AttributeInfoEdit;
-    resource: Atomic.Resource;
-
-}
 
 class JSComponentSection extends ComponentSection {
 
@@ -144,11 +138,11 @@ class JSComponentSection extends ComponentSection {
 
         this.hasDynamicAttr = true;
 
-        this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
+        this.subscribeToEvent(this, EditorEvents.AttributeEditResourceChangedEvent((ev) => this.handleAttributeEditResourceChanged(ev)));
         this.updateTitleFromComponentClass();
     }
 
-    private handleAttributeEditResourceChanged(ev: AttributeEditResourceChangedEvent) {
+    private handleAttributeEditResourceChanged(ev: EditorEvents.AttributeEditResourceChangedEvent) {
 
         var jsc = <Atomic.JSComponent>this.editType.getFirstObject();
 
@@ -168,7 +162,7 @@ class JSComponentSection extends ComponentSection {
             let jscf = <Atomic.JSComponentFile> jsc.componentFile;
             if (jscf.typeScriptClass) {
                 this.text = this.text.replace(".js", ".ts");
-            }            
+            }
         }
     }
 
@@ -184,11 +178,11 @@ class CSComponentSection extends ComponentSection {
 
         this.hasDynamicAttr = true;
 
-        this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
+        this.subscribeToEvent(this, EditorEvents.AttributeEditResourceChangedEvent((ev) => this.handleAttributeEditResourceChanged(ev)));
 
-        this.subscribeToEvent("CSComponentAssemblyChanged", (ev) => this.handleCSComponentAssemblyChanged(ev));
+        this.subscribeToEvent(AtomicNETScript.CSComponentAssemblyChangedEvent((ev) => this.handleCSComponentAssemblyChanged(ev)));
 
-        this.subscribeToEvent("CSComponentClassChanged", (ev) => this.handleCSComponentClassChanged(ev));
+        this.subscribeToEvent(AtomicNETScript.CSComponentClassChangedEvent((ev) => this.handleCSComponentClassChanged(ev)));
 
     }
 
@@ -222,7 +216,7 @@ class CSComponentSection extends ComponentSection {
     }
 
 
-    private handleAttributeEditResourceChanged(ev: AttributeEditResourceChangedEvent) {
+    private handleAttributeEditResourceChanged(ev: EditorEvents.AttributeEditResourceChangedEvent) {
 
 
         var csc = <AtomicNETScript.CSComponent>this.editType.getFirstObject();
@@ -290,14 +284,14 @@ class SelectionInspector extends ScriptWidget {
         this.createComponentButton = new CreateComponentButton();
         mainLayout.addChild(this.createComponentButton);
 
-        this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesBegin", (data) => this.handleSceneEditStateChangesBeginEvent());
-        this.subscribeToEvent("SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
-        this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesEnd", (data) => this.handleSceneEditStateChangesEndEvent());
+        this.subscribeToEvent(sceneEditor.scene, Editor.SceneEditStateChangesBeginEvent((data) => this.handleSceneEditStateChangesBeginEvent()));
+        this.subscribeToEvent(Editor.SceneEditStateChangeEvent((data) => this.handleSceneEditStateChangeEvent(data)));
+        this.subscribeToEvent(sceneEditor.scene, Editor.SceneEditStateChangesEndEvent((data) => this.handleSceneEditStateChangesEndEvent()));
 
-        this.subscribeToEvent(sceneEditor.scene, "SceneEditNodeRemoved", (ev: Editor.SceneEditNodeRemovedEvent) => this.handleSceneEditNodeRemoved(ev));
-        this.subscribeToEvent(sceneEditor.scene, "SceneEditComponentAddedRemoved", (ev) => this.handleSceneEditComponentAddedRemovedEvent(ev));
+        this.subscribeToEvent(sceneEditor.scene, Editor.SceneEditNodeRemovedEvent((ev: Editor.SceneEditNodeRemovedEvent) => this.handleSceneEditNodeRemoved(ev)));
+        this.subscribeToEvent(sceneEditor.scene, Editor.SceneEditComponentAddedRemovedEvent((ev) => this.handleSceneEditComponentAddedRemovedEvent(ev)));
 
-        this.subscribeToEvent(this.createComponentButton, "SelectionCreateComponent", (data) => this.handleSelectionCreateComponent(data));
+        this.subscribeToEvent(this.createComponentButton, Editor.SelectionCreateComponentEvent((data) => this.handleSelectionCreateComponent(data)));
 
     }
 
@@ -682,7 +676,7 @@ class SelectionInspector extends ScriptWidget {
 
         if (removed.length) {
 
-            this.sceneEditor.scene.sendEvent("SceneEditEnd");
+            this.sceneEditor.scene.sendEvent(Editor.SceneEditEndEventName);
             this.refresh();
 
         }
@@ -706,7 +700,7 @@ class SelectionInspector extends ScriptWidget {
 
             this.component = c;
 
-            this.sceneEditor.scene.sendEvent("SceneEditComponentCopy", { component: this.component });
+            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentCopyEventName, { component: this.component });
             this.refresh();
 
         }
@@ -728,7 +722,7 @@ class SelectionInspector extends ScriptWidget {
 
             this.component = c;
 
-            this.sceneEditor.scene.sendEvent("SceneEditComponentPaste", { component: this.component });
+            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentPasteEventName, { component: this.component });
             this.refresh();
         }
 

@@ -38,9 +38,9 @@ class AnimationToolbar extends Atomic.UIWidget {
         this.leftAnimContainer = <Atomic.UILayout>this.getWidget("leftanimcontainer");
         this.rightAnimContainer = <Atomic.UILayout>this.getWidget("rightanimcontainer");
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
-        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
-        this.subscribeToEvent(EditorEvents.SceneClosed, (data) => this.handleSceneClosed(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
+        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
+        this.subscribeToEvent(EditorEvents.SceneClosedEvent((data) => this.handleSceneClosed(data)));
 
         var leftAnimationField = InspectorUtils.createAttrEditFieldWithSelectButton("Animation A", this.leftAnimContainer);
         leftAnimationField.selectButton.onClick = function () { this.openAnimationSelectionBox(leftAnimationField.editField, this.leftAnim); }.bind(this);

@@ -49,10 +49,10 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         // one time subscriptions waiting for the web view to finish loading.  This event
         // actually hits the editor instance before we can hook it, so listen to it on the
         // frame and then unhook it
-        editor.subscribeToEvent(EditorEvents.WebViewLoadEnd, (data) => {
+        editor.subscribeToEvent(EditorEvents.WebViewLoadEndEvent((data) => {
             editor.unsubscribeFromEvent(EditorEvents.WebViewLoadEnd);
             this.loadCode(<Editor.JSResourceEditor>editor, resourcePath);
-        });
+        }));
 
         // Cannot subscribe to WebMessage until the .ts side can return a Handler.Success() message
         // editor.subscribeToEvent(EditorEvents.WebMessage, (data) => {
@@ -68,15 +68,15 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         //     }
         // });
 
-        editor.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => {
+        editor.subscribeToEvent(EditorEvents.DeleteResourceNotificationEvent((data) => {
             const webClient = editor.webView.webClient;
             webClient.executeJavaScript(`HOST_resourceDeleted("${this.getNormalizedPath(data.path)}");`);
-        });
+        }));
 
-        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data: EditorEvents.UserPreferencesChangedEvent) => {
+        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotificationEvent((data: EditorEvents.UserPreferencesChangedEvent) => {
             const webClient = editor.webView.webClient;
             webClient.executeJavaScript(`HOST_preferencesChanged('${data.projectPreferences}','${data.applicationPreferences}');`);
-        });
+        }));
 
         return editor;
     }

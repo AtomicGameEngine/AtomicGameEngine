@@ -30,13 +30,13 @@ class ResourceOps extends Atomic.ScriptObject {
 
         super();
 
-        this.subscribeToEvent("AssetImportError", (ev: ToolCore.AssetImportErrorEvent) => {
+        this.subscribeToEvent(ToolCore.AssetImportErrorEvent((ev: ToolCore.AssetImportErrorEvent) => {
 
             resourceOps.sendEvent(EditorEvents.ModalError, { title: "Asset Import Error", message: ev.error });
 
-        });
+        }));
 
-        this.subscribeToEvent(EditorEvents.RequestProjectLoad, (ev: EditorEvents.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); });
+        this.subscribeToEvent(EditorEvents.RequestProjectLoadEvent((ev: EditorEvents.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); }));
 
     }
 

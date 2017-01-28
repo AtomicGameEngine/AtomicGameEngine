@@ -32,7 +32,7 @@ class PrefabInspector extends InspectorWidget {
         this.fd.id = "Vera";
         this.fd.size = 11;
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

@@ -30,9 +30,9 @@ class Shortcuts extends Atomic.ScriptObject {
 
         super();
 
-        this.subscribeToEvent(Atomic.UIShortcutEvent ( (ev) => this.handleUIShortcut(ev)));
+        this.subscribeToEvent(Atomic.UIShortcutEvent((ev) => this.handleUIShortcut(ev)));
 
-        this.subscribeToEvent(Atomic.KeyDownEvent( (ev) => this.handleKeyDown(ev)));
+        this.subscribeToEvent(Atomic.KeyDownEvent((ev) => this.handleKeyDown(ev)));
 
 
     }
@@ -43,7 +43,7 @@ class Shortcuts extends Atomic.ScriptObject {
         this.sendEvent(EditorEvents.SaveAllResources);
 
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerExitRequest");
+            this.sendEvent("IPCPlayerExitRequest" /*AtomicApp.IPCPlayerExitRequestEventName*/);
         } else {
 
             var playerWindow = Preferences.getInstance().playerWindow;
@@ -92,13 +92,13 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokePauseOrResumePlayer() {
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerPauseResumeRequest");
+            this.sendEvent("IPCPlayerPauseResumeRequest" /*AtomicApp.IPCPlayerPauseResumeRequestEventName*/);
         }
     }
 
     invokeStepPausedPlayer() {
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerPauseStepRequest");
+            this.sendEvent("IPCPlayerPauseStepRequest" /*AtomicApp.IPCPlayerPauseStepRequestEventName*/);
         }
     }
 
@@ -153,7 +153,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokeGizmoEditModeChanged(mode: Editor.EditMode) {
 
-        this.sendEvent("GizmoEditModeChanged", { mode: mode });
+        this.sendEvent(Editor.GizmoEditModeChangedEventName, { mode: mode });
 
     }
 
@@ -162,7 +162,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         if (editor && editor instanceof Editor.SceneEditor3D) {
             var mode = editor.getGizmo().axisMode ? Editor.AxisMode.AXIS_WORLD : Editor.AxisMode.AXIS_LOCAL;
-            this.sendEvent("GizmoAxisModeChanged", { mode: mode });
+            this.sendEvent(Editor.GizmoAxisModeChangedEventName, { mode: mode });
         }
     }
 

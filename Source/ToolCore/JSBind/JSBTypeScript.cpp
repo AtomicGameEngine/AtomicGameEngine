@@ -423,7 +423,7 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
             {
                 typeName = "number";
                 mapped = true;
-            } else if (typeName == "bool") {
+            } else if (typeName == "bool" || typeName == "boolean") {
                 typeName = "boolean";
                 mapped = true;
             } else if (typeName == "string") {

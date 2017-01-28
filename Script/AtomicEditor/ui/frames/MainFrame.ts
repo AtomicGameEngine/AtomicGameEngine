@@ -63,17 +63,17 @@ class MainFrame extends ScriptWidget {
 
         this.disableProjectMenus();
 
-        this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
+        this.subscribeToEvent(UIEvents.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
-        this.subscribeToEvent("ProjectLoaded", (data) => {
+        this.subscribeToEvent(EditorEvents.ProjectLoadedEvent((data) => {
             this.showWelcomeFrame(false);
             this.enableProjectMenus();
-        });
+        }));
 
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => {
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => {
             this.showWelcomeFrame(true);
             this.disableProjectMenus();
-        });
+        }));
 
         this.showWelcomeFrame(true);
 

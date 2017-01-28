@@ -208,7 +208,13 @@ declare module Editor.Extensions {
          * @param  {string} eventType
          * @param  {any} callback
          */
-        subscribeToEvent(eventType, callback);
+        subscribeToEvent?(eventType: string, callback: (...params) => any);
+
+        /**
+         * Subscribe to an event with a pre-wrapped event object.  This can be used by services to subscribe to custom events
+         * @param  {Atomic.EventMetaData} wrappedEvent
+         */
+        subscribeToEvent?(wrappedEvent: Atomic.EventMetaData);
     }
 
     /**

@@ -55,41 +55,41 @@ class MainToolbar extends Atomic.UIWidget {
 
         parent.addChild(this);
 
-        this.subscribeToEvent("GizmoAxisModeChanged", (ev) => this.handleGizmoAxisModeChanged(ev));
-        this.subscribeToEvent("GizmoEditModeChanged", (ev) => this.handleGizmoEditModeChanged(ev));
+        this.subscribeToEvent(Editor.GizmoAxisModeChangedEvent((ev) => this.handleGizmoAxisModeChanged(ev)));
+        this.subscribeToEvent(Editor.GizmoEditModeChangedEvent((ev) => this.handleGizmoEditModeChanged(ev)));
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
-        this.subscribeToEvent(EditorEvents.PlayerStarted, (data) => {
+        this.subscribeToEvent(EditorEvents.PlayerStartedEvent(() => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("StopButton");
             skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
-        });
-        this.subscribeToEvent(EditorEvents.PlayerStopped, (data) => {
+        }));
+        this.subscribeToEvent(EditorEvents.PlayerStoppedEvent(() => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
             skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
-        });
-        this.subscribeToEvent(EditorEvents.PlayerPaused, (data) => {
+        }));
+        this.subscribeToEvent(EditorEvents.PlayerPausedEvent(() => {
             var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
-        });
+        }));
 
-        this.subscribeToEvent(EditorEvents.PlayerResumed, (data) => {
+        this.subscribeToEvent(EditorEvents.PlayerResumedEvent(() => {
             var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
-        });
+        }));
 
         // TODO: We need better control over playmode during NET compiles
-        this.subscribeToEvent("NETBuildBegin", (data) => {
+        this.subscribeToEvent(ToolCore.NETBuildBeginEvent((data) => {
             this.playButton.disable();
-        });
+        }));
 
-        this.subscribeToEvent("NETBuildResult", (data) => {
+        this.subscribeToEvent(ToolCore.NETBuildResultEvent((data) => {
             this.playButton.enable();
-        });
+        }));
 
     }
 
@@ -135,7 +135,7 @@ class MainToolbar extends Atomic.UIWidget {
                 else if (ev.target.id == "3d_scale")
                     mode = 3;
 
-                this.sendEvent("GizmoEditModeChanged", { mode: mode });
+                this.sendEvent(Editor.GizmoEditModeChangedEventName, { mode: mode });
 
                 return true;
 

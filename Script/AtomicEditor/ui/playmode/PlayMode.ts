@@ -33,9 +33,9 @@ class PlayMode extends Atomic.ScriptObject {
 
         super();
         this.myPlayer = null;
-        this.subscribeToEvent("IPCJSError", (ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev));
-        this.subscribeToEvent(EditorEvents.PlayerStarted, (ev) => this.handlePlayerStarted(ev));
-        this.subscribeToEvent(EditorEvents.PlayerStopped, (ev) => this.handlePlayerStopped(ev));
+        this.subscribeToEvent(Atomic.IPCJSErrorEvent((ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev)));
+        this.subscribeToEvent(EditorEvents.PlayerStartedEvent((ev) => this.handlePlayerStarted(ev)));
+        this.subscribeToEvent(EditorEvents.PlayerStoppedEvent((ev) => this.handlePlayerStopped(ev)));
 
     }
 

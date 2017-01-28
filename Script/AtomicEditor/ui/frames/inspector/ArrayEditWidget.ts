@@ -46,7 +46,7 @@ class ArrayEditWidget extends Atomic.UILayout {
 
         this.countEditField = <Atomic.UIEditField>countEdit.getWidget("editfield");
 
-        this.subscribeToEvent(this.countEditField, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+        this.subscribeToEvent(this.countEditField, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
 
     }
 

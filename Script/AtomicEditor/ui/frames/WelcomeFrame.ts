@@ -58,9 +58,9 @@ class WelcomeFrame extends ScriptWidget {
 
         this.updateRecentProjects();
 
-        this.subscribeToEvent(EditorEvents.CloseProject, () => {
+        this.subscribeToEvent(EditorEvents.CloseProjectEvent(() => {
             this.updateRecentProjects();
-        });
+        }));
 
         this.initExampleBrowser();
 

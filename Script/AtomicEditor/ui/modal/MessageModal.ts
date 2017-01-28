@@ -37,7 +37,7 @@ export class MessageModal extends Atomic.ScriptObject {
 
     super();
 
-    this.subscribeToEvent(UIEvents.MessageModalEvent, (data) => {
+    this.subscribeToEvent(UIEvents.MessageModalEvent((data) => {
 
       if (data.type == "error") {
 
@@ -45,7 +45,7 @@ export class MessageModal extends Atomic.ScriptObject {
 
       }
 
-    });
+    }));
 
   }
 

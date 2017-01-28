@@ -59,7 +59,7 @@ class BuildWindow extends ModalWindow {
 
         }
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
