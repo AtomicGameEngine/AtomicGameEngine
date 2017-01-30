@@ -375,6 +375,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
       // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig
       tsconfig.compilerOptions["baseUrl"] = "./Resources";
+      tsconfig.compilerOptions.allowJs = false;
 
       tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
       tsconfigFile.close();
