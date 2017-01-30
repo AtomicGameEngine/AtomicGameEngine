@@ -88,8 +88,6 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
-    /// Set emission enabled.
-    void SetEmissionEnabled(bool enable);
     /// Set particle effect.
     void SetEffect(ParticleEffect2D* effect);
     /// Set sprite.
@@ -99,8 +97,6 @@ public:
     /// Set max particles.
     void SetMaxParticles(unsigned maxParticles);
 
-    /// Return emission state.
-    bool GetEmissionEnabled() const;
     /// Return particle effect.
     ParticleEffect2D* GetEffect() const;
     /// Return sprite.
@@ -120,6 +116,15 @@ public:
     void SetSpriteAttr(const ResourceRef& value);
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
+
+    // ATOMIC BEGIN
+
+    /// Set emission state.
+    void SetEmitting(bool enable);
+    /// Return emission state.
+    bool IsEmitting() const;
+
+    // ATOMIC END
 
 private:
     /// Handle scene being assigned.
@@ -141,15 +146,13 @@ private:
     /// Update particle.
     void UpdateParticle(Particle2D& particle, float timeStep, const Vector3& worldPosition, float worldScale);
 
-    /// Emission enabled.
-    bool emissionEnabled_;
     /// Particle effect.
     SharedPtr<ParticleEffect2D> effect_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
     /// Blend mode.
     BlendMode blendMode_;
-    /// Nummber of particles.
+    /// Number of particles.
     unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
@@ -161,6 +164,14 @@ private:
     Vector3 boundingBoxMinPoint_;
     /// Bounding box max point.
     Vector3 boundingBoxMaxPoint_;
+
+    // ATOMIC BEGIN
+
+    /// Emission enabled.
+    bool emitting_;
+
+    // ATOMIC END
+
 };
 
 }
