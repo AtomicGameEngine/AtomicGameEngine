@@ -76,7 +76,6 @@ ATOMIC_EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
     ATOMIC_PARAM(P_RESOURCEEDITOR, ResourceEditor); // ResourceEditor*
 }
 
-
 // emitted once play has started
 ATOMIC_EVENT(E_EDITORPLAYERSTARTED, EditorPlayerStarted)
 {
@@ -126,6 +125,10 @@ ATOMIC_EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
     ATOMIC_PARAM(P_SCENEEDITOR, SceneEditor);  // SceneEditor3D pointer
 }
 
+ATOMIC_EVENT(E_EDITORSCENECLOSED, EditorSceneClosed)
+{
+    ATOMIC_PARAM(P_SCENE, Scene); // Scene pointer
+}
 
 ATOMIC_EVENT(E_PLAYERERROR, PlayerError)
 {
@@ -166,6 +169,83 @@ ATOMIC_EVENT(E_CURLCOMPLETE, CurlComplete)
 ATOMIC_EVENT(E_EDITORSHUTDOWN, EditorShutdown)
 {
 
+}
+
+ATOMIC_EVENT(E_EDITORLOADPROJECT, EditorLoadProject)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+ATOMIC_EVENT(E_CONTENTFOLDERCHANGED, ContentFolderChanged)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+ATOMIC_EVENT(E_EDITORCLOSEPROJECT, EditorCloseProject)
+{
+
+}
+
+ATOMIC_EVENT(E_EDITORPROJECTCLOSED, EditorProjectClosed)
+{
+
+}
+
+ATOMIC_EVENT(E_EDITORSAVEALLRESOURCES, EditorSaveAllResources)
+{
+
+}
+
+ATOMIC_EVENT(E_EDITORSAVERESOURCE, EditorSaveResource)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+// Called once the resource has been saved
+ATOMIC_EVENT(E_EDITORSAVERESOURCENOTIFICATION, EditorSaveResourceNotification)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+ATOMIC_EVENT(E_EDITOREDITRESOURCE, EditorEditResource)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+ATOMIC_EVENT(E_EDITORDELETERESOURCE, EditorDeleteResource)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+// Called once the resource has been deleted
+ATOMIC_EVENT(E_EDITORDELETERESOURCENOTIFICATION, EditorDeleteResourceNotification)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string
+}
+
+// Called when a resource has been renamed
+ATOMIC_EVENT(E_EDITORRENAMERESOURCENOTIFICATION, EditorRenameResourceNotification)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string (full path of the old resource)
+    ATOMIC_PARAM(P_NEWPATH, NewPath);   // string (full path of the new resource)
+    ATOMIC_PARAM(P_NEWNAME, NewName);    // string (new name of resource)
+    ATOMIC_PARAM(P_ASSET, Asset);       // Asset pointer
+}
+
+ATOMIC_EVENT(E_USERPREFERENCESCHANGEDNOTIFICATION, UserPreferencesChangedNotification)
+{
+   ATOMIC_PARAM(P_PROJECTPREFERENCES, ProjectPreferences);  // string (JSON object)
+   ATOMIC_PARAM(P_APPLICATIONPREFERENCES, ApplicationPreferences);        // string (JSON object)
+}
+
+ATOMIC_EVENT(E_INSPECTORPROJECTREFERENCE, InspectorProjectReference)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string (Full path of the resource to edit)
+}
+
+ATOMIC_EVENT(E_ATTRIBUTEEDITRESOURCECHANGED, AttributeEditResourceChanged)
+{
+    ATOMIC_PARAM(P_RESOURCE, Resource); // Resource pointer
 }
 
 }
