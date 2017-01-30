@@ -21,7 +21,6 @@
 //
 
 import EditorUI = require("./EditorUI");
-import EditorEvents = require("../editor/EditorEvents");
 
 class MainToolbar extends Atomic.UIWidget {
 
@@ -60,24 +59,24 @@ class MainToolbar extends Atomic.UIWidget {
 
         this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
-        this.subscribeToEvent(EditorEvents.PlayerStartedEvent(() => {
+        this.subscribeToEvent(Editor.EditorPlayerStartedEvent(() => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("StopButton");
             skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
         }));
-        this.subscribeToEvent(EditorEvents.PlayerStoppedEvent(() => {
+        this.subscribeToEvent(Editor.EditorPlayerStoppedEvent(() => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
             skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
         }));
-        this.subscribeToEvent(EditorEvents.PlayerPausedEvent(() => {
+        this.subscribeToEvent(Editor.EditorPlayerPausedEvent(() => {
             var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
         }));
 
-        this.subscribeToEvent(EditorEvents.PlayerResumedEvent(() => {
+        this.subscribeToEvent(Editor.EditorPlayerResumedEvent(() => {
             var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
         }));
@@ -135,7 +134,7 @@ class MainToolbar extends Atomic.UIWidget {
                 else if (ev.target.id == "3d_scale")
                     mode = 3;
 
-                this.sendEvent(Editor.GizmoEditModeChangedEventName, { mode: mode });
+                this.sendEvent(Editor.GizmoEditModeChangedEventType, { mode: mode });
 
                 return true;
 

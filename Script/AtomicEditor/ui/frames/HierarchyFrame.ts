@@ -22,7 +22,6 @@
 
 import HierarchyFrameMenu = require("./menus/HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import SearchBarFiltering = require("resources/SearchBarFiltering");
 
@@ -70,8 +69,8 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
-        this.subscribeToEvent(EditorEvents.EditorResourceCloseEvent((data) => this.handleEditorResourceClosed(data)));
-        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
+        this.subscribeToEvent(Editor.EditorResourceCloseEvent((data) => this.handleEditorResourceClosed(data)));
+        this.subscribeToEvent(Editor.EditorActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
 
         this.searchEdit.subscribeToEvent(this.searchEdit, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
@@ -90,14 +89,14 @@ class HierarchyFrame extends Atomic.UIWidget {
             this.canReparent = true;
         }));
 
-        this.subscribeToEvent(EditorEvents.ProjectClosedEvent((ev) => {
+        this.subscribeToEvent(Editor.EditorProjectClosedEvent((ev) => {
 
             this.scene = null;
             this.populate();
 
         }));
 
-        this.subscribeToEvent(EditorEvents.SceneClosedEvent((ev: EditorEvents.SceneClosedEvent) => {
+        this.subscribeToEvent(Editor.EditorSceneClosedEvent((ev: Editor.EditorSceneClosedEvent) => {
 
             if (ev.scene == this.scene) {
 
@@ -246,7 +245,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     }
 
-    handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
+    handleActiveSceneEditorChanged(event: Editor.EditorActiveSceneEditorChangeEvent) {
 
         this.setSceneEditor(event.sceneEditor);
 

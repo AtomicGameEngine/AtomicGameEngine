@@ -23,7 +23,6 @@
 import ScriptWidget = require("ui/ScriptWidget");
 import UIEvents = require("ui/UIEvents");
 import EditorUI = require("ui/EditorUI");
-import EditorEvents = require("editor/EditorEvents");
 import InspectorWidget = require("./InspectorWidget");
 import InspectorUtils = require("./InspectorUtils");
 

@@ -24,7 +24,6 @@ import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import AttributeInfoEdit = require("./AttributeInfoEdit");
 import SerializableEditType = require("./SerializableEditType");
-import EditorEvents = require("editor/EditorEvents");
 
 class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
@@ -56,7 +55,7 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-                o.scene.sendEvent(Editor.SceneEditEndEventName);
+                o.scene.sendEvent(Editor.SceneEditEndEventType);
                 _this.refresh();
 
             }.bind({ index: index, field: field });
@@ -173,7 +172,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
             }
 
-            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": resource.name });
+            this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
             this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
             this.refresh();
 
@@ -229,7 +228,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                 if (importer) {
 
                     var resource = asset.getResource(resourceTypeName);
-                    this.sendEvent(EditorEvents.InspectorProjectReference, { "path": resource.name });
+                    this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
                     this.refresh();
                 }
@@ -242,7 +241,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
 
                 var pathName = materialEdit.pathReference;
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+                this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": pathName });
 
             } else if (o.editField.text == "") {
 
@@ -288,7 +287,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-                scene.sendEvent(Editor.SceneEditEndEventName);
+                scene.sendEvent(Editor.SceneEditEndEventType);
 
                 return true;
 

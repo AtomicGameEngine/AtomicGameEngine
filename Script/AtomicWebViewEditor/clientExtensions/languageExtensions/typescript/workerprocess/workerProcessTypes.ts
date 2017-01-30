@@ -28,10 +28,10 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent { }
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.ClientExtensions.CodeSavedEvent { }
 
-export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent { }
-export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent { }
+export interface DeleteMessageData extends WorkerProcessMessageData, Editor.ClientExtensions.DeleteResourceEvent { }
+export interface RenameMessageData extends WorkerProcessMessageData, Editor.ClientExtensions.RenameResourceEvent { }
 
 export const SetPreferences = "SET_PREFERENCES";
 export interface SetPreferencesMessageData extends WorkerProcessMessageData {

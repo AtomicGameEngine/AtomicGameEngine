@@ -25,7 +25,7 @@
 /// <reference path="../TypeScript/Editor.d.ts" />
 /// <reference path="../TypeScript/AtomicWork.d.ts" />
 
-import Editor = require("editor/Editor");
+import Editor from "editor/Editor";
 
 class Main {
 

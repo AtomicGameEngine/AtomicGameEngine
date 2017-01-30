@@ -140,7 +140,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu file popup") {
             if (refid == "quit") {
 
-                this.sendEvent(Atomic.ExitRequestedEventName);
+                this.sendEvent(Atomic.ExitRequestedEventType);
                 return true;
 
             }
@@ -175,14 +175,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 if (ToolCore.toolSystem.project) {
 
-                    this.subscribeToEvent(EditorEvents.ProjectClosedEvent(() => {
+                    this.subscribeToEvent(Editor.EditorProjectClosedEvent(() => {
 
-                        this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
+                        this.unsubscribeFromEvent(Editor.EditorProjectClosedEventType);
                         requestProjectLoad();
 
                     }));
 
-                    this.sendEvent(EditorEvents.CloseProject);
+                    this.sendEvent(Editor.EditorCloseProjectEventType);
 
                 } else {
 
@@ -196,7 +196,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "file close project") {
 
-                this.sendEvent(EditorEvents.CloseProject);
+                this.sendEvent(Editor.EditorCloseProjectEventType);
 
                 return true;
 
@@ -213,7 +213,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "file save all") {
-                this.sendEvent(EditorEvents.SaveAllResources);
+                this.sendEvent(Editor.EditorSaveAllResourcesEventType);
                 return true;
             }
 

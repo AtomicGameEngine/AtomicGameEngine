@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
 import Preferences = require("editor/Preferences");
 
@@ -40,7 +39,7 @@ class Shortcuts extends Atomic.ScriptObject {
     //this should be moved somewhere else...
     invokePlayOrStopPlayer(debug: boolean = false) {
 
-        this.sendEvent(EditorEvents.SaveAllResources);
+        this.sendEvent(Editor.EditorSaveAllResourcesEventType);
 
         if (Atomic.editorMode.isPlayerEnabled()) {
             this.sendEvent("IPCPlayerExitRequest" /*AtomicApp.IPCPlayerExitRequestEventName*/);
@@ -119,7 +118,7 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     invokeFileSave() {
-        this.sendEvent(EditorEvents.SaveResource);
+        this.sendEvent(Editor.EditorSaveResourceEventType);
     }
 
     invokeUndo() {
@@ -153,7 +152,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokeGizmoEditModeChanged(mode: Editor.EditMode) {
 
-        this.sendEvent(Editor.GizmoEditModeChangedEventName, { mode: mode });
+        this.sendEvent(Editor.GizmoEditModeChangedEventType, { mode: mode });
 
     }
 
@@ -162,7 +161,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         if (editor && editor instanceof Editor.SceneEditor3D) {
             var mode = editor.getGizmo().axisMode ? Editor.AxisMode.AXIS_WORLD : Editor.AxisMode.AXIS_LOCAL;
-            this.sendEvent(Editor.GizmoAxisModeChangedEventName, { mode: mode });
+            this.sendEvent(Editor.GizmoAxisModeChangedEventType, { mode: mode });
         }
     }
 

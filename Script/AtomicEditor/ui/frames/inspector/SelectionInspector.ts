@@ -23,7 +23,6 @@
 import EditorUI = require("../../EditorUI");
 import CreateComponentButton = require("./CreateComponentButton");
 import ScriptWidget = require("ui/ScriptWidget");
-import EditorEvents = require("editor/EditorEvents");
 import SerializableEditType = require("./SerializableEditType");
 import SelectionSection = require("./SelectionSection");
 import SelectionPrefabWidget = require("./SelectionPrefabWidget");
@@ -138,11 +137,11 @@ class JSComponentSection extends ComponentSection {
 
         this.hasDynamicAttr = true;
 
-        this.subscribeToEvent(this, EditorEvents.AttributeEditResourceChangedEvent((ev) => this.handleAttributeEditResourceChanged(ev)));
+        this.subscribeToEvent(this, Editor.AttributeEditResourceChangedEvent((ev) => this.handleAttributeEditResourceChanged(ev)));
         this.updateTitleFromComponentClass();
     }
 
-    private handleAttributeEditResourceChanged(ev: EditorEvents.AttributeEditResourceChangedEvent) {
+    private handleAttributeEditResourceChanged(ev: Editor.AttributeEditResourceChangedEvent) {
 
         var jsc = <Atomic.JSComponent>this.editType.getFirstObject();
 
@@ -178,7 +177,7 @@ class CSComponentSection extends ComponentSection {
 
         this.hasDynamicAttr = true;
 
-        this.subscribeToEvent(this, EditorEvents.AttributeEditResourceChangedEvent((ev) => this.handleAttributeEditResourceChanged(ev)));
+        this.subscribeToEvent(this, Editor.AttributeEditResourceChangedEvent((ev) => this.handleAttributeEditResourceChanged(ev)));
 
         this.subscribeToEvent(AtomicNETScript.CSComponentAssemblyChangedEvent((ev) => this.handleCSComponentAssemblyChanged(ev)));
 
@@ -216,7 +215,7 @@ class CSComponentSection extends ComponentSection {
     }
 
 
-    private handleAttributeEditResourceChanged(ev: EditorEvents.AttributeEditResourceChangedEvent) {
+    private handleAttributeEditResourceChanged(ev: Editor.AttributeEditResourceChangedEvent) {
 
 
         var csc = <AtomicNETScript.CSComponent>this.editType.getFirstObject();
@@ -676,7 +675,7 @@ class SelectionInspector extends ScriptWidget {
 
         if (removed.length) {
 
-            this.sceneEditor.scene.sendEvent(Editor.SceneEditEndEventName);
+            this.sceneEditor.scene.sendEvent(Editor.SceneEditEndEventType);
             this.refresh();
 
         }
@@ -700,7 +699,7 @@ class SelectionInspector extends ScriptWidget {
 
             this.component = c;
 
-            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentCopyEventName, { component: this.component });
+            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentCopyEventType, { component: this.component });
             this.refresh();
 
         }
@@ -722,7 +721,7 @@ class SelectionInspector extends ScriptWidget {
 
             this.component = c;
 
-            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentPasteEventName, { component: this.component });
+            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentPasteEventType, { component: this.component });
             this.refresh();
         }
 

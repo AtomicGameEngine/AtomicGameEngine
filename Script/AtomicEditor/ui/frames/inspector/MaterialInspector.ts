@@ -23,7 +23,6 @@
 import ScriptWidget = require("ui/ScriptWidget");
 import UIEvents = require("ui/UIEvents");
 import EditorUI = require("ui/EditorUI");
-import EditorEvents = require("editor/EditorEvents");
 
 import TextureSelector = require("./TextureSelector");
 
@@ -295,7 +294,7 @@ class MaterialInspector extends ScriptWidget {
             var texture = this.material.getTexture(textureUnit);
 
             if (textureWidget.getTexture() != null) {
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });
+                this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": texture.getName() });
             } else {
                 this.openTextureSelectionBox(textureUnit, textureWidget);
             }
@@ -410,7 +409,7 @@ class MaterialInspector extends ScriptWidget {
                         this.material.setTexture(ev.target["tunit"], texture);
                         (<Atomic.UITextureWidget>ev.target["textureWidget"]).texture = this.getTextureThumbnail(texture);
 
-                        this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName(), "ButtonID": texture.getName() });
+                        this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": texture.getName(), "ButtonID": texture.getName() });
                     }
                 }
             }));

@@ -127,9 +127,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
     /**
      * Called when the editor needs to be configured for a particular file
-     * @param  {Editor.EditorEvents.EditorFileEvent} ev
+     * @param  {Editor.ClientExtensions.EditorFileEvent} ev
      */
-    configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
+    configureEditor(ev: Editor.ClientExtensions.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
             let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
             this.editor = editor; // cache this so that we can reference it later
@@ -223,7 +223,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Called when code is first loaded into the editor
      * @param  {CodeLoadedEvent} ev
      */
-    codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
+    codeLoaded(ev: Editor.ClientExtensions.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
 
             // Build our worker
@@ -374,9 +374,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
     /**
      * Called once a resource has been saved
-     * @param  {Editor.EditorEvents.SaveResourceEvent} ev
+     * @param  {Editor.ClientExtensions.SaveResourceEvent} ev
      */
-    save(ev: Editor.EditorEvents.CodeSavedEvent) {
+    save(ev: Editor.ClientExtensions.CodeSavedEvent) {
         if (this.active && this.isValidFiletype(ev.filename)) {
             const message: WorkerProcessTypes.SaveMessageData = {
                 command: ClientExtensionEventNames.CodeSavedEvent,
@@ -392,9 +392,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
     /**
      * Handle the delete.  This should delete the corresponding javascript file
-     * @param  {Editor.EditorEvents.DeleteResourceEvent} ev
+     * @param  {Editor.ClientExtensions.DeleteResourceEvent} ev
      */
-    delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
+    delete(ev: Editor.ClientExtensions.DeleteResourceEvent) {
         if (this.active && this.isValidFiletype(ev.path)) {
             // notify the typescript language service that the file has been deleted
             const message: WorkerProcessTypes.DeleteMessageData = {
@@ -408,9 +408,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
     /**
      * Handle the rename.  Should rename the corresponding .js file
-     * @param  {Editor.EditorEvents.RenameResourceEvent} ev
+     * @param  {Editor.ClientExtensions.RenameResourceEvent} ev
      */
-    rename(ev: Editor.EditorEvents.RenameResourceEvent) {
+    rename(ev: Editor.ClientExtensions.RenameResourceEvent) {
         if (this.active && this.isValidFiletype(ev.path)) {
             // notify the typescript language service that the file has been renamed
             const message: WorkerProcessTypes.RenameMessageData = {

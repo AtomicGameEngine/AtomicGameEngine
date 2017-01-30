@@ -21,7 +21,7 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
-import Editor = require("editor/Editor");
+import {default as AtomicEditor} from "editor/Editor";
 import EditorEvents = require("editor/EditorEvents");
 import ProjectFrameMenu = require("./menus/ProjectFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
@@ -75,7 +75,7 @@ class ProjectFrame extends ScriptWidget {
         this.subscribeToEvent(ToolCore.ResourceAddedEvent((ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev)));
         this.subscribeToEvent(ToolCore.ResourceRemovedEvent((ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev)));
         this.subscribeToEvent(ToolCore.AssetRenamedEvent((ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev)));
-        this.subscribeToEvent(EditorEvents.InspectorProjectReferenceEvent((ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path); }));
+        this.subscribeToEvent(Editor.InspectorProjectReferenceEvent((ev: Editor.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path); }));
 
         this.searchEdit.subscribeToEvent(this.searchEdit, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
@@ -260,7 +260,7 @@ class ProjectFrame extends ScriptWidget {
 
                     } else {
 
-                        this.sendEvent(EditorEvents.EditResource, { "path": asset.path });
+                        this.sendEvent(Editor.EditorEditResourceEventType, { "path": asset.path });
                     }
 
                 }
@@ -470,7 +470,7 @@ class ProjectFrame extends ScriptWidget {
 
         if (this.currentFolder != folder) {
 
-            this.sendEvent(EditorEvents.ContentFolderChanged, { path: folder.path });
+            this.sendEvent(Editor.ContentFolderChangedEventType, { path: folder.path });
 
         }
 

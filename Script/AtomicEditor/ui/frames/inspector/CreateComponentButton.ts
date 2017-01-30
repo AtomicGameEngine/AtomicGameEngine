@@ -143,7 +143,7 @@ class CreateComponentButton extends Atomic.UIButton {
         var menu = new Atomic.UIMenuWindow(this, "create component popup");
         menu.fontDescription = this.fd;
         menu.show(componentCreateSource);
-    };
+    }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
@@ -152,7 +152,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
         if (ev.target && ev.target.id == "create component popup") {
 
-            this.sendEvent(Editor.SelectionCreateComponentEventName, { componentTypeName : ev.refid});
+            this.sendEvent(Editor.SelectionCreateComponentEventType, { componentTypeName : ev.refid});
 
             return true;
 

@@ -51,9 +51,9 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
 
     /**
      * Called when the editor needs to be configured for a particular file
-     * @param  {Editor.EditorEvents.EditorFileEvent} ev
+     * @param  {Editor.ClientExtensions.EditorFileEvent} ev
      */
-    configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
+    configureEditor(ev: Editor.ClientExtensions.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
             this.active = true;
             monaco.languages.register({ id: "turbobadger" });
@@ -73,7 +73,7 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
      * Called when code is first loaded into the editor
      * @param  {CodeLoadedEvent} ev
      */
-    codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
+    codeLoaded(ev: Editor.ClientExtensions.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
             let editor = <monaco.editor.IStandaloneCodeEditor>ev.editor;
             editor.getModel().updateOptions({

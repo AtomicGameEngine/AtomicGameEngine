@@ -69,8 +69,8 @@ class ColorChooser extends Atomic.UIWindow {
 
         (<Atomic.UIButton>this.getWidget("ccancelbutton")).onClick = () => {
 
-            this.sendEvent(Atomic.UIWidgetEditCanceledEventName, { widget : this });
-            this.unsubscribeFromEvent(Atomic.UIWidgetDeletedEventName);
+            this.sendEvent(Atomic.UIWidgetEditCanceledEventType, { widget : this });
+            this.unsubscribeFromEvent(Atomic.UIWidgetDeletedEventType);
             this.close();
 
         };
@@ -79,14 +79,14 @@ class ColorChooser extends Atomic.UIWindow {
 
             Preferences.getInstance().addColorHistory(this.infohex.text);
 
-            this.sendEvent(Atomic.UIWidgetEditCompleteEventName, { widget : this });
-            this.unsubscribeFromEvent(Atomic.UIWidgetDeletedEventName);
+            this.sendEvent(Atomic.UIWidgetEditCompleteEventType, { widget : this });
+            this.unsubscribeFromEvent(Atomic.UIWidgetDeletedEventType);
             this.close();
         };
 
         this.subscribeToEvent(this, Atomic.UIWidgetDeletedEvent((event: Atomic.UIWidgetDeletedEvent) => {
 
-            this.sendEvent(Atomic.UIWidgetEditCanceledEventName, { widget : this });
+            this.sendEvent(Atomic.UIWidgetEditCanceledEventType, { widget : this });
 
         }));
 
@@ -192,7 +192,7 @@ class ColorChooser extends Atomic.UIWindow {
 
         if (changed) {
 
-            this.sendEvent(Editor.ColorChooserChangedEventName, { widget : this });
+            this.sendEvent(Editor.ColorChooserChangedEventType, { widget : this });
 
         }
 
@@ -226,7 +226,7 @@ class ColorChooser extends Atomic.UIWindow {
             this.fixcolor();
             this.update_hslwidgets();
             this.update_rgbwidgets();
-            this.sendEvent(Editor.ColorChooserChangedEventName, { widget : this });
+            this.sendEvent(Editor.ColorChooserChangedEventType, { widget : this });
 
         }
 

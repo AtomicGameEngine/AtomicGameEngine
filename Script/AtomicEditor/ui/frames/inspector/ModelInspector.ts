@@ -23,7 +23,6 @@
 import InspectorWidget = require("./InspectorWidget");
 import ArrayEditWidget = require("./ArrayEditWidget");
 import InspectorUtils = require("./InspectorUtils");
-import EditorEvents = require("editor/EditorEvents");
 
 class ModelInspector extends InspectorWidget {
 
@@ -96,7 +95,7 @@ class ModelInspector extends InspectorWidget {
         editField.subscribeToEvent(editField, Atomic.UIWidgetFocusChangedEvent((ev: Atomic.UIWidgetFocusChangedEvent) => {
 
             if (ev.widget == editField && editField.focus) {
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+                this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
             }
 
         }));

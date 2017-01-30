@@ -22,8 +22,6 @@
 
 /// <reference path="../../../TypeScript/duktape.d.ts" />
 
-import * as EditorEvents from "../../editor/EditorEvents";
-
 /**
  * Resource extension that supports the web view typescript extension
  */
@@ -97,7 +95,7 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
      * Called when the project is being loaded to allow the typescript language service to reset and
      * possibly compile
      */
-    projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
+    projectLoaded(ev: Editor.EditorLoadProjectEvent) {
         // got a load, we need to reset the language service
         console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
         let system = ToolCore.getToolSystem();

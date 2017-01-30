@@ -21,7 +21,6 @@
 //
 
 import EditorUI = require("../EditorUI");
-import EditorEvents = require("../../editor/EditorEvents");
 import ModalWindow = require("./ModalWindow");
 import SearchBarFiltering = require("resources/SearchBarFiltering");
 

@@ -128,11 +128,11 @@ class SerializableEditType {
 
         if (scene) {
 
-            scene.sendEvent(Editor.SceneEditEndEventName);
+            scene.sendEvent(Editor.SceneEditEndEventType);
 
             if (editTypeName != "Node") {
 
-                scene.sendEvent(Editor.ComponentEditEndEventName);
+                scene.sendEvent(Editor.ComponentEditEndEventType);
 
             }
         }

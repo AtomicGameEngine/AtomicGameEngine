@@ -54,14 +54,14 @@ class InspectorFrame extends ScriptWidget {
 
         var container = this.getWidget("inspectorcontainer");
 
-        this.subscribeToEvent(EditorEvents.EditResourceEvent((data) => this.handleEditResource(data)));
+        this.subscribeToEvent(Editor.EditorEditResourceEvent((data) => this.handleEditResource(data)));
         this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
 
-        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
+        this.subscribeToEvent(Editor.EditorActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
 
     }
 
-    handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
+    handleActiveSceneEditorChanged(event: Editor.EditorActiveSceneEditorChangeEvent) {
 
         if (this.sceneEditor == event.sceneEditor) {
             return;
@@ -151,7 +151,7 @@ class InspectorFrame extends ScriptWidget {
     }
 
 
-    handleEditResource(ev: EditorEvents.EditResourceEvent) {
+    handleEditResource(ev: Editor.EditorEditResourceEvent) {
 
         var path = ev.path;
 

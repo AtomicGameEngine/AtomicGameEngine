@@ -54,9 +54,9 @@ export default class JavascriptLanguageExtension implements Editor.ClientExtensi
 
     /**
      * Called when the editor needs to be configured for a particular file
-     * @param  {Editor.EditorEvents.EditorFileEvent} ev
+     * @param  {Editor.ClientExtensions.EditorFileEvent} ev
      */
-    configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
+    configureEditor(ev: Editor.ClientExtensions.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
             this.editor = ev.editor; // cache this so that we can reference it later
             this.active = true;

@@ -23,7 +23,6 @@
 import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
-import EditorEvents = require("editor/EditorEvents");
 import ColorChooser = require("./ColorChooser");
 
 class AttributeInfoEdit extends Atomic.UILayout {
@@ -796,7 +795,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         if (parent) {
 
-            parent.sendEvent(EditorEvents.AttributeEditResourceChangedEventName, { attrInfoEdit: this, resource: resource });
+            parent.sendEvent(Editor.AttributeEditResourceChangedEventType, { attrInfoEdit: this, resource: resource });
 
         }
 
@@ -862,18 +861,18 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                         if (resource instanceof Atomic.JSComponentFile) {
 
                             var pathName = resource.name;
-                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+                            this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": pathName });
 
                         } else if (resource instanceof Atomic.Model) {
 
                             var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+                            this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
 
                         } else if (resource instanceof Atomic.Animation) {
 
                              var animCacheReferenceName = resource.name.replace( "_" + (<Atomic.Animation>resource).animationName, "");
                              var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
-                             this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+                             this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
 
                         } else {
 
@@ -1237,8 +1236,8 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
                 // record for undo/redo
                 let scene = this.editType.getEditScene();
                 if (scene) {
-                    scene.sendEvent(Editor.SceneEditEndEventName);
-                    scene.sendEvent(Editor.ComponentEditEndEventName);
+                    scene.sendEvent(Editor.SceneEditEndEventType);
+                    scene.sendEvent(Editor.ComponentEditEndEventType);
                 }
 
                 refresh = true;
