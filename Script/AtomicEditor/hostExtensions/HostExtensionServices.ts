@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import * as EditorEvents from "../editor/EditorEvents";
 import * as EditorUI from "../ui/EditorUI";
 import MainFrame = require("../ui/frames/MainFrame");
 import InspectorFrame = require("../ui/frames/inspector/InspectorFrame");
@@ -70,7 +69,7 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
-        eventDispatcher.subscribeToEvent(EditorEvents.LoadProjectNotificationEvent((ev) => this.projectLoaded(ev)));
+        eventDispatcher.subscribeToEvent(Editor.LoadProjectNotificationEvent((ev) => this.projectLoaded(ev)));
         eventDispatcher.subscribeToEvent(Editor.EditorCloseProjectEvent((ev) => this.projectUnloaded(ev)));
         eventDispatcher.subscribeToEvent(Editor.EditorPlayRequestEvent(() => this.playerStarted()));
     }

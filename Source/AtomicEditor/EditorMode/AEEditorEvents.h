@@ -57,7 +57,7 @@ ATOMIC_EVENT(E_JAVASCRIPTSAVED, JavascriptSaved)
 
 }
 
-// editor play request
+// emitted when the play button has been pressed in the editor, but the player has not yet started
 ATOMIC_EVENT(E_EDITORPLAYREQUEST, EditorPlayRequest)
 {
     ATOMIC_PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
@@ -70,7 +70,6 @@ ATOMIC_EVENT(E_EDITORPLAYSTOP, EditorPlayStop)
 
 }
 
-// stop play mode
 ATOMIC_EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
 {
     ATOMIC_PARAM(P_RESOURCEEDITOR, ResourceEditor); // ResourceEditor*
@@ -112,12 +111,12 @@ ATOMIC_EVENT(E_EDITORBUILD, EditorBuild)
 static const unsigned EDITOR_MODALERROR = 0x1;
 static const unsigned EDITOR_MODALINFO = 0x2;
 
-
+// emitted to display a modal message in the editor
 ATOMIC_EVENT(E_EDITORMODAL, EditorModal)
 {
-    ATOMIC_PARAM(P_TYPE, Type);      // uint (EDITOR_ERROR_MODAL, etc)
-    ATOMIC_PARAM(P_TITLE, Title);      // for modal errors, title text
-    ATOMIC_PARAM(P_MESSAGE, Message);    // for modal errors, error text
+    ATOMIC_PARAM(P_TYPE, Type);      // uint (Type can be EDITOR_MODALERROR, EDITOR_MODAL_INFOT)
+    ATOMIC_PARAM(P_TITLE, Title);      // string (for modal errors, title text)
+    ATOMIC_PARAM(P_MESSAGE, Message);    // string (for modal errors, error text)
 }
 
 ATOMIC_EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
@@ -181,6 +180,7 @@ ATOMIC_EVENT(E_CONTENTFOLDERCHANGED, ContentFolderChanged)
     ATOMIC_PARAM(P_PATH, Path);     // string
 }
 
+// emitted when the editor has been requested to close the current project.
 ATOMIC_EVENT(E_EDITORCLOSEPROJECT, EditorCloseProject)
 {
 
@@ -191,6 +191,7 @@ ATOMIC_EVENT(E_EDITORPROJECTCLOSED, EditorProjectClosed)
 
 }
 
+// command to save all the open editors
 ATOMIC_EVENT(E_EDITORSAVEALLRESOURCES, EditorSaveAllResources)
 {
 
@@ -198,7 +199,7 @@ ATOMIC_EVENT(E_EDITORSAVEALLRESOURCES, EditorSaveAllResources)
 
 ATOMIC_EVENT(E_EDITORSAVERESOURCE, EditorSaveResource)
 {
-    ATOMIC_PARAM(P_PATH, Path);     // string
+    ATOMIC_PARAM(P_PATH, Path);     // string full path of the current resource
 }
 
 // Called once the resource has been saved
@@ -246,6 +247,37 @@ ATOMIC_EVENT(E_INSPECTORPROJECTREFERENCE, InspectorProjectReference)
 ATOMIC_EVENT(E_ATTRIBUTEEDITRESOURCECHANGED, AttributeEditResourceChanged)
 {
     ATOMIC_PARAM(P_RESOURCE, Resource); // Resource pointer
+}
+
+ATOMIC_EVENT(E_RESOURCEEDITORCHANGED, ResourceEditorChanged)
+{
+    ATOMIC_PARAM(P_EDITOR, Editor); // ResourceEditor pointer
+}
+
+ATOMIC_EVENT(E_EDITORPLAYERLOG, EditorPlayerLog)
+{
+    ATOMIC_PARAM(P_MESSAGE, Message);   // string
+    ATOMIC_PARAM(P_LEVEL, Level);       // int
+}
+
+ATOMIC_EVENT(E_PROJECTUNLOADEDNOTIFICATION, ProjectUnloadedNotification)
+{
+
+}
+
+ATOMIC_EVENT(E_REQUESTPROJECTLOAD, RequestProjectLoad)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string (Full path to the .atomic file)
+}
+
+ATOMIC_EVENT(E_PROJECTLOADED, ProjectLoaded)
+{
+
+}
+
+ATOMIC_EVENT(E_LOADPROJECTNOTIFICATION,LoadProjectNotification)
+{
+    ATOMIC_PARAM(P_PATH, Path);     // string (Full path to the .atomic file)
 }
 
 }

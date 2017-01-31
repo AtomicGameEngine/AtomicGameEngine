@@ -112,7 +112,6 @@
         "./AtomicEditor/ui/resourceEditors/XMLResourceEditorBuilder.ts",
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
-        "./AtomicEditor/ui/UIEvents.ts",
         "./TypeScript/Atomic.d.ts",
         "./TypeScript/AtomicApp.d.ts",
         "./TypeScript/AtomicNETScript.d.ts",

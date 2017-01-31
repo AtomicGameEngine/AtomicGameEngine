@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("editor/EditorEvents");
 import ScriptWidget = require("ui/ScriptWidget");
 
 // inspectors
@@ -55,7 +54,7 @@ class InspectorFrame extends ScriptWidget {
         var container = this.getWidget("inspectorcontainer");
 
         this.subscribeToEvent(Editor.EditorEditResourceEvent((data) => this.handleEditResource(data)));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
 
         this.subscribeToEvent(Editor.EditorActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
 

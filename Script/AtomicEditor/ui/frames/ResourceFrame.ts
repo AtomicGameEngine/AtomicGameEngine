@@ -21,8 +21,6 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
-import EditorEvents = require("editor/EditorEvents");
-import UIEvents = require("ui/UIEvents");
 import ResourceEditorProvider from "../ResourceEditorProvider";
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
@@ -224,7 +222,7 @@ class ResourceFrame extends ScriptWidget {
 
                     }
 
-                    this.sendEvent(UIEvents.ResourceEditorChanged, { editor: w.editor });
+                    this.sendEvent(Editor.ResourceEditorChangedEventType, { editor: w.editor });
 
                 }
 
@@ -278,7 +276,7 @@ class ResourceFrame extends ScriptWidget {
         this.resourceEditorProvider = new ResourceEditorProvider(this);
         this.resourceEditorProvider.loadStandardEditors();
 
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
         this.subscribeToEvent(Editor.EditorEditResourceEvent((data) => this.handleEditResource(data)));
         this.subscribeToEvent(Editor.EditorSaveResourceEvent((data) => this.handleSaveResource(data)));
         this.subscribeToEvent(Editor.EditorSaveAllResourcesEvent((data) => this.handleSaveAllResources()));
@@ -286,7 +284,7 @@ class ResourceFrame extends ScriptWidget {
         this.subscribeToEvent(Editor.EditorRenameResourceNotificationEvent((ev: Editor.EditorRenameResourceNotificationEvent) => this.handleRenameResource(ev)));
         this.subscribeToEvent(Editor.EditorDeleteResourceNotificationEvent((data) => this.handleDeleteResource(data)));
 
-        this.subscribeToEvent(UIEvents.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
+        this.subscribeToEvent(Editor.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
         this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 

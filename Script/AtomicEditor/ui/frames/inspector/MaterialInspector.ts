@@ -21,7 +21,6 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
-import UIEvents = require("ui/UIEvents");
 import EditorUI = require("ui/EditorUI");
 
 import TextureSelector = require("./TextureSelector");

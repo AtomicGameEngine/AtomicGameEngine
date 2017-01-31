@@ -22,7 +22,6 @@
 
 import ScriptWidget = require("ui/ScriptWidget");
 import {default as AtomicEditor} from "editor/Editor";
-import EditorEvents = require("editor/EditorEvents");
 import ProjectFrameMenu = require("./menus/ProjectFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import SearchBarFiltering = require("resources/SearchBarFiltering");
@@ -68,8 +67,8 @@ class ProjectFrame extends ScriptWidget {
         foldercontainer.addChild(folderList);
 
         // events
-        this.subscribeToEvent(EditorEvents.ProjectLoadedEvent((data) => this.handleProjectLoaded(data)));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(Editor.ProjectLoadedEvent((data) => this.handleProjectLoaded(data)));
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
         this.subscribeToEvent(Atomic.DragEndedEvent((data: Atomic.DragEndedEvent) => this.handleDragEnded(data)));
 
         this.subscribeToEvent(ToolCore.ResourceAddedEvent((ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev)));

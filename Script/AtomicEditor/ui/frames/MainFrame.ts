@@ -28,13 +28,10 @@ import HierarchyFrame = require("./HierarchyFrame");
 import MainToolbar = require("ui//MainToolbar");
 import AnimationToolbar = require("ui//AnimationToolbar");
 
-import UIEvents = require("ui/UIEvents");
-
 import ScriptWidget = require("ui/ScriptWidget");
 import MainFrameMenu = require("./menus/MainFrameMenu");
 
 import MenuItemSources = require("./menus/MenuItemSources");
-import * as EditorEvents from "../../editor/EditorEvents";
 
 class MainFrame extends ScriptWidget {
 
@@ -63,14 +60,14 @@ class MainFrame extends ScriptWidget {
 
         this.disableProjectMenus();
 
-        this.subscribeToEvent(UIEvents.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
+        this.subscribeToEvent(Editor.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
-        this.subscribeToEvent(EditorEvents.ProjectLoadedEvent((data) => {
+        this.subscribeToEvent(Editor.ProjectLoadedEvent((data) => {
             this.showWelcomeFrame(false);
             this.enableProjectMenus();
         }));
 
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => {
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => {
             this.showWelcomeFrame(true);
             this.disableProjectMenus();
         }));

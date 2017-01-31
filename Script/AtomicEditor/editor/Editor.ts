@@ -21,7 +21,6 @@
 //
 
 import EditorUI = require("ui/EditorUI");
-import UIEvents = require("ui/UIEvents");
 import PlayMode = require("ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
@@ -63,12 +62,12 @@ class AtomicEditor extends Atomic.ScriptObject {
 
         this.subscribeToEvent(Editor.EditorLoadProjectEvent((data) => this.handleEditorLoadProject(data)));
         this.subscribeToEvent(Editor.EditorCloseProjectEvent((data) => this.handleEditorCloseProject(data)));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotificationEvent((data) => {
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => {
             Atomic.graphics.windowTitle = "AtomicEditor";
             this.handleProjectUnloaded(data);
         }));
 
-        this.subscribeToEvent(Atomic.ScriptEvent("IPCPlayerWindowChanged", /*AtomicApp.IPCPlayerWindowChangedEvent(*/ (data: AtomicApp.IPCPlayerWindowChangedEvent) => {
+        this.subscribeToEvent(Atomic.ScriptEvent(EditorEvents.IPCPlayerWindowChangedEventType, (data: AtomicApp.IPCPlayerWindowChangedEvent) => {
             var playerWindow = Preferences.getInstance().playerWindow;
             //if player window is maximized, then we want keep the window size from the previous state
             if (data.maximized) {
@@ -187,13 +186,13 @@ class AtomicEditor extends Atomic.ScriptObject {
         this.sendEvent(Editor.UserPreferencesChangedNotificationEventType, eventData);
     }
 
-    handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
+    handleEditorLoadProject(event: Editor.LoadProjectNotificationEvent): boolean {
 
         var system = ToolCore.getToolSystem();
         if (system.project) {
 
-            this.sendEvent(UIEvents.MessageModalEventName,
-                { type: "error", title: "Project already loaded", message: "Project already loaded" });
+            this.sendEvent(Editor.EditorModalEventType,
+                { type: Editor.EDITOR_MODALERROR, title: "Project already loaded", message: "Project already loaded" });
 
             return false;
 
@@ -203,7 +202,7 @@ class AtomicEditor extends Atomic.ScriptObject {
             Preferences.getInstance().loadUserPrefs();
             WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
             WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ApplicationPreferences", JSON.stringify(Preferences.getInstance().cachedApplicationPreferences, null, 2 ));
-            this.sendEvent(EditorEvents.LoadProjectNotification, event);
+            this.sendEvent(Editor.LoadProjectNotificationEventType, event);
         }
         return loaded;
     }
@@ -227,12 +226,12 @@ class AtomicEditor extends Atomic.ScriptObject {
 
     handleEditorCloseProject(event) {
         this.projectCloseRequested = true;
-        this.sendEvent(EditorEvents.ProjectUnloadedNotification, event);
+        this.sendEvent(Editor.ProjectUnloadedNotificationEventType, event);
         this.closeAllResourceEditors();
     }
 
     closeProject() {
-        this.sendEvent("IPCPlayerExitRequest" /*AtomicApp.IPCPlayerExitRequestEventName*/);
+        this.sendEvent(EditorEvents.IPCPlayerExitRequestEventType);
         var system = ToolCore.getToolSystem();
 
         if (system.project) {

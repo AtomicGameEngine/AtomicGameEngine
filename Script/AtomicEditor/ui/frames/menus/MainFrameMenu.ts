@@ -21,7 +21,6 @@
 //
 
 import strings = require("../../EditorStrings");
-import EditorEvents = require("../../../editor/EditorEvents");
 import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 import Preferences = require("editor/Preferences");
@@ -171,7 +170,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 }
 
-                var requestProjectLoad = () => this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
+                var requestProjectLoad = () => this.sendEvent(Editor.RequestProjectLoadEventType, { path: path });
 
                 if (ToolCore.toolSystem.project) {
 

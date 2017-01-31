@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("../ui/EditorUI");
 import ProjectTemplates = require("ProjectTemplates");
 
@@ -36,11 +35,11 @@ class ResourceOps extends Atomic.ScriptObject {
 
         }));
 
-        this.subscribeToEvent(EditorEvents.RequestProjectLoadEvent((ev: EditorEvents.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); }));
+        this.subscribeToEvent(Editor.RequestProjectLoadEvent((ev: Editor.RequestProjectLoadEvent) => { this.handleRequestProjectLoad(ev); }));
 
     }
 
-    handleRequestProjectLoad(ev:EditorEvents.RequestProjectLoadEvent) {
+    handleRequestProjectLoad(ev:Editor.RequestProjectLoadEvent) {
 
         var fs = Atomic.fileSystem;
         var projectPath = Atomic.addTrailingSlash(Atomic.getPath(ev.path));

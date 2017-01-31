@@ -23,7 +23,6 @@
 import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
-import UIEvents = require("../../UIEvents");
 
 import WindowsSettingsWidget = require("./platforms/WindowsSettingsWidget");
 import MacSettingsWidget = require("./platforms/MacSettingsWidget");

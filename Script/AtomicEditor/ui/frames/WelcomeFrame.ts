@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import ScriptWidget = require("ui/ScriptWidget");
 import Preferences = require("editor/Preferences");
@@ -233,7 +232,7 @@ class WelcomeFrame extends ScriptWidget {
                 var path = utils.openProjectFileDialog();
                 if (path) {
 
-                    this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
+                    this.sendEvent(Editor.RequestProjectLoadEventType, { path: path });
 
                 }
 
@@ -253,7 +252,7 @@ class WelcomeFrame extends ScriptWidget {
                     return;
                 }
                 var path: string = this.recent[this.recentList.getSelectedItemID()];
-                this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
+                this.sendEvent(Editor.RequestProjectLoadEventType, { path: path });
             }
 
             if (id == "recentProjectsContextMenu") {

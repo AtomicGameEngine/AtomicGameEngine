@@ -112,6 +112,8 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
             if (line.StartsWith("ATOMIC_EVENT"))
             {
                 // First check to see if there is a line comment above this and try to capture it
+                eventComment = NULL;
+
                 if (j > 0) {
                     String prevLine = lines[j-1].Trimmed();
                     if (prevLine.StartsWith(("//")))

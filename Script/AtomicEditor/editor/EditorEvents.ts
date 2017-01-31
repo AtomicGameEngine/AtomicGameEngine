@@ -20,45 +20,7 @@
 // THE SOFTWARE.
 //
 
-export const PlayerLog = "EditorPlayerLog";
-export function PlayerLogEvent(callback: Atomic.EventCallback<PlayerLogEvent>) {
-    return Atomic.ScriptEvent(PlayerLog, callback);
-}
-export interface PlayerLogEvent extends Atomic.EventMetaData {
-
-  message: string;
-  level: number;
-
-}
-
-export const ProjectUnloadedNotification = "ProjectUnloadedNotification";
-export function ProjectUnloadedNotificationEvent(callback: Atomic.EventCallback<null>) {
-    return Atomic.ScriptEvent(ProjectUnloadedNotification, callback);
-}
-
-export const RequestProjectLoad = "RequestProjectLoad";
-export function RequestProjectLoadEvent(callback: Atomic.EventCallback<RequestProjectLoadEvent>) {
-    return Atomic.ScriptEvent(RequestProjectLoad, callback);
-}
-export interface RequestProjectLoadEvent extends Atomic.EventMetaData {
-
-  // The full path to the .atomic file
-  path: string;
-
-}
-
-export const ProjectLoaded = "ProjectLoaded";
-export function ProjectLoadedEvent(callback: Atomic.EventCallback<null>) {
-    return Atomic.ScriptEvent(ProjectLoaded, callback);
-}
-
-export const LoadProjectNotification = "EditorLoadProjectNotification";
-export function LoadProjectNotificationEvent(callback: Atomic.EventCallback<LoadProjectEvent>) {
-    return Atomic.ScriptEvent(LoadProjectNotification, callback);
-}
-export interface LoadProjectEvent extends Atomic.EventMetaData {
-
-  // The full path to the .atomic file
-  path: string;
-
-}
+// These are exposed in AtomicApp, but that module is not available to call until the player is playing
+// but we need the event names
+export const IPCPlayerExitRequestEventType = "IPCPlayerExitRequest";
+export const IPCPlayerWindowChangedEventType = "IPCPlayerWindowChanged";
