@@ -446,6 +446,11 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
                 mapped = true;
             }
 
+            if (p.comment_.Length())
+            {
+                source += ToString("        /** %s */\n", p.comment_.CString());
+            }
+
             if (mapped == true) {
                 source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
             } else {
@@ -457,7 +462,15 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
         source += "    }\n\n";
 
         // Write the event function signature
-        source += ToString("    /** Wrapper function to generate a properly formatted event handler to pass to 'subscribeToEvent' for the %s event. **/\n", event->GetEventName().CString());
+        if (event->GetEventComment().Length())
+        {
+            source += "    /**\n";
+            source += ToString("     Wrapper function to generate a properly formatted event handler to pass to 'subscribeToEvent' for the %s event. \n\n", event->GetEventName().CString());
+            source += ToString("     %s\n", event->GetEventComment().CString());
+            source += "    **/\n";
+        } else {
+            source += ToString("    /** Wrapper function to generate a properly formatted event handler to pass to 'subscribeToEvent' for the %s event. **/\n", event->GetEventName().CString());
+        }
         source += ToString("    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n", scriptEventName.CString(), scriptEventName.CString());
 
         source += "\n\n";
