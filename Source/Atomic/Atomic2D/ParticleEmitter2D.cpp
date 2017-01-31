@@ -326,7 +326,9 @@ void ParticleEmitter2D::Update(float timeStep)
 
 bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
 {
+    // ATOMIC BEGIN
     if (!emitting_ || numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
+    // ATOMIC END
         return false;
 
     float lifespan = effect_->GetParticleLifeSpan() + effect_->GetParticleLifespanVariance() * Random(-1.0f, 1.0f);
