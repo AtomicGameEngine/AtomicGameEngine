@@ -35,11 +35,12 @@ ATOMIC_EVENT(E_PROJECTBEGINLOAD, ProjectBeginLoad)
     ATOMIC_PARAM(P_PROJECT, Project);           // Project *
 }
 
+// Event is triggered once a project has been loaded and after prefs have been loaded
 ATOMIC_EVENT(E_PROJECTLOADED, ProjectLoaded)
 {
-    ATOMIC_PARAM(P_PROJECTPATH, ProjectPath);   // string
-    ATOMIC_PARAM(P_PROJECT, Project);           // Project *
-    ATOMIC_PARAM(P_RESULT, Result);             // bool
+    ATOMIC_PARAM(P_PROJECTPATH, ProjectPath);   // string (The path to the project that was loaded)
+    ATOMIC_PARAM(P_PROJECT, Project);           // Project * (The reference to the project)
+    ATOMIC_PARAM(P_RESULT, Result);             // bool (whether the project loaded successfully)
 }
 
 ATOMIC_EVENT(E_PROJECTUNLOADED, ProjectUnloaded)

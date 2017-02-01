@@ -60,9 +60,9 @@ class MainFrame extends ScriptWidget {
 
         this.disableProjectMenus();
 
-        this.subscribeToEvent(Editor.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
+        this.subscribeToEvent(Editor.EditorResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
-        this.subscribeToEvent(Editor.ProjectLoadedEvent((data) => {
+        this.subscribeToEvent(ToolCore.ProjectLoadedEvent((data) => {
             this.showWelcomeFrame(false);
             this.enableProjectMenus();
         }));
@@ -156,9 +156,9 @@ class MainFrame extends ScriptWidget {
 
     }
 
-    handleResourceEditorChanged(data): void {
+    handleResourceEditorChanged(data: Editor.EditorResourceEditorChangedEvent): void {
 
-        var editor = <Editor.ResourceEditor> data.editor;
+        var editor = data.resourceEditor;
 
         if (editor) {
 

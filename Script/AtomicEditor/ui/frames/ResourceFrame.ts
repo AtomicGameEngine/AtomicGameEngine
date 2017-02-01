@@ -191,9 +191,9 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleResourceEditorChanged(data) {
+    handleResourceEditorChanged(data: Editor.EditorResourceEditorChangedEvent) {
 
-        var editor = <Editor.ResourceEditor> data.editor;
+        var editor = data.resourceEditor;
         this.currentResourceEditor = editor;
 
     }
@@ -222,7 +222,7 @@ class ResourceFrame extends ScriptWidget {
 
                     }
 
-                    this.sendEvent(Editor.ResourceEditorChangedEventType, { editor: w.editor });
+                    this.sendEvent(Editor.EditorResourceEditorChangedEventType, { resourceEditor: w.editor });
 
                 }
 
@@ -284,7 +284,7 @@ class ResourceFrame extends ScriptWidget {
         this.subscribeToEvent(Editor.EditorRenameResourceNotificationEvent((ev: Editor.EditorRenameResourceNotificationEvent) => this.handleRenameResource(ev)));
         this.subscribeToEvent(Editor.EditorDeleteResourceNotificationEvent((data) => this.handleDeleteResource(data)));
 
-        this.subscribeToEvent(Editor.ResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
+        this.subscribeToEvent(Editor.EditorResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
         this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 

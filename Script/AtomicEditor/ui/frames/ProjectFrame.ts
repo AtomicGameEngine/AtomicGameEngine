@@ -67,7 +67,7 @@ class ProjectFrame extends ScriptWidget {
         foldercontainer.addChild(folderList);
 
         // events
-        this.subscribeToEvent(Editor.ProjectLoadedEvent((data) => this.handleProjectLoaded(data)));
+        this.subscribeToEvent(ToolCore.ProjectLoadedEvent((data) => this.handleProjectLoaded(data)));
         this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
         this.subscribeToEvent(Atomic.DragEndedEvent((data: Atomic.DragEndedEvent) => this.handleDragEnded(data)));
 
@@ -415,7 +415,7 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    handleProjectLoaded(data) {
+    handleProjectLoaded(data: ToolCore.ProjectLoadedEvent) {
 
         this.folderList.rootList.value = 0;
         this.folderList.setExpanded(this.resourcesID, true);
