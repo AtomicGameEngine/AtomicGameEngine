@@ -185,7 +185,7 @@ ATOMIC_EVENT(E_EDITORRENAMERESOURCENOTIFICATION, EditorRenameResourceNotificatio
     ATOMIC_PARAM(P_PATH, Path);     // string (full path of the old resource)
     ATOMIC_PARAM(P_NEWPATH, NewPath);   // string (full path of the new resource)
     ATOMIC_PARAM(P_NEWNAME, NewName);    // string (new name of resource)
-    ATOMIC_PARAM(P_ASSET, Asset);       // Asset pointer
+    ATOMIC_PARAM(P_ASSET, Asset);       // ToolCore.Asset pointer
 }
 
 // emitted when user preferences have been changed
@@ -204,6 +204,7 @@ ATOMIC_EVENT(E_INSPECTORPROJECTREFERENCE, InspectorProjectReference)
 // emitted when a component attribute has been changed
 ATOMIC_EVENT(E_ATTRIBUTEEDITRESOURCECHANGED, AttributeEditResourceChanged)
 {
+    ATOMIC_PARAM(P_ATTRINFOEDIT, AttrInfoEdit); // AttrbuteInfoEdit window
     ATOMIC_PARAM(P_RESOURCE, Resource); // Resource pointer
 }
 

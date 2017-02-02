@@ -389,7 +389,7 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
 
         // Write the event type
         source += ToString("    /** Event type to use in calls requiring the event such as 'sendEvent'.  Event Type is: \"%s\" **/\n", event->GetEventName().CString());
-        source += ToString("    export var %sType : string;\n\n", scriptEventName.CString());
+        source += ToString("    export var %sType : Atomic.EventType;\n\n", scriptEventName.CString());
 
         // Write the event interface
         source += ToString("    /** object returned in the callback for the %s event.**/\n", event->GetEventName().CString());
@@ -454,8 +454,8 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
             if (mapped == true) {
                 source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
             } else {
-                source += ToString("        // Unmapped Native Type:%s \n", typeName.CString());
-                source += ToString("        %s : any;\n", p.paramName_.ToLower().CString());
+                source += ToString("        /** Unmapped Native Type: %s */\n", p.typeInfo_.CString());
+                source += ToString("        %s : any;\n", paramName.CString());
             }
         }
 
