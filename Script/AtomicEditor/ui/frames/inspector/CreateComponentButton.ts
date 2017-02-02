@@ -152,7 +152,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
         if (ev.target && ev.target.id == "create component popup") {
 
-            this.sendEvent(Editor.SelectionCreateComponentEventType, { componentTypeName : ev.refid});
+            this.sendEvent<Editor.SelectionCreateComponentEvent>(Editor.SelectionCreateComponentEventType, { componentTypeName : ev.refid});
 
             return true;
 

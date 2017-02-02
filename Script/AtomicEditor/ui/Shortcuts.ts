@@ -22,6 +22,7 @@
 
 import EditorUI = require("./EditorUI");
 import Preferences = require("editor/Preferences");
+import * as EditorEvents from "../editor/EditorEvents";
 
 class Shortcuts extends Atomic.ScriptObject {
 
@@ -42,7 +43,7 @@ class Shortcuts extends Atomic.ScriptObject {
         this.sendEvent(Editor.EditorSaveAllResourcesEventType);
 
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerExitRequest" /*AtomicApp.IPCPlayerExitRequestEventName*/);
+            this.sendEvent(EditorEvents.IPCPlayerExitRequestEventType);
         } else {
 
             var playerWindow = Preferences.getInstance().playerWindow;
@@ -91,13 +92,13 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokePauseOrResumePlayer() {
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerPauseResumeRequest" /*AtomicApp.IPCPlayerPauseResumeRequestEventName*/);
+            this.sendEvent(EditorEvents.IPCPlayerPauseResumeRequestEventType);
         }
     }
 
     invokeStepPausedPlayer() {
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerPauseStepRequest" /*AtomicApp.IPCPlayerPauseStepRequestEventName*/);
+            this.sendEvent(EditorEvents.IPCPlayerPauseStepRequestEventType);
         }
     }
 
@@ -152,7 +153,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokeGizmoEditModeChanged(mode: Editor.EditMode) {
 
-        this.sendEvent(Editor.GizmoEditModeChangedEventType, { mode: mode });
+        this.sendEvent<Editor.GizmoEditModeChangedEvent>(Editor.GizmoEditModeChangedEventType, { mode: mode });
 
     }
 
@@ -161,7 +162,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         if (editor && editor instanceof Editor.SceneEditor3D) {
             var mode = editor.getGizmo().axisMode ? Editor.AxisMode.AXIS_WORLD : Editor.AxisMode.AXIS_LOCAL;
-            this.sendEvent(Editor.GizmoAxisModeChangedEventType, { mode: mode });
+            this.sendEvent<Editor.GizmoAxisModeChangedEvent>(Editor.GizmoAxisModeChangedEventType, { mode: mode });
         }
     }
 

@@ -27,6 +27,7 @@
 
 		"Object" : [
 			"sendEvent(eventType:string, data?:Object);",
+			"sendEvent<T extends Atomic.EventMetaData>(eventType:Atomic.EventType, data?:T);",
 			"subscribeToEvent(eventType:string, callback:(data:any) => void);",
 			"subscribeToEvent(sender:AObject, eventType:string, callback:(data: any) => void);",
 			"subscribeToEvent(eventMetaData:Atomic.EventMetaData);",

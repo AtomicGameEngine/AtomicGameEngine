@@ -26,6 +26,9 @@ declare module Atomic {
 
     // end subsystems
 
+    /** Base for all event types */
+    type EventType = string;
+
     // Base interface for events, contains eventType string and callback
     interface EventMetaData {
         /**@internal*/

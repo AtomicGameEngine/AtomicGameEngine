@@ -699,7 +699,7 @@ class SelectionInspector extends ScriptWidget {
 
             this.component = c;
 
-            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentCopyEventType, { component: this.component });
+            this.sceneEditor.scene.sendEvent<Editor.SceneEditComponentCopyEvent>(Editor.SceneEditComponentCopyEventType, { component: this.component });
             this.refresh();
 
         }
@@ -721,7 +721,7 @@ class SelectionInspector extends ScriptWidget {
 
             this.component = c;
 
-            this.sceneEditor.scene.sendEvent(Editor.SceneEditComponentPasteEventType, { component: this.component });
+            this.sceneEditor.scene.sendEvent<Editor.SceneEditComponentPasteEvent>(Editor.SceneEditComponentPasteEventType, { component: this.component , end: false});
             this.refresh();
         }
 

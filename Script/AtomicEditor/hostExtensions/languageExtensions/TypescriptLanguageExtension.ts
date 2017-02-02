@@ -226,12 +226,12 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 console.log(`${this.name}: deleting corresponding .js file`);
                 ToolCore.assetDatabase.deleteAsset(jsFileAsset);
 
-                let eventData: Editor.EditorDeleteResourceEvent = {
+                let eventData : Editor.EditorDeleteResourceNotificationEvent = {
                     path: jsFile
                 };
 
                 this.setTsConfigOnWebView(this.buildTsConfig());
-                this.serviceRegistry.sendEvent(Editor.EditorDeleteResourceNotificationEventType, eventData);
+                this.serviceRegistry.sendEvent<Editor.EditorDeleteResourceNotificationEvent>(Editor.EditorDeleteResourceNotificationEventType, eventData);
             }
         }
     }
@@ -260,7 +260,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 };
 
                 this.setTsConfigOnWebView(this.buildTsConfig());
-                this.serviceRegistry.sendEvent(Editor.EditorRenameResourceNotificationEventType, eventData);
+                this.serviceRegistry.sendEvent<Editor.EditorRenameResourceNotificationEvent>(Editor.EditorRenameResourceNotificationEventType, eventData);
             }
         }
     }

@@ -795,7 +795,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         if (parent) {
 
-            parent.sendEvent(Editor.AttributeEditResourceChangedEventType, { attrInfoEdit: this, resource: resource });
+            parent.sendEvent<Editor.AttributeEditResourceChangedEvent>(Editor.AttributeEditResourceChangedEventType, { attrInfoEdit: this, resource: resource });
 
         }
 
@@ -861,18 +861,18 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                         if (resource instanceof Atomic.JSComponentFile) {
 
                             var pathName = resource.name;
-                            this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": pathName });
+                            this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": pathName });
 
                         } else if (resource instanceof Atomic.Model) {
 
                             var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                            this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
+                            this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
 
                         } else if (resource instanceof Atomic.Animation) {
 
                              var animCacheReferenceName = resource.name.replace( "_" + (<Atomic.Animation>resource).animationName, "");
                              var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
-                             this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
+                             this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
 
                         } else {
 

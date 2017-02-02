@@ -152,7 +152,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         this.matIndex = materialIndex;
 
-        EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function (retObject: any) {
+        EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, (retObject: any) => {
 
             if (retObject == null) {
                 this.editType.onAttributeInfoEdited(this.attrInfo, null, this.matIndex);
@@ -172,11 +172,11 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
             }
 
-            this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
+            this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
             this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
             this.refresh();
 
-        }.bind(this));
+        });
 
     }
 
@@ -228,7 +228,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                 if (importer) {
 
                     var resource = asset.getResource(resourceTypeName);
-                    this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
+                    this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
                     this.refresh();
                 }
@@ -241,7 +241,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
 
                 var pathName = materialEdit.pathReference;
-                this.sendEvent(Editor.InspectorProjectReferenceEventType, { "path": pathName });
+                this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": pathName });
 
             } else if (o.editField.text == "") {
 

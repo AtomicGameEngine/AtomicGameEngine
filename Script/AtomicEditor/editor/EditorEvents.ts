@@ -22,5 +22,7 @@
 
 // These are exposed in AtomicApp, but that module is not available to call until the player is playing
 // but we need the event names
-export const IPCPlayerExitRequestEventType = "IPCPlayerExitRequest";
-export const IPCPlayerWindowChangedEventType = "IPCPlayerWindowChanged";
+export const IPCPlayerExitRequestEventType: Atomic.EventType = "IPCPlayerExitRequest";
+export const IPCPlayerWindowChangedEventType: Atomic.EventType = "IPCPlayerWindowChanged";
+export const IPCPlayerPauseResumeRequestEventType: Atomic.EventType = "IPCPlayerPauseResumeRequest";
+export const IPCPlayerPauseStepRequestEventType: Atomic.EventType = "IPCPlayerPauseStepRequest";
