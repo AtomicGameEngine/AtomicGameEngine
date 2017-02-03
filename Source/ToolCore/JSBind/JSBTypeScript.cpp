@@ -393,7 +393,7 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
 
         // Write the event interface
         source += ToString("    /** object returned in the callback for the %s event.**/\n", event->GetEventName().CString());
-        source += ToString("    export interface %s extends Atomic.NativeEvent {\n", scriptEventName.CString());
+        source += ToString("    export interface %s extends Atomic.EventData {\n", scriptEventName.CString());
 
         // parameters
 
@@ -472,6 +472,16 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
             source += ToString("    /** Wrapper function to generate a properly formatted event handler to pass to 'subscribeToEvent' for the %s event. **/\n", event->GetEventName().CString());
         }
         source += ToString("    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n", scriptEventName.CString(), scriptEventName.CString());
+        source += "\n";
+
+        if (params.Size() > 0)
+        {
+            source += ToString("    /** Wrapper function to construct callback data to pass to 'sendEvent' for the %s event. **/ \n", event->GetEventName().CString());
+            source += ToString("    export function %sData (callbackData : %s) : Atomic.EventCallbackMetaData; \n", scriptEventName.CString(), scriptEventName.CString());
+        } else {
+            source += ToString("    /** Wrapper function to construct object to pass to 'sendEvent' for the %s event. **/ \n", event->GetEventName().CString());
+            source += ToString("    export function %sData () : Atomic.EventCallbackMetaData; \n", scriptEventName.CString());
+        }
 
         source += "\n\n";
 
