@@ -63,7 +63,7 @@ export class ResourceDelete extends ModalWindow {
                 var db = ToolCore.getAssetDatabase();
                 db.deleteAsset(this.asset);
 
-                this.sendEvent<Editor.EditorDeleteResourceNotificationEvent>(Editor.EditorDeleteResourceNotificationEventType, eventData);
+                this.sendEvent(Editor.EditorDeleteResourceNotificationEventData(eventData));
 
                 return true;
             }
@@ -186,7 +186,7 @@ export class CreateComponent extends ModalWindow {
 
                         this.hide();
 
-                        this.sendEvent<Editor.EditorEditResourceEvent>(Editor.EditorEditResourceEventType, { path: outputFile });
+                        this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
 
                     }
 
@@ -272,7 +272,7 @@ export class CreateScript extends ModalWindow {
 
                         this.hide();
 
-                        this.sendEvent<Editor.EditorEditResourceEvent>(Editor.EditorEditResourceEventType, { path: outputFile });
+                        this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
 
                     }
 
@@ -330,7 +330,7 @@ export class CreateScene extends ModalWindow {
 
                     this.hide();
 
-                    this.sendEvent<Editor.EditorEditResourceEvent>(Editor.EditorEditResourceEventType, { path: outputFile });
+                    this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
 
                 }
 
@@ -382,7 +382,7 @@ export class CreateMaterial extends ModalWindow {
 
                     this.hide();
 
-                    this.sendEvent<Editor.EditorEditResourceEvent>(Editor.EditorEditResourceEventType, { path: outputFile });
+                    this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
 
                 }
 
@@ -448,7 +448,7 @@ export class RenameAsset extends ModalWindow {
                         asset: this.asset
                     };
 
-                    this.sendEvent<Editor.EditorRenameResourceNotificationEvent>(Editor.EditorRenameResourceNotificationEventType, eventData);
+                    this.sendEvent(Editor.EditorRenameResourceNotificationEventData(eventData));
                 }
 
                 return true;

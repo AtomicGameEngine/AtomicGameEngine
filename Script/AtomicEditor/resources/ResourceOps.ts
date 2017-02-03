@@ -31,7 +31,7 @@ class ResourceOps extends Atomic.ScriptObject {
 
         this.subscribeToEvent(ToolCore.AssetImportErrorEvent((ev: ToolCore.AssetImportErrorEvent) => {
 
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: "Asset Import Error", message: ev.error });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: "Asset Import Error", message: ev.error }));
 
         }));
 
@@ -44,7 +44,7 @@ class ResourceOps extends Atomic.ScriptObject {
         var fs = Atomic.fileSystem;
         var projectPath = Atomic.addTrailingSlash(Atomic.getPath(ev.path));
 
-        var openProject = () => this.sendEvent<Editor.EditorLoadProjectEvent>(Editor.EditorLoadProjectEventType, { path: ev.path });
+        var openProject = () => this.sendEvent(Editor.EditorLoadProjectEventData({ path: ev.path }));
 
         // Check whether there is a cache folder, if so, this project has been loaded before
         if (Atomic.fileSystem.dirExists(projectPath + "Cache")) {
@@ -115,7 +115,7 @@ export function CreateNewFolder(resourcePath: string, reportError: boolean = tru
 
     if (fs.dirExists(resourcePath) || fs.fileExists(resourcePath)) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath }));
         return false;
 
     }
@@ -123,7 +123,7 @@ export function CreateNewFolder(resourcePath: string, reportError: boolean = tru
     if (!fs.createDir(resourcePath)) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Could not create " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Could not create " + resourcePath }));
 
         return false;
     }
@@ -143,7 +143,7 @@ export function CreateNewComponent(resourcePath: string, componentName: string, 
 
     if (fs.dirExists(resourcePath) || fs.fileExists(resourcePath)) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath }));
         return false;
 
     }
@@ -154,7 +154,7 @@ export function CreateNewComponent(resourcePath: string, componentName: string, 
     if (!file) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename }));
         return false;
 
     }
@@ -165,7 +165,7 @@ export function CreateNewComponent(resourcePath: string, componentName: string, 
 
     if (!success) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath }));
         return false;
     }
 
@@ -183,7 +183,7 @@ export function CreateNewScript(resourcePath: string, scriptName: string, templa
 
     if (fs.dirExists(resourcePath) || fs.fileExists(resourcePath)) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath }));
         return false;
 
     }
@@ -194,7 +194,7 @@ export function CreateNewScript(resourcePath: string, scriptName: string, templa
     if (!file) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename }));
         return false;
 
     }
@@ -205,7 +205,7 @@ export function CreateNewScript(resourcePath: string, scriptName: string, templa
 
     if (!success) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath }));
         return false;
     }
 
@@ -223,7 +223,7 @@ export function CreateNewScene(resourcePath: string, sceneName: string, reportEr
 
     if (fs.dirExists(resourcePath) || fs.fileExists(resourcePath)) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath }));
         return false;
 
     }
@@ -234,7 +234,7 @@ export function CreateNewScene(resourcePath: string, sceneName: string, reportEr
     if (!file) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename }));
         return false;
 
     }
@@ -245,7 +245,7 @@ export function CreateNewScene(resourcePath: string, sceneName: string, reportEr
 
     if (!success) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath }));
         return false;
     }
 
@@ -263,7 +263,7 @@ export function CreateNewMaterial(resourcePath: string, materialName: string, re
 
     if (fs.dirExists(resourcePath) || fs.fileExists(resourcePath)) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Already exists: " + resourcePath }));
         return false;
 
     }
@@ -274,7 +274,7 @@ export function CreateNewMaterial(resourcePath: string, materialName: string, re
     if (!file) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template: " + templateFilename }));
         return false;
 
     }
@@ -285,7 +285,7 @@ export function CreateNewMaterial(resourcePath: string, materialName: string, re
 
     if (!success) {
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed template copy: " + templateFilename + " -> " + resourcePath }));
         return false;
     }
 
@@ -307,7 +307,7 @@ export function CreateNewAnimationPreviewScene(reportError: boolean = true): boo
     if (!templateFile) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template scene: " + templateFile });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open template scene: " + templateFile }));
         return false;
 
     }
@@ -318,7 +318,7 @@ export function CreateNewAnimationPreviewScene(reportError: boolean = true): boo
     if (!animFile) {
 
         if (reportError)
-            resourceOps.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open animation viewer: " + animFilename });
+            resourceOps.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: title, message: "Failed to open animation viewer: " + animFilename }));
         return false;
 
     }
@@ -326,7 +326,7 @@ export function CreateNewAnimationPreviewScene(reportError: boolean = true): boo
     //Reset the animation viewer scene to a blank scene
     animFile = templateFile;
 
-    resourceOps.sendEvent<Editor.EditorEditResourceEvent>(Editor.EditorEditResourceEventType, { path: animFilename });
+    resourceOps.sendEvent(Editor.EditorEditResourceEventData({ path: animFilename }));
 
     return true;
 

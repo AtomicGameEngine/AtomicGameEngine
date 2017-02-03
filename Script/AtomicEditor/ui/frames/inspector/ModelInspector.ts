@@ -95,7 +95,7 @@ class ModelInspector extends InspectorWidget {
         editField.subscribeToEvent(editField, Atomic.UIWidgetFocusChangedEvent((ev: Atomic.UIWidgetFocusChangedEvent) => {
 
             if (ev.widget == editField && editField.focus) {
-                this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": asset.getRelativePath() });
+                this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": asset.getRelativePath() }));
             }
 
         }));

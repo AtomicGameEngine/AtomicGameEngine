@@ -293,7 +293,7 @@ class MaterialInspector extends ScriptWidget {
             var texture = this.material.getTexture(textureUnit);
 
             if (textureWidget.getTexture() != null) {
-                this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": texture.getName() });
+                this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": texture.getName() }));
             } else {
                 this.openTextureSelectionBox(textureUnit, textureWidget);
             }
@@ -409,7 +409,7 @@ class MaterialInspector extends ScriptWidget {
                         (<Atomic.UITextureWidget>ev.target["textureWidget"]).texture = this.getTextureThumbnail(texture);
 
                         // note, ButtonID has been commented out because it doesn't appear to be used anywhere
-                        this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": texture.getName() /* "ButtonID": texture.getName() */ });
+                        this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": texture.getName() /* "ButtonID": texture.getName() */ }));
                     }
                 }
             }));

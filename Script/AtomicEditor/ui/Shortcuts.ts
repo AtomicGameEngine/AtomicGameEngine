@@ -153,7 +153,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokeGizmoEditModeChanged(mode: Editor.EditMode) {
 
-        this.sendEvent<Editor.GizmoEditModeChangedEvent>(Editor.GizmoEditModeChangedEventType, { mode: mode });
+        this.sendEvent(Editor.GizmoEditModeChangedEventData({ mode: mode }));
 
     }
 
@@ -162,7 +162,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         if (editor && editor instanceof Editor.SceneEditor3D) {
             var mode = editor.getGizmo().axisMode ? Editor.AxisMode.AXIS_WORLD : Editor.AxisMode.AXIS_LOCAL;
-            this.sendEvent<Editor.GizmoAxisModeChangedEvent>(Editor.GizmoAxisModeChangedEventType, { mode: mode });
+            this.sendEvent(Editor.GizmoAxisModeChangedEventData({ mode: mode }));
         }
     }
 

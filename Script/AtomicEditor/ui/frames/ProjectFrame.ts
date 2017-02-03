@@ -259,7 +259,7 @@ class ProjectFrame extends ScriptWidget {
 
                     } else {
 
-                        this.sendEvent<Editor.EditorEditResourceEvent>(Editor.EditorEditResourceEventType, { "path": asset.path });
+                        this.sendEvent(Editor.EditorEditResourceEventData({ "path": asset.path }));
                     }
 
                 }
@@ -469,7 +469,7 @@ class ProjectFrame extends ScriptWidget {
 
         if (this.currentFolder != folder) {
 
-            this.sendEvent<Editor.ContentFolderChangedEvent>(Editor.ContentFolderChangedEventType, { path: folder.path });
+            this.sendEvent(Editor.ContentFolderChangedEventData({ path: folder.path }));
 
         }
 

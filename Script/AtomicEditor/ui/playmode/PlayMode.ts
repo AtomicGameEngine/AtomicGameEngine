@@ -66,7 +66,7 @@ class PlayMode extends Atomic.ScriptObject {
         this.inErrorState = true;
 
         var errorMessage = ev.errorFileName + " - " + ev.errorLineNumber + " : " + ev.errorMessage;
-        this.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType, { type: Editor.EDITOR_MODALERROR, title: "Player JavaScript Error", message: errorMessage });
+        this.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: "Player JavaScript Error", message: errorMessage }));
 
         Atomic.graphics.raiseWindow();
 

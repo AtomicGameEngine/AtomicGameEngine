@@ -134,7 +134,7 @@ class MainToolbar extends Atomic.UIWidget {
                 else if (ev.target.id == "3d_scale")
                     mode = 3;
 
-                this.sendEvent<Editor.GizmoEditModeChangedEvent>(Editor.GizmoEditModeChangedEventType, { mode: mode });
+                this.sendEvent(Editor.GizmoEditModeChangedEventData({ mode: mode }));
 
                 return true;
 

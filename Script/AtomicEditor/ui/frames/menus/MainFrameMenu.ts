@@ -170,7 +170,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 }
 
-                var requestProjectLoad = () => this.sendEvent<Editor.RequestProjectLoadEvent>(Editor.RequestProjectLoadEventType, { path: path });
+                var requestProjectLoad = () => this.sendEvent(Editor.RequestProjectLoadEventData({ path: path }));
 
                 if (ToolCore.toolSystem.project) {
 

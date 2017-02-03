@@ -30,7 +30,7 @@ export default class Scene3dResourceEditorBuilder implements Editor.Extensions.R
     getEditor(resourceFram: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor {
 
         const editor = new Editor.SceneEditor3D(resourcePath, tabContainer);
-        editor.sendEvent<Editor.EditorActiveSceneEditorChangeEvent>(Editor.EditorActiveSceneEditorChangeEventType, { sceneEditor: editor });
+        editor.sendEvent(Editor.EditorActiveSceneEditorChangeEventData({ sceneEditor: editor }));
 
         return editor;
     }

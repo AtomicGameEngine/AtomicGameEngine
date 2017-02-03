@@ -259,7 +259,7 @@ class CreateProject extends ModalWindow {
 
             this.hide();
 
-            this.sendEvent<Editor.EditorLoadProjectEvent>(Editor.EditorLoadProjectEventType, { path: folder });
+            this.sendEvent(Editor.EditorLoadProjectEventData({ path: folder }));
             return true;
         } else {
             let message = [

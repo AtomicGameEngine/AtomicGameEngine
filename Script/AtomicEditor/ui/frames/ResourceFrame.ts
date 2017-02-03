@@ -56,9 +56,9 @@ class ResourceFrame extends ScriptWidget {
         if (this.currentResourceEditor) {
             this.currentResourceEditor.save();
             // Grab the path to this file and pass it to the save resource
-            this.sendEvent<Editor.EditorSaveResourceNotificationEvent>(Editor.EditorSaveResourceNotificationEventType, {
+            this.sendEvent(Editor.EditorSaveResourceNotificationEventData({
                 path: ev.path || this.currentResourceEditor.fullPath
-            });
+            }));
         }
 
     }
@@ -75,9 +75,9 @@ class ResourceFrame extends ScriptWidget {
 
         for (var i in this.editors) {
             this.editors[i].save();
-            this.sendEvent<Editor.EditorSaveResourceNotificationEvent>(Editor.EditorSaveResourceNotificationEventType, {
+            this.sendEvent(Editor.EditorSaveResourceNotificationEventData({
                 path: this.editors[i].fullPath
-            });
+            }));
         }
 
     }
@@ -218,11 +218,11 @@ class ResourceFrame extends ScriptWidget {
 
                     if (w.editor.typeName == "SceneEditor3D") {
 
-                        this.sendEvent<Editor.EditorActiveSceneEditorChangeEvent>(Editor.EditorActiveSceneEditorChangeEventType, { sceneEditor: (<Editor.SceneEditor3D> w.editor) });
+                        this.sendEvent(Editor.EditorActiveSceneEditorChangeEventData({ sceneEditor: (<Editor.SceneEditor3D> w.editor) }));
 
                     }
 
-                    this.sendEvent<Editor.EditorResourceEditorChangedEvent>(Editor.EditorResourceEditorChangedEventType, { resourceEditor: w.editor });
+                    this.sendEvent(Editor.EditorResourceEditorChangedEventData({ resourceEditor: w.editor }));
 
                 }
 
@@ -244,7 +244,7 @@ class ResourceFrame extends ScriptWidget {
         // on exit close all open editors
         for (var path in this.editors) {
 
-            this.sendEvent<Editor.EditorResourceCloseEvent>(Editor.EditorResourceCloseEventType, { editor: this.editors[path], navigateToAvailableResource: false });
+            this.sendEvent(Editor.EditorResourceCloseEventData({ editor: this.editors[path], navigateToAvailableResource: false }));
 
         }
 
@@ -254,7 +254,7 @@ class ResourceFrame extends ScriptWidget {
 
       for (var i in this.editors) {
           var editor = this.editors[i];
-           this.sendEvent<Editor.EditorResourceCloseEvent>(Editor.EditorResourceCloseEventType, { editor: editor, navigateToAvailableResource: false });
+           this.sendEvent(Editor.EditorResourceCloseEventData({ editor: editor, navigateToAvailableResource: false }));
            editor.close();
       }
 

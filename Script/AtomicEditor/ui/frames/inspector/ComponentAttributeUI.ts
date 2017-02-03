@@ -172,7 +172,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
             }
 
-            this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
+            this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": resource.name }));
             this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
             this.refresh();
 
@@ -228,7 +228,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                 if (importer) {
 
                     var resource = asset.getResource(resourceTypeName);
-                    this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": resource.name });
+                    this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": resource.name }));
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
                     this.refresh();
                 }
@@ -241,7 +241,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
 
                 var pathName = materialEdit.pathReference;
-                this.sendEvent<Editor.InspectorProjectReferenceEvent>(Editor.InspectorProjectReferenceEventType, { "path": pathName });
+                this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": pathName }));
 
             } else if (o.editField.text == "") {
 

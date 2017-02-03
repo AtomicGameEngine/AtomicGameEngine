@@ -165,7 +165,7 @@ class AtomicEditor extends Atomic.ScriptObject {
             applicationPreferences: JSON.stringify(Preferences.getInstance().cachedApplicationPreferences)
         };
 
-        this.sendEvent<Editor.UserPreferencesChangedNotificationEvent>(Editor.UserPreferencesChangedNotificationEventType, eventData);
+        this.sendEvent(Editor.UserPreferencesChangedNotificationEventData(eventData));
     }
 
     /**
@@ -183,7 +183,7 @@ class AtomicEditor extends Atomic.ScriptObject {
             applicationPreferences: JSON.stringify(Preferences.getInstance().cachedApplicationPreferences)
         };
 
-        this.sendEvent<Editor.UserPreferencesChangedNotificationEvent>(Editor.UserPreferencesChangedNotificationEventType, eventData);
+        this.sendEvent(Editor.UserPreferencesChangedNotificationEventData(eventData));
     }
 
     handleEditorLoadProject(event: Editor.LoadProjectNotificationEvent): boolean {
@@ -191,8 +191,7 @@ class AtomicEditor extends Atomic.ScriptObject {
         var system = ToolCore.getToolSystem();
         if (system.project) {
 
-            this.sendEvent<Editor.EditorModalEvent>(Editor.EditorModalEventType,
-                { type: Editor.EDITOR_MODALERROR, title: "Project already loaded", message: "Project already loaded" });
+            this.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: "Project already loaded", message: "Project already loaded" }));
 
             return false;
 
@@ -202,7 +201,7 @@ class AtomicEditor extends Atomic.ScriptObject {
             Preferences.getInstance().loadUserPrefs();
             WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
             WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ApplicationPreferences", JSON.stringify(Preferences.getInstance().cachedApplicationPreferences, null, 2 ));
-            this.sendEvent<Editor.LoadProjectNotificationEvent>(Editor.LoadProjectNotificationEventType, event);
+            this.sendEvent(Editor.LoadProjectNotificationEventData(event));
         }
         return loaded;
     }
@@ -226,7 +225,7 @@ class AtomicEditor extends Atomic.ScriptObject {
 
     handleEditorCloseProject(event: Editor.ProjectUnloadedNotificationEvent) {
         this.projectCloseRequested = true;
-        this.sendEvent<Editor.ProjectUnloadedNotificationEvent>(Editor.ProjectUnloadedNotificationEventType, event);
+        this.sendEvent(Editor.ProjectUnloadedNotificationEventData());
         this.closeAllResourceEditors();
     }
 
@@ -246,7 +245,7 @@ class AtomicEditor extends Atomic.ScriptObject {
 
     handleProjectUnloaded(event) {
 
-        this.sendEvent<Editor.EditorActiveSceneEditorChangeEvent>(Editor.EditorActiveSceneEditorChangeEventType, { sceneEditor: null });
+        this.sendEvent(Editor.EditorActiveSceneEditorChangeEventData({ sceneEditor: null }));
 
     }
 
@@ -260,7 +259,7 @@ class AtomicEditor extends Atomic.ScriptObject {
 
             if (args[idx] == "--project") {
 
-                this.sendEvent<Editor.EditorLoadProjectEvent>(Editor.EditorLoadProjectEventType, { path: args[idx + 1] });
+                this.sendEvent(Editor.EditorLoadProjectEventData({ path: args[idx + 1] }));
 
             }
 

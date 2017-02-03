@@ -232,7 +232,7 @@ class WelcomeFrame extends ScriptWidget {
                 var path = utils.openProjectFileDialog();
                 if (path) {
 
-                    this.sendEvent<Editor.RequestProjectLoadEvent>(Editor.RequestProjectLoadEventType, { path: path });
+                    this.sendEvent(Editor.RequestProjectLoadEventData({ path: path }));
 
                 }
 
@@ -252,7 +252,7 @@ class WelcomeFrame extends ScriptWidget {
                     return;
                 }
                 var path: string = this.recent[this.recentList.getSelectedItemID()];
-                this.sendEvent<Editor.RequestProjectLoadEvent>(Editor.RequestProjectLoadEventType, { path: path });
+                this.sendEvent(Editor.RequestProjectLoadEventData({ path: path }));
             }
 
             if (id == "recentProjectsContextMenu") {
