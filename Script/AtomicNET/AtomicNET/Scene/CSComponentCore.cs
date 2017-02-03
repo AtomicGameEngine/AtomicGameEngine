@@ -72,6 +72,10 @@ namespace AtomicEngine
                     field.SetValue(o, fieldMap.GetInt(field.Name));
                     break;
 
+                case TypeCode.UInt32:
+                    field.SetValue(o, fieldMap.GetUInt(field.Name));
+                    break;
+
                 case TypeCode.Single:
                     field.SetValue(o, fieldMap.GetFloat(field.Name));
                     break;
