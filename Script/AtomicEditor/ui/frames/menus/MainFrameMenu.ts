@@ -221,6 +221,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
         } else if (target.id == "menu developer popup") {
 
+            if (refid == "toggle theme") {
+                Preferences.getInstance().toggleTheme();
+                return true;
+            }
+
             if (refid == "developer show console") {
                 Atomic.ui.showConsole(true);
                 return true;
@@ -271,11 +276,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
             if (refid == "tools toggle profiler") {
                 Atomic.ui.toggleDebugHud();
                 return true;
-            } if (refid == "tools perf profiler") {                
+            } if (refid == "tools perf profiler") {
                 Atomic.ui.debugHudProfileMode = Atomic.DebugHudProfileMode.DEBUG_HUD_PROFILE_PERFORMANCE;
                 Atomic.ui.showDebugHud(true);
                 return true;
-            } else if (refid == "tools metrics profiler") {                
+            } else if (refid == "tools metrics profiler") {
                 Atomic.ui.debugHudProfileMode = Atomic.DebugHudProfileMode.DEBUG_HUD_PROFILE_METRICS;
                 Atomic.ui.showDebugHud(true);
                 return true;
@@ -394,6 +399,7 @@ var buildItems = {
 
 var developerItems = {
 
+    "Toggle Theme": ["toggle theme"],
     "Show Console": ["developer show console"],
     "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {
