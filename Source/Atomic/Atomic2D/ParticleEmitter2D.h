@@ -117,6 +117,15 @@ public:
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
 
+    // ATOMIC BEGIN
+
+    /// Set emission state.
+    void SetEmitting(bool enable);
+    /// Return emission state.
+    bool IsEmitting() const;
+
+    // ATOMIC END
+
 private:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
@@ -143,7 +152,7 @@ private:
     SharedPtr<Sprite2D> sprite_;
     /// Blend mode.
     BlendMode blendMode_;
-    /// Nummber of particles.
+    /// Number of particles.
     unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
@@ -155,6 +164,14 @@ private:
     Vector3 boundingBoxMinPoint_;
     /// Bounding box max point.
     Vector3 boundingBoxMaxPoint_;
+
+    // ATOMIC BEGIN
+
+    /// Emission enabled.
+    bool emitting_;
+
+    // ATOMIC END
+
 };
 
 }

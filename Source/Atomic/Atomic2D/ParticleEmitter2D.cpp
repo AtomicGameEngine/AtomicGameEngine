@@ -48,7 +48,10 @@ ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     emissionTime_(0.0f),
     emitParticleTime_(0.0f),
     boundingBoxMinPoint_(Vector3::ZERO),
-    boundingBoxMaxPoint_(Vector3::ZERO)
+    boundingBoxMaxPoint_(Vector3::ZERO),
+    // ATOMIC BEGIN
+    emitting_(true)
+    // ATOMIC END
 {
     sourceBatches_.Resize(1);
     sourceBatches_[0].owner_ = this;
@@ -313,8 +316,7 @@ void ParticleEmitter2D::Update(float timeStep)
             emitParticleTime_ -= timeBetweenParticles;
         }
 
-        if (emissionTime_ > 0.0f)
-            emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
+        emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
     }
 
     sourceBatchesDirty_ = true;
@@ -324,7 +326,9 @@ void ParticleEmitter2D::Update(float timeStep)
 
 bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
 {
-    if (numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
+    // ATOMIC BEGIN
+    if (!emitting_ || numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
+    // ATOMIC END
         return false;
 
     float lifespan = effect_->GetParticleLifeSpan() + effect_->GetParticleLifespanVariance() * Random(-1.0f, 1.0f);
@@ -431,5 +435,18 @@ void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep, con
     boundingBoxMaxPoint_.y_ = Max(boundingBoxMaxPoint_.y_, particle.position_.y_ + halfSize);
     boundingBoxMaxPoint_.z_ = Max(boundingBoxMaxPoint_.z_, particle.position_.z_);
 }
+
+// ATOMIC BEGIN
+
+void ParticleEmitter2D::SetEmitting(bool enable)
+{
+    emitting_ = enable;
+}
+bool ParticleEmitter2D::IsEmitting() const
+{
+    return emitting_;
+}
+
+// ATOMIC END
 
 }
