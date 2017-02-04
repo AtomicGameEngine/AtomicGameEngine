@@ -235,18 +235,17 @@ class Preferences {
     }
 
     /**
-     * Sets a user preference value in the user settings file located in the project
+     * Sets a preference value in a preferences file that is provided
+     * @param  {string} preferencesFilePath path to the prefs file to update
      * @param  {string} settingsGroup name of the group the preference lives under
      * @param  {string} preferenceName name of the preference to set
      * @param  {number | boolean | string} value value to set
      */
-    setUserPreference(settingsGroup: string, preferenceName: string, value: number | boolean | string) {
-
-        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+    setGenericPreference(preferencesFilePath: string, settingsGroup: string, preferenceName: string, value: number | boolean | string): Object {
         let prefs = {};
 
-        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_READ);
+        if (Atomic.fileSystem.fileExists(preferencesFilePath)) {
+            let prefsFile = new Atomic.File(preferencesFilePath, Atomic.FileMode.FILE_READ);
             try {
                 prefs = JSON.parse(prefsFile.readText());
             } finally {
@@ -257,7 +256,7 @@ class Preferences {
         prefs[settingsGroup] = prefs[settingsGroup] || {};
         prefs[settingsGroup][preferenceName] = value;
 
-        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FileMode.FILE_WRITE);
+        let saveFile = new Atomic.File(preferencesFilePath, Atomic.FileMode.FILE_WRITE);
         try {
             saveFile.writeString(JSON.stringify(prefs, null, "  "));
         } finally {
@@ -266,9 +265,63 @@ class Preferences {
         }
 
         // Cache the update
+        return prefs;
+    }
+
+    /**
+     * Sets a user preference value in the user settings file located in the project
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(settingsGroup: string, preferenceName: string, value: number | boolean | string) {
+
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        const prefs = this.setGenericPreference(prefsFileLoc, settingsGroup, preferenceName, value);
+
+        // Cache the update
         this._cachedProjectPreferences = prefs;
     }
 
+    /**
+     * Sets an editor preference value in the global user settings file
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setApplicationPreference(settingsGroup: string, preferenceName: string, value: number | boolean | string) {
+
+        const prefsFileLoc = this.getPreferencesFullPath();
+        const prefs = this.setGenericPreference(prefsFileLoc, settingsGroup, preferenceName, value);
+
+        // Cache the update
+        this._prefs = prefs as PreferencesFormat;
+    }
+
+    /**
+     * Return a preference value or the provided default from the global user settings file located in the project
+     * @param  {string} settingsGroup name of the group these settings should fall under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
+
+        // Cache the settings so we don't keep going out to the file
+        if (this._prefs == null) {
+            this.read();
+        }
+
+        if (this._prefs && this._prefs[settingsGroup]) {
+            return this._prefs[settingsGroup][preferenceName] || defaultValue;
+        }
+
+        // if all else fails
+        return defaultValue;
+    }
 
     /**
      * Sets a group of user preference values in the user settings file located in the project.  Elements in the

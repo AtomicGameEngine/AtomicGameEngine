@@ -141,15 +141,38 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
         return EditorUI.getEditor().getUserPreference(extensionName, preferenceName, defaultValue);
     }
 
+    /**
+     * Return a preference value or the provided default from the global user settings file
+     * @param  {string} groupName name of the section the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
+        return EditorUI.getEditor().getApplicationPreference(settingsGroup, preferenceName, defaultValue);
+    }
 
     /**
-     * Sets a user preference value in the user settings file
+     * Sets a user preference value in the project user settings file
      * @param  {string} extensionName name of the extension the preference lives under
      * @param  {string} preferenceName name of the preference to set
      * @param  {number | boolean | string} value value to set
      */
     setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
         EditorUI.getEditor().setUserPreference(extensionName, preferenceName, value);
+    }
+
+    /**
+     * Sets an editor preference value in the global application settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setApplicationPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
+        EditorUI.getEditor().setApplicationPreference(extensionName, preferenceName, value);
     }
 
     /**
