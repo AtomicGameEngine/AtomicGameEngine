@@ -86,6 +86,11 @@ export default class HostInteropType {
     static EDITOR_CHANGE = "editorChange";
     static EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
+    private setCodeLoaded;
+    private editorReady = new Promise((resolve, reject) => {
+        this.setCodeLoaded = resolve;
+    });
+
     /**
      * Called from the host to notify the client what file to load
      * @param  {string} codeUrl
@@ -104,7 +109,9 @@ export default class HostInteropType {
         // get the code
         this.getResource(codeUrl).then((src: string) => {
             editorCommands.loadCodeIntoEditor(src, filename, fileExt);
-            window.atomicQueryPromise(HostInteropType.EDITOR_GET_USER_PREFS);
+            return window.atomicQueryPromise(HostInteropType.EDITOR_GET_USER_PREFS);
+        }).then(() => {
+            this.setCodeLoaded();
         }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error loading code: " + e.error_message);
         });
@@ -240,5 +247,21 @@ export default class HostInteropType {
      */
     formatCode() {
         editorCommands.formatCode();
+    }
+
+    /**
+     * Jump to the provided line number
+     */
+    gotoLineNumber(lineNumber:number) {
+        this.editorReady.then(() => {
+            editorCommands.gotoLineNumber(lineNumber);
+        });
+    }
+
+    /**
+     * Jump to the provided position
+     */
+    gotoTokenPos(tokenPos:number) {
+        editorCommands.gotoTokenPos(tokenPos);
     }
 }

@@ -235,12 +235,12 @@ void JSResourceEditor::SetFocus()
 
 void JSResourceEditor::GotoTokenPos(int tokenPos)
 {
-
+    webClient_->ExecuteJavaScript(ToString("HOST_gotoTokenPos(%d);", tokenPos));
 }
 
 void JSResourceEditor::GotoLineNumber(int lineNumber)
 {
-
+    webClient_->ExecuteJavaScript(ToString("HOST_gotoLineNumber(%d);", lineNumber));
 }
 
 bool JSResourceEditor::Save()

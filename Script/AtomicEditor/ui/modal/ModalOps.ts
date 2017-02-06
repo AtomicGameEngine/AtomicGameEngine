@@ -257,23 +257,24 @@ class ModalOps extends Atomic.ScriptObject {
     }
 
     // TODO: standardize  to same pattern as other modal windows
-    showError(windowText: string, message: string) {
+    showError(windowText: string, message: string):Atomic.UIMessageWindow {
         var view = EditorUI.getView();
         var window = new Atomic.UIMessageWindow(view, "modal_error");
         window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
+        return window;
     }
 
-    showExtensionWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
-        if (this.show()) {
+    showExtensionWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void, modal: boolean = true): Editor.Modal.ExtensionWindow {
+        if (this.show(modal)) {
 
             this.opWindow = new ExtensionWindow(windowText, uifilename, handleWidgetEventCB);
             return this.opWindow;
         }
     }
 
-    private show(): boolean {
+    private show(modal:boolean = true): boolean {
 
-        if (this.dimmer.parent) {
+        if (modal && this.dimmer.parent) {
 
             console.log("WARNING: attempting to show modal while dimmer is active");
             return false;
@@ -288,7 +289,9 @@ class ModalOps extends Atomic.ScriptObject {
         }
 
         var view = EditorUI.getView();
-        view.addChild(this.dimmer);
+        if (modal) {
+            view.addChild(this.dimmer);
+        }
 
         return true;
 

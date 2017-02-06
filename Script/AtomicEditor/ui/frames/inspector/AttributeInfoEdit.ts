@@ -123,7 +123,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
     }
 
-    static createAttrEdit(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo, nameOverride:string=undefined, typeOverride:Atomic.VariantType = undefined ): AttributeInfoEdit {
+    static createAttrEdit(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo, nameOverride:string = undefined, typeOverride:Atomic.VariantType = undefined ): AttributeInfoEdit {
 
         var type: typeof AttributeInfoEdit;
         var customTypes = AttributeInfoEdit.customAttrEditTypes[editType.typeName];
@@ -445,7 +445,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
                     console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
                     widget.text = "???";
 
-                } else {                    
+                } else {
                     widget.text = parseFloat(value.toFixed(5)).toString();
                 }
 
@@ -746,7 +746,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
             this.colorWidget.color = color;
         }
 
-        
+
     }
 
     // updates color on selection without committing to undo/redo for preview
@@ -1161,7 +1161,7 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
 
         this.layout.addChild(indexEdit);
 
-        this.indexEdits.push(indexEdit);        
+        this.indexEdits.push(indexEdit);
 
     }
 
@@ -1238,17 +1238,17 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
                 let scene = this.editType.getEditScene();
                 if (scene) {
                     scene.sendEvent("SceneEditEnd");
-                    scene.sendEvent("ComponentEditEnd");                    
+                    scene.sendEvent("ComponentEditEnd");
                 }
 
                 refresh = true;
-            } 
+            }
 
         }
 
         if (refresh)
             this.refresh();
-        
+
     }
 
     refresh() {
