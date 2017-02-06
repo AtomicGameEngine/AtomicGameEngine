@@ -21,6 +21,7 @@
 //
 
 import strings = require("../../EditorStrings");
+import EditorEvents = require("../../../editor/EditorEvents");
 import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 import Preferences = require("editor/Preferences");
@@ -139,7 +140,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu file popup") {
             if (refid == "quit") {
 
-                this.sendEvent(Atomic.ExitRequestedEventType);
+                this.sendEvent("ExitRequested");
                 return true;
 
             }
@@ -170,18 +171,18 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 }
 
-                var requestProjectLoad = () => this.sendEvent(Editor.RequestProjectLoadEventData({ path: path }));
+                var requestProjectLoad = () => this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
 
                 if (ToolCore.toolSystem.project) {
 
-                    this.subscribeToEvent(Editor.EditorProjectClosedEvent(() => {
+                    this.subscribeToEvent(EditorEvents.ProjectClosed, () => {
 
-                        this.unsubscribeFromEvent(Editor.EditorProjectClosedEventType);
+                        this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
                         requestProjectLoad();
 
-                    }));
+                    });
 
-                    this.sendEvent(Editor.EditorCloseProjectEventType);
+                    this.sendEvent(EditorEvents.CloseProject);
 
                 } else {
 
@@ -195,7 +196,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "file close project") {
 
-                this.sendEvent(Editor.EditorCloseProjectEventType);
+                this.sendEvent(EditorEvents.CloseProject);
 
                 return true;
 
@@ -212,7 +213,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "file save all") {
-                this.sendEvent(Editor.EditorSaveAllResourcesEventType);
+                this.sendEvent(EditorEvents.SaveAllResources);
                 return true;
             }
 
