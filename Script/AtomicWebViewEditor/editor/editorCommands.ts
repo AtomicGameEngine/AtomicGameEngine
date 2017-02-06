@@ -32,6 +32,28 @@ import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventN
  */
 export function configure(fileExt: string, filename: string) {
 
+    let monacoEditor = <monaco.editor.IStandaloneCodeEditor>internalEditor.getInternalEditor();
+
+    updateEditorPrefs();
+
+    // give the language extensions the opportunity to configure the editor based upon the file type
+    serviceLocator.sendEvent(ClientExtensionEventNames.ConfigureEditorEvent, {
+        fileExt: fileExt,
+        filename: filename,
+        editor: monacoEditor
+    });
+
+    // Override CMD/CTRL+I since that is going to be used for Format Code and in the editor it is assigned to something else
+    const noOpCommand: monaco.editor.ICommandHandler = () => { };
+    monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I, noOpCommand, null);
+
+    updateEditorPrefs();
+}
+
+/**
+ * Update the editor prefs
+ */
+export function updateEditorPrefs() {
     // converter to handle new version of the renderWhitespace setting
     const renderWhitespaceAdapter = (setting): "none" | "boundary" | "all" => {
         switch (setting.toLowerCase()) {
@@ -49,18 +71,6 @@ export function configure(fileExt: string, filename: string) {
         fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12),
         fontFamily: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontFamily", "")
     });
-
-    // give the language extensions the opportunity to configure the editor based upon the file type
-    serviceLocator.sendEvent(ClientExtensionEventNames.ConfigureEditorEvent, {
-        fileExt: fileExt,
-        filename: filename,
-        editor: monacoEditor
-    });
-
-    // Override CMD/CTRL+I since that is going to be used for Format Code and in the editor it is assigned to something else
-    const noOpCommand: monaco.editor.ICommandHandler = () => { };
-    monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I, noOpCommand, null);
-
 }
 
 /**
@@ -153,6 +163,8 @@ export function editorLoaded() {
  */
 export function preferencesChanged(prefs: Editor.ClientExtensions.PreferencesChangedEventData) {
     serviceLocator.clientServices.setPreferences(prefs.projectPreferences, prefs.applicationPreferences);
+    updateEditorPrefs();
+
     serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, prefs);
 }
 

@@ -152,7 +152,7 @@ class AtomicEditor extends Atomic.ScriptObject {
 
 
     /**
-     * Sets a user preference value in the user settings file
+     * Sets a user preference value in the project user settings file
      * @param  {string} extensionName name of the extension the preference lives under
      * @param  {string} preferenceName name of the preference to set
      * @param  {number | boolean | string} value value to set
@@ -166,6 +166,37 @@ class AtomicEditor extends Atomic.ScriptObject {
         };
 
         this.sendEvent(Editor.UserPreferencesChangedNotificationEventData(eventData));
+    }
+
+    /**
+     * Return a preference value or the provided default from the global user settings file
+     * @param  {string} groupName name of the section the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getApplicationPreference(groupName: string, preferenceName: string, defaultValue?: any): any {
+        return Preferences.getInstance().getApplicationPreference(groupName, preferenceName, defaultValue);
+    }
+
+    /**
+     * Sets a user preference value in the global application settings file
+     * @param  {string} groupName name of the section the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setApplicationPreference(groupName: string, preferenceName: string, value: number | boolean | string) {
+        Preferences.getInstance().setApplicationPreference(groupName, preferenceName, value);
+        WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ApplicationPreferences", JSON.stringify(Preferences.getInstance().cachedApplicationPreferences, null, 2 ));
+        const eventData: EditorEvents.UserPreferencesChangedEvent = {
+            projectPreferences: JSON.stringify(Preferences.getInstance().cachedProjectPreferences),
+            applicationPreferences: JSON.stringify(Preferences.getInstance().cachedApplicationPreferences)
+        };
+
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification, eventData);
     }
 
     /**
