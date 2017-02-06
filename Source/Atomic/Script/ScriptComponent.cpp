@@ -28,7 +28,9 @@
 namespace Atomic
 {
 
-ScriptComponent::ScriptComponent(Context* context) : Component(context)
+ScriptComponent::ScriptComponent(Context* context) : Component(context),
+    loading_(false)
+
 {
 
 }
@@ -36,12 +38,42 @@ ScriptComponent::ScriptComponent(Context* context) : Component(context)
 void ScriptComponent::RegisterObject(Context* context)
 {
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATOMIC_ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
+
+    ATOMIC_ACCESSOR_ATTRIBUTE("FieldValues", GetFieldValuesAttr, SetFieldValuesAttr, VariantMap, Variant::emptyVariantMap, AM_FILE);
+
 }
 
 ScriptComponent::~ScriptComponent()
 {
 
+}
+
+bool ScriptComponent::Load(Deserializer& source, bool setInstanceDefault)
+{
+    loading_ = true;
+    bool success = Component::Load(source, setInstanceDefault);
+    loading_ = false;
+
+    return success;
+}
+
+bool ScriptComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
+{
+    loading_ = true;
+    bool success = Component::LoadXML(source, setInstanceDefault);
+    loading_ = false;
+
+    return success;
+}
+
+const VariantMap& ScriptComponent::GetFieldValuesAttr() const
+{
+    return fieldValues_;
+}
+
+void ScriptComponent::SetFieldValuesAttr(const VariantMap& value)
+{
+    fieldValues_ = value;
 }
 
 }

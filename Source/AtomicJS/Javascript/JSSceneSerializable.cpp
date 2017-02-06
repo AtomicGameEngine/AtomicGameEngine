@@ -117,7 +117,9 @@ namespace Atomic
                     const FieldMap& fields = file->GetFields(className);
                     const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums(className);
 
-                    if (fieldInfo = fields[name])
+                    fieldInfo = fields[name];
+
+                    if (fieldInfo)
                     {
                         variantType = fieldInfo->variantType_;
 

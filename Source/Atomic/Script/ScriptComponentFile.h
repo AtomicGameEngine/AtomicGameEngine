@@ -42,11 +42,14 @@ struct FieldInfo
 
     FieldInfo(const String& name, VariantType variantType, const String& resourceTypeName = String::EMPTY, bool isArray = false, unsigned fixedArraySize = 0)
     {
-        name_ = name;        
+        name_ = name;
         variantType_ = variantType;
         resourceTypeName_ = resourceTypeName;
         isArray_ = isArray;
         fixedArraySize_ = fixedArraySize;
+
+        // register field name as significant, for serialization
+        StringHash::RegisterSignificantString(name);
     }
 
     String name_;
