@@ -395,7 +395,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @return {Editor.ResourceEditor}
      */
     loadResourceEditor(resourcePath: string): Editor.ResourceEditor {
-        this.mainFrame.resourceframe.sendEvent(EditorEvents.EditResource, {path: resourcePath} );
+        this.mainFrame.resourceframe.sendEvent(Editor.EditorEditResourceEventData({path: resourcePath}));
         return this.mainFrame.resourceframe.currentResourceEditor;
     }
 
