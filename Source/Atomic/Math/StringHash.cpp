@@ -29,6 +29,12 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+
+#include "../Container/HashMap.h"
+
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -68,5 +74,41 @@ String StringHash::ToString() const
     sprintf(tempBuffer, "%08X", value_);
     return String(tempBuffer);
 }
+
+// ATOMIC BEGIN
+
+// Lookup for significant strings, not a member of StringHash so don't need to drag hashmap into header
+static HashMap<unsigned, String> gSignificantLookup;
+
+void StringHash::RegisterSignificantString(const char* str)
+{
+    unsigned hash = Calculate(str);
+
+    if (gSignificantLookup.Contains(hash))
+        return;
+
+    gSignificantLookup[hash] = String(str);
+
+}
+
+void StringHash::RegisterSignificantString(const String& str)
+{
+    RegisterSignificantString(str.CString());
+}
+
+bool StringHash::GetSignificantString(unsigned hash, String& strOut)
+{
+    if (!gSignificantLookup.TryGetValue(hash, strOut))
+    {
+        strOut.Clear();
+        return false;
+    }
+
+    return true;
+
+}
+
+// ATOMIC END
+
 
 }

@@ -32,7 +32,7 @@ class ScriptComponentFile;
 
 class ATOMIC_API ScriptComponent : public Component
 {
-    ATOMIC_OBJECT(ScriptComponent, Component);
+    ATOMIC_OBJECT(ScriptComponent, Component)
 
 public:
 
@@ -49,10 +49,18 @@ public:
 
     VariantMap& GetFieldValues() { return fieldValues_; }
 
+    bool Load(Deserializer& source, bool setInstanceDefault);
+    bool LoadXML(const XMLElement& source, bool setInstanceDefault);
 
 protected:
 
+    const VariantMap& GetFieldValuesAttr() const;
+    void SetFieldValuesAttr(const VariantMap& value);
+
     VariantMap fieldValues_;
+
+    bool loading_;
+
 
 };
 

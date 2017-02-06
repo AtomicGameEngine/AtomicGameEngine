@@ -58,10 +58,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    bool Load(Deserializer& source, bool setInstanceDefault);
-    bool LoadXML(const XMLElement& source, bool setInstanceDefault);
-    void ApplyAttributes();
-
     /// Match script name
     bool MatchScriptName(const String& path);
 

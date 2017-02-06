@@ -106,9 +106,23 @@ public:
     /// Zero hash.
     static const StringHash ZERO;
 
+    // ATOMIC BEGIN
+
+    /// Register significant C string, which can be looked up via hash, note that the lookup is case insensitive
+    static void RegisterSignificantString(const char* str);
+
+    /// Register significant string, which can be looked up via hash, note that the lookup is case insensitive
+    static void RegisterSignificantString(const String& str);
+
+    /// Get a significant string from a case insensitive hash value
+    static bool GetSignificantString(unsigned hash, String& strOut);
+
+    // ATOMIC END
+
 private:
     /// Hash value.
     unsigned value_;
+
 };
 
 }

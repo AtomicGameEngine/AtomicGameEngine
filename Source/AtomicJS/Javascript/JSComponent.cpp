@@ -125,8 +125,7 @@ JSComponent::JSComponent(Context* context) :
     started_(false),
     destroyed_(false),
     scriptClassInstance_(false),
-    delayedStartCalled_(false),
-    loading_(false)
+    delayedStartCalled_(false)
 {
     vm_ = JSVM::GetJSVM(NULL);
 }
@@ -155,10 +154,6 @@ void JSComponent::SetUpdateEventMask(unsigned char mask)
         updateEventMask_ = mask;
         UpdateEventSubscription();
     }
-}
-
-void JSComponent::ApplyAttributes()
-{
 }
 
 bool JSComponent::IsInstanceInitialized() {
@@ -504,24 +499,6 @@ void JSComponent::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventD
     FixedPostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 #endif
-
-bool JSComponent::Load(Deserializer& source, bool setInstanceDefault)
-{
-    loading_ = true;
-    bool success = Component::Load(source, setInstanceDefault);
-    loading_ = false;
-
-    return success;
-}
-
-bool JSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
-{
-    loading_ = true;
-    bool success = Component::LoadXML(source, setInstanceDefault);
-    loading_ = false;
-
-    return success;
-}
 
 bool JSComponent::MatchScriptName(const String& path)
 {

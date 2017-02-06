@@ -462,7 +462,20 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
         XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
-        variantElem.SetUInt("hash", i->first_.Value());
+
+// ATOMIC BEGIN
+        // Check for significant string, to make variant map XML more friendly than using a hash
+        String sigString;
+        if (StringHash::GetSignificantString(i->first_.Value(), sigString))
+        {
+            variantElem.SetString("name", sigString);
+        }
+        else
+        {
+            variantElem.SetUInt("hash", i->first_.Value());
+        }
+// ATOMIC END
+
         variantElem.SetVariant(i->second_);
     }
 
