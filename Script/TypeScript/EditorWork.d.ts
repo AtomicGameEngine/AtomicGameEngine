@@ -251,7 +251,8 @@ declare module Editor.HostExtensions {
         refreshHierarchyFrame();
         loadCustomInspector(customInspector: Atomic.UIWidget);
         showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
-        showModalError(windowText: string, message: string);
+        showNonModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
+        showModalError(windowText: string, message: string):Atomic.UIMessageWindow;
         showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args?: any);
 
         /**
@@ -259,6 +260,13 @@ declare module Editor.HostExtensions {
          * @return {Editor.ResourceEditor}
          */
         getCurrentResourceEditor(): Editor.ResourceEditor;
+
+        
+        /**
+         * Will load a resource editor or navigate to an already loaded resource editor by path
+         * @return {Editor.ResourceEditor}
+         */
+        loadResourceEditor(path: string): Editor.ResourceEditor;
 
         /**
          * Register a custom editor.  These editors will override editors in the standard editor list if

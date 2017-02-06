@@ -200,3 +200,22 @@ export function invokeShortcut(shortcut: Editor.EditorShortcutType) {
             break;
     }
 }
+
+/**
+ * Selects the provided line number
+ */
+export function gotoLineNumber(lineNumber:number) {
+    const ed = internalEditor.getInternalEditor();
+    ed.revealLineInCenterIfOutsideViewport(lineNumber);
+    ed.setPosition(new monaco.Position(lineNumber, 0));
+}
+
+/**
+ * Selects the provided position
+ */
+export function gotoTokenPos(tokenPos:number) {
+    const ed = internalEditor.getInternalEditor();
+    const pos = ed.getModel().getPositionAt(tokenPos);
+    ed.revealPositionInCenterIfOutsideViewport(pos);
+    ed.setPosition(pos);
+}
