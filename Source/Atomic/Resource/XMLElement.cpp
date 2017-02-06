@@ -884,7 +884,14 @@ VariantMap XMLElement::GetVariantMap() const
     {
         // If this is a manually edited map, user can not be expected to calculate hashes manually. Also accept "name" attribute
         if (variantElem.HasAttribute("name"))
-            ret[StringHash(variantElem.GetAttribute("name"))] = variantElem.GetVariant();
+        {   
+            // ATOMIC BEGIN
+            const String name = variantElem.GetAttribute("name");
+            // register the name in the variant map, as significant for reverse lookup from hash
+            StringHash::RegisterSignificantString(name);            
+            ret[StringHash(name)] = variantElem.GetVariant();
+            // ATOMIC END
+        }
         else if (variantElem.HasAttribute("hash"))
             ret[StringHash(variantElem.GetUInt("hash"))] = variantElem.GetVariant();
 
