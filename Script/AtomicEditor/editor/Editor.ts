@@ -191,12 +191,12 @@ class AtomicEditor extends Atomic.ScriptObject {
     setApplicationPreference(groupName: string, preferenceName: string, value: number | boolean | string) {
         Preferences.getInstance().setApplicationPreference(groupName, preferenceName, value);
         WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ApplicationPreferences", JSON.stringify(Preferences.getInstance().cachedApplicationPreferences, null, 2 ));
-        const eventData: EditorEvents.UserPreferencesChangedEvent = {
+        const eventData: Editor.UserPreferencesChangedNotificationEvent = {
             projectPreferences: JSON.stringify(Preferences.getInstance().cachedProjectPreferences),
             applicationPreferences: JSON.stringify(Preferences.getInstance().cachedApplicationPreferences)
         };
 
-        this.sendEvent(EditorEvents.UserPreferencesChangedNotification, eventData);
+        this.sendEvent(Editor.UserPreferencesChangedNotificationEventData(eventData));
     }
 
     /**
