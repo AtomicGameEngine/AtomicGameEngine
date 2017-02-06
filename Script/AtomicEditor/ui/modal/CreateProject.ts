@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 import Preferences = require("../../editor/Preferences");
@@ -260,7 +259,7 @@ class CreateProject extends ModalWindow {
 
             this.hide();
 
-            this.sendEvent(EditorEvents.LoadProject, { path: folder });
+            this.sendEvent(Editor.EditorLoadProjectEventData({ path: folder }));
             return true;
         } else {
             let message = [

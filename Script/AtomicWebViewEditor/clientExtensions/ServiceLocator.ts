@@ -64,9 +64,15 @@ export class ClientServiceLocatorType implements Editor.ClientExtensions.ClientS
      * @param  {string} eventType
      * @param  {any} callback
      */
-    subscribeToEvent(eventType: string, callback: (data: any) => void) {
+    subscribeToEvent(eventType: string, callback: (...params) => any);
+    subscribeToEvent(wrapped: Atomic.EventMetaData);
+    subscribeToEvent(eventTypeOrWrapped: any, callback?: any) {
         if (this.eventDispatcher) {
-            this.eventDispatcher.subscribeToEvent(eventType, callback);
+            if (callback) {
+                this.eventDispatcher.subscribeToEvent(eventTypeOrWrapped, callback);
+            } else {
+                this.eventDispatcher.subscribeToEvent(eventTypeOrWrapped);
+            }
         }
     }
 

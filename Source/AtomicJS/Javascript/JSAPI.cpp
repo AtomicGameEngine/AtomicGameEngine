@@ -214,17 +214,47 @@ namespace Atomic
         return 1;
     }
 
+    static int js_push_native_event_callbackdata(duk_context* ctx) {
+
+        duk_push_current_function(ctx);
+
+        duk_push_object(ctx);
+        duk_get_prop_string(ctx, -2, "_eventType");
+        duk_put_prop_string(ctx, -2, "_eventType");
+        duk_dup(ctx, 0);
+        duk_put_prop_string(ctx, -2, "_callbackData");
+
+        return 1;
+    }
+
     void js_define_native_event(duk_context* ctx, const String& eventType, const String &eventName)
     {
+        // Set up the pieces for subscribe to eventj
+
         // push c function which takes 1 argument, the callback
         duk_push_c_function(ctx, js_push_native_event_metadata, 1);
 
         // store the event type in the function object
+        // function {event}( eventName, callback ) : { _eventType , _callback }
         duk_push_string(ctx, eventType.CString());
         duk_put_prop_string(ctx, -2, "_eventType");
 
         // store to module object
         duk_put_prop_string(ctx, -2, eventName.CString());
+
+        // Set up the pieces for sendEvent
+
+        // push c function which takes 1 argument, the callback
+        duk_push_c_function(ctx, js_push_native_event_callbackdata, 1);
+
+        // store the event type in the function object
+        // function {event}Data( eventName, callbackData ) : { _eventType , _callbackData }
+        duk_push_string(ctx, eventType.CString());
+        duk_put_prop_string(ctx, -2, "_eventType");
+
+        // store to module object
+        duk_put_prop_string(ctx, -2, ToString("%sData", eventName.CString()).CString());
+
 
     }
 

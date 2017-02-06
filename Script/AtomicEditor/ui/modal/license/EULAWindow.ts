@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 
@@ -63,7 +62,7 @@ class EULAWindow extends ModalWindow {
 
             if (id == "quit") {
 
-                this.sendEvent("ExitRequested");
+                this.sendEvent(Atomic.ExitRequestedEventType);
                 return true;
 
             } else if (id == "ok") {
@@ -78,7 +77,7 @@ class EULAWindow extends ModalWindow {
                 var licenseSystem = ToolCore.getLicenseSystem();
                 licenseSystem.licenseAgreementConfirmed();
 
-                this.sendEvent("LicenseEulaAccepted");
+                this.sendEvent(ToolCore.LicenseEulaAcceptedEventType);
 
                 return true;
             }

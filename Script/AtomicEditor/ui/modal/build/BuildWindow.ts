@@ -20,11 +20,9 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
-import UIEvents = require("../../UIEvents");
 
 import WindowsSettingsWidget = require("./platforms/WindowsSettingsWidget");
 import MacSettingsWidget = require("./platforms/MacSettingsWidget");
@@ -59,7 +57,7 @@ class BuildWindow extends ModalWindow {
 
         }
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {

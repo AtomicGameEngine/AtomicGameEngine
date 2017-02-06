@@ -123,6 +123,11 @@ ATOMIC_EVENT(E_UIWIDGETFOCUSESCAPED, UIWidgetFocusEscaped)
 {
 }
 
+ATOMIC_EVENT(E_UIWIDGETEDITCANCELED, UIWidgetEditCanceled)
+{
+    ATOMIC_PARAM(P_WIDGET, Widget);         // UIWidget pointer
+}
+
 ATOMIC_EVENT(E_UIWIDGETEDITCOMPLETE, UIWidgetEditComplete)
 {
     ATOMIC_PARAM(P_WIDGET, Widget);             // UIWidget pointer
@@ -138,6 +143,5 @@ ATOMIC_EVENT(E_UILISTVIEWSELECTIONCHANGED, UIListViewSelectionChanged)
     ATOMIC_PARAM(P_REFID, RefID); // string tbid
     ATOMIC_PARAM(P_SELECTED, Selected);        // bool
 }
-
 
 }

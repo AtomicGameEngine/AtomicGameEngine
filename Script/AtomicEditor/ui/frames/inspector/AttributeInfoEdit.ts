@@ -23,7 +23,6 @@
 import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
-import EditorEvents = require("editor/EditorEvents");
 import ColorChooser = require("./ColorChooser");
 
 class AttributeInfoEdit extends Atomic.UILayout {
@@ -65,7 +64,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
         this.createEditWidget();
 
-        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.editWidget.subscribeToEvent(this.editWidget, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
         if (this.attrInfo.tooltip) {
             this.editWidget.tooltip = this.attrInfo.tooltip;
@@ -123,7 +122,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
     }
 
-    static createAttrEdit(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo, nameOverride:string=undefined, typeOverride:Atomic.VariantType = undefined ): AttributeInfoEdit {
+    static createAttrEdit(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo, nameOverride:string = undefined, typeOverride:Atomic.VariantType = undefined ): AttributeInfoEdit {
 
         var type: typeof AttributeInfoEdit;
         var customTypes = AttributeInfoEdit.customAttrEditTypes[editType.typeName];
@@ -244,7 +243,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
         lp.width = 160;
         field.layoutParams = lp;
 
-        field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+        field.subscribeToEvent(field, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
 
         this.editWidget = field;
     }
@@ -327,7 +326,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
             lp.width = 140;
             field.layoutParams = lp;
 
-            field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+            field.subscribeToEvent(field, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
 
             this.editWidget = field;
         }
@@ -422,7 +421,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
         lp.width = 140;
         field.layoutParams = lp;
 
-        field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+        field.subscribeToEvent(field, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
 
         this.editWidget = field;
 
@@ -445,7 +444,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
                     console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
                     widget.text = "???";
 
-                } else {                    
+                } else {
                     widget.text = parseFloat(value.toFixed(5)).toString();
                 }
 
@@ -525,8 +524,8 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
             select["_dec"] = select.getWidget("dec");
             select["_inc"] = select.getWidget("inc");
 
-            select.subscribeToEvent(select, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
-            select.subscribeToEvent(select, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+            select.subscribeToEvent(select, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
+            select.subscribeToEvent(select, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
         }
 
         this.editWidget = layout;
@@ -661,7 +660,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
 
         this.editWidget = layout;
 
-        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.editWidget.subscribeToEvent(this.editWidget, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
         selectButton.onClick = () => {
 
@@ -678,14 +677,14 @@ class ColorAttributeEdit extends AttributeInfoEdit {
             let restore = null;
             let chooser = new ColorChooser ( color );
 
-            this.subscribeToEvent(chooser, "ColorChooserChanged", (ev) => {
+            this.subscribeToEvent(chooser, Editor.ColorChooserChangedEvent((ev) => {
 
                 restore = color;
                 this.updateColor(chooser.getRGBA());
 
-            });
+            }));
 
-            this.subscribeToEvent(chooser, "UIWidgetEditCanceled", (ev) => {
+            this.subscribeToEvent(chooser, Atomic.UIWidgetEditCanceledEvent((ev) => {
 
                 if (restore) {
 
@@ -694,9 +693,9 @@ class ColorAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-            });
+            }));
 
-            this.subscribeToEvent(chooser, "UIWidgetEditComplete", (ev) => {
+            this.subscribeToEvent(chooser, Atomic.UIWidgetEditCompleteEvent((ev) => {
 
                 let newColor = chooser.getRGBA();
 
@@ -729,7 +728,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-            });
+            }));
 
         };
 
@@ -746,7 +745,7 @@ class ColorAttributeEdit extends AttributeInfoEdit {
             this.colorWidget.color = color;
         }
 
-        
+
     }
 
     // updates color on selection without committing to undo/redo for preview
@@ -796,7 +795,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         if (parent) {
 
-            parent.sendEvent("AttributeEditResourceChanged", { attrInfoEdit: this, resource: resource });
+            parent.sendEvent(Editor.AttributeEditResourceChangedEventData({ attrInfoEdit: this, resource: resource }));
 
         }
 
@@ -853,7 +852,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 }
                 this.editField.text = text;
 
-                this.editField.subscribeToEvent(this.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
+                this.editField.subscribeToEvent(this.editField, Atomic.UIWidgetEvent((ev: Atomic.UIWidgetEvent) => {
 
                     if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN) {
 
@@ -862,18 +861,18 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                         if (resource instanceof Atomic.JSComponentFile) {
 
                             var pathName = resource.name;
-                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+                            this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": pathName }));
 
                         } else if (resource instanceof Atomic.Model) {
 
                             var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+                            this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": asset.getRelativePath() }));
 
                         } else if (resource instanceof Atomic.Animation) {
 
                              var animCacheReferenceName = resource.name.replace( "_" + (<Atomic.Animation>resource).animationName, "");
                              var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
-                             this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+                             this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": asset.getRelativePath() }));
 
                         } else {
 
@@ -882,7 +881,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                         }
                     }
 
-                });
+                }));
             }
 
 
@@ -939,7 +938,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
         };
 
         // handle dropping of component on field
-        this.editField.subscribeToEvent(this.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+        this.editField.subscribeToEvent(this.editField, Atomic.DragEndedEvent((ev: Atomic.DragEndedEvent) => {
 
             if (ev.target == o.editField) {
 
@@ -969,7 +968,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 }
             }
 
-        });
+        }));
 
     }
 
@@ -1026,7 +1025,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         lp.width = 160;
         sizeEdit.layoutParams = lp;
 
-        sizeEdit.subscribeToEvent(sizeEdit, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+        sizeEdit.subscribeToEvent(sizeEdit, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
 
         this.editWidget = layout;
 
@@ -1036,7 +1035,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         this.createEditWidget();
 
-        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.editWidget.subscribeToEvent(this.editWidget, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
         this.addChild(this.editWidget);
 
@@ -1161,7 +1160,7 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
 
         this.layout.addChild(indexEdit);
 
-        this.indexEdits.push(indexEdit);        
+        this.indexEdits.push(indexEdit);
 
     }
 
@@ -1196,7 +1195,7 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
         lp.width = 160;
         sizeEdit.layoutParams = lp;
 
-        sizeEdit.subscribeToEvent(sizeEdit, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
+        sizeEdit.subscribeToEvent(sizeEdit, Atomic.UIWidgetEditCompleteEvent((ev) => this.handleUIWidgetEditCompleteEvent(ev)));
 
         this.editWidget = layout;
 
@@ -1206,7 +1205,7 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
 
         this.createEditWidget();
 
-        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.editWidget.subscribeToEvent(this.editWidget, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
         this.addChild(this.editWidget);
 
@@ -1237,18 +1236,18 @@ class ArrayAttributeEdit extends AttributeInfoEdit {
                 // record for undo/redo
                 let scene = this.editType.getEditScene();
                 if (scene) {
-                    scene.sendEvent("SceneEditEnd");
-                    scene.sendEvent("ComponentEditEnd");                    
+                    scene.sendEvent(Editor.SceneEditEndEventType);
+                    scene.sendEvent(Editor.ComponentEditEndEventType);
                 }
 
                 refresh = true;
-            } 
+            }
 
         }
 
         if (refresh)
             this.refresh();
-        
+
     }
 
     refresh() {

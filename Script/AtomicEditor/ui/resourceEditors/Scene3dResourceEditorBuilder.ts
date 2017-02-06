@@ -19,7 +19,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-import EditorEvents = require("../../editor/EditorEvents");
 
 export default class Scene3dResourceEditorBuilder implements Editor.Extensions.ResourceEditorBuilder {
 
@@ -31,7 +30,7 @@ export default class Scene3dResourceEditorBuilder implements Editor.Extensions.R
     getEditor(resourceFram: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor {
 
         const editor = new Editor.SceneEditor3D(resourcePath, tabContainer);
-        editor.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: editor });
+        editor.sendEvent(Editor.EditorActiveSceneEditorChangeEventData({ sceneEditor: editor }));
 
         return editor;
     }

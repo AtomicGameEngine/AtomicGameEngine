@@ -42,7 +42,7 @@ class IOSSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
 
         this.refreshWidgets();
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
 
     }
 

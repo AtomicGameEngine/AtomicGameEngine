@@ -69,8 +69,8 @@ class ColorChooser extends Atomic.UIWindow {
 
         (<Atomic.UIButton>this.getWidget("ccancelbutton")).onClick = () => {
 
-            this.sendEvent("UIWidgetEditCanceled", { widget : this });
-            this.unsubscribeFromEvent("WidgetDeleted");
+            this.sendEvent(Atomic.UIWidgetEditCanceledEventData({ widget : this }));
+            this.unsubscribeFromEvent(Atomic.UIWidgetDeletedEventType);
             this.close();
 
         };
@@ -79,18 +79,18 @@ class ColorChooser extends Atomic.UIWindow {
 
             Preferences.getInstance().addColorHistory(this.infohex.text);
 
-            this.sendEvent("UIWidgetEditComplete", { widget : this });
-            this.unsubscribeFromEvent("WidgetDeleted");
+            this.sendEvent(Atomic.UIWidgetEditCompleteEventData({ widget : this }));
+            this.unsubscribeFromEvent(Atomic.UIWidgetDeletedEventType);
             this.close();
         };
 
-        this.subscribeToEvent(this, "WidgetDeleted", (event: Atomic.UIWidgetDeletedEvent) => {
+        this.subscribeToEvent(this, Atomic.UIWidgetDeletedEvent((event: Atomic.UIWidgetDeletedEvent) => {
 
-            this.sendEvent("UIWidgetEditCanceled", { widget : this });
+            this.sendEvent(Atomic.UIWidgetEditCanceledEventData({ widget : this }));
 
-        });
+        }));
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
         this.resizeToFitContent();
         this.center();
@@ -192,7 +192,7 @@ class ColorChooser extends Atomic.UIWindow {
 
         if (changed) {
 
-            this.sendEvent("ColorChooserChanged", { widget : this });
+            this.sendEvent(Editor.ColorChooserChangedEventData({ widget : this }));
 
         }
 
@@ -226,7 +226,7 @@ class ColorChooser extends Atomic.UIWindow {
             this.fixcolor();
             this.update_hslwidgets();
             this.update_rgbwidgets();
-            this.sendEvent("ColorChooserChanged", { widget : this });
+            this.sendEvent(Editor.ColorChooserChangedEventData({ widget : this }));
 
         }
 

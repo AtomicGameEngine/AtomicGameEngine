@@ -274,6 +274,9 @@ void JSModuleWriter::WriteModulePreInit(String& source)
 
     for (unsigned i = 0; i < events.Size(); i++)
     {
+        source.AppendWithFormat("duk_push_string(ctx, \"%s\");\n", events[i]->GetEventName().CString());
+        source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%sType\");\n", events[i]->GetScriptEventName(BINDINGLANGUAGE_JAVASCRIPT).CString());
+
         source.AppendWithFormat("js_define_native_event(ctx, \"%s\", \"%s\");\n", events[i]->GetEventName().CString(), events[i]->GetScriptEventName(BINDINGLANGUAGE_JAVASCRIPT).CString());
     }
 

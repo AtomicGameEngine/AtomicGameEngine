@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import Preferences = require("../../editor/Preferences");
 
@@ -51,8 +50,8 @@ class PlayerOutput extends Atomic.UIWindow {
 
         };
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
-        this.subscribeToEvent(EditorEvents.PlayerLog, (ev: EditorEvents.PlayerLogEvent) => this.handlePlayerLog(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
+        this.subscribeToEvent(Editor.EditorPlayerLogEvent((ev: Editor.EditorPlayerLogEvent) => this.handlePlayerLog(ev)));
 
         this.resizeToFitContent();
         this.center();
@@ -60,7 +59,7 @@ class PlayerOutput extends Atomic.UIWindow {
 
     }
 
-    handlePlayerLog(ev: EditorEvents.PlayerLogEvent) {
+    handlePlayerLog(ev: Editor.EditorPlayerLogEvent) {
 
         var text = this.output.text;
 

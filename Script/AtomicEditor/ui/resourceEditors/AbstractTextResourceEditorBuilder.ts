@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../../editor/EditorEvents");
 export abstract class AbstractTextResourceEditorBuilder implements Editor.Extensions.ResourceEditorBuilder {
 
     abstract canHandleResource(resourcePath: string): boolean;
@@ -49,10 +48,10 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         // one time subscriptions waiting for the web view to finish loading.  This event
         // actually hits the editor instance before we can hook it, so listen to it on the
         // frame and then unhook it
-        editor.subscribeToEvent(EditorEvents.WebViewLoadEnd, (data) => {
-            editor.unsubscribeFromEvent(EditorEvents.WebViewLoadEnd);
+        editor.subscribeToEvent(WebView.WebViewLoadEndEvent((data) => {
+            editor.unsubscribeFromEvent(WebView.WebViewLoadEndEventType);
             this.loadCode(<Editor.JSResourceEditor>editor, resourcePath);
-        });
+        }));
 
         // Cannot subscribe to WebMessage until the .ts side can return a Handler.Success() message
         // editor.subscribeToEvent(EditorEvents.WebMessage, (data) => {
@@ -68,15 +67,15 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         //     }
         // });
 
-        editor.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => {
+        editor.subscribeToEvent(Editor.EditorDeleteResourceNotificationEvent((data) => {
             const webClient = editor.webView.webClient;
             webClient.executeJavaScript(`HOST_resourceDeleted("${this.getNormalizedPath(data.path)}");`);
-        });
+        }));
 
-        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data: EditorEvents.UserPreferencesChangedEvent) => {
+        editor.subscribeToEvent(Editor.UserPreferencesChangedNotificationEvent((data: Editor.UserPreferencesChangedNotificationEvent) => {
             const webClient = editor.webView.webClient;
             webClient.executeJavaScript(`HOST_preferencesChanged('${data.projectPreferences}','${data.applicationPreferences}');`);
-        });
+        }));
 
         return editor;
     }

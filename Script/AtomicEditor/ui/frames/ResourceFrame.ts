@@ -21,8 +21,6 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
-import EditorEvents = require("editor/EditorEvents");
-import UIEvents = require("ui/UIEvents");
 import ResourceEditorProvider from "../ResourceEditorProvider";
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
@@ -53,19 +51,19 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleSaveResource(ev: EditorEvents.SaveResourceEvent) {
+    handleSaveResource(ev: Editor.EditorSaveResourceEvent) {
 
         if (this.currentResourceEditor) {
             this.currentResourceEditor.save();
             // Grab the path to this file and pass it to the save resource
-            this.sendEvent(EditorEvents.SaveResourceNotification, {
+            this.sendEvent(Editor.EditorSaveResourceNotificationEventData({
                 path: ev.path || this.currentResourceEditor.fullPath
-            });
+            }));
         }
 
     }
 
-    handleDeleteResource(ev: EditorEvents.DeleteResourceEvent) {
+    handleDeleteResource(ev: Editor.EditorDeleteResourceEvent) {
         var editor = this.editors[ev.path];
         if (editor) {
             editor.close(true);
@@ -73,18 +71,18 @@ class ResourceFrame extends ScriptWidget {
         }
     }
 
-    handleSaveAllResources(data) {
+    handleSaveAllResources() {
 
         for (var i in this.editors) {
             this.editors[i].save();
-            this.sendEvent(EditorEvents.SaveResourceNotification, {
+            this.sendEvent(Editor.EditorSaveResourceNotificationEventData({
                 path: this.editors[i].fullPath
-            });
+            }));
         }
 
     }
 
-    handleEditResource(ev: EditorEvents.EditResourceEvent) {
+    handleEditResource(ev: Editor.EditorEditResourceEvent) {
 
         var path = ev.path;
 
@@ -151,7 +149,7 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleCloseResource(ev: EditorEvents.EditorCloseResourceEvent) {
+    handleCloseResource(ev: Editor.EditorResourceCloseEvent) {
         this.wasClosed = false;
         var editor = ev.editor;
         var navigate = ev.navigateToAvailableResource;
@@ -193,14 +191,14 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleResourceEditorChanged(data) {
+    handleResourceEditorChanged(data: Editor.EditorResourceEditorChangedEvent) {
 
-        var editor = <Editor.ResourceEditor> data.editor;
+        var editor = data.resourceEditor;
         this.currentResourceEditor = editor;
 
     }
 
-    handleRenameResource(ev:EditorEvents.RenameResourceEvent) {
+    handleRenameResource(ev:Editor.EditorRenameResourceNotificationEvent) {
         var editor = this.editors[ev.path];
         if (editor) {
             this.editors[ev.newPath] = editor;
@@ -220,11 +218,11 @@ class ResourceFrame extends ScriptWidget {
 
                     if (w.editor.typeName == "SceneEditor3D") {
 
-                        this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: (<Editor.SceneEditor3D> w.editor) });
+                        this.sendEvent(Editor.EditorActiveSceneEditorChangeEventData({ sceneEditor: (<Editor.SceneEditor3D> w.editor) }));
 
                     }
 
-                    this.sendEvent(UIEvents.ResourceEditorChanged, { editor: w.editor });
+                    this.sendEvent(Editor.EditorResourceEditorChangedEventData({ resourceEditor: w.editor }));
 
                 }
 
@@ -246,7 +244,7 @@ class ResourceFrame extends ScriptWidget {
         // on exit close all open editors
         for (var path in this.editors) {
 
-            this.sendEvent(EditorEvents.EditorResourceClose, { editor: this.editors[path], navigateToAvailableResource: false });
+            this.sendEvent(Editor.EditorResourceCloseEventData({ editor: this.editors[path], navigateToAvailableResource: false }));
 
         }
 
@@ -256,7 +254,7 @@ class ResourceFrame extends ScriptWidget {
 
       for (var i in this.editors) {
           var editor = this.editors[i];
-           this.sendEvent(EditorEvents.EditorResourceClose, { editor: editor, navigateToAvailableResource: false });
+           this.sendEvent(Editor.EditorResourceCloseEventData({ editor: editor, navigateToAvailableResource: false }));
            editor.close();
       }
 
@@ -278,17 +276,17 @@ class ResourceFrame extends ScriptWidget {
         this.resourceEditorProvider = new ResourceEditorProvider(this);
         this.resourceEditorProvider.loadStandardEditors();
 
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
-        this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
-        this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
-        this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));
-        this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
-        this.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev));
-        this.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => this.handleDeleteResource(data));
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(Editor.EditorEditResourceEvent((data) => this.handleEditResource(data)));
+        this.subscribeToEvent(Editor.EditorSaveResourceEvent((data) => this.handleSaveResource(data)));
+        this.subscribeToEvent(Editor.EditorSaveAllResourcesEvent((data) => this.handleSaveAllResources()));
+        this.subscribeToEvent(Editor.EditorResourceCloseEvent((ev: Editor.EditorResourceCloseEvent) => this.handleCloseResource(ev)));
+        this.subscribeToEvent(Editor.EditorRenameResourceNotificationEvent((ev: Editor.EditorRenameResourceNotificationEvent) => this.handleRenameResource(ev)));
+        this.subscribeToEvent(Editor.EditorDeleteResourceNotificationEvent((data) => this.handleDeleteResource(data)));
 
-        this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
+        this.subscribeToEvent(Editor.EditorResourceEditorChangedEvent((data) => this.handleResourceEditorChanged(data)));
 
-        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

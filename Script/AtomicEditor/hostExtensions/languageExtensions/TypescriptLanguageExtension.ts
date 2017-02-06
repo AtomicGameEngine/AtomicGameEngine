@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-import * as EditorEvents from "../../editor/EditorEvents";
-
 /**
  * Default compiler options to use for compilation.  If there
  * is a compiler option block in a tsconfig.json located in the project,
@@ -199,9 +197,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     /**
      * Handle when a new file is loaded and we have not yet configured the editor for TS.
      * This could be when someone adds a TS file to a vanilla project
-     * @param  {Editor.EditorEvents.EditResourceEvent} ev
+     * @param  {Editor.EditorEditResourceEvent} ev
      */
-    edit(ev: Editor.EditorEvents.EditResourceEvent) {
+    edit(ev: Editor.EditorEditResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
             // update ts config in case we have a new resource
             let tsConfig = this.buildTsConfig();
@@ -215,9 +213,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
     /**
      * Handle the delete.  This should delete the corresponding javascript file
-     * @param  {Editor.EditorEvents.DeleteResourceEvent} ev
+     * @param  {Editor.EditorDeleteResourceEvent} ev
      */
-    delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
+    delete(ev: Editor.EditorDeleteResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
             // console.log(`${this.name}: received a delete resource event`);
 
@@ -228,21 +226,21 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 console.log(`${this.name}: deleting corresponding .js file`);
                 ToolCore.assetDatabase.deleteAsset(jsFileAsset);
 
-                let eventData: EditorEvents.DeleteResourceEvent = {
+                let eventData : Editor.EditorDeleteResourceNotificationEvent = {
                     path: jsFile
                 };
 
                 this.setTsConfigOnWebView(this.buildTsConfig());
-                this.serviceRegistry.sendEvent(EditorEvents.DeleteResourceNotification, eventData);
+                this.serviceRegistry.sendEvent<Editor.EditorDeleteResourceNotificationEvent>(Editor.EditorDeleteResourceNotificationEventType, eventData);
             }
         }
     }
 
     /**
      * Handle the rename.  Should rename the corresponding .js file
-     * @param  {Editor.EditorEvents.RenameResourceEvent} ev
+     * @param  {Editor.EditorRenameResourceNotificationEvent} ev
      */
-    rename(ev: Editor.EditorEvents.RenameResourceEvent) {
+    rename(ev: Editor.EditorRenameResourceNotificationEvent) {
         if (this.isValidFiletype(ev.path)) {
             // console.log(`${this.name}: received a rename resource event`);
 
@@ -254,7 +252,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 console.log(`${this.name}: renaming corresponding .js file`);
                 jsFileAsset.rename(ev.newName);
 
-                let eventData: EditorEvents.RenameResourceEvent = {
+                let eventData: Editor.EditorRenameResourceNotificationEvent = {
                     path: jsFile,
                     newPath: jsFileNew,
                     newName: ev.newName,
@@ -262,17 +260,16 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 };
 
                 this.setTsConfigOnWebView(this.buildTsConfig());
-                this.serviceRegistry.sendEvent(EditorEvents.RenameResourceNotification, eventData);
+                this.serviceRegistry.sendEvent<Editor.EditorRenameResourceNotificationEvent>(Editor.EditorRenameResourceNotificationEventType, eventData);
             }
         }
     }
 
     /**
      * Handles the save event and detects if a typescript file has been added to a non-typescript project
-     * @param  {Editor.EditorEvents.SaveResourceEvent} ev
-     * @return {[type]}
+     * @param  ev
      */
-    save(ev: Editor.EditorEvents.SaveResourceEvent) {
+    save(ev: Editor.EditorSaveResourceEvent) {
         // let's check to see if we have created a typescript file
         if (!this.isTypescriptProject) {
             if (Atomic.getExtension(ev.path) == ".ts") {
@@ -288,7 +285,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * Called when the project is being loaded to allow the typescript language service to reset and
      * possibly compile
      */
-    projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
+    projectLoaded(ev: Editor.EditorLoadProjectEvent) {
         // got a load, we need to reset the language service
         this.isTypescriptProject = false;
         //scan all the files in the project for any typescript files so we can determine if this is a typescript project

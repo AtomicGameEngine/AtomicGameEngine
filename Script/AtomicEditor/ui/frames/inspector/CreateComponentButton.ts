@@ -133,7 +133,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
         this.text = "Create Component";
 
-        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 
@@ -143,7 +143,7 @@ class CreateComponentButton extends Atomic.UIButton {
         var menu = new Atomic.UIMenuWindow(this, "create component popup");
         menu.fontDescription = this.fd;
         menu.show(componentCreateSource);
-    };
+    }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
@@ -152,7 +152,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
         if (ev.target && ev.target.id == "create component popup") {
 
-            this.sendEvent("SelectionCreateComponent", { componentTypeName : ev.refid});
+            this.sendEvent(Editor.SelectionCreateComponentEventData({ componentTypeName : ev.refid}));
 
             return true;
 

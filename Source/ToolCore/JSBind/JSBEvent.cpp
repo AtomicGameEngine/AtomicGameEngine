@@ -34,12 +34,13 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-JSBEvent::JSBEvent(Context* context, JSBModule* module, const String& eventID, const String& eventName) :
+JSBEvent::JSBEvent(Context* context, JSBModule* module, const String& eventID, const String& eventName, const String& eventComment) :
     Object(context),
     module_(module), 
     header_(0),
     eventID_(eventID),
-    eventName_(eventName)
+    eventName_(eventName),
+    eventComment_(eventComment)
 {
 
 }
@@ -100,6 +101,7 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
         SharedPtr<JSBEvent> curEvent;
         String eventID;
         String eventName;
+        String eventComment;
 
         for (unsigned j = 0; j < lines.Size(); j++)
         {
@@ -109,6 +111,18 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
             // Note: processes ATOMIC_EVENT decl in commented blocks
             if (line.StartsWith("ATOMIC_EVENT"))
             {
+                // First check to see if there is a line comment above this and try to capture it
+                eventComment = NULL;
+
+                if (j > 0) {
+                    String prevLine = lines[j-1].Trimmed();
+                    if (prevLine.StartsWith(("//")))
+                    {
+                        prevLine.Replace("//", "");
+                        eventComment = prevLine.Trimmed();
+                    }
+                }
+
                 StringVector parts = line.Split('(');
 
                 if (parts.Size() != 2)
@@ -129,7 +143,7 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
                 eventName = parts[1].Trimmed();
                 eventName.Replace(")", "");
 
-                curEvent = new JSBEvent(module->GetContext(), module, eventID, eventName);
+                curEvent = new JSBEvent(module->GetContext(), module, eventID, eventName, eventComment);
             }            
 
             if (line.Contains("}") && curEvent.NotNull())
@@ -162,6 +176,7 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
 
                 String typeInfo;
                 String enumTypeName;
+                String formalComment;
 
                 // comment contains type
                 if (parts[1].Contains("//"))
@@ -170,6 +185,7 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
                     comment.Replace("//", "");
                     comment = comment.Trimmed();
                     StringVector typeVector = comment.Split(' ');
+                    int commentStart = 1;
                     if (typeVector.Size() > 0)
                     {
                         typeInfo = typeVector[0];
@@ -179,6 +195,18 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
                             if (JSBPackage::GetEnumAllPackages(typeVector[1]))
                             {
                                 enumTypeName = typeVector[1];
+                            }
+
+                            commentStart = 1;
+                        }
+
+                        // Check to see if there are any comments following and try to capture them
+                        if (typeVector.Size() > commentStart + 1)
+                        {
+                            formalComment = "";
+                            for (int i = commentStart; i < typeVector.Size(); i++) {
+                                formalComment.Append(" ");
+                                formalComment.Append(typeVector[i]);
                             }
                         }
                     }
@@ -207,6 +235,7 @@ bool JSBEvent::ScanModuleEvents(JSBModule* module)
                 param.paramName_ = parts[1].Trimmed();
                 param.typeInfo_ = typeInfo;
                 param.enumTypeName_ = enumTypeName;
+                param.comment_ = formalComment;
 
                 curEvent->parameters_.Push(param);
 

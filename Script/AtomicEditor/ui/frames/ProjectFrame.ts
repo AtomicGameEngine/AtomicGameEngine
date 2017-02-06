@@ -21,8 +21,7 @@
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
-import Editor = require("editor/Editor");
-import EditorEvents = require("editor/EditorEvents");
+import {default as AtomicEditor} from "editor/Editor";
 import ProjectFrameMenu = require("./menus/ProjectFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import SearchBarFiltering = require("resources/SearchBarFiltering");
@@ -68,27 +67,27 @@ class ProjectFrame extends ScriptWidget {
         foldercontainer.addChild(folderList);
 
         // events
-        this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
-        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
-        this.subscribeToEvent("DragEnded", (data: Atomic.DragEndedEvent) => this.handleDragEnded(data));
+        this.subscribeToEvent(ToolCore.ProjectLoadedEvent((data) => this.handleProjectLoaded(data)));
+        this.subscribeToEvent(Editor.ProjectUnloadedNotificationEvent((data) => this.handleProjectUnloaded(data)));
+        this.subscribeToEvent(Atomic.DragEndedEvent((data: Atomic.DragEndedEvent) => this.handleDragEnded(data)));
 
-        this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
-        this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
-        this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
-        this.subscribeToEvent(EditorEvents.InspectorProjectReference, (ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path); });
+        this.subscribeToEvent(ToolCore.ResourceAddedEvent((ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev)));
+        this.subscribeToEvent(ToolCore.ResourceRemovedEvent((ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev)));
+        this.subscribeToEvent(ToolCore.AssetRenamedEvent((ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev)));
+        this.subscribeToEvent(Editor.InspectorProjectReferenceEvent((ev: Editor.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path); }));
 
-        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.searchEdit.subscribeToEvent(this.searchEdit, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
-        folderList.subscribeToEvent("UIListViewSelectionChanged", (event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event));
+        folderList.subscribeToEvent(Atomic.UIListViewSelectionChangedEvent((event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event)));
 
         // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
         // this uses FileWatcher which doesn't catch subfolder creation
-        this.subscribeToEvent("FileChanged", (data) => {
+        this.subscribeToEvent(Atomic.FileChangedEvent((data) => {
 
             // console.log("File CHANGED! ", data.fileName);
 
-        });
+        }));
 
     }
 
@@ -260,7 +259,7 @@ class ProjectFrame extends ScriptWidget {
 
                     } else {
 
-                        this.sendEvent(EditorEvents.EditResource, { "path": asset.path });
+                        this.sendEvent(Editor.EditorEditResourceEventData({ "path": asset.path }));
                     }
 
                 }
@@ -416,7 +415,7 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    handleProjectLoaded(data) {
+    handleProjectLoaded(data: ToolCore.ProjectLoadedEvent) {
 
         this.folderList.rootList.value = 0;
         this.folderList.setExpanded(this.resourcesID, true);
@@ -470,7 +469,7 @@ class ProjectFrame extends ScriptWidget {
 
         if (this.currentFolder != folder) {
 
-            this.sendEvent(EditorEvents.ContentFolderChanged, { path: folder.path });
+            this.sendEvent(Editor.ContentFolderChangedEventData({ path: folder.path }));
 
         }
 

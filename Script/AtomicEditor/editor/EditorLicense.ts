@@ -29,8 +29,8 @@ class EditorLicense extends Atomic.ScriptObject {
 
         super();
 
-        this.subscribeToEvent("LicenseEulaRequired", (eventData) => this.handleLicenseEulaRequired(eventData));
-        this.subscribeToEvent("LicenseEulaAccepted", (eventData) => this.handleLicenseEulaAccepted(eventData));
+        this.subscribeToEvent(ToolCore.LicenseEulaRequiredEvent((eventData) => this.handleLicenseEulaRequired(eventData)));
+        this.subscribeToEvent(ToolCore.LicenseEulaAcceptedEvent((eventData) => this.handleLicenseEulaAccepted(eventData)));
 
     }
 

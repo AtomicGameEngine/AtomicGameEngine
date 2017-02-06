@@ -21,7 +21,6 @@
 //
 
 import strings = require("ui/EditorStrings");
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 
 var UIMenuItemSource = Atomic.UIMenuItemSource;

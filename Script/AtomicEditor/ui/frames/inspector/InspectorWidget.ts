@@ -48,7 +48,7 @@ class InspectorWidget extends ScriptWidget {
         this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
         this.addChild(layout);
 
-        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import HierarchyFrame = require("ui/frames/HierarchyFrame");
 import InspectorUtils = require("ui/frames/inspector/InspectorUtils");
@@ -38,9 +37,9 @@ class AnimationToolbar extends Atomic.UIWidget {
         this.leftAnimContainer = <Atomic.UILayout>this.getWidget("leftanimcontainer");
         this.rightAnimContainer = <Atomic.UILayout>this.getWidget("rightanimcontainer");
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
-        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
-        this.subscribeToEvent(EditorEvents.SceneClosed, (data) => this.handleSceneClosed(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
+        this.subscribeToEvent(Editor.EditorActiveSceneEditorChangeEvent((data) => this.handleActiveSceneEditorChanged(data)));
+        this.subscribeToEvent(Editor.EditorSceneClosedEvent((data) => this.handleSceneClosed(data)));
 
         var leftAnimationField = InspectorUtils.createAttrEditFieldWithSelectButton("Animation A", this.leftAnimContainer);
         leftAnimationField.selectButton.onClick = function () { this.openAnimationSelectionBox(leftAnimationField.editField, this.leftAnim); }.bind(this);
@@ -122,7 +121,7 @@ class AnimationToolbar extends Atomic.UIWidget {
         return true;
     }
 
-    handleSceneClosed(ev: EditorEvents.SceneClosedEvent) {
+    handleSceneClosed(ev: Editor.EditorSceneClosedEvent) {
         if (ev.scene == this.scene) {
             Atomic.fileSystem.delete(this.sceneAssetPath);
 
@@ -141,7 +140,7 @@ class AnimationToolbar extends Atomic.UIWidget {
             this.remove();
     }
 
-    handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
+    handleActiveSceneEditorChanged(event: Editor.EditorActiveSceneEditorChangeEvent) {
 
         if (!event.sceneEditor)
             return;

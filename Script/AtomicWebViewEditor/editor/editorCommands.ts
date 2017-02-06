@@ -106,7 +106,7 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
  * @param  {string} newPath
  */
 export function resourceRenamed(path: string, newPath: string) {
-    let data: Editor.EditorEvents.RenameResourceEvent = {
+    let data: Editor.ClientExtensions.RenameResourceEvent = {
         path: path,
         newPath: newPath
     };
@@ -118,7 +118,7 @@ export function resourceRenamed(path: string, newPath: string) {
  * @param  {string} path
  */
 export function resourceDeleted(path: string) {
-    let data: Editor.EditorEvents.DeleteResourceEvent = {
+    let data: Editor.ClientExtensions.DeleteResourceEvent = {
         path: path
     };
     serviceLocator.sendEvent(ClientExtensionEventNames.ResourceDeletedEvent, data);
@@ -131,7 +131,7 @@ export function resourceDeleted(path: string) {
  * @param {string} contents
  */
 export function codeSaved(path: string, fileExt: string, contents: string) {
-    let data: Editor.EditorEvents.CodeSavedEvent = {
+    let data: Editor.ClientExtensions.CodeSavedEvent = {
         filename: path,
         fileExt: fileExt,
         editor: internalEditor.getInternalEditor(),

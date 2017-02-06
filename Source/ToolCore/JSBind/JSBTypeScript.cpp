@@ -370,18 +370,6 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         }
         source_ += "    }\n";
         source_ += "\n";
-
-        // legacy support - This should be removed in a couple releases
-        source_ += "   // Legacy JS Access for enum:  " + _enum->GetName() + "\n";
-        valsIter = values.Begin();
-        while (valsIter != values.End())
-        {
-            String name = (*valsIter).first_;
-            source_ += "   /** Deprecated - use: [[" + _enum->GetName() + "." + name + "]]\n@deprecated */\n";
-            source_ += "   export var " + name + ": number;\n";
-            valsIter++;
-        }
-        source_ += "\n";
     }
 
 }
@@ -399,7 +387,13 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
         JSBEvent* event = events[i];
         String scriptEventName = event->GetScriptEventName(BINDINGLANGUAGE_JAVASCRIPT);
 
-        source += ToString("    export interface %s extends Atomic.NativeEvent {\n", scriptEventName.CString());
+        // Write the event type
+        source += ToString("    /** Event type to use in calls requiring the event such as 'sendEvent'.  Event Type is: \"%s\" **/\n", event->GetEventName().CString());
+        source += ToString("    export var %sType : Atomic.EventType;\n\n", scriptEventName.CString());
+
+        // Write the event interface
+        source += ToString("    /** object returned in the callback for the %s event.**/\n", event->GetEventName().CString());
+        source += ToString("    export interface %s extends Atomic.EventData {\n", scriptEventName.CString());
 
         // parameters
 
@@ -431,11 +425,11 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
 
             bool mapped = false;
 
-            if (typeName == "int" || typeName == "float" || typeName == "unsigned" || typeName == "uint")
+            if (typeName == "int" || typeName == "float" || typeName == "unsigned" || typeName == "uint" || typeName == "double")
             {
                 typeName = "number";
                 mapped = true;
-            } else if (typeName == "bool") {
+            } else if (typeName == "bool" || typeName == "boolean") {
                 typeName = "boolean";
                 mapped = true;
             } else if (typeName == "string") {
@@ -452,19 +446,44 @@ void JSBTypeScript::ExportModuleEvents(JSBModule* module)
                 mapped = true;
             }
 
+            if (p.comment_.Length())
+            {
+                source += ToString("        /** %s */\n", p.comment_.CString());
+            }
+
             if (mapped == true) {
                 source += ToString("        %s : %s;\n", paramName.CString(), typeName.CString());
             } else {
-                source += ToString("        // Unmapped Native Type:%s \n", typeName.CString());
-                source += ToString("        // %s : any;\n", p.paramName_.ToLower().CString());
+                source += ToString("        /** Unmapped Native Type: %s */\n", p.typeInfo_.CString());
+                source += ToString("        %s : any;\n", paramName.CString());
             }
         }
 
         source += "    }\n\n";
 
         // Write the event function signature
+        if (event->GetEventComment().Length())
+        {
+            source += "    /**\n";
+            source += ToString("     Wrapper function to generate a properly formatted event handler to pass to 'subscribeToEvent' for the %s event. \n\n", event->GetEventName().CString());
+            source += ToString("     %s\n", event->GetEventComment().CString());
+            source += "    **/\n";
+        } else {
+            source += ToString("    /** Wrapper function to generate a properly formatted event handler to pass to 'subscribeToEvent' for the %s event. **/\n", event->GetEventName().CString());
+        }
+        source += ToString("    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n", scriptEventName.CString(), scriptEventName.CString());
+        source += "\n";
 
-        source += ToString("\n    export function %s (callback : Atomic.EventCallback<%s>) : Atomic.EventMetaData;\n\n", scriptEventName.CString(), scriptEventName.CString());
+        if (params.Size() > 0)
+        {
+            source += ToString("    /** Wrapper function to construct callback data to pass to 'sendEvent' for the %s event. **/ \n", event->GetEventName().CString());
+            source += ToString("    export function %sData (callbackData : %s) : Atomic.EventCallbackMetaData; \n", scriptEventName.CString(), scriptEventName.CString());
+        } else {
+            source += ToString("    /** Wrapper function to construct object to pass to 'sendEvent' for the %s event. **/ \n", event->GetEventName().CString());
+            source += ToString("    export function %sData () : Atomic.EventCallbackMetaData; \n", scriptEventName.CString());
+        }
+
+        source += "\n\n";
 
     }
     source_ += source;

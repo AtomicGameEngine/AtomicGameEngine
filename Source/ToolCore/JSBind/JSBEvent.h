@@ -49,18 +49,19 @@ namespace ToolCore
             String paramName_;
             String typeInfo_;
             String enumTypeName_;
+            String comment_;
         };
 
-        JSBEvent(Context* context, JSBModule* module, const String& eventID, const String& eventName);
+        JSBEvent(Context* context, JSBModule* module, const String& eventID, const String& eventName, const String& eventComment);
         virtual ~JSBEvent();
 
         const String& GetEventID() const { return eventID_; }
         const String& GetEventName() const { return eventName_; }
+        const String& GetEventComment() const { return eventComment_; }
         unsigned GetEventHash() const;
         /// Generally this is the EventName + "Event"
         String GetScriptEventName(BindingLanguage language = BINDINGLANGUAGE_ANY) const;
         const Vector<EventParam>& GetParameters() const { return parameters_;  }
-
 
         void SetHeader(JSBHeader* header) { header_ = header; }
         JSBHeader* GetHeader() { return header_; }
@@ -77,6 +78,7 @@ namespace ToolCore
 
         String eventName_;
         String eventID_;
+        String eventComment_;
 
         Vector<EventParam> parameters_;
 

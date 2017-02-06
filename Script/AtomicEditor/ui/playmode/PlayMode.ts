@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../../editor/EditorEvents");
 import PlayerOutput = require("./PlayerOutput");
 import Preferences = require("../../editor/Preferences");
 
@@ -33,9 +32,9 @@ class PlayMode extends Atomic.ScriptObject {
 
         super();
         this.myPlayer = null;
-        this.subscribeToEvent("IPCJSError", (ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev));
-        this.subscribeToEvent(EditorEvents.PlayerStarted, (ev) => this.handlePlayerStarted(ev));
-        this.subscribeToEvent(EditorEvents.PlayerStopped, (ev) => this.handlePlayerStopped(ev));
+        this.subscribeToEvent(Atomic.IPCJSErrorEvent((ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev)));
+        this.subscribeToEvent(Editor.EditorPlayerStartedEvent((ev) => this.handlePlayerStarted(ev)));
+        this.subscribeToEvent(Editor.EditorPlayerStoppedEvent((ev) => this.handlePlayerStopped(ev)));
 
     }
 
@@ -67,7 +66,7 @@ class PlayMode extends Atomic.ScriptObject {
         this.inErrorState = true;
 
         var errorMessage = ev.errorFileName + " - " + ev.errorLineNumber + " : " + ev.errorMessage;
-        this.sendEvent(EditorEvents.ModalError, { title: "Player JavaScript Error", message: errorMessage });
+        this.sendEvent(Editor.EditorModalEventData({ type: Editor.EDITOR_MODALERROR, title: "Player JavaScript Error", message: errorMessage }));
 
         Atomic.graphics.raiseWindow();
 

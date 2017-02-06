@@ -10,145 +10,6 @@
 /// <reference path="ToolCore.d.ts" />
 /// <reference path="WebView.d.ts" />
 
-declare module Editor.EditorEvents {
-
-    export interface ModalErrorEvent {
-
-        title: string;
-        message: string;
-
-    }
-
-    export interface PlayerLogEvent {
-
-        message: string;
-        level: number;
-
-    }
-
-    export interface ActiveSceneEditorChangeEvent {
-
-        sceneEditor: Editor.SceneEditor3D;
-
-    }
-
-    export interface SceneClosedEvent {
-
-        scene: Atomic.Scene;
-
-    }
-
-    export interface ContentFolderChangedEvent {
-
-        path: string;
-
-    }
-
-    export interface LoadProjectEvent {
-
-        // The full path to the .atomic file
-        path: string;
-
-    }
-
-    /**
-     * Called once the resource has been saved
-     * @type {String}
-     */
-    export interface SaveResourceEvent {
-
-        // The full path to the resource to save / empty or undefined for current
-        path: string;
-
-    }
-
-    export interface LoadResourceEvent {
-
-        // The full path to the resource to load
-        path: string;
-
-    }
-
-    export interface EditorFileEvent {
-        filename: string;
-        fileExt: string;
-        editor: any;
-    }
-
-    export interface CodeLoadedEvent extends EditorFileEvent {
-        code: string;
-    }
-
-    export interface CodeSavedEvent extends EditorFileEvent {
-        code: string;
-    }
-
-    export interface EditorCloseResourceEvent {
-
-        editor: Editor.ResourceEditor;
-        navigateToAvailableResource: boolean;
-
-    }
-
-    export interface EditResourceEvent {
-
-        // The full path to the resource to edit
-        path: string;
-
-    }
-
-    /**
-     * Called once the resource has been deleted
-     * @type {String}
-     */
-    export interface DeleteResourceEvent {
-
-        // The full path to the resource to edit
-        path: string;
-
-    }
-
-    /**
-     * Called once the resource has been renamed
-     * @type {String}
-     */
-    export interface RenameResourceEvent {
-
-        /**
-         * Original path of the resource
-         * @type {string}
-         */
-        path: string;
-
-        /**
-         * New path of the resource
-         * @type {string}
-         */
-        newPath: string;
-
-        /**
-         * New base name of the resource (no path or extension)
-         * @type {string}
-         */
-        newName?: string;
-
-        // the asset being changed
-        asset?: ToolCore.Asset;
-    }
-
-    export interface SceneEditStateChangeEvent {
-
-        serializable: Atomic.Serializable;
-
-    }
-
-    export interface PreferencesChangedEvent {
-
-        preferences: any;
-
-    }
-}
-
 declare module Editor.Templates {
     // Commented out until the TSDoc gets updated to the latest version of TypeScript
     //export type TemplateType = "component" | "script";
@@ -202,13 +63,20 @@ declare module Editor.Extensions {
          * @param  {any} data
          */
         sendEvent(eventType: string, data: any);
+        sendEvent<T extends Atomic.EventMetaData>(eventType:string, data?:T);
 
         /**
          * Subscribe to an event and provide a callback.  This can be used by services to subscribe to custom events
          * @param  {string} eventType
          * @param  {any} callback
          */
-        subscribeToEvent(eventType, callback);
+        subscribeToEvent?(eventType: string, callback: (...params) => any);
+
+        /**
+         * Subscribe to an event with a pre-wrapped event object.  This can be used by services to subscribe to custom events
+         * @param  {Atomic.EventMetaData} wrappedEvent
+         */
+        subscribeToEvent?(wrappedEvent: Atomic.EventMetaData);
     }
 
     /**
@@ -288,19 +156,19 @@ declare module Editor.HostExtensions {
         /**
          * Called once a resource is saved
          */
-        save?(ev: EditorEvents.SaveResourceEvent);
+        save?(ev: Editor.EditorSaveResourceEvent);
         /**
          * Called when a resource is deleted
          */
-        delete?(ev: EditorEvents.DeleteResourceEvent);
+        delete?(ev: Editor.EditorDeleteResourceEvent);
         /**
          * Called when a resource is renamed
          */
-        rename?(ev: EditorEvents.RenameResourceEvent);
+        rename?(ev: Editor.EditorRenameResourceNotificationEvent);
         /**
          * Called when a resource is about to be edited
          */
-        edit?(ev: EditorEvents.EditResourceEvent);
+        edit?(ev: Editor.EditorEditResourceEvent);
     }
 
     export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> {
@@ -309,7 +177,7 @@ declare module Editor.HostExtensions {
 
     export interface ProjectServicesEventListener extends Editor.Extensions.ServiceEventListener {
         projectUnloaded?();
-        projectLoaded?(ev: EditorEvents.LoadProjectEvent);
+        projectLoaded?(ev: Editor.EditorLoadProjectEvent);
         playerStarted?();
     }
     export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> {
@@ -335,8 +203,8 @@ declare module Editor.HostExtensions {
     }
 
     export interface SceneServicesEventListener extends Editor.Extensions.ServiceEventListener {
-        activeSceneEditorChanged?(ev: EditorEvents.ActiveSceneEditorChangeEvent);
-        editorSceneClosed?(ev: EditorEvents.SceneClosedEvent);
+        activeSceneEditorChanged?(ev: Editor.EditorActiveSceneEditorChangeEvent);
+        editorSceneClosed?(ev: Editor.EditorSceneClosedEvent);
     }
     export interface SceneServicesProvider extends Editor.Extensions.ServicesProvider<SceneServicesEventListener> { }
 
@@ -392,6 +260,56 @@ declare module Editor.HostExtensions {
  */
 declare module Editor.ClientExtensions {
 
+    export interface EditorFileEvent {
+        filename: string;
+        fileExt: string;
+        editor: any;
+    }
+
+    export interface CodeLoadedEvent extends EditorFileEvent {
+        code: string;
+    }
+
+    export interface CodeSavedEvent extends EditorFileEvent {
+        code: string;
+    }
+
+    /**
+     * Called once the resource has been deleted
+     * @type {String}
+     */
+    export interface DeleteResourceEvent {
+
+        // The full path to the resource to edit
+        path: string;
+
+    }
+
+    /**
+     * Called once the resource has been renamed
+     * @type {String}
+     */
+    export interface RenameResourceEvent {
+
+        /**
+         * Original path of the resource
+         * @type {string}
+         */
+        path: string;
+
+        /**
+         * New path of the resource
+         * @type {string}
+         */
+        newPath: string;
+
+        /**
+         * New base name of the resource (no path or extension)
+         * @type {string}
+         */
+        newName?: string;
+    }
+
     /**
      * Generic service locator of editor services that may be injected by either a plugin
      * or by the editor itself.
@@ -412,16 +330,16 @@ declare module Editor.ClientExtensions {
     }
 
     export interface PreferencesChangedEventData {
-        applicationPreferences? : any,
-        projectPreferences? : any
+        applicationPreferences? : any;
+        projectPreferences? : any;
     }
 
     export interface WebViewServiceEventListener extends Editor.Extensions.EditorServiceExtension {
-        configureEditor?(ev: EditorEvents.EditorFileEvent);
-        codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
-        save?(ev: EditorEvents.CodeSavedEvent);
-        delete?(ev: EditorEvents.DeleteResourceEvent);
-        rename?(ev: EditorEvents.RenameResourceEvent);
+        configureEditor?(ev: EditorFileEvent);
+        codeLoaded?(ev: CodeLoadedEvent);
+        save?(ev: CodeSavedEvent);
+        delete?(ev: DeleteResourceEvent);
+        rename?(ev: RenameResourceEvent);
         projectUnloaded?();
         formatCode?();
         preferencesChanged?(preferences: PreferencesChangedEventData);

@@ -128,15 +128,15 @@ class SerializableEditType {
 
         if (scene) {
 
-            scene.sendEvent("SceneEditEnd");
+            scene.sendEvent(Editor.SceneEditEndEventType);
 
             if (editTypeName != "Node") {
 
-                scene.sendEvent("ComponentEditEnd");
-                
+                scene.sendEvent(Editor.ComponentEditEndEventType);
+
             }
         }
-            
+
 
 
     }
@@ -153,7 +153,7 @@ class SerializableEditType {
         if (node)
             return node.scene;
 
-        return null;        
+        return null;
     }
 
     compareTypes(otherType: SerializableEditType, multiSelect:boolean = false): boolean {

@@ -23,7 +23,6 @@
 import InspectorWidget = require("./InspectorWidget");
 import ArrayEditWidget = require("./ArrayEditWidget");
 import InspectorUtils = require("./InspectorUtils");
-import EditorEvents = require("editor/EditorEvents");
 
 class ModelInspector extends InspectorWidget {
 
@@ -31,7 +30,7 @@ class ModelInspector extends InspectorWidget {
 
         super();
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 
@@ -93,13 +92,13 @@ class ModelInspector extends InspectorWidget {
         editField.text = asset.name;
 
         //This should preferably be onClick
-        editField.subscribeToEvent(editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
+        editField.subscribeToEvent(editField, Atomic.UIWidgetFocusChangedEvent((ev: Atomic.UIWidgetFocusChangedEvent) => {
 
             if (ev.widget == editField && editField.focus) {
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+                this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": asset.getRelativePath() }));
             }
 
-        });
+        }));
 
         this.scaleEdit = InspectorUtils.createAttrEditField("Scale", modelLayout);
         this.scaleEdit.text = this.importer.scale.toString();

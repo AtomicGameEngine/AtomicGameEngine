@@ -174,4 +174,20 @@ ATOMIC_EVENT(E_CUBEMAPRENDEREND, CubemapRenderEnd)
 
 }
 
+ATOMIC_EVENT(E_COMPONENTEDITEND, ComponentEditEnd)
+{
+
+}
+
+ATOMIC_EVENT(E_COLORCHOOSERCHANGED, ColorChooserChanged)
+{
+    ATOMIC_PARAM(P_WIDGET, Widget); // UIWidget
+}
+
+ATOMIC_EVENT(E_SELECTIONCREATECOMPONENT, SelectionCreateComponent)
+{
+    ATOMIC_PARAM(P_COMPONENTTYPENAME, ComponentTypeName);   // string
+}
+
+
 }

@@ -57,7 +57,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         saveButton.onClick = () => {
 
-            this.node.scene.sendEvent("SceneEditPrefabSave", {node : this.node});
+            this.node.scene.sendEvent(Editor.SceneEditPrefabSaveEventData({node : this.node}));
             return true;
         };
 
@@ -67,7 +67,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         undoButton.onClick = () => {
 
-            this.node.scene.sendEvent("SceneEditPrefabRevert", {node : this.node});
+            this.node.scene.sendEvent(Editor.SceneEditPrefabRevertEventData({node : this.node}));
             return true;
 
         };
@@ -192,7 +192,7 @@ class ConfirmPrefabBreak extends Atomic.UIWindow {
 
         this.dimmer = new Atomic.UIDimmer();
 
-        this.subscribeToEvent("WidgetEvent", (ev) => { this.handleWidgetEvent(ev); });
+        this.subscribeToEvent(Atomic.UIWidgetEvent((ev) => { this.handleWidgetEvent(ev); }));
 
     }
 
@@ -206,7 +206,7 @@ class ConfirmPrefabBreak extends Atomic.UIWindow {
 
                 this.hide();
 
-                this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
+                this.node.scene.sendEvent(Editor.SceneEditPrefabBreakEventData({node : this.node}));
 
                 return true;
             }
@@ -215,7 +215,7 @@ class ConfirmPrefabBreak extends Atomic.UIWindow {
 
                 this.hide();
 
-                this.node.scene.sendEvent("SceneEditPrefabRevert", {node : this.node});
+                this.node.scene.sendEvent(Editor.SceneEditPrefabRevertEventData({node : this.node}));
 
                 return true;
             }

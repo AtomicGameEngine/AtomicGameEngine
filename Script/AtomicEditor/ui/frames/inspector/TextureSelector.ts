@@ -75,7 +75,7 @@ class TextureSelector extends Atomic.UIWindow {
 
         this.center();
 
-        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(Atomic.UIWidgetEvent((data) => this.handleWidgetEvent(data)));
 
     }
 

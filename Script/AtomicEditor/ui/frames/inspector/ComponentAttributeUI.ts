@@ -24,7 +24,6 @@ import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import AttributeInfoEdit = require("./AttributeInfoEdit");
 import SerializableEditType = require("./SerializableEditType");
-import EditorEvents = require("editor/EditorEvents");
 
 class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
@@ -56,7 +55,7 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-                o.scene.sendEvent("SceneEditEnd");
+                o.scene.sendEvent(Editor.SceneEditEndEventType);
                 _this.refresh();
 
             }.bind({ index: index, field: field });
@@ -69,7 +68,7 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
         for (var i = 0; i < 4; i++) {
             var field = InspectorUtils.createAttrEditField("Split " + i, panel);
             field.layoutParams = flp;
-            field.subscribeToEvent(field, "UIWidgetEditComplete", createHandler(i, field));
+            field.subscribeToEvent(field, Atomic.UIWidgetEditCompleteEvent(createHandler(i, field)));
             this.splitFields.push(field);
         }
 
@@ -152,8 +151,8 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
     openResourceSelectionBox(materialIndex: number, resourceTypeName: string, importerName: string) {
 
         this.matIndex = materialIndex;
-        
-        EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function (retObject: any) {
+
+        EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, (retObject: any) => {
 
             if (retObject == null) {
                 this.editType.onAttributeInfoEdited(this.attrInfo, null, this.matIndex);
@@ -173,11 +172,11 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
             }
 
-            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": resource.name });
+            this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": resource.name }));
             this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
             this.refresh();
 
-        }.bind(this));
+        });
 
     }
 
@@ -208,7 +207,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
         };
 
         // handle dropping of component on field
-        o.editField.subscribeToEvent(o.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+        o.editField.subscribeToEvent(o.editField, Atomic.DragEndedEvent((ev: Atomic.DragEndedEvent) => {
 
             if (ev.target == o.editField) {
 
@@ -229,27 +228,27 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                 if (importer) {
 
                     var resource = asset.getResource(resourceTypeName);
-                    this.sendEvent(EditorEvents.InspectorProjectReference, { "path": resource.name });
+                    this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": resource.name }));
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
                     this.refresh();
                 }
             }
 
-        });
+        }));
 
-        o.editField.subscribeToEvent(o.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
+        o.editField.subscribeToEvent(o.editField, Atomic.UIWidgetEvent((ev: Atomic.UIWidgetEvent) => {
 
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
 
                 var pathName = materialEdit.pathReference;
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+                this.sendEvent(Editor.InspectorProjectReferenceEventData({ "path": pathName }));
 
             } else if (o.editField.text == "") {
 
                 this.openResourceSelectionBox(materialIndex, resourceTypeName, importerName);
             }
 
-        });
+        }));
     }
 
     createEditWidget() {
@@ -264,7 +263,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
         var cb = InspectorUtils.createAttrCheckBox(this.name, mainLayout);
         this.enabledCheckBox = cb.checkBox;
 
-        cb.checkBox.subscribeToEvent(cb.checkBox, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
+        cb.checkBox.subscribeToEvent(cb.checkBox, Atomic.UIWidgetEvent((ev: Atomic.UIWidgetEvent) => {
 
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CHANGED) {
 
@@ -288,7 +287,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
                 }
 
-                scene.sendEvent("SceneEditEnd");
+                scene.sendEvent(Editor.SceneEditEndEventType);
 
                 return true;
 
@@ -297,7 +296,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
             return false;
 
 
-        });
+        }));
 
 
         this.nameField = cb.textField;

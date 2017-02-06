@@ -21,7 +21,6 @@
 //
 
 import strings = require("ui/EditorStrings");
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 import ServiceLocator from "../../../hostExtensions/ServiceLocator";
@@ -39,9 +38,9 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("hierarchy create items", createItems);
         this.contextMenuItemSource = MenuItemSources.createMenuItemSource("node context general", nodeGeneralContextItems);
 
-        this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
+        this.subscribeToEvent(Editor.ContentFolderChangedEvent((ev: Editor.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
-        });
+        }));
 
     }
 
@@ -74,7 +73,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
             }
 
             if (child) {
-                child.scene.sendEvent("SceneEditNodeCreated", { node: child });
+                child.scene.sendEvent(Editor.SceneEditNodeCreatedEventData({ node: child }));
             }
 
             return true;
@@ -101,10 +100,10 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                     return;
 
                 var scene = node.scene;
-                scene.sendEvent("SceneEditAddRemoveNodes", { end: false });
-                scene.sendEvent("SceneEditNodeRemoved", { node: node, parent: node.parent, scene: scene });
+                scene.sendEvent(Editor.SceneEditAddRemoveNodesEventData({ end: false }));
+                scene.sendEvent(Editor.SceneEditNodeRemovedEventData({ node: node, parent: node.parent, scene: scene }));
                 node.remove();
-                scene.sendEvent("SceneEditAddRemoveNodes", { end: true });
+                scene.sendEvent(Editor.SceneEditAddRemoveNodesEventData({ end: true }));
 
                 editor.selection.delete();
 
@@ -116,7 +115,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                     return;
 
                 var newnode = node.clone();
-                node.scene.sendEvent("SceneEditNodeCreated", { node: newnode });
+                node.scene.sendEvent(Editor.SceneEditNodeCreatedEventData({ node: newnode }));
 
                 return true;
             }

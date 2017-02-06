@@ -165,7 +165,33 @@ static int Object_SendEvent(duk_context* ctx)
 
     if (top == 1)
     {
-        sender->SendEvent(duk_to_string(ctx, 0));
+        if (duk_is_string(ctx, 0))
+        {
+            sender->SendEvent(duk_to_string(ctx, 0));
+        } else if (duk_is_object(ctx, 0)) {
+            duk_get_prop_string(ctx, 0, "_callbackData");
+            duk_get_prop_string(ctx, 0, "_eventType");
+
+            if (!duk_is_string(ctx, -1))
+            {
+                duk_push_string(ctx, "Object.sendEvent() - Bad callback meta data");
+                duk_throw(ctx);
+            }
+
+            if (duk_is_object(ctx, -2))
+            {
+                VariantMap sendEventVMap;
+                js_object_to_variantmap(ctx, -2, sendEventVMap);
+
+                sender->SendEvent(duk_to_string(ctx, -1), sendEventVMap);
+            } else {
+                sender->SendEvent(duk_to_string(ctx, -1));
+            }
+        } else {
+            duk_push_string(ctx, "Object.sendEvent() - Bad callback meta data");
+            duk_throw(ctx);
+        }
+
     }
     else if (top == 2)
     {

@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import UIEvents = require("../UIEvents");
 import EditorUI = require("../EditorUI");
 
 export class MessageModal extends Atomic.ScriptObject {
@@ -37,15 +36,15 @@ export class MessageModal extends Atomic.ScriptObject {
 
     super();
 
-    this.subscribeToEvent(UIEvents.MessageModalEvent, (data) => {
+    this.subscribeToEvent(Editor.EditorModalEvent((data) => {
 
-      if (data.type == "error") {
+      if (data.type == Editor.EDITOR_MODALERROR) {
 
         this.showErrorWindow(data.title, data.message);
 
       }
 
-    });
+    }));
 
   }
 

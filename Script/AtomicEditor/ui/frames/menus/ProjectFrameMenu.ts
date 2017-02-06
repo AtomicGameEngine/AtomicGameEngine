@@ -21,7 +21,6 @@
 //
 
 import strings = require("ui/EditorStrings");
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 import ServiceLocator from "../../../hostExtensions/ServiceLocator";
@@ -40,9 +39,9 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
         this.contextMenuItemSource = MenuItemSources.createMenuItemSource("asset context general", assetGeneralContextItems);
         MenuItemSources.createMenuItemSource("project create items", createItems);
 
-        this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
+        this.subscribeToEvent(Editor.ContentFolderChangedEvent((ev: Editor.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
-        });
+        }));
 
     }
 

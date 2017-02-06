@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
 import Preferences = require("editor/Preferences");
+import * as EditorEvents from "../editor/EditorEvents";
 
 class Shortcuts extends Atomic.ScriptObject {
 
@@ -30,9 +30,9 @@ class Shortcuts extends Atomic.ScriptObject {
 
         super();
 
-        this.subscribeToEvent(Atomic.UIShortcutEvent ( (ev) => this.handleUIShortcut(ev)));
+        this.subscribeToEvent(Atomic.UIShortcutEvent((ev) => this.handleUIShortcut(ev)));
 
-        this.subscribeToEvent(Atomic.KeyDownEvent( (ev) => this.handleKeyDown(ev)));
+        this.subscribeToEvent(Atomic.KeyDownEvent((ev) => this.handleKeyDown(ev)));
 
 
     }
@@ -40,10 +40,10 @@ class Shortcuts extends Atomic.ScriptObject {
     //this should be moved somewhere else...
     invokePlayOrStopPlayer(debug: boolean = false) {
 
-        this.sendEvent(EditorEvents.SaveAllResources);
+        this.sendEvent(Editor.EditorSaveAllResourcesEventType);
 
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerExitRequest");
+            this.sendEvent(EditorEvents.IPCPlayerExitRequestEventType);
         } else {
 
             var playerWindow = Preferences.getInstance().playerWindow;
@@ -92,13 +92,13 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokePauseOrResumePlayer() {
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerPauseResumeRequest");
+            this.sendEvent(EditorEvents.IPCPlayerPauseResumeRequestEventType);
         }
     }
 
     invokeStepPausedPlayer() {
         if (Atomic.editorMode.isPlayerEnabled()) {
-            this.sendEvent("IPCPlayerPauseStepRequest");
+            this.sendEvent(EditorEvents.IPCPlayerPauseStepRequestEventType);
         }
     }
 
@@ -119,7 +119,7 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     invokeFileSave() {
-        this.sendEvent(EditorEvents.SaveResource);
+        this.sendEvent(Editor.EditorSaveResourceEventType);
     }
 
     invokeUndo() {
@@ -153,7 +153,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokeGizmoEditModeChanged(mode: Editor.EditMode) {
 
-        this.sendEvent("GizmoEditModeChanged", { mode: mode });
+        this.sendEvent(Editor.GizmoEditModeChangedEventData({ mode: mode }));
 
     }
 
@@ -162,7 +162,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         if (editor && editor instanceof Editor.SceneEditor3D) {
             var mode = editor.getGizmo().axisMode ? Editor.AxisMode.AXIS_WORLD : Editor.AxisMode.AXIS_LOCAL;
-            this.sendEvent("GizmoAxisModeChanged", { mode: mode });
+            this.sendEvent(Editor.GizmoAxisModeChangedEventData({ mode: mode }));
         }
     }
 

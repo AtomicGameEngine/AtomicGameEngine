@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
@@ -90,13 +89,13 @@ export class BuildSettingsWindow extends ModalWindow {
         this.resizeToFitContent();
         this.center();
 
-        this.subscribeToEvent("PlatformChanged", (ev: ToolCore.PlatformChangedEvent) => {
+        this.subscribeToEvent(ToolCore.PlatformChangedEvent((ev: ToolCore.PlatformChangedEvent) => {
 
             this.platformIndicator.skinBg = this.platformInfo[ev.platform.name].logo;
 
-        });
+        }));
 
-        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
+        this.subscribeToEvent(this, Atomic.UIWidgetEvent((ev) => this.handleWidgetEvent(ev)));
     }
 
     commitBuildSettings() {
