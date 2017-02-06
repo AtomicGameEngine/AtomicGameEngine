@@ -165,6 +165,7 @@ ATOMIC_EVENT(E_EDITORSAVERESOURCENOTIFICATION, EditorSaveResourceNotification)
 ATOMIC_EVENT(E_EDITOREDITRESOURCE, EditorEditResource)
 {
     ATOMIC_PARAM(P_PATH, Path);     // string
+    ATOMIC_PARAM(P_LINENUMBER, LineNumber); // int optional
 }
 
 // command to delete a resource

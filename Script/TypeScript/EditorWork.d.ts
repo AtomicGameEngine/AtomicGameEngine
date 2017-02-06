@@ -119,10 +119,12 @@ declare module Editor.Extensions {
         canHandleResource(resourcePath: string) : boolean;
         /**
          * Generates a resource editor for the provided resource type
+         * @param  resourceFrame 
          * @param  resourcePath
          * @param  tabContainer
+         * @param  lineNumber
          */
-        getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor;
+        getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer, lineNumber: number) : Editor.ResourceEditor;
     }
 }
 
@@ -264,9 +266,11 @@ declare module Editor.HostExtensions {
         
         /**
          * Will load a resource editor or navigate to an already loaded resource editor by path
+         * @param path The path to the resource to load
+         * @param lineNumber optional line number to navigate to
          * @return {Editor.ResourceEditor}
          */
-        loadResourceEditor(path: string): Editor.ResourceEditor;
+        loadResourceEditor(path: string, lineNumber?: number): Editor.ResourceEditor;
 
         /**
          * Register a custom editor.  These editors will override editors in the standard editor list if

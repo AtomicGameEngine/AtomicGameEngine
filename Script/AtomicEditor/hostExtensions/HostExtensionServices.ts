@@ -392,10 +392,12 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
 
     /**
      * Will load a resource editor or navigate to an already loaded resource editor by path
+     * @param resourcePath full path to resource to load 
+     * @param lineNumber optional line number to navigate to
      * @return {Editor.ResourceEditor}
      */
-    loadResourceEditor(resourcePath: string): Editor.ResourceEditor {
-        this.mainFrame.resourceframe.sendEvent(Editor.EditorEditResourceEventData({path: resourcePath}));
+    loadResourceEditor(resourcePath: string, lineNumber?: number): Editor.ResourceEditor {
+        this.mainFrame.resourceframe.sendEvent(Editor.EditorEditResourceEventData({path: resourcePath, lineNumber: lineNumber}));
         return this.mainFrame.resourceframe.currentResourceEditor;
     }
 

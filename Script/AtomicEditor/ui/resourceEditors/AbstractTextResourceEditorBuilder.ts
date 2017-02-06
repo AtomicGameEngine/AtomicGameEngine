@@ -42,7 +42,7 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/MonacoEditor.html`;
     }
 
-    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {
+    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer, lineNumber: number): Editor.ResourceEditor {
         const editor = new Editor.JSResourceEditor(resourcePath, tabContainer, this.getEditorUrl());
 
         // one time subscriptions waiting for the web view to finish loading.  This event
@@ -51,6 +51,9 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         editor.subscribeToEvent(WebView.WebViewLoadEndEvent((data) => {
             editor.unsubscribeFromEvent(WebView.WebViewLoadEndEventType);
             this.loadCode(<Editor.JSResourceEditor>editor, resourcePath);
+            if (lineNumber > 0) {
+                (<Editor.JSResourceEditor>editor).gotoLineNumber(lineNumber);
+            }
         }));
 
         // Cannot subscribe to WebMessage until the .ts side can return a Handler.Success() message

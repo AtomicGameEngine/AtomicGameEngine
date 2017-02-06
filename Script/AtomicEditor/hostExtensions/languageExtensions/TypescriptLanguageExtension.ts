@@ -479,7 +479,6 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             `Compilation Completed in ${results.duration}ms`
         ].join("\n");
 
-        //let window = this.serviceRegistry.uiServices.showModalError("TypeScript Compilation Results", message);
         let window = this.serviceRegistry.uiServices.showNonModalWindow("TypeScript Compilation Results", "AtomicEditor/editor/ui/typescriptresults.tb.txt", (ev:Atomic.UIWidgetEvent) => {
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
                 if (ev.target.id == "close") {
@@ -487,10 +486,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 } else {
                     let diag = links[ev.target.id];
                     if (diag) {
-                        const editor = this.serviceRegistry.uiServices.loadResourceEditor(diag.file) as Editor.JSResourceEditor;
-
-                        // TODO: need something here to wait for editor to fully load
-                        editor.gotoLineNumber(diag.row + 1);
+                        this.serviceRegistry.uiServices.loadResourceEditor(diag.file, diag.row + 1);
                     }
                 }
             }
@@ -499,20 +495,5 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         let textField = window.getWidget<Atomic.UIEditField>("msg");
         textField.setText(message);
         textField.reformat(true);
-
-        /*
-        window.subscribeToEvent(Atomic.UIWidgetEvent(ev => {
-            if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
-                let diag = links[ev.target.id];
-                if (diag) {
-                    const editor = this.serviceRegistry.uiServices.loadResourceEditor(diag.file) as Editor.JSResourceEditor;
-
-                    // TODO: need something here to wait for editor to fully load
-                    editor.gotoLineNumber(diag.row + 1);
-                }
-            }
-        }));
-        */
-
     }
 }

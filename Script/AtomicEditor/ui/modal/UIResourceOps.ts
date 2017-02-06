@@ -186,7 +186,7 @@ export class CreateComponent extends ModalWindow {
 
                         this.hide();
 
-                        this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
+                        this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile, lineNumber: 0 }));
 
                     }
 
@@ -272,7 +272,7 @@ export class CreateScript extends ModalWindow {
 
                         this.hide();
 
-                        this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
+                        this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile, lineNumber: 0 }));
 
                     }
 
@@ -330,7 +330,7 @@ export class CreateScene extends ModalWindow {
 
                     this.hide();
 
-                    this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
+                    this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile, lineNumber: 0 }));
 
                 }
 
@@ -382,7 +382,7 @@ export class CreateMaterial extends ModalWindow {
 
                     this.hide();
 
-                    this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile }));
+                    this.sendEvent(Editor.EditorEditResourceEventData({ path: outputFile, lineNumber: 0 }));
 
                 }
 

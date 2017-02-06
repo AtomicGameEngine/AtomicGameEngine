@@ -259,7 +259,7 @@ class ProjectFrame extends ScriptWidget {
 
                     } else {
 
-                        this.sendEvent(Editor.EditorEditResourceEventData({ "path": asset.path }));
+                        this.sendEvent(Editor.EditorEditResourceEventData({ "path": asset.path, lineNumber: 0 }));
                     }
 
                 }
