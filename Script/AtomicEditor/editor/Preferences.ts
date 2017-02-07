@@ -149,6 +149,26 @@ class Preferences {
         this.write();
     }
 
+    saveEditorUiData(uiData: UserInterfaceData) {
+        this._prefs.uiData = uiData;
+        this.write();
+    }
+
+    toggleTheme() : void { // swap the themes
+        var uiData = this.uiData;
+        if ( this.uiData.defaultSkinPath == "AtomicEditor/resources/default_skin/" ) {
+            this.uiData.defaultSkinPath = "AtomicEditor/resources/default_skin_light/";
+            this.uiData.skinPath = "AtomicEditor/editor/skin_light/";
+        }
+        else {
+            this.uiData.defaultSkinPath = "AtomicEditor/resources/default_skin/";
+            this.uiData.skinPath = "AtomicEditor/editor/skin/";
+        }
+        var ui = Atomic.ui; // install the new skins, live action
+        ui.loadSkin(this.uiData.skinPath + "/skin.tb.txt", this.uiData.defaultSkinPath + "/skin.tb.txt");
+        this.saveEditorUiData(this.uiData); // save preferences
+    }
+
     useDefaultConfig(): void {
         this._prefs = new PreferencesFormat();
     }

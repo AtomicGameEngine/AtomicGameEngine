@@ -220,6 +220,20 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
         } else if (target.id == "menu developer popup") {
 
+            if (refid == "toggle theme") {
+                Preferences.getInstance().toggleTheme();
+                return true;
+            }
+
+            if (refid == "toggle codeeditor") {
+                var ctheme = EditorUI.getEditor().getApplicationPreference( "codeEditor","theme", "");
+                if ( ctheme == "vs-dark" )
+                    EditorUI.getEditor().setApplicationPreference( "codeEditor","theme","vs");
+                else
+                    EditorUI.getEditor().setApplicationPreference( "codeEditor","theme","vs-dark");
+                return true;
+            }
+
             if (refid == "developer show console") {
                 Atomic.ui.showConsole(true);
                 return true;
@@ -393,6 +407,8 @@ var buildItems = {
 
 var developerItems = {
 
+    "Toggle Theme": ["toggle theme"],
+    "Toggle Code Editor Theme": ["toggle codeeditor"],
     "Show Console": ["developer show console"],
     "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {
