@@ -21,7 +21,6 @@
 //
 
 import strings = require("../../EditorStrings");
-import EditorEvents = require("../../../editor/EditorEvents");
 import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 import Preferences = require("editor/Preferences");
@@ -140,7 +139,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu file popup") {
             if (refid == "quit") {
 
-                this.sendEvent("ExitRequested");
+                this.sendEvent(Atomic.ExitRequestedEventType);
                 return true;
 
             }
@@ -171,18 +170,18 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 }
 
-                var requestProjectLoad = () => this.sendEvent(EditorEvents.RequestProjectLoad, { path: path });
+                var requestProjectLoad = () => this.sendEvent(Editor.RequestProjectLoadEventData({ path: path }));
 
                 if (ToolCore.toolSystem.project) {
 
-                    this.subscribeToEvent(EditorEvents.ProjectClosed, () => {
+                    this.subscribeToEvent(Editor.EditorProjectClosedEvent(() => {
 
-                        this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
+                        this.unsubscribeFromEvent(Editor.EditorProjectClosedEventType);
                         requestProjectLoad();
 
-                    });
+                    }));
 
-                    this.sendEvent(EditorEvents.CloseProject);
+                    this.sendEvent(Editor.EditorCloseProjectEventType);
 
                 } else {
 
@@ -196,7 +195,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "file close project") {
 
-                this.sendEvent(EditorEvents.CloseProject);
+                this.sendEvent(Editor.EditorCloseProjectEventType);
 
                 return true;
 
@@ -213,7 +212,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "file save all") {
-                this.sendEvent(EditorEvents.SaveAllResources);
+                this.sendEvent(Editor.EditorSaveAllResourcesEventType);
                 return true;
             }
 
@@ -408,8 +407,6 @@ var buildItems = {
 
 var developerItems = {
 
-    "Toggle Theme": ["toggle theme"],
-    "Toggle Code Editor theme": ["toggle codeeditor"],
     "Show Console": ["developer show console"],
     "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {
