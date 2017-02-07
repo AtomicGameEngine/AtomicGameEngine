@@ -391,6 +391,17 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
     }
 
     /**
+     * Will load a resource editor or navigate to an already loaded resource editor by path
+     * @param resourcePath full path to resource to load 
+     * @param lineNumber optional line number to navigate to
+     * @return {Editor.ResourceEditor}
+     */
+    loadResourceEditor(resourcePath: string, lineNumber?: number): Editor.ResourceEditor {
+        this.mainFrame.resourceframe.sendEvent(Editor.EditorEditResourceEventData({path: resourcePath, lineNumber: lineNumber}));
+        return this.mainFrame.resourceframe.currentResourceEditor;
+    }
+
+    /**
      * Adds a new menu to the hierarchy context menu
      * @param  {string} id
      * @param  {any} items
@@ -442,12 +453,21 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
             this.inspectorFrame.loadCustomInspectorWidget(customInspector);
         }
     }
+
     /**
      * Disaplays a modal window
      * @param  {Editor.Modal.ModalWindow} window
      */
     showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
-        return this.modalOps.showExtensionWindow(windowText, uifilename, handleWidgetEventCB);
+        return this.modalOps.showExtensionWindow(windowText, uifilename, handleWidgetEventCB, true);
+    }
+
+    /**
+     * Disaplays a modal window
+     * @param  {Editor.Modal.ModalWindow} window
+     */
+    showNonModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
+        return this.modalOps.showExtensionWindow(windowText, uifilename, handleWidgetEventCB, false);
     }
 
     /**
@@ -455,7 +475,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @param  {string} windowText
      * @param  {string} message
      */
-    showModalError(windowText: string, message: string) {
+    showModalError(windowText: string, message: string): Atomic.UIMessageWindow {
         return this.modalOps.showError(windowText, message);
     }
 

@@ -94,7 +94,7 @@ class ResourceFrame extends ScriptWidget {
 
         }
 
-        var editor = this.resourceEditorProvider.getEditor(ev.path, this.tabcontainer);
+        var editor = this.resourceEditorProvider.getEditor(ev.path, this.tabcontainer, ev.lineNumber);
         if (editor) {
 
             // cast and add editor lookup on widget itself

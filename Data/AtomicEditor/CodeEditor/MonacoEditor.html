@@ -118,6 +118,18 @@
                 interop.getInstance().formatCode();
             });
         }
+
+        function HOST_gotoLineNumber(lineNumber) {
+            setupEditor.then((interop) => {
+                interop.getInstance().gotoLineNumber(lineNumber);
+            });
+        }
+
+        function HOST_gotoTokenPos(tokenPosition) {
+            setupEditor.then((interop) => {
+                interop.getInstance().gotoPos(tokenPosition);
+            });
+        }
     </script>
 
 </body>

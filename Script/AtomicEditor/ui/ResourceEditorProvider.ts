@@ -69,7 +69,7 @@ export default class ResourceEditorProvider {
     /**
      * Returns an editor for the provided resource type or null
      */
-    getEditor(resourcePath: string, tabContainer) {
+    getEditor(resourcePath: string, tabContainer, lineNumber: number) {
         let editorBuilder: Editor.Extensions.ResourceEditorBuilder;
         this.customEditorRegistry.forEach((builder) => {
             if (builder.canHandleResource(resourcePath)) {
@@ -88,7 +88,7 @@ export default class ResourceEditorProvider {
         }
 
         if (editorBuilder) {
-            return editorBuilder.getEditor(this.resourceFrame, resourcePath, tabContainer);
+            return editorBuilder.getEditor(this.resourceFrame, resourcePath, tabContainer, lineNumber);
         } else {
             return null;
         }

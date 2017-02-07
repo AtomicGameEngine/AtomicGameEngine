@@ -441,6 +441,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     }) {
         // get the name of the resources directory without preceding path
         let resourceDir = ToolCore.toolSystem.project.resourcePath.replace(Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath), "");
+        let links = {};
+        let linkId = 0;
+
         let messageArray = results.annotations.filter(result => {
             // If we are compiling the lib.d.ts or some other built-in library and it was successful, then
             // we really don't need to display that result since it's just noise.  Only display it if it fails
@@ -456,7 +459,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             if (result.type == "success") {
                 message += `<color #00ff00>${result.text}</color>`;
             } else {
-                message += `<color #e3e02b>${result.text} at line ${result.row} col ${result.column}</color>`;
+                message += `<color #e3e02b>${result.text} at line ${result.row + 1} col ${result.column}</color> <widget TBSkinImage: skin: MagnifierBitmap, text:"..." id: link${linkId}>`;
+                links["link" + linkId] = result;
+                linkId++;
             }
             return message;
         }).join("\n");
@@ -474,6 +479,21 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             `Compilation Completed in ${results.duration}ms`
         ].join("\n");
 
-        this.serviceRegistry.uiServices.showModalError("TypeScript Compilation Results", message);
+        let window = this.serviceRegistry.uiServices.showNonModalWindow("TypeScript Compilation Results", "AtomicEditor/editor/ui/typescriptresults.tb.txt", (ev:Atomic.UIWidgetEvent) => {
+            if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
+                if (ev.target.id == "close") {
+                  window.close();
+                } else {
+                    let diag = links[ev.target.id];
+                    if (diag) {
+                        this.serviceRegistry.uiServices.loadResourceEditor(diag.file, diag.row + 1);
+                    }
+                }
+            }
+        });
+
+        let textField = window.getWidget<Atomic.UIEditField>("msg");
+        textField.setText(message);
+        textField.reformat(true);
     }
 }
