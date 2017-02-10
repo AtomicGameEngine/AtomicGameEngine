@@ -27,6 +27,9 @@ import ResourceOps = require("resources/ResourceOps");
 
 class AnimationToolbar extends Atomic.UIWidget {
 
+    updateDelta: number = 0.0;
+    updateYaw: number = 0.0;
+
     constructor(parent: Atomic.UIWidget, properties: Atomic.UIWidget, asset: ToolCore.Asset) {
 
         super();
@@ -67,14 +70,47 @@ class AnimationToolbar extends Atomic.UIWidget {
         this.blendSpeed = InspectorUtils.createAttrEditField("Blend Speed:", this.animationPropertiesContainer);
         this.blendSpeed.setAdaptToContentSize(true);
 
+        var attrLayout = new Atomic.UILayout();
+        attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE.UI_LAYOUT_SIZE_AVAILABLE;
+        attrLayout.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_LEFT_RIGHT;
+        attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        var nameField = new Atomic.UITextField();
+        nameField.textAlign = Atomic.UI_TEXT_ALIGN.UI_TEXT_ALIGN_RIGHT;
+        nameField.skinBg = "InspectorTextAttrName";
+        nameField.text = "Spin Speed:";
+        attrLayout.addChild(nameField);
+        this.rotateModel = new Atomic.UISlider();
+        this.rotateModel.setLimits(0, 10);
+        this.rotateModel.setValue(0);
+        attrLayout.addChild(this.rotateModel);
+        this.animationPropertiesContainer.addChild( attrLayout );
+
         //Set default values
         this.animationSpeed.setText("1");
         this.blendSpeed.setText("0");
 
         properties.addChild(this.animationPropertiesContainer);
 
+        this.subscribeToEvent(Atomic.UpdateEvent((ev) => this.handleUpdate(ev))); // if we want the model to rotate
+
     }
 
+    handleUpdate(ev) {
+    
+        var rotspeed = this.rotateModel.value;
+        if (rotspeed > 0) {                  // only do work if the spinning is turned on
+            this.updateDelta += ev.timeStep; // add some time to the clock
+            if (this.updateDelta > (0.134 * (10-rotspeed))) {  //see if we have reached our limit
+                this.updateDelta = 0.0;      // reset the limit
+                this.updateYaw += 2.1;       // increase the yaw
+                if (this.updateYaw > 26.3)   // clamp the yaw
+                    this.updateYaw = 0;
+                this.modelNode.yaw(this.updateYaw); // and rotate the model.
+            }
+
+        }
+    }
+    
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
         if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
@@ -216,6 +252,7 @@ class AnimationToolbar extends Atomic.UIWidget {
     animationPropertiesContainer: Atomic.UILayout;
     animationSpeed: Atomic.UIEditField;
     blendSpeed: Atomic.UIEditField;
+    rotateModel: Atomic.UISlider;
 }
 
 export = AnimationToolbar;
