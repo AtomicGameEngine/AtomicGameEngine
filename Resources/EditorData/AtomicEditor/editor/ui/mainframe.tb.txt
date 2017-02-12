@@ -66,5 +66,5 @@ TBLayout: distribution: gravity, axis: y
                             TBLayout: axis: y, position: left, gravity: top left
                                 TBSkinImage: skin: LogoAtomic64, id: current_platform_indicator
                                     lp: height: 28, width:28
-                        TBLayout: gravity: left right
-                            TBWidget
+                        TBLayout: gravity: left right, distribution: available, size: available
+                            TBEditField: id: editorStatusText, text: "", is-focusable: 0, skin: 0, readonly: 1, adapt-to-content: 0
