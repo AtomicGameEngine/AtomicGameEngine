@@ -68,6 +68,10 @@ export function showModalError(windowText:string, message:string) {
   editorUI.showModalError(windowText, message);
 }
 
+export function showEditorStatus(message:string) {
+    editorUI.showEditorStatus(message);
+}
+
 export function getCurrentResourceEditor():Editor.ResourceEditor {
     return getMainFrame().resourceframe.currentResourceEditor;
 }
@@ -107,13 +111,22 @@ class EditorUI extends Atomic.ScriptObject {
     ServiceLocator.subscribeToEvents(this.mainframe);
 
     this.subscribeToEvent(Editor.EditorModalEvent((event:Editor.EditorModalEvent) => {
-      this.showModalError(event.title, event.message);
+        if (event.type == Editor.EDITOR_MODALERROR)
+            this.showModalError(event.title, event.message);
+        else if ( event.type == Editor.EDITOR_MODALINFO)
+            this.showEditorStatus(event.message);
     }));
+
+    this.showEditorStatus("Ready.");
 
   }
 
   showModalError(windowText: string, message: string) {
       this.modalOps.showError(windowText, message);
+  }
+
+  showEditorStatus(message: string) {
+      this.mainframe.showStatusText(message);
   }
 
   view: Atomic.UIView;
