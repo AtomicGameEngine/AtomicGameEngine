@@ -558,13 +558,31 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         {
             tooltip_ = new UIPopupWindow(context_, true, hoveredWidget, "tooltip");
             UILayout* tooltipLayout = new UILayout(context_, UI_AXIS_Y, true);
-            if (hoveredWidget->GetShortened())
+            if (hoveredWidget->GetTooltip().Length() > 0 && hoveredWidget->GetTooltip().At(0) == '#' )
+            {
+                tooltipLayout->SetLayoutSize( UI_LAYOUT_SIZE_PREFERRED );
+                tooltipLayout->SetLayoutPosition(UI_LAYOUT_POSITION_CENTER); 
+                tooltipLayout->SetLayoutDistribution(UI_LAYOUT_DISTRIBUTION_PREFERRED ); 
+                tooltipLayout->SetLayoutDistributionPosition( UI_LAYOUT_DISTRIBUTION_POSITION_CENTER); 
+                UIImageWidget* img = new UIImageWidget(context_, true);
+                img->SetWidth(256);
+                img->SetHeight(256);
+                tooltipLayout->AddChild(img);
+                img->SetLayoutWidth(256);
+                img->SetLayoutHeight(256);
+                img->SetLayoutPrefWidth(256);
+                img->SetLayoutPrefHeight(256);
+                String myfile = hoveredWidget->GetTooltip();
+                myfile.Replace( "#", "" );
+                img->SetImage(myfile);
+            }
+            else if (hoveredWidget->GetShortened())
             {
                 UITextField* fullTextField = new UITextField(context_, true);
                 fullTextField->SetText(hoveredWidget->GetText());
                 tooltipLayout->AddChild(fullTextField);
             }
-            if (hoveredWidget->GetTooltip().Length() > 0)
+            else if (hoveredWidget->GetTooltip().Length() > 0)
             {
                 UITextField* tooltipTextField = new UITextField(context_, true);
                 tooltipTextField->SetText(hoveredWidget->GetTooltip());
