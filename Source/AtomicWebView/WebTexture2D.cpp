@@ -50,12 +50,6 @@ public:
 
     WebTexture2DPrivate(WebTexture2D* webTexture2D)
     {
-
-#ifdef ATOMIC_D3D11
-        stagingTexture_ = 0;
-        stagingWidth_ = 0;
-        stagingHeight_ = 0;
-#endif
         webTexture2D_ = webTexture2D;
         graphics_ = webTexture2D->GetSubsystem<Graphics>();
         ClearPopupRects();
@@ -218,56 +212,6 @@ public:
 
     // Windows D3D blitting
 
-#ifdef ATOMIC_D3D11
-
-    void ReleaseStagingTexture()
-    {
-        if (stagingTexture_)
-        {
-            stagingTexture_->Release();
-        }
-
-        stagingTexture_ = 0;
-        stagingWidth_ = 0;
-        stagingHeight_ = 0;
-    }
-
-    void UpdateStagingTexture()
-    {
-        if (stagingTexture_)
-        {
-            ReleaseStagingTexture();
-        }
-
-        D3D11_TEXTURE2D_DESC textureDesc;
-        memset(&textureDesc, 0, sizeof textureDesc);
-
-        textureDesc.Width = (UINT)webTexture2D_->GetWidth();
-        textureDesc.Height = (UINT)webTexture2D_->GetHeight();
-        textureDesc.MipLevels = 1;
-        textureDesc.ArraySize = 1;
-        textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        textureDesc.SampleDesc.Count = 1;
-        textureDesc.SampleDesc.Quality = 0;
-        textureDesc.Usage = D3D11_USAGE_DEFAULT;
-
-        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, nullptr, &stagingTexture_);
-
-        if (!SUCCEEDED(hr))
-        {
-            stagingTexture_ = 0;
-            return;
-        }
-
-        stagingWidth_ = webTexture2D_->GetWidth();
-        stagingHeight_ = webTexture2D_->GetHeight();
-
-    }
-
-
-#endif
-
-
     void D3DBlit(const IntRect& dstRect, unsigned char* src, unsigned srcStride, bool discard = false)
     {
 
@@ -278,10 +222,8 @@ public:
             return;
         }
 
-        if (!stagingTexture_ || (stagingWidth_ != webTexture2D_->GetWidth()) || (stagingHeight_ != webTexture2D_->GetHeight()))        
-        {
+        if ((dstRect.left_ + dstRect.Width() > webTexture2D_->GetWidth()) || (dstRect.top_ + dstRect.Height() > webTexture2D_->GetHeight()))
             return;
-        }
                 
         D3D11_BOX box;
         box.left = dstRect.left_;
@@ -291,13 +233,7 @@ public:
         box.front = 0;
         box.back = 1;
 
-        if ((dstRect.left_ + dstRect.Width() > stagingWidth_) || (dstRect.top_ + dstRect.Height() > stagingHeight_))
-            return;
-
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource(stagingTexture_, 0, &box, src, srcStride, 0);
-
-        graphics_->GetImpl()->GetDeviceContext()->CopyResource((ID3D11Resource*)webTexture2D_->GetTexture2D()->GetGPUObject(), stagingTexture_);            
-
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)webTexture2D_->GetTexture2D()->GetGPUObject(), 0, &box, src, srcStride, 0);
 
 #else
         RECT d3dRect;
@@ -399,12 +335,6 @@ public:
 
 private:
 
-#ifdef ATOMIC_D3D11
-    ID3D11Texture2D* stagingTexture_;
-    int stagingWidth_;
-    int stagingHeight_;
-#endif
-
     CefRect popupRect_;
     CefRect popupRectOriginal_;
 
@@ -427,10 +357,6 @@ WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context), clearC
 WebTexture2D::~WebTexture2D()
 {
     //d_->Release();
-
-#ifdef ATOMIC_D3D11
-    d_->ReleaseStagingTexture();
-#endif
 }
 
 CefRenderHandler* WebTexture2D::GetCEFRenderHandler()
@@ -461,16 +387,15 @@ void WebTexture2D::SetSize(int width, int height)
         ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
         return;
     }
+
 #else
     
+    // D3D11 uses a static texture (in BGRA format), required for subresource update with rectangle
     if (!texture_->SetSize(width, height, DXGI_FORMAT_B8G8R8A8_UNORM, TEXTURE_STATIC))
     {
         ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
         return;
     }
-
-    d_->UpdateStagingTexture();
-
 
 #endif
 
