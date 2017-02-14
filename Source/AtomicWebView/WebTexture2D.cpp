@@ -381,24 +381,23 @@ void WebTexture2D::SetSize(int width, int height)
 
     // initialize to white (color should probably be an option)
 
-#ifndef ATOMIC_D3D11
-    if (!texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC))
-    {
-        ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
-        return;
-    }
+    TextureUsage textureUsage = TEXTURE_DYNAMIC;
+    unsigned format = Graphics::GetRGBAFormat();
 
-#else
-    
+#ifdef ATOMIC_D3D11
+
     // D3D11 uses a static texture (in BGRA format), required for subresource update with rectangle
-    if (!texture_->SetSize(width, height, DXGI_FORMAT_B8G8R8A8_UNORM, TEXTURE_STATIC))
-    {
-        ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
-        return;
-    }
+    textureUsage = TEXTURE_STATIC;
+    format = DXGI_FORMAT_B8G8R8A8_UNORM;
 
 #endif
 
+    if (!texture_->SetSize(width, height, format, textureUsage))
+    {
+        ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
+        return;
+    }
+    
     SharedArrayPtr<unsigned> cleardata(new unsigned[width * height]);
     unsigned color = clearColor_.ToUInt();
     unsigned* ptr = cleardata.Get();
