@@ -51,6 +51,7 @@ public:
     WebTexture2DPrivate(WebTexture2D* webTexture2D)
     {
         webTexture2D_ = webTexture2D;
+        graphics_ = webTexture2D->GetSubsystem<Graphics>();
         ClearPopupRects();
     }
 
@@ -207,11 +208,34 @@ public:
     }
 #else
 
-    void D3D9Blit(const IntRect& dstRect, unsigned char* src, unsigned srcStride, bool discard = false)
-    {
-#ifndef ATOMIC_D3D11
 #ifndef ATOMIC_OPENGL
 
+    // Windows D3D blitting
+
+    void D3DBlit(const IntRect& dstRect, unsigned char* src, unsigned srcStride, bool discard = false)
+    {
+
+#ifdef ATOMIC_D3D11
+
+        if (!webTexture2D_ || !webTexture2D_->GetWidth() || !webTexture2D_->GetHeight() || !dstRect.Width() || !dstRect.Height())
+        {
+            return;
+        }
+
+        if ((dstRect.left_ + dstRect.Width() > webTexture2D_->GetWidth()) || (dstRect.top_ + dstRect.Height() > webTexture2D_->GetHeight()))
+            return;
+                
+        D3D11_BOX box;
+        box.left = dstRect.left_;
+        box.right = dstRect.right_;
+        box.top = dstRect.top_;
+        box.bottom = dstRect.bottom_;
+        box.front = 0;
+        box.back = 1;
+
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)webTexture2D_->GetTexture2D()->GetGPUObject(), 0, &box, src, srcStride, 0);
+
+#else
         RECT d3dRect;
 
         d3dRect.left = dstRect.left_;
@@ -243,21 +267,19 @@ public:
 
         object->UnlockRect(level);
 #endif
-#endif
+
     }
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
-#ifndef ATOMIC_D3D11
-#ifndef ATOMIC_OPENGL
 
         if (type == PET_VIEW)
         {
             if (dirtyRects.size() == 1 &&
                     dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
             {
-                D3D9Blit(IntRect(0, 0, width, height), (unsigned char*) buffer, width * 4, true);
+                D3DBlit(IntRect(0, 0, width, height), (unsigned char*) buffer, width * 4, true);
                 return;
             }
 
@@ -269,7 +291,7 @@ public:
                 const CefRect& rect = *i;
                 unsigned char* src = (unsigned char*) buffer;
                 src += rect.y * (width * 4) + (rect.x * 4);
-                D3D9Blit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
+                D3DBlit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
             }
 
         }
@@ -301,11 +323,10 @@ public:
             }
 
             unsigned char* src = (unsigned char*) buffer;
-            D3D9Blit(IntRect(x, y, x + w, y + h), src, width * 4, false);
+            D3DBlit(IntRect(x, y, x + w, y + h), src, width * 4, false);
 
         }
 
-#endif
 #endif
 
     }
@@ -317,6 +338,7 @@ private:
     CefRect popupRect_;
     CefRect popupRectOriginal_;
 
+    WeakPtr<Graphics> graphics_;
     WeakPtr<WebTexture2D> webTexture2D_;
 
 };
@@ -358,22 +380,33 @@ void WebTexture2D::SetSize(int width, int height)
         return;
 
     // initialize to white (color should probably be an option)
-    if (texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC))
-    {
-        SharedArrayPtr<unsigned> cleardata(new unsigned[width * height]);
-        unsigned color = clearColor_.ToUInt();
-        unsigned* ptr = cleardata.Get();
-        for (unsigned i = 0; i < width * height; i++, ptr++)
-        {
-            *ptr = color;
-        }
 
-        texture_->SetData(0, 0, 0, width, height, cleardata.Get());
-    }
-    else
+    TextureUsage textureUsage = TEXTURE_DYNAMIC;
+    unsigned format = Graphics::GetRGBAFormat();
+
+#ifdef ATOMIC_D3D11
+
+    // D3D11 uses a static texture (in BGRA format), required for subresource update with rectangle
+    textureUsage = TEXTURE_STATIC;
+    format = DXGI_FORMAT_B8G8R8A8_UNORM;
+
+#endif
+
+    if (!texture_->SetSize(width, height, format, textureUsage))
     {
         ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
+        return;
     }
+    
+    SharedArrayPtr<unsigned> cleardata(new unsigned[width * height]);
+    unsigned color = clearColor_.ToUInt();
+    unsigned* ptr = cleardata.Get();
+    for (unsigned i = 0; i < width * height; i++, ptr++)
+    {
+        *ptr = color;
+    }
+
+    texture_->SetData(0, 0, 0, width, height, cleardata.Get());
 
 }
 
