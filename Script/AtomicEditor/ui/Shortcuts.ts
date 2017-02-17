@@ -179,7 +179,7 @@ class Shortcuts extends Atomic.ScriptObject {
         var pic_ext = features.screenshotFormat;
         var pic_path = features.screenshotPath;
         var dx = new Date();  // get the date NOW
-        var datestring = ("0" + dx.getDate()).slice( -2 ) + "_" + ("0" + (dx.getMonth() + 1 )).slice( -2 ) + "_" + dx.getFullYear()
+        var datestring = dx.getFullYear() + "_" + ("0" + (dx.getMonth() + 1 )).slice(-2) + "_"  + ("0" + dx.getDate()).slice(-2)
             + "_" + ("0" + dx.getHours()).slice(-2) + "_" + ("0" + dx.getMinutes()).slice(-2) + "_" + ("0" + dx.getSeconds()).slice(-2);
         pic_path += "/Screenshot_" + datestring + "." + pic_ext;  // form filename
         var myimage = new Atomic.Image; // make an image to save
