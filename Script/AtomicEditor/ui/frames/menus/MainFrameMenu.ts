@@ -40,7 +40,8 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
-
+        this.goScreenshot = 0;
+        this.subscribeToEvent(Atomic.UpdateEvent((ev) => this.handleScreenshot(ev)));
     }
 
     createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
@@ -61,6 +62,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 developerMenuItemSource.removeItemWithStr("Plugins");
                 this.pluginMenuItemSource = null;
             }
+        }
+    }
+
+    handleScreenshot(ev) {
+        if ( this.goScreenshot > 0 ) {
+            this.goScreenshot--;
+            if ( this.goScreenshot == 0 )
+                EditorUI.getShortcuts().invokeScreenshot();
         }
     }
 
@@ -226,11 +235,16 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "toggle codeeditor") {
-                var ctheme = EditorUI.getEditor().getApplicationPreference( "codeEditor","theme", "");
+                var ctheme = EditorUI.getEditor().getApplicationPreference( "codeEditor", "theme", "");
                 if ( ctheme == "vs-dark" )
-                    EditorUI.getEditor().setApplicationPreference( "codeEditor","theme","vs");
+                    EditorUI.getEditor().setApplicationPreference( "codeEditor", "theme", "vs");
                 else
-                    EditorUI.getEditor().setApplicationPreference( "codeEditor","theme","vs-dark");
+                    EditorUI.getEditor().setApplicationPreference( "codeEditor", "theme", "vs-dark");
+                return true;
+            }
+
+            if ( refid == "screenshot") {
+                this.goScreenshot = 19;  // number of ticks to wait for the menu to close
                 return true;
             }
 
@@ -350,6 +364,8 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
     }
 
+    goScreenshot: number;
+
 }
 
 export = MainFrameMenu;
@@ -409,6 +425,7 @@ var developerItems = {
 
     "Toggle Theme": ["toggle theme"],
     "Toggle Code Editor Theme": ["toggle codeeditor"],
+    "ScreenShot": ["screenshot", StringID.ShortcutScreenshot],
     "Show Console": ["developer show console"],
     "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {

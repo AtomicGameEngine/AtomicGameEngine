@@ -41,7 +41,8 @@ export enum StringID {
     ShortcutPlayDebug,
     ShortcutBuild,
     ShortcutBuildSettings,
-    ShortcutFrameSelected
+    ShortcutFrameSelected,
+    ShortcutScreenshot
 }
 
 export class EditorString {
@@ -96,6 +97,7 @@ export class EditorString {
         lookup[StringID.ShortcutPlayDebug] = "⇧" + shortcutKey + "P";
 
         lookup[StringID.ShortcutBuild] = shortcutKey + "B";
+        lookup[StringID.ShortcutScreenshot] = shortcutKey + "9";
 
     })();
 
