@@ -77,6 +77,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     private buildTsConfig(): any {
         // only build out a tsconfig.atomic if we actually have typescript files in the project
         let projectFiles: Array<string> = [];
+        let hasJsFiles = false;
         const slashedProjectPath = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath);
 
         //scan all the files in the project for any typescript files and add them to the project
@@ -101,7 +102,12 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         let compilerOptions = defaultCompilerOptions;
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
-            projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
+            // if the .js file matches up to a .ts file already loaded, then skip it
+            let tsfn = filename.replace("\.js$", ".ts");
+            if (projectFiles.indexOf(tsfn) == -1) {
+                hasJsFiles = true;
+                projectFiles.push(fn);
+            }
         });
 
         // First we need to load in a copy of the lib.es6.d.ts that is necessary for the hosted typescript compiler
@@ -156,6 +162,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
         // set the base url
         compilerOptions["baseUrl"] = ToolCore.toolSystem.project.resourcePath;
+
+        // enable JS files in the TS Compiler if we have js files
+        compilerOptions.allowJs = hasJsFiles;
 
         let tsConfig = {
             compilerOptions: compilerOptions,
