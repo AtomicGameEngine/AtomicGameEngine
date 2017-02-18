@@ -264,7 +264,7 @@ export class CreateScript extends ModalWindow {
 
                 if (selectedTemplate) {
                     // Check to see if we have a file extension.  If we don't then use the one defined in the template
-                    if (outputFile.indexOf(".") == -1) {
+                    if (outputFile.lastIndexOf(`.${selectedTemplate.ext}`) != outputFile.length - selectedTemplate.ext.length) {
                         outputFile += selectedTemplate.ext;
                     }
 
