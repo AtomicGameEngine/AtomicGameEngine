@@ -88,7 +88,7 @@ class ResourceFrame extends ScriptWidget {
 
         if (this.editors[path]) {
 
-            this.navigateToResource(path);
+            this.navigateToResource(path, ev.lineNumber);
 
             return;
 
@@ -117,7 +117,10 @@ class ResourceFrame extends ScriptWidget {
 
         var editor = this.editors[fullpath];
 
-        if (this.currentResourceEditor == editor) return;
+        if (this.currentResourceEditor == editor) {
+            this.setCursorPositionInEditor(editor, lineNumber, tokenPos);
+            return;
+        }
 
         var root = this.tabcontainer.contentRoot;
 
@@ -135,18 +138,30 @@ class ResourceFrame extends ScriptWidget {
 
             editor.setFocus();
 
-            // this cast could be better
-            var ext = Atomic.getExtension(fullpath);
-
-            if (ext == ".js" && lineNumber != -1) {
-                (<Editor.JSResourceEditor>editor).gotoLineNumber(lineNumber);
-            }
-            else if (ext == ".js" && tokenPos != -1) {
-                (<Editor.JSResourceEditor>editor).gotoTokenPos(tokenPos);
-            }
-
+            this.setCursorPositionInEditor(editor, lineNumber, tokenPos);
         }
 
+    }
+
+    /**
+     * 
+     * Set the cursor to the correct line number in the editor
+     * @param {Editor.ResourceEditor} editor
+     * @param {any} [lineNumber=-1]
+     * @param {any} [tokenPos=-1]
+     * 
+     * @memberOf ResourceFrame
+     */
+    setCursorPositionInEditor(editor: Editor.ResourceEditor, lineNumber = -1, tokenPos = -1) {
+        if (editor instanceof Editor.JSResourceEditor) {
+            if (lineNumber != -1) {
+                (<Editor.JSResourceEditor>editor).gotoLineNumber(lineNumber);
+            }
+
+            if (tokenPos != -1) {
+                (<Editor.JSResourceEditor>editor).gotoTokenPos(tokenPos);
+            }
+        }
     }
 
     handleCloseResource(ev: Editor.EditorResourceCloseEvent) {

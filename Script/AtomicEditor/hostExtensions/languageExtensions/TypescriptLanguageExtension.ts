@@ -103,7 +103,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
             // if the .js file matches up to a .ts file already loaded, then skip it
-            let tsfn = filename.replace("\.js$", ".ts");
+            let tsfn = filename.replace(/\.js$/, ".ts");
             if (projectFiles.indexOf(tsfn) == -1) {
                 hasJsFiles = true;
                 projectFiles.push(fn);
@@ -453,6 +453,17 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         let links = {};
         let linkId = 0;
 
+        // choose different colors based upon if we are in a dark theme or light theme
+        let successColor = "#00ff00";
+        let errorColor = "#e3e02b";
+        let infoColor = "#888888";
+        const currentSkin = this.serviceRegistry.projectServices.getApplicationPreference("uiData", "skinPath", "");
+        if (currentSkin.indexOf("light") != -1) {
+            successColor = "#006600";
+            errorColor = "#7f5f04";
+            infoColor = "#333333";
+        }
+
         let messageArray = results.annotations.filter(result => {
             // If we are compiling the lib.d.ts or some other built-in library and it was successful, then
             // we really don't need to display that result since it's just noise.  Only display it if it fails
@@ -464,11 +475,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
             // Clean up the path for display
             let file = result.file.replace(ToolCore.toolSystem.project.projectPath, "");
-            let message = `<color #888888>${file}: </color>`;
+            let message = `<color ${infoColor}>${file}: </color>`;
             if (result.type == "success") {
-                message += `<color #00ff00>${result.text}</color>`;
+                message += `<color ${successColor}>${result.text}</color>`;
             } else {
-                message += `<color #e3e02b>${result.text} at line ${result.row + 1} col ${result.column}</color> <widget TBSkinImage: skin: MagnifierBitmap, text:"..." id: link${linkId}>`;
+                message += `<color ${errorColor}>${result.text} at line ${result.row + 1} col ${result.column}</color> <widget TBSkinImage: skin: MagnifierBitmap, text:"..." id: link${linkId}>`;
                 links["link" + linkId] = result;
                 linkId++;
             }
@@ -495,6 +506,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 } else {
                     let diag = links[ev.target.id];
                     if (diag) {
+                        console.log(`Load editor: ${diag.file}:${diag.row + 1}`);
                         this.serviceRegistry.uiServices.loadResourceEditor(diag.file, diag.row + 1);
                     }
                 }
