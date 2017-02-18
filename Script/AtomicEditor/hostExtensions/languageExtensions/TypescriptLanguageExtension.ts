@@ -43,7 +43,7 @@ const defaultCompilerOptions = {
 /**
  * Resource extension that supports the web view typescript extension
  */
-export default class TypescriptLanguageExtension implements Editor.HostExtensions.ResourceServicesEventListener, Editor.HostExtensions.ProjectServicesEventListener {
+export default class TypescriptLanguageExtension extends Atomic.ScriptObject implements Editor.HostExtensions.ResourceServicesEventListener, Editor.HostExtensions.ProjectServicesEventListener {
     name: string = "HostTypeScriptLanguageExtension";
     description: string = "This service supports the typescript webview extension.";
 
@@ -240,7 +240,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 };
 
                 this.setTsConfigOnWebView(this.buildTsConfig());
-                this.serviceRegistry.sendEvent<Editor.EditorDeleteResourceNotificationEvent>(Editor.EditorDeleteResourceNotificationEventType, eventData);
+                this.sendEvent(Editor.EditorDeleteResourceNotificationEventData(eventData));
             }
         }
     }
@@ -269,7 +269,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 };
 
                 this.setTsConfigOnWebView(this.buildTsConfig());
-                this.serviceRegistry.sendEvent<Editor.EditorRenameResourceNotificationEvent>(Editor.EditorRenameResourceNotificationEventType, eventData);
+                this.sendEvent(Editor.EditorRenameResourceNotificationEventData(eventData));
             }
         }
     }
@@ -314,6 +314,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         this.compileOnSaveMenuItem = null;
         this.menuCreated = false;
         this.isTypescriptProject = false;
+        this.unsubscribeFromAllEvents();
     }
 
     /*** UIService implementation ***/
@@ -408,7 +409,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     doFullCompile() {
         const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
         if (editor && editor.typeName == "JSResourceEditor" && this.isValidFiletype(editor.fullPath)) {
-            this.serviceRegistry.sendEvent(Editor.EditorModalEventData({
+            this.sendEvent(Editor.EditorModalEventData({
               type: Editor.EDITOR_MODALINFO,
               title: "Compiling TypeScript",
               message: "Compiling TypeScript..."
@@ -499,13 +500,13 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         }
 
         if (errors) {
-            this.serviceRegistry.sendEvent(Editor.EditorModalEventData({
+            this.sendEvent(Editor.EditorModalEventData({
               type: Editor.EDITOR_MODALINFO,
               title: "Compiling TypeScript",
               message: "Errors detected while compiling TypeScript."
             }));
         } else {
-            this.serviceRegistry.sendEvent(Editor.EditorModalEventData({
+            this.sendEvent(Editor.EditorModalEventData({
               type: Editor.EDITOR_MODALINFO,
               title: "Compiling TypeScript",
               message: "Successfully compiled TypeScript."

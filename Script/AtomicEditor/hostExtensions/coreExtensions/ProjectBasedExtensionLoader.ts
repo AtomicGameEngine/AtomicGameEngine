@@ -25,7 +25,7 @@
 /**
  * Resource extension that supports the web view typescript extension
  */
-export default class ProjectBasedExtensionLoader implements Editor.HostExtensions.ProjectServicesEventListener {
+export default class ProjectBasedExtensionLoader extends Atomic.ScriptObject implements Editor.HostExtensions.ProjectServicesEventListener {
     name: string = "ProjectBasedExtensionLoader";
     description: string = "This service supports loading extensions that reside in the project under {ProjectRoot}/Editor and named '*.Service.js'.";
 
