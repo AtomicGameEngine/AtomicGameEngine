@@ -408,6 +408,12 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     doFullCompile() {
         const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
         if (editor && editor.typeName == "JSResourceEditor" && this.isValidFiletype(editor.fullPath)) {
+            this.serviceRegistry.sendEvent(Editor.EditorModalEventData({
+              type: Editor.EDITOR_MODALINFO,
+              title: "Compiling TypeScript",
+              message: "Compiling TypeScript..."
+            }));
+
             const jsEditor = <Editor.JSResourceEditor>editor;
             jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile('${JSON.stringify(this.buildTsConfig())}');`);
         } else {
@@ -464,6 +470,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             infoColor = "#333333";
         }
 
+        let errors = false;
         let messageArray = results.annotations.filter(result => {
             // If we are compiling the lib.d.ts or some other built-in library and it was successful, then
             // we really don't need to display that result since it's just noise.  Only display it if it fails
@@ -482,12 +489,27 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 message += `<color ${errorColor}>${result.text} at line ${result.row + 1} col ${result.column}</color> <widget TBSkinImage: skin: MagnifierBitmap, text:"..." id: link${linkId}>`;
                 links["link" + linkId] = result;
                 linkId++;
+                errors = true;
             }
             return message;
         }).join("\n");
 
         if (messageArray.length == 0) {
             messageArray = "Success";
+        }
+
+        if (errors) {
+            this.serviceRegistry.sendEvent(Editor.EditorModalEventData({
+              type: Editor.EDITOR_MODALINFO,
+              title: "Compiling TypeScript",
+              message: "Errors detected while compiling TypeScript."
+            }));
+        } else {
+            this.serviceRegistry.sendEvent(Editor.EditorModalEventData({
+              type: Editor.EDITOR_MODALINFO,
+              title: "Compiling TypeScript",
+              message: "Successfully compiled TypeScript."
+            }));
         }
 
         let message = [

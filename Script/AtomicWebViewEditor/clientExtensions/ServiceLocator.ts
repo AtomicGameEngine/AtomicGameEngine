@@ -53,9 +53,15 @@ export class ClientServiceLocatorType implements Editor.ClientExtensions.ClientS
      * @param  {string} eventType
      * @param  {any} data
      */
-    sendEvent(eventType: string, data: any) {
+    sendEvent<T extends Atomic.EventCallbackMetaData>(eventCallbackMetaData:T)
+    sendEvent(eventType: string, data: any)
+    sendEvent(eventTypeOrWrapped: any, data?: any) {
         if (this.eventDispatcher) {
-            this.eventDispatcher.sendEvent(eventType, data);
+            if (data) {
+                this.eventDispatcher.sendEvent(eventTypeOrWrapped, data);
+            } else {
+                this.eventDispatcher.sendEvent(eventTypeOrWrapped);
+            }
         }
     }
 

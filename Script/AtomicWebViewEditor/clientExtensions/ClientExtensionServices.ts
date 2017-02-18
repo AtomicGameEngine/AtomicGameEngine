@@ -35,10 +35,23 @@ interface EventSubscription {
 export class EventDispatcher implements Editor.Extensions.EventDispatcher {
     private subscriptions: EventSubscription[] = [];
 
-    sendEvent(eventType: string, data: any) {
+    sendEvent<T extends Atomic.EventCallbackMetaData>(eventCallbackMetaData:T)
+    sendEvent(eventType: string, data: any)
+    sendEvent(eventTypeOrWrapped: any, data?: any) {
+        let eventType: string;
+        let eventData: any;
+        if (typeof(eventTypeOrWrapped) == "string") {
+            eventType = eventTypeOrWrapped;
+            eventData = data;
+        } else {
+            const metaData = eventTypeOrWrapped as Atomic.EventCallbackMetaData;
+            eventType = metaData._eventType;
+            eventData = metaData._callbackData;
+        }
+
         this.subscriptions.forEach(sub => {
             if (sub.eventName == eventType) {
-                sub.callback(data);
+                sub.callback(eventData);
             }
         });
     }
