@@ -18,6 +18,11 @@ TBLayout: distribution: gravity, spacing: 4
 		TBSkinImage: skin: StepButton, id: skin_image
 		id maintoolbar_step
 		tooltip Step paused project 1 frame
+	TBButton
+		@include definitions>menubutton
+		TBSkinImage: skin: DebugButton, id: skin_image
+		id maintoolbar_jsdebug
+		tooltip Invoke debugger on javascript project
 	TBButton: toggle-mode: 1
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DTranslateBitmap

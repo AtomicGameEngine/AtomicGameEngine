@@ -109,6 +109,9 @@ elements
 	StepButton
 		bitmap step.png
 
+	DebugButton
+		bitmap jsdebug.png
+
 	PowerOffButton
 		bitmap power_off.png
 

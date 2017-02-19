@@ -69,6 +69,12 @@ ATOMIC_EVENT(E_UPDATESPAUSEDRESUMED, UpdatesPaused)
 {
     ATOMIC_PARAM(P_PAUSED, Paused);            // bool
 }
+
+// we want the js debugger to connect to the player
+ATOMIC_EVENT(E_JSDEBUGGER, GoJSDebugger)
+{
+}
 // ATOMIC END
+
 
 }

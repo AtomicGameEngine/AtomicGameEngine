@@ -49,6 +49,7 @@ public:
 
     bool PlayProject(String addArgs = "", bool debug = false);
     bool IsPlayerEnabled();
+    void PlayerJSDebug();
 
 private:
 

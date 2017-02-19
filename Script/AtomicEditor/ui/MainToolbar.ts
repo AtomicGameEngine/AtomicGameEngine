@@ -31,6 +31,7 @@ class MainToolbar extends Atomic.UIWidget {
     playButton: Atomic.UIButton;
     pauseButton: Atomic.UIButton;
     stepButton: Atomic.UIButton;
+    jsdebugButton: Atomic.UIButton;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -49,6 +50,8 @@ class MainToolbar extends Atomic.UIWidget {
         this.pauseButton = <Atomic.UIButton>this.getWidget("maintoolbar_pause");
 
         this.stepButton = <Atomic.UIButton>this.getWidget("maintoolbar_step");
+
+        this.jsdebugButton = <Atomic.UIButton>this.getWidget("maintoolbar_jsdebug");
 
         this.translateButton.value = 1;
 
@@ -153,6 +156,9 @@ class MainToolbar extends Atomic.UIWidget {
 
             } else if (ev.target.id == "maintoolbar_step") {
                 EditorUI.getShortcuts().invokeStepPausedPlayer();
+                return true;
+            } else if (ev.target.id == "maintoolbar_jsdebug") {
+                EditorUI.getShortcuts().invokePlayerJSDebug();
                 return true;
             }
 

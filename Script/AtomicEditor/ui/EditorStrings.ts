@@ -38,6 +38,7 @@ export enum StringID {
     ShortcutPlay,
     ShortcutPause,
     ShortcutStep,
+    ShortcutJSDebug,
     ShortcutPlayDebug,
     ShortcutBuild,
     ShortcutBuildSettings,
@@ -94,6 +95,7 @@ export class EditorString {
         lookup[StringID.ShortcutPlay] = shortcutKey + "P";
         lookup[StringID.ShortcutPause] = shortcutKey + "U";
         lookup[StringID.ShortcutStep] = "⇧" + shortcutKey + "U";
+        lookup[StringID.ShortcutJSDebug] = shortcutKey + "J";
         lookup[StringID.ShortcutPlayDebug] = "⇧" + shortcutKey + "P";
 
         lookup[StringID.ShortcutBuild] = shortcutKey + "B";

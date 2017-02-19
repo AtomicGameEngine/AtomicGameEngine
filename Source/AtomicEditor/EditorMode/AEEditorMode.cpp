@@ -204,7 +204,7 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
 
 #ifdef ATOMIC_DEV_BUILD
 
-#ifdef ATOMIC_DEBUG        
+#ifdef ATOMIC_DEBUG
         playerBinary = project->GetProjectPath() + "AtomicNET/Debug/Bin/Desktop/" + projectExe;
 #else
         playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
@@ -215,7 +215,7 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
         playerBinary = project->GetProjectPath() + "AtomicNET/Release/Bin/Desktop/" + projectExe;
 #endif
 
-        
+
         if (!fileSystem->FileExists(playerBinary))
         {
             ATOMIC_LOGERRORF("Managed player: %s does not exist", playerBinary.CString());
@@ -313,7 +313,7 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
         SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
         SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
         SubscribeToEvent(E_IPCPLAYEREXITREQUEST, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerExitRequest));
-    
+
 
         SubscribeToEvent(playerBroker_, E_IPCJSERROR, ATOMIC_HANDLER(EditorMode, HandleIPCJSError));
         SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, ATOMIC_HANDLER(EditorMode, HandleIPCWorkerExit));
@@ -359,6 +359,13 @@ void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& ev
 bool EditorMode::IsPlayerEnabled()
 {
     return playerEnabled_;
+}
+
+void EditorMode::PlayerJSDebug()
+{
+    if (!playerBroker_) return;
+    VariantMap noEventData;
+    playerBroker_->PostMessage( E_JSDEBUGGER, noEventData);
 }
 
 }

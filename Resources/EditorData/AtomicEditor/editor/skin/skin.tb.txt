@@ -109,6 +109,9 @@ elements
 	StepButton
 		bitmap step.png
 
+	DebugButton
+		bitmap jsdebug.png
+
 	BlendleftButton
 		bitmap blendleft.png
 
