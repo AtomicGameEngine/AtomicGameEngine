@@ -11,6 +11,13 @@ declare var console: Console;
 declare function require(filename: string): any;
 
 declare interface DuktapeModule {
+    /**
+     * List of modules that have been loaded via the "require" statement
+     * 
+     * @type {string[]}
+     * @memberOf DuktapeModule
+     */
+    modLoaded: string[];
     modSearch(id: string, require, exports, module);
 }
 

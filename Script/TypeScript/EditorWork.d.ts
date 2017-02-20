@@ -64,6 +64,7 @@ declare module Editor.Extensions {
          */
         sendEvent(eventType: string, data: any);
         sendEvent<T extends Atomic.EventMetaData>(eventType:string, data?:T);
+        sendEvent<T extends Atomic.EventCallbackMetaData>(eventCallbackMetaData:T);
 
         /**
          * Subscribe to an event and provide a callback.  This can be used by services to subscribe to custom events

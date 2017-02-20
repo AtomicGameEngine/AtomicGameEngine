@@ -71,9 +71,15 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
      * @param  {string} eventType
      * @param  {any} data
      */
-    sendEvent(eventType: string, data: any) {
+    sendEvent<T extends Atomic.EventCallbackMetaData>(eventCallbackMetaData:T)
+    sendEvent(eventType: string, data: any)
+    sendEvent(eventTypeOrMetaData: any, data?: any) {
         if (this.eventDispatcher) {
-            this.eventDispatcher.sendEvent(eventType, data);
+            if  (data) {
+                this.eventDispatcher.sendEvent(eventTypeOrMetaData, data);
+            } else {
+                this.eventDispatcher.sendEvent(eventTypeOrMetaData);
+            }
         }
     }
 

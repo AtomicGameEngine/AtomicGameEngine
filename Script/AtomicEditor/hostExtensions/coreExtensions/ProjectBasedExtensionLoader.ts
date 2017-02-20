@@ -25,7 +25,7 @@
 /**
  * Resource extension that supports the web view typescript extension
  */
-export default class ProjectBasedExtensionLoader implements Editor.HostExtensions.ProjectServicesEventListener {
+export default class ProjectBasedExtensionLoader extends Atomic.ScriptObject implements Editor.HostExtensions.ProjectServicesEventListener {
     name: string = "ProjectBasedExtensionLoader";
     description: string = "This service supports loading extensions that reside in the project under {ProjectRoot}/Editor and named '*.Service.js'.";
 
@@ -112,9 +112,12 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
                         extensionPath = extensionPath.substring(0, extensionPath.length - 3);
 
                         console.log(`Detected project extension at: ${extensionPath} `);
-                        // Note: duktape does not yet support unloading modules,
-                        // but will return the same object when passed a path the second time.
-                        let resourceServiceModule = require(ProjectBasedExtensionLoader.duktapeRequirePrefix + extensionPath);
+                        const moduleName = ProjectBasedExtensionLoader.duktapeRequirePrefix + extensionPath;
+
+                        // Make sure that we delete the module from the module cache first so if there are any
+                        // changes, they get reflected
+                        delete Duktape.modLoaded[moduleName];
+                        let resourceServiceModule = require(moduleName);
 
                         // Handle situation where the service is either exposed by a typescript default export
                         // or as the module.export (depends on if it is being written in typescript, javascript, es6, etc.)
