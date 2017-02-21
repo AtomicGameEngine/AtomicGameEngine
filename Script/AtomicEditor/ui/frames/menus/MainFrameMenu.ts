@@ -41,7 +41,6 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
         this.goScreenshot = 0;
-        this.subscribeToEvent(Atomic.UpdateEvent((ev) => this.handleScreenshot(ev)));
     }
 
     createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
@@ -68,8 +67,10 @@ class MainFrameMenu extends Atomic.ScriptObject {
     handleScreenshot(ev) {
         if ( this.goScreenshot > 0 ) {
             this.goScreenshot--;
-            if ( this.goScreenshot == 0 )
+            if ( this.goScreenshot == 0 ) {
                 EditorUI.getShortcuts().invokeScreenshot();
+                this.unsubscribeFromEvent("Update");
+            }
         }
     }
 
@@ -244,6 +245,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if ( refid == "screenshot") {
+                this.subscribeToEvent(Atomic.UpdateEvent((ev) => this.handleScreenshot(ev)));
                 this.goScreenshot = 19;  // number of ticks to wait for the menu to close
                 return true;
             }
