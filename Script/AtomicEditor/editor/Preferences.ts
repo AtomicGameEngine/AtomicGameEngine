@@ -416,6 +416,8 @@ interface EditorFeatures {
     closePlayerLog: boolean;
     defaultPath: string;
     defaultLanguage: string;
+    screenshotPath: string;
+    screenshotFormat: string;
 }
 
 class PreferencesFormat {
@@ -478,7 +480,9 @@ class PreferencesFormat {
         this.editorFeatures = {
             closePlayerLog: true,
             defaultPath: userDocuments,
-            defaultLanguage: "JavaScript"
+            defaultLanguage: "JavaScript",
+            screenshotPath: userDocuments,
+            screenshotFormat: "png"
         };
 
     }
@@ -533,6 +537,16 @@ class PreferencesFormat {
 
         if (!prefs.editorFeatures.defaultPath) {
             prefs.editorFeatures.defaultPath = this.editorFeatures.defaultPath;
+            updatedMissingDefaults = true;
+        }
+
+        if (!prefs.editorFeatures.screenshotPath) {
+            prefs.editorFeatures.screenshotPath = this.editorFeatures.screenshotPath;
+            updatedMissingDefaults = true;
+        }
+
+        if (!prefs.editorFeatures.screenshotFormat) {
+            prefs.editorFeatures.screenshotFormat = this.editorFeatures.screenshotFormat;
             updatedMissingDefaults = true;
         }
 

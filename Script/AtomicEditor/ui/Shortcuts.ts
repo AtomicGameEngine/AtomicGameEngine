@@ -174,6 +174,29 @@ class Shortcuts extends Atomic.ScriptObject {
         }
     }
 
+    invokeScreenshot() {
+        var features = Preferences.getInstance().editorFeatures; // get prefs
+        var pic_ext = features.screenshotFormat;
+        var pic_path = features.screenshotPath;
+        var dx = new Date();  // get the date NOW
+        var datestring = dx.getFullYear() + "_" + ("0" + (dx.getMonth() + 1 )).slice(-2) + "_"  + ("0" + dx.getDate()).slice(-2)
+            + "_" + ("0" + dx.getHours()).slice(-2) + "_" + ("0" + dx.getMinutes()).slice(-2) + "_" + ("0" + dx.getSeconds()).slice(-2);
+        pic_path += "/Screenshot_" + datestring + "." + pic_ext;  // form filename
+        var myimage = new Atomic.Image; // make an image to save
+        if (Atomic.graphics.takeScreenShot(myimage)) { // take the screenshot
+            var saved_pic = false;
+            var jpgquality = 92; // very good quality jpeg 
+            if ( pic_ext == "png" ) saved_pic = myimage.savePNG(pic_path);
+            else if ( pic_ext == "jpg" ) saved_pic = myimage.saveJPG(pic_path, jpgquality);
+            else if ( pic_ext == "tga" ) saved_pic = myimage.saveTGA(pic_path);
+            else if ( pic_ext == "bmp" ) saved_pic = myimage.saveBMP(pic_path);
+            else if ( pic_ext == "dds" ) saved_pic = myimage.saveDDS(pic_path);
+            if (saved_pic)  EditorUI.showEditorStatus ( "Saved screenshot " + pic_path );
+            else EditorUI.showEditorStatus ( "Error - could not save screenshot " + pic_path );
+        }
+        else EditorUI.showEditorStatus ( "Error - could not take screenshot.");
+    }
+
     handleKeyDown(ev: Atomic.KeyDownEvent) {
 
         // if the right mouse buttons isn't down
@@ -249,6 +272,9 @@ class Shortcuts extends Atomic.ScriptObject {
                 } else {
                     this.invokePauseOrResumePlayer();
                 }
+            }
+            else if (ev.key == Atomic.KEY_9) {
+                this.invokeScreenshot();
             }
 
         }
