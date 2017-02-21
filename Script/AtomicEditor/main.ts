@@ -25,6 +25,9 @@
 /// <reference path="../TypeScript/Editor.d.ts" />
 /// <reference path="../TypeScript/AtomicWork.d.ts" />
 
+// Bring in AtomicEventLoop so the editor has access to the timer apis.  This
+// attaches the timer apis to the global object so they are available everywhere from this point.
+import "AtomicEventLoop";
 import Editor from "editor/Editor";
 
 class Main {
