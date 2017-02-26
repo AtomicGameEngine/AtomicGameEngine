@@ -104,6 +104,10 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokePlayerJSDebug() {
         Atomic.editorMode.playerJSDebug();
+        this.sendEvent(Editor.EditorEditResourceEventData({
+            path: "Duktape Debugger",
+            lineNumber: -1
+        }));
     }
 
     invokeFormatCode() {
@@ -246,8 +250,8 @@ class Shortcuts extends Atomic.ScriptObject {
 
         var cmdKey = this.cmdKeyDown();
 
-        if ( !cmdKey && ev.qualifiers > 0 ) { // check the event, the qualifier may have been programmitically set
-            cmdKey = ( ev.qualifiers == Atomic.QUAL_CTRL );
+        if (!cmdKey && ev.qualifiers > 0) { // check the event, the qualifier may have been programmitically set
+            cmdKey = (ev.qualifiers == Atomic.QUAL_CTRL);
         }
 
         if (cmdKey) {
@@ -264,7 +268,7 @@ class Shortcuts extends Atomic.ScriptObject {
             else if (ev.key == Atomic.KEY_P) {
                 this.invokePlayOrStopPlayer();
             } else if (ev.key == Atomic.KEY_J) {
-                this.invokePlayerJSDebug ();
+                this.invokePlayerJSDebug();
             } else if (ev.key == Atomic.KEY_B) {
                 if (ev.qualifiers & Atomic.QUAL_SHIFT) {
                     EditorUI.getModelOps().showBuildSettings();

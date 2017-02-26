@@ -24,6 +24,7 @@ import * as internalEditor from "./editor";
 import serviceLocator from "../clientExtensions/ServiceLocator";
 import HostInterop from "../interop";
 import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventNames";
+import DuktapeDebugger from "../debugger/DuktapeDebugger";
 
 
 /**
@@ -170,6 +171,13 @@ export function preferencesChanged(prefs: Editor.ClientExtensions.PreferencesCha
 
 export function setEditor(editor: any) {
     internalEditor.setInternalEditor(editor);
+}
+
+export function setDebuggerEditor(editor: any) {
+    internalEditor.setInternalEditor(editor);
+
+    const dbg = new DuktapeDebugger();
+    dbg.initialize(editor);
 }
 
 /**

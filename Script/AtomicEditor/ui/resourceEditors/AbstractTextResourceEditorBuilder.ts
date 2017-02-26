@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-export abstract class AbstractTextResourceEditorBuilder implements Editor.Extensions.ResourceEditorBuilder {
+export abstract class AbstractTextResourceEditorBuilder extends Atomic.ScriptObject implements Editor.Extensions.ResourceEditorBuilder {
 
     abstract canHandleResource(resourcePath: string): boolean;
 

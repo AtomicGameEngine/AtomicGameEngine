@@ -987,6 +987,7 @@ void duk_trans_socket_write_flush_cb(void *udata) {
             {
                 ATOMIC_LOGERROR("IPCPlayerApp::Start() - Unable to initialize IPC Worker");
             }
+
         }
 
         if (subprocess_)
@@ -1005,6 +1006,13 @@ void duk_trans_socket_write_flush_cb(void *udata) {
 
         GetSubsystem<Graphics>()->RaiseWindow();
 
+        if (debugPlayer_)
+        {
+            ATOMIC_LOGERROR("Starting Debugger");
+            set_autoreconn (this);  // for auto-reconnect
+            //SendEvent(E_JSDEBUGGER);
+            Reconnect();
+        }
 
     }
 
@@ -1059,6 +1067,7 @@ void duk_trans_socket_write_flush_cb(void *udata) {
                 debugHud->SetProfilerMode((DebugHudProfileMode)eventData["debugHudProfilerMode"].GetUInt());
             }
         }
+
 
     }
 

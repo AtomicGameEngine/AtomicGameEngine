@@ -235,6 +235,15 @@ export default class HostInteropType {
     }
 
     /**
+     * Sets the editor used for debugging
+     * @param  {any} editor
+     * @return {[type]}
+     */
+    setDebuggerEditor(editor: any) {
+        editorCommands.setDebuggerEditor(editor);
+    }
+
+    /**
      * Called when a shortcut should be invoked, coming from the host editor
      * @param {Editor.EditorShortcutType} shortcut shortcut to be executed
      */

@@ -30,6 +30,7 @@ import CSharpResourceEditorBuilder from "./resourceEditors/CSharpResourceEditorB
 import XMLResourceEditorBuilder from "./resourceEditors/XMLResourceEditorBuilder";
 import ShaderResourceEditorBuilder from "./resourceEditors/ShaderResourceEditorBuilder";
 import VisualStudioResourceEditorBuilder from "./resourceEditors/VisualStudioResourceEditorBuilder";
+import DukDebugResourceEditorBuilder from "./resourceEditors/DukDebuggerResourceEditorBuilder";
 
 export default class ResourceEditorProvider {
     private standardEditorRegistry: Editor.Extensions.ResourceEditorBuilder[] = [];
@@ -107,7 +108,10 @@ export default class ResourceEditorProvider {
         this.registerStandardEditor(new XMLResourceEditorBuilder());
         this.registerStandardEditor(new ShaderResourceEditorBuilder());
 
-        // this overrides the test resource editor so need to put it in the custom bucket
+        // This will hook in and possibly override all editors, so put it in the custom bucket
+        this.registerCustomEditor(new DukDebugResourceEditorBuilder());
+
+        // this overrides the TextFileResourceEditorBuilder so need to put it in the custom bucket
         this.registerCustomEditor(new TurboBadgerResourceEditorBuilder());
 
         this.registerCustomEditor(new VisualStudioResourceEditorBuilder());

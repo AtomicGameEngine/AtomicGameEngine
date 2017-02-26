@@ -101,6 +101,7 @@
         "./AtomicEditor/ui/ResourceEditorProvider.ts",
         "./AtomicEditor/ui/resourceEditors/AbstractTextResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/CSharpResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/DukDebuggerResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/JavascriptResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/JsonResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/Scene3dResourceEditorBuilder.ts",
