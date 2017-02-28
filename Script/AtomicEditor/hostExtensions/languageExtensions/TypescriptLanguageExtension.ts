@@ -350,10 +350,11 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
      * @param message The message type that was submitted to be used to determine what the data contains if present
      * @param data any additional data that needs to be submitted with the message
      */
-    handleWebMessage(messageType: string, data: any) {
+    handleWebMessage(webMessage: WebView.WebMessageEvent, messageType: string, data: any) {
         switch (messageType) {
             case "TypeScript.DisplayCompileResults":
                 this.displayCompileResults(data);
+                webMessage.handler.success();
                 break;
         }
     }

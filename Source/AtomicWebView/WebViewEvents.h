@@ -96,7 +96,7 @@ ATOMIC_EVENT(E_WEBMESSAGE, WebMessage)
     ATOMIC_PARAM(P_CEFBROWSER, Browser);       // CefBrowser*
     ATOMIC_PARAM(P_CEFFRAME, Frame);           // CefFrame*
 
-    ATOMIC_PARAM(P_DEFERRED, Deferred);        // Return Value: Bool
+    ATOMIC_PARAM(P_DEFERRED, Deferred);        // Bool Return Value
 }
 
 

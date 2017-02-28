@@ -20,31 +20,53 @@
 // THE SOFTWARE.
 //
 
+interface HostMessage {
+    message: string;
+}
+
 /**
  * Defines the interface to what is available for the host to call or for the client to call on the window object
  */
 interface Window {
-    atomicQuery: (message: {
+    atomicQuery(message: {
         request: any,
         persistent: boolean,
-        onSuccess: () => void,
-        onFailure: (error_code, error_message) => void
-    }) => void;
+        onSuccess: (result?: string) => void,
+        onFailure: (error_code: number, error_message: string) => void
+    }): void;
 
     /**
-     * Used to call into the host and provide messages
+     * Used to send a notification message to the host
      * @param {string} messageType
      * @param {object} data
+     * @return {Promise} will resolve when the host has handled the message
+     * @deprecated use window.hostNotify
+     */
+    atomicQueryPromise(messageType: string, data?: {}): Promise<void>;
+
+    /**
+     * Used to send a notification message to the host
+     * @param {string} messageType
+     * @param {object} data
+     * @return {Promise} will resolve when the host has handled the message
+     * @deprecated
+     */
+    atomicHostEvent(messageType: string, data?: {}): Promise<void>;
+
+    /**
+     * Used to send a request to the server.  The server will send back the results in the promise
+     * @param  {string} messageType
+     * @param  {object} data
      * @return {Promise}
      */
-    atomicQueryPromise: (messageType: string, data?: {}) => Promise<{}>;
+    atomicHostRequest<T>(messageType: string, data?: {}): Promise<T>;
 
-    HOST_loadCode: (codeUrl) => void;
-    HOST_saveCode: () => void;
+    HOST_loadCode(codeUrl): void;
+    HOST_saveCode(): void;
 
-    HOST_resourceRenamed: (path: string, newPath: string) => void;
-    HOST_resourceDeleted: (path: string) => void;
-    HOST_preferencesChanged: (jsonProjectPrefs: string, jsonApplicationPrefs: string) => void;
+    HOST_resourceRenamed(path: string, newPath: string): void;
+    HOST_resourceDeleted(path: string): void;
+    HOST_preferencesChanged(jsonProjectPrefs: string, jsonApplicationPrefs: string): void;
 
     /**
      * Preferences set by the host.  Each preference category is a JSON string of all the prefs
@@ -54,3 +76,7 @@ interface Window {
         ProjectPreferences: string
     };
 }
+
+// globally expose these
+declare function atomicHostEvent(messageType: string, data?: {}): Promise<void>;
+declare function atomicHostRequest<T>(messageType: string, data?: {}): Promise<T>;

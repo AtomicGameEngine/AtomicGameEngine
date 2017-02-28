@@ -202,3 +202,13 @@ declare module ToolCore {
     export function getAssetDatabase(): AssetDatabase;
     export function getLicenseSystem(): LicenseSystem;
 }
+
+declare module WebView {
+
+    /**
+     * interface for sending data to the web view in a standard way.
+     */
+    export interface WebMessageEventResponse<T> {
+        response: T
+    }
+}

@@ -43,6 +43,7 @@
         "./typings/systemjs.d.ts",
         "./typings/webworkers.d.ts",
         "./typings/WindowExt.d.ts",
+        "./utils/WindowExt.ts",
         "../TypeScript/Atomic.d.ts",
         "../TypeScript/AtomicApp.d.ts",
         "../TypeScript/AtomicNETScript.d.ts",

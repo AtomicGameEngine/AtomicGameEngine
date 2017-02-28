@@ -21,6 +21,7 @@
 //
 
 // This is the interop file, exposing functions that can be called by the host game engine
+import "./utils/WindowExt";
 import * as editorCommands from "./editor/editorCommands";
 
 /**
@@ -34,38 +35,6 @@ const DEBUG_PORT = 3335;
  * @type {Boolean}
  */
 const DEBUG_ALERT = false;
-
-/**
- * Promise version of atomic query
- * @param  {string} messageType the message type to pass to atomicQuery.  If there is no payload, this will be passed directly, otherwise it will be passed in a data object
- * @param  {any} data optional data to send
- * @return {Promise}
- */
-window.atomicQueryPromise = function(messageType: string, data?: {}): Promise<{}> {
-    return new Promise(function(resolve, reject) {
-
-        let queryMessage;
-
-        // if we have a data element, then we need to structure the message so that the host understands it
-        // by adding the message to the object and then stringify-ing the whole thing
-        if (data) {
-            // stringify and reparse since we need to modify the data, but don't want to modify the passed in object
-            queryMessage = JSON.parse(JSON.stringify(data));
-            queryMessage.message = messageType;
-        } else {
-            queryMessage = {
-                message: messageType
-            };
-        }
-
-        window.atomicQuery({
-            request: JSON.stringify(queryMessage),
-            persistent: false,
-            onSuccess: resolve,
-            onFailure: (error_code, error_message) => reject({ error_code: error_code, error_message: error_message })
-        });
-    });
-};
 
 export default class HostInteropType {
 
@@ -109,7 +78,7 @@ export default class HostInteropType {
         // get the code
         this.getResource(codeUrl).then((src: string) => {
             editorCommands.loadCodeIntoEditor(src, filename, fileExt);
-            return window.atomicQueryPromise(HostInteropType.EDITOR_GET_USER_PREFS);
+            return atomicHostEvent(HostInteropType.EDITOR_GET_USER_PREFS);
         }).then(() => {
             this.setCodeLoaded();
         }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
@@ -123,7 +92,7 @@ export default class HostInteropType {
      */
     saveCode(): Promise<any> {
         let source = editorCommands.getSourceText();
-        return window.atomicQueryPromise(HostInteropType.EDITOR_SAVE_CODE, {
+        return atomicHostEvent(HostInteropType.EDITOR_SAVE_CODE, {
             payload: source
         }).then(() => {
             editorCommands.codeSaved(this.fileName, this.fileExt, source);
@@ -137,7 +106,7 @@ export default class HostInteropType {
      * @return {Promise}
      */
     saveFile(filename: string, fileContents: string): Promise<any> {
-        return window.atomicQueryPromise(HostInteropType.EDITOR_SAVE_FILE, {
+        return atomicHostEvent(HostInteropType.EDITOR_SAVE_FILE, {
             filename: filename,
             payload: fileContents
         });
@@ -152,7 +121,9 @@ export default class HostInteropType {
             alert(`Attach chrome dev tools to this instance by navigating to http://localhost:${DEBUG_PORT}`);
         }
         editorCommands.editorLoaded();
-        window.atomicQueryPromise(HostInteropType.EDITOR_LOAD_COMPLETE);
+        atomicHostEvent(HostInteropType.EDITOR_LOAD_COMPLETE);
+
+        atomicHostRequest<string>("foo").then((d) => alert(d));
     }
 
     /**
@@ -186,7 +157,7 @@ export default class HostInteropType {
      * Notify the host that the contents of the editor has changed
      */
     notifyEditorChange() {
-        window.atomicQueryPromise(HostInteropType.EDITOR_CHANGE).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
+        atomicHostEvent(HostInteropType.EDITOR_CHANGE).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error on change: " + e.error_message);
         });
     }

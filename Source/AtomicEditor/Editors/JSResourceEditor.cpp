@@ -131,6 +131,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
         String message = jvalue["message"].GetString();
         if (message == EDITOR_CHANGE) {
             SetModified(true);
+            handler->Success();
         }
         else if (message == EDITOR_SAVE_CODE)
         {
@@ -138,6 +139,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
             File file(context_, fullpath_, FILE_WRITE);
             file.Write((void*) code.CString(), code.Length());
             file.Close();
+            handler->Success();
         }
         else if (message == EDITOR_SAVE_FILE)
         {
@@ -158,10 +160,10 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
             } else {
                 ATOMIC_LOGWARNING("Ignoring attempt to write file: " + fn);
             }
+            handler->Success();
         }
     }
 
-    handler->Success();
 
 }
 

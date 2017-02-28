@@ -120,7 +120,7 @@ declare module Editor.Extensions {
         canHandleResource(resourcePath: string) : boolean;
         /**
          * Generates a resource editor for the provided resource type
-         * @param  resourceFrame 
+         * @param  resourceFrame
          * @param  resourcePath
          * @param  tabContainer
          * @param  lineNumber
@@ -238,10 +238,11 @@ declare module Editor.HostExtensions {
 
         /**
          * Handle messages that are submitted via Atomic.Query from within a web view editor.
+         * @param webMessage The original message coming in from the browser
          * @param message The message type that was submitted to be used to determine what the data contains if present
          * @param data any additional data that needs to be submitted with the message
          */
-        handleWebMessage?(messageType: string, data?: any): void;
+        handleWebMessage?(webMessage: WebView.WebMessageEvent, messageType: string, data?: any): void;
     }
 
     export interface UIServicesProvider extends Editor.Extensions.ServicesProvider<UIServicesEventListener> {

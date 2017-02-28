@@ -462,7 +462,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         let messageArray = results.annotations.map((result) => {
             return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
         });
-        window.atomicQueryPromise("TypeScript.DisplayCompileResults", results);
+        atomicHostEvent("TypeScript.DisplayCompileResults", results);
     }
 }
 

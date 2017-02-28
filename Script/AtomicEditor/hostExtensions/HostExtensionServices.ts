@@ -29,7 +29,7 @@ import ResourceOps = require("../resources/ResourceOps");
 /**
  * Generic registry for storing Editor Extension Services
  */
-export class ServicesProvider<T extends Editor.Extensions.ServiceEventListener> implements Editor.Extensions.ServicesProvider<T> {
+export class ServicesProvider<T extends Editor.Extensions.ServiceEventListener> extends Atomic.ScriptObject implements Editor.Extensions.ServicesProvider<T> {
     registeredServices: T[] = [];
 
     /**
@@ -392,7 +392,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
 
     /**
      * Will load a resource editor or navigate to an already loaded resource editor by path
-     * @param resourcePath full path to resource to load 
+     * @param resourcePath full path to resource to load
      * @param lineNumber optional line number to navigate to
      * @return {Editor.ResourceEditor}
      */
@@ -608,16 +608,16 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * Hooks into web messages coming in from web views
      * @param  {[String|Object]} data
      */
-    handleWebMessage(data: WebView.WebMessageEvent) {
+    handleWebMessage(webMessage: WebView.WebMessageEvent) {
         let messageType;
         let messageObject;
 
         try {
-            messageObject = JSON.parse(data.request);
+            messageObject = JSON.parse(webMessage.request);
             messageType = messageObject.message;
         } catch (e) {
             // not JSON, we are just getting a notification message of some sort
-            messageType = data.request;
+            messageType = webMessage.request;
         }
 
         // run through and find any services that can handle this.
@@ -625,7 +625,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
             try {
                 // Verify that the service contains the appropriate methods and that it can save
                 if (service.handleWebMessage) {
-                    service.handleWebMessage(messageType, messageObject);
+                    service.handleWebMessage(webMessage, messageType, messageObject);
                 }
             } catch (e) {
                 EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
@@ -639,6 +639,6 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
         // Placeholder for when UI events published by the editor need to be listened for
-        eventDispatcher.subscribeToEvent(WebView.WebMessageEvent((ev) => this.handleWebMessage(ev)));
+        this.subscribeToEvent(WebView.WebMessageEvent((ev) => this.handleWebMessage(ev)));
     }
 }
