@@ -28,6 +28,7 @@
         "./AtomicEditor/editor/EditorEvents.ts",
         "./AtomicEditor/editor/EditorLicense.ts",
         "./AtomicEditor/editor/Preferences.ts",
+        "./AtomicEditor/hostExtensions/coreExtensions/DuktapeDebuggerExtension.ts",
         "./AtomicEditor/hostExtensions/coreExtensions/ProjectBasedExtensionLoader.ts",
         "./AtomicEditor/hostExtensions/HostExtensionServices.ts",
         "./AtomicEditor/hostExtensions/languageExtensions/CSharpLanguageExtension.ts",

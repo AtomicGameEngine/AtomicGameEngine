@@ -25,6 +25,8 @@ import * as ts from "../../../modules/typescript";
 import * as WorkerProcessTypes from "./workerprocess/workerProcessTypes";
 import ClientExtensionEventNames from "../../ClientExtensionEventNames";
 import * as tsLanguageSupport from "./tsLanguageSupport";
+import BreakpointDecoratorManager from "../../../debugger/BreakpointDecoratorManager";
+import * as debuggerProxy from "../../../debugger/HostDebuggerExtensionProxy";
 
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
@@ -51,6 +53,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     private worker: SharedWorker.SharedWorker;
 
     private editor: monaco.editor.IStandaloneCodeEditor;
+
+    private breakpointDecorator: BreakpointDecoratorManager;
 
     /**
      * Perform a full compile on save, or just transpile the current file
@@ -147,6 +151,38 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
             // Let's turn some things off in the editor.  These will be provided by the shared web worker
             if (this.isJsFile(ev.filename)) {
+
+                // for now, we just want to set breakpoints in JS files
+                editor.updateOptions({
+                    glyphMargin: true
+                });
+
+                this.breakpointDecorator = new BreakpointDecoratorManager(editor);
+                this.breakpointDecorator.setCurrentFileName(ev.filename);
+
+                let marginTimeout = 0;
+                editor.onMouseMove((e) => {
+                    var targetZone = e.target.toString();
+                    if (targetZone.indexOf("GUTTER_GLYPH_MARGIN") != -1) {
+                        clearTimeout(marginTimeout);
+                        var line = e.target.position.lineNumber;
+                        this.breakpointDecorator.updateMarginHover(line);
+                        marginTimeout = setTimeout(() => this.breakpointDecorator.removeMarginHover(), 500);
+                    } else {
+                        clearTimeout(marginTimeout);
+                        this.breakpointDecorator.removeMarginHover();
+                    }
+                });
+
+                editor.onMouseDown((e) => {
+                    var targetZone = e.target.toString();
+                    if (targetZone.indexOf("GUTTER_GLYPH_MARGIN") != -1) {
+                        var line = e.target.position.lineNumber;
+                        this.breakpointDecorator.toggleBreakpoint(ev.filename, line);
+                        debuggerProxy.toggleBreakpoint(ev.filename, line);
+                    }
+                });
+
                 monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
                     noEmit: true,
                     noResolve: true,

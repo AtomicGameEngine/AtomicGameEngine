@@ -558,22 +558,6 @@ code.sourcecode div.execution {
 	color: #ffffff;
 }
 
-.code-breakpoint {
-	background: red;
-	border-radius: 50%;
-	margin-left: 5px;
-}
-.code-breakpoint-pending {
-	background: goldenrod;
-	border-radius: 50%;
-	margin-left: 5px;
-}
-.code-breakpoint-margin-hover {
-	background: pink;
-	border-radius: 50%;
-	margin-left: 5px;
-}
-
 #source-select {
 	margin-top: 5px;
 }

@@ -1,114 +1,7 @@
 import HostInteropType from "../interop";
+import * as debuggerProxy from "./HostDebuggerExtensionProxy";
+import {default as BreakpointDecoratorManager, Breakpoint} from "./BreakpointDecoratorManager";
 
-
-interface Breakpoint {
-    fileName: string;
-    lineNumber: number;
-}
-
-class BreakpointDecoratorManager {
-    currEditorDecorations: monaco.editor.IModelDeltaDecoration[] = [];
-    currEditorDecorationIds: string[] = [];
-    currFileName: string;
-
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor) { }
-
-    setCurrentFileName(fileName: string) {
-        if (this.currFileName != fileName) {
-            this.clearBreakpointDecorations();
-        }
-        this.currFileName = fileName;
-    }
-
-    clearBreakpointDecorations() {
-        this.currEditorDecorations.length = 0;
-        this.currEditorDecorationIds = this.editor.deltaDecorations(this.currEditorDecorationIds, this.currEditorDecorations);
-    }
-
-    removeBreakpointDecoration(fileName: string, lineNumber: number) {
-        if (fileName != this.currFileName) {
-            return;
-        }
-
-        const idx = this.currEditorDecorations.findIndex(d => d.range.startLineNumber == lineNumber);
-        if (idx != -1) {
-            this.currEditorDecorations.splice(idx);
-            this.currEditorDecorationIds = this.editor.deltaDecorations(this.currEditorDecorationIds, this.currEditorDecorations);
-        }
-    }
-
-    addBreakpointDecoration(fileName: string, lineNumber: number, pendingBreakpoint?: boolean) {
-        if (fileName != this.currFileName) {
-            return;
-        }
-
-        const requestedBreakpointClass = pendingBreakpoint ? "code-breakpoint-pending" : "code-breakpoint";
-        let idx = this.currEditorDecorations.findIndex(d => d.range.startLineNumber == lineNumber);
-        if (idx != -1 && this.currEditorDecorations[idx].options.glyphMarginClassName != requestedBreakpointClass) {
-            this.removeBreakpointDecoration(fileName, lineNumber);
-            idx = -1;
-        }
-
-        if (idx == -1) {
-            this.currEditorDecorations.push({
-                range: new monaco.Range(lineNumber, 1, lineNumber, 1),
-                options: {
-                    glyphMarginClassName: pendingBreakpoint ? "code-breakpoint-pending" : "code-breakpoint"
-                }
-            });
-
-            this.currEditorDecorationIds = this.editor.deltaDecorations(this.currEditorDecorationIds, this.currEditorDecorations);
-        }
-    }
-
-    getBreakpointDecorator(fileName: string, lineNumber: number) {
-        return this.currEditorDecorations.find(d => d.range.startLineNumber == lineNumber && d.options.glyphMarginClassName != "code-breakpoint-margin-hover");
-    }
-
-    toggleBreakpoint(fileName: string, lineNumber: number) {
-        if (fileName != this.currFileName) {
-            return;
-        }
-
-        let decoration = this.getBreakpointDecorator(fileName, lineNumber);
-        if (decoration) {
-            this.removeBreakpointDecoration(fileName, lineNumber);
-        } else {
-            this.addBreakpointDecoration(fileName, lineNumber, true);
-        }
-    }
-
-    updateMarginHover(lineNumber: number) {
-        let idx = this.currEditorDecorations.findIndex(d => d.options.glyphMarginClassName == "code-breakpoint-margin-hover");
-
-        if (idx != -1 && this.currEditorDecorations[idx].range.startLineNumber == lineNumber) {
-            return; // nothing to do
-        }
-
-        const hover = {
-            range: new monaco.Range(lineNumber, 1, lineNumber, 1),
-            options: {
-                glyphMarginClassName: "code-breakpoint-margin-hover"
-            }
-        };
-
-        if (idx == -1) {
-            this.currEditorDecorations.push(hover);
-        } else {
-            this.currEditorDecorations[idx] = hover;
-        }
-
-        this.currEditorDecorationIds = this.editor.deltaDecorations(this.currEditorDecorationIds, this.currEditorDecorations);
-    }
-
-    removeMarginHover() {
-        let idx = this.currEditorDecorations.findIndex(d => d.options.glyphMarginClassName == "code-breakpoint-margin-hover");
-        if (idx != -1) {
-            this.currEditorDecorations.splice(idx);
-            this.currEditorDecorationIds = this.editor.deltaDecorations(this.currEditorDecorationIds, this.currEditorDecorations);
-        }
-    }
-}
 /*
  *  Duktape debugger web client
  *
@@ -348,33 +241,52 @@ export default class DuktapeDebugger {
         }
     }
 
-    deleteAllBreakpoints() {
+    deleteAllBreakpoints(notifyHost = true) {
         this.socket.emit("delete-all-breakpoints");
         this.breakpointDecorator.clearBreakpointDecorations();
+
+        if (notifyHost) {
+            debuggerProxy.removeAllBreakpoints();
+        }
     }
 
-    addBreakpoint(fileName: string, lineNumber: number) {
+    addBreakpoint(fileName: string, lineNumber: number, notifyHost = true) {
+        fileName = this.fixBreakpointFilename(fileName);
         this.breakpointDecorator.addBreakpointDecoration(fileName, lineNumber);
         this.socket.emit("add-breakpoint", {
             fileName,
             lineNumber
         });
+
+        if (notifyHost) {
+            debuggerProxy.addBreakpoint(fileName, lineNumber);
+        }
     }
 
-    toggleBreakpoint(fileName: string, lineNumber: number) {
+    toggleBreakpoint(fileName: string, lineNumber: number, notifyHost = true) {
+        fileName = this.fixBreakpointFilename(fileName);
         this.breakpointDecorator.toggleBreakpoint(fileName, lineNumber);
         this.socket.emit("toggle-breakpoint", {
             fileName,
             lineNumber
         });
+
+        if (notifyHost) {
+            debuggerProxy.toggleBreakpoint(fileName, lineNumber);
+        }
     }
 
-    deleteBreakpoint(fileName: string, lineNumber: number) {
+    removeBreakpoint(fileName: string, lineNumber: number, notifyHost = true) {
+        fileName = this.fixBreakpointFilename(fileName);
         this.breakpointDecorator.removeBreakpointDecoration(fileName, lineNumber);
         this.socket.emit("delete-breakpoint", {
             fileName,
             lineNumber
         });
+
+        if (notifyHost) {
+            debuggerProxy.removeBreakpoint(fileName, lineNumber);
+        }
     }
 
     initSocket() {
@@ -560,7 +472,7 @@ export default class DuktapeDebugger {
             //div.append(sub);
             //sub = $("<button id='add-breakpoint-button'></button>").text("Add breakpoint");
             //sub.on("click", () => {
-                //this.addBreakpoint($("#add-breakpoint-file").val(), Number($("#add-breakpoint-line").val()));
+            //this.addBreakpoint($("#add-breakpoint-file").val(), Number($("#add-breakpoint-line").val()));
             //});
             //div.append(sub);
             //sub = $("<span id='breakpoint-hint'></span>").text("or dblclick source");
@@ -575,7 +487,7 @@ export default class DuktapeDebugger {
                 div = $("<div class='breakpoint-line'></div>");
                 sub = $("<button class='delete-breakpoint-button'></button>").text("Delete");
                 sub.on("click", () => {
-                    this.deleteBreakpoint(bp.fileName, bp.lineNumber);
+                    this.removeBreakpoint(bp.fileName, bp.lineNumber);
                 });
                 div.append(sub);
                 sub = $("<a></a>").text((bp.fileName || "?") + ":" + (bp.lineNumber || 0));
@@ -645,6 +557,7 @@ export default class DuktapeDebugger {
 
         $("#attach-button").click(() => {
             this.socket.emit("attach", {});
+            this.retrieveBreakpoints();
         });
 
         $("#detach-button").click(() => {
@@ -913,8 +826,41 @@ export default class DuktapeDebugger {
             // nop
         });
 
+        this.registerDebuggerFunctions();
+
         this.forceButtonUpdate = true;
         this.doUiUpdate();
+
     };
+
+    async retrieveBreakpoints() {
+        let s = await debuggerProxy.getBreakpoints();
+
+        // If the filename starts with "Resources" then trim it off since the module
+        // name won't have that, but the editor uses it
+        s.forEach(b => this.addBreakpoint(b.fileName, b.lineNumber));
+    }
+
+    registerDebuggerFunctions() {
+        // Register the callback functions
+        const interop = HostInteropType.getInstance();
+        interop.addCustomHostRoutine(
+            debuggerProxy.debuggerHostKeys.toggleBreakpoint,
+            this.toggleBreakpoint.bind(this));
+
+        interop.addCustomHostRoutine(
+            debuggerProxy.debuggerHostKeys.addBreakpoint,
+            this.addBreakpoint.bind(this));
+
+        interop.addCustomHostRoutine(
+            debuggerProxy.debuggerHostKeys.removeBreakpoint,
+            this.removeBreakpoint.bind(this));
+
+        debuggerProxy.registerDebuggerFrameWithHost();
+    }
+
+    fixBreakpointFilename(fileName: string): string {
+        return fileName.replace(/^Resources\//, "");
+    }
 
 }

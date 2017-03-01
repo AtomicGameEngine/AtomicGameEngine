@@ -25,6 +25,7 @@ import * as EditorUI from "../ui/EditorUI";
 import ProjectBasedExtensionLoader from "./coreExtensions/ProjectBasedExtensionLoader";
 import TypescriptLanguageExtension from "./languageExtensions/TypescriptLanguageExtension";
 import CSharpLanguageExtension from "./languageExtensions/CSharpLanguageExtension";
+import DuktapeDebuggerExtension from "./coreExtensions/DuktapeDebuggerExtension";
 
 /**
  * Generic service locator of editor services that may be injected by either a plugin
@@ -110,3 +111,4 @@ export default serviceLocator;
 serviceLocator.loadService(new ProjectBasedExtensionLoader());
 serviceLocator.loadService(new TypescriptLanguageExtension());
 serviceLocator.loadService(new CSharpLanguageExtension());
+serviceLocator.loadService(new DuktapeDebuggerExtension());

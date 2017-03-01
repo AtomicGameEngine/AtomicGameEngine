@@ -193,7 +193,7 @@ export default class HostInteropType {
      * @param  {string} routineName
      * @param  {(} callback
      */
-    addCustomHostRoutine(routineName: string, callback: () => void) {
+    addCustomHostRoutine(routineName: string, callback: (...args) => void) {
         window[routineName] = callback;
     }
 
