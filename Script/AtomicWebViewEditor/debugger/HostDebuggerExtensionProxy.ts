@@ -63,8 +63,14 @@ export const debuggerHostKeys = {
 };
 
 /**
- * Register host-callable commands with the web view
+ * Register host-callable commands with the web view.  This registers the
+ * this named web view with the host so that it can be notified of any
+ * host initiated debugger messages
+ * @param {string} name The name associated with the listener.  Ususally the filename.
  */
-export function  registerDebuggerFrameWithHost() {
-    atomicHostEvent("Debugger.RegisterDebuggerFrame", debuggerHostKeys);
+export function  registerDebuggerListener(name: string) {
+    atomicHostEvent("Debugger.RegisterDebuggerListener", {
+        name,
+        callbacks: debuggerHostKeys
+    });
 }

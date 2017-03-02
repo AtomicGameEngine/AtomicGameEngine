@@ -25,6 +25,7 @@ import * as ClientExtensionServices from "./ClientExtensionServices";
 import tsExtension from "./languageExtensions/typescript/TypescriptLanguageExtension";
 import jsExtension from "./languageExtensions/javascript/JavascriptLanguageExtension";
 import tbExtension from "./languageExtensions/turbobadger/TurboBadgerLanguageExtension";
+import debuggerHookExtension from "./languageExtensions/debugger/EditorDebuggingHook";
 
 /**
  * Generic service locator of editor services that may be injected by either a plugin
@@ -92,3 +93,4 @@ export default serviceLocator;
 serviceLocator.loadService(new tsExtension());
 serviceLocator.loadService(new jsExtension());
 serviceLocator.loadService(new tbExtension());
+serviceLocator.loadService(new debuggerHookExtension());

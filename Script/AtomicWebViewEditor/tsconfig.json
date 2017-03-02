@@ -22,6 +22,7 @@
     "files": [
         "./clientExtensions/ClientExtensionEventNames.ts",
         "./clientExtensions/ClientExtensionServices.ts",
+        "./clientExtensions/languageExtensions/debugger/EditorDebuggingHook.ts",
         "./clientExtensions/languageExtensions/javascript/JavascriptLanguageExtension.ts",
         "./clientExtensions/languageExtensions/turbobadger/TurboBadgerLanguageExtension.ts",
         "./clientExtensions/languageExtensions/typescript/tsLanguageSupport.ts",

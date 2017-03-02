@@ -856,7 +856,7 @@ export default class DuktapeDebugger {
             debuggerProxy.debuggerHostKeys.removeBreakpoint,
             this.removeBreakpoint.bind(this));
 
-        debuggerProxy.registerDebuggerFrameWithHost();
+        debuggerProxy.registerDebuggerListener("DuktapeDebugger");
     }
 
     fixBreakpointFilename(fileName: string): string {

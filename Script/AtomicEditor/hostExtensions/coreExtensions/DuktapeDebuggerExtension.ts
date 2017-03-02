@@ -83,6 +83,18 @@ class BreakpointList {
     }
 }
 
+interface ClientProxyMappings {
+    toggleBreakpoint: string;
+    addBreakpoint: string;
+    removeBreakpoint: string;
+}
+
+interface ClientListener {
+    name: string;
+    frame: WebView.WebClient;
+    callbacks: ClientProxyMappings;
+}
+
 /**
  * extension that will communicate with the duktape debugger
  */
@@ -90,14 +102,8 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
     name: string = "HostDebuggerExtension";
     description: string = "This service supports the duktape debugger interface";
 
-    private debuggerWebClient: WebView.WebClient;
-    private clientProxyMappings: {
-        toggleBreakpoint: string,
-        addBreakpoint: string,
-        removeBreakpoint: string
-    };
-
     private serviceRegistry: Editor.HostExtensions.HostServiceLocator = null;
+    private listeners: ClientListener[] = [];
 
     private breakpointList = new BreakpointList();
 
@@ -129,7 +135,7 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
                 this.webMessageEventResponse(webMessage);
                 break;
             case "Debugger.ToggleBreakpoint":
-                this.toggleBreakpoint(data);
+                this.toggleBreakpoint(data, webMessage.handler.webClient);
                 this.webMessageEventResponse(webMessage);
                 break;
             case "Debugger.RemoveAllBreakpoints":
@@ -139,8 +145,8 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
             case "Debugger.GetBreakpoints":
                 this.webMessageEventResponse(webMessage, this.breakpointList.getBreakpoints());
                 break;
-            case "Debugger.RegisterDebuggerFrame":
-                this.registerDebuggerFrame(webMessage, data);
+            case "Debugger.RegisterDebuggerListener":
+                this.registerDebuggerListener(webMessage, data);
                 this.webMessageEventResponse(webMessage);
                 break;
         }
@@ -158,44 +164,65 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
         }
     }
 
-    registerDebuggerFrame(originalMessage: WebView.WebMessageEvent, mappings) {
-        this.debuggerWebClient = originalMessage.handler.webClient;
-        this.clientProxyMappings = mappings;
+    registerDebuggerListener(originalMessage: WebView.WebMessageEvent, messageData: {
+        name: string,
+        callbacks: any
+    }) {
+        console.log(`Registering debug listener: ${messageData.name}`);
+        const listenerReference: ClientListener = {
+            name: messageData.name,
+            frame: originalMessage.handler.webClient,
+            callbacks: messageData.callbacks
+        };
+
+        this.listeners.push(listenerReference);
+
+        // clean up any stale ones
+        this.listeners = this.listeners.filter(l => l.frame);
     }
 
     addBreakpoint(bp: Breakpoint) {
         this.breakpointList.addBreakpoint(bp.fileName, bp.lineNumber);
-        if (this.debuggerWebClient) {
-            this.proxyWebClientMethod(
-                this.debuggerWebClient,
-                this.clientProxyMappings.addBreakpoint,
-                bp.fileName,
-                bp.lineNumber,
-                false);
+        for (let listener of this.listeners) {
+            if (listener.frame) {
+                console.log(`Adding breakpoint ${bp.fileName}:${bp.lineNumber} to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.addBreakpoint,
+                    bp.fileName,
+                    bp.lineNumber,
+                    false);
+            }
         }
     }
 
     removeBreakpoint(bp: Breakpoint) {
         this.breakpointList.removeBreakpoint(bp.fileName, bp.lineNumber);
-        if (this.debuggerWebClient) {
-            this.proxyWebClientMethod(
-                this.debuggerWebClient,
-                this.clientProxyMappings.removeBreakpoint,
-                bp.fileName,
-                bp.lineNumber,
-                false);
+        for (let listener of this.listeners) {
+            if (listener.frame) {
+                console.log(`Remove breakpoint ${bp.fileName}:${bp.lineNumber} to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.removeBreakpoint,
+                    bp.fileName,
+                    bp.lineNumber,
+                    false);
+            }
         }
     }
 
-    toggleBreakpoint(bp: Breakpoint) {
+    toggleBreakpoint(bp: Breakpoint, sender: WebView.WebClient) {
         this.breakpointList.toggleBreakpoint(bp.fileName, bp.lineNumber);
-        if (this.debuggerWebClient) {
-            this.proxyWebClientMethod(
-                this.debuggerWebClient,
-                this.clientProxyMappings.toggleBreakpoint,
-                bp.fileName,
-                bp.lineNumber,
-                false);
+        for (let listener of this.listeners) {
+            if (listener.frame && listener.frame != sender) {
+                console.log(`Sending Toggle breakpoint ${bp.fileName}:${bp.lineNumber} to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.toggleBreakpoint,
+                    bp.fileName,
+                    bp.lineNumber,
+                    false);
+            }
         }
     }
 
