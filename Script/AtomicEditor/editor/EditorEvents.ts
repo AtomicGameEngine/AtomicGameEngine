@@ -26,3 +26,4 @@ export const IPCPlayerExitRequestEventType: Atomic.EventType = "IPCPlayerExitReq
 export const IPCPlayerWindowChangedEventType: Atomic.EventType = "IPCPlayerWindowChanged";
 export const IPCPlayerPauseResumeRequestEventType: Atomic.EventType = "IPCPlayerPauseResumeRequest";
 export const IPCPlayerPauseStepRequestEventType: Atomic.EventType = "IPCPlayerPauseStepRequest";
+export const IPCPlayerUpdatesPausedResumedEventType: Atomic.EventType = "IPCPlayerUpdatesPausedResumed";

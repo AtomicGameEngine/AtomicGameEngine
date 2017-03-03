@@ -134,6 +134,7 @@ export default class DuktapeDebugger {
 
         this.editor.revealLineInCenterIfOutsideViewport(reqLine);
         this.editor.setPosition(new monaco.Position(reqLine, 0));
+        debuggerProxy.notifyHostCurrentSourcePosition("Resources/" + this.loadedFileName, reqLine);
     }
 
     /*
@@ -287,6 +288,32 @@ export default class DuktapeDebugger {
         if (notifyHost) {
             debuggerProxy.removeBreakpoint(fileName, lineNumber);
         }
+    }
+
+    pause() {
+        this.socket.emit("pause", {});
+
+        // Pause may take seconds to complete so indicate it is pending.
+        $("#pause-button").addClass("pending");
+    }
+
+    resume() {
+        this.socket.emit("resume", {});
+    }
+
+    stepInto() {
+        this.socket.emit("stepinto", {});
+        setTimeout(() => this.doSourceUpdate(), 125);
+    }
+
+    stepOut() {
+        this.socket.emit("stepout", {});
+        setTimeout(() => this.doSourceUpdate(), 125);
+    }
+
+    stepOver() {
+        this.socket.emit("stepover", {});
+        setTimeout(() => this.doSourceUpdate(), 125);
     }
 
     initSocket() {
@@ -532,28 +559,11 @@ export default class DuktapeDebugger {
             this.bytecodeIdxInstr = msg.idxPreformattedInstructions;
         });
 
-        $("#stepinto-button").click(() => {
-            this.socket.emit("stepinto", {});
-        });
-
-        $("#stepover-button").click(() => {
-            this.socket.emit("stepover", {});
-        });
-
-        $("#stepout-button").click(() => {
-            this.socket.emit("stepout", {});
-        });
-
-        $("#pause-button").click(() => {
-            this.socket.emit("pause", {});
-
-            // Pause may take seconds to complete so indicate it is pending.
-            $("#pause-button").addClass("pending");
-        });
-
-        $("#resume-button").click(() => {
-            this.socket.emit("resume", {});
-        });
+        $("#stepinto-button").click(() => this.stepInto());
+        $("#stepover-button").click(() => this.stepOver());
+        $("#stepout-button").click(() => this.stepOut());
+        $("#pause-button").click(() => this.pause());
+        $("#resume-button").click(() => this.resume());
 
         $("#attach-button").click(() => {
             this.socket.emit("attach", {});
@@ -619,18 +629,6 @@ export default class DuktapeDebugger {
 
 
     setSourceText(data) {
-        /* TSH
-        var elem, div;
-
-        elem = $("#source-code");
-        elem.empty();
-        data.split("\n").forEach(function (line) {
-            div = $("<div></div>");
-            div.text(line);
-            elem.append(div);
-        });
-        */
-
         this.editor.deltaDecorations([], []);
         this.editor.getModel().setValue(data);
         this.sourceEditedLines = [];
@@ -640,12 +638,6 @@ export default class DuktapeDebugger {
      *  AJAX request handling to fetch source files
      */
     requestSourceFile(fileName: string, lineNumber: number) {
-        // If previous update is pending, abort and start a new one.
-        if (this.sourceFetchXhr) {
-            this.sourceFetchXhr.abort();
-            this.sourceFetchXhr = null;
-        }
-
         console.log(`Retrieving File: ${fileName}`);
         // get the code
         return HostInteropType.getInstance().getFileResource("Resources/" + fileName).then((data: string) => {
@@ -749,7 +741,7 @@ export default class DuktapeDebugger {
 
         // Source is updated periodically.  Other code can also call doSourceUpdate()
         // directly if an immediate update is needed.
-        this.sourceUpdateInterval = setInterval(this.doSourceUpdate.bind(this), this.SOURCE_UPDATE_INTERVAL);
+        // this.sourceUpdateInterval = setInterval(this.doSourceUpdate.bind(this), this.SOURCE_UPDATE_INTERVAL);
         this.editor.onMouseMove((e) => {
             var targetZone = e.target.toString();
             if (targetZone.indexOf("GUTTER_GLYPH_MARGIN") != -1) {
@@ -855,6 +847,10 @@ export default class DuktapeDebugger {
         interop.addCustomHostRoutine(
             debuggerProxy.debuggerHostKeys.removeBreakpoint,
             this.removeBreakpoint.bind(this));
+
+        interop.addCustomHostRoutine(
+            debuggerProxy.debuggerHostKeys.pause,
+            this.pause.bind(this));
 
         debuggerProxy.registerDebuggerListener("DuktapeDebugger");
     }

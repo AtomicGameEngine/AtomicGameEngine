@@ -144,12 +144,11 @@ class ResourceFrame extends ScriptWidget {
     }
 
     /**
-     * 
      * Set the cursor to the correct line number in the editor
      * @param {Editor.ResourceEditor} editor
      * @param {any} [lineNumber=-1]
      * @param {any} [tokenPos=-1]
-     * 
+     *
      * @memberOf ResourceFrame
      */
     setCursorPositionInEditor(editor: Editor.ResourceEditor, lineNumber = -1, tokenPos = -1) {

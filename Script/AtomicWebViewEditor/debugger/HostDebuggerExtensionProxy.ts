@@ -9,7 +9,7 @@ export interface Breakpoint {
  * Get a list of all breakpoints that have been registered
  * @return {Breakpoint[]}
  */
-export async function getBreakpoints() : Promise<Breakpoint[]> {
+export async function getBreakpoints(): Promise<Breakpoint[]> {
     return atomicHostRequest<Breakpoint[]>("Debugger.GetBreakpoints");
 }
 
@@ -59,7 +59,11 @@ export async function removeAllBreakpoints() {
 export const debuggerHostKeys = {
     toggleBreakpoint: "HOST_DEBUGGER_ToggleBreakpoint",
     addBreakpoint: "HOST_DEBUGGER_AddBreakpoint",
-    removeBreakpoint: "HOST_DEBUGGER_RemoveBreakpoint"
+    removeBreakpoint: "HOST_DEBUGGER_RemoveBreakpoint",
+    pause: "HOST_DEBUGGER_Pause",
+    step: "HOST_DEBUGGER_Step",
+    resume: "HOST_DEBUGGER_Resume",
+    stop: "HOST_DEBUGGER_Stop"
 };
 
 /**
@@ -68,9 +72,21 @@ export const debuggerHostKeys = {
  * host initiated debugger messages
  * @param {string} name The name associated with the listener.  Ususally the filename.
  */
-export function  registerDebuggerListener(name: string) {
+export function registerDebuggerListener(name: string) {
     atomicHostEvent("Debugger.RegisterDebuggerListener", {
         name,
         callbacks: debuggerHostKeys
+    });
+}
+
+/**
+ * Notify the host of the current line number and source file.  Used during pause, step, etc.
+ * @param  {string} fileName
+ * @param  {number} lineNumber
+ */
+export async function notifyHostCurrentSourcePosition(fileName: string, lineNumber: number) {
+    return atomicHostEvent("Debugger.CurrentSourcePosition", {
+        fileName,
+        lineNumber
     });
 }

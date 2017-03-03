@@ -19,6 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+import EditorEvents = require("../../editor/EditorEvents");
 
 export interface Breakpoint {
     fileName: string;
@@ -87,6 +88,10 @@ interface ClientProxyMappings {
     toggleBreakpoint: string;
     addBreakpoint: string;
     removeBreakpoint: string;
+    pause: string;
+    step: string;
+    resume: string;
+    stop: string;
 }
 
 interface ClientListener {
@@ -94,6 +99,8 @@ interface ClientListener {
     frame: WebView.WebClient;
     callbacks: ClientProxyMappings;
 }
+
+const DUKTAPE_DEBUGGER_NAME = "Duktape Debugger";
 
 /**
  * extension that will communicate with the duktape debugger
@@ -117,6 +124,29 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
         serviceLocator.projectServices.register(this);
         serviceLocator.uiServices.register(this);
         this.serviceRegistry = serviceLocator;
+
+        this.subscribeToEvent(Editor.EditorResourceCloseEvent((data) => this.handleResourceClosedEvent(data)));
+        this.subscribeToEvent(Editor.EditorPlayerPausedEvent((data) => this.handlePause()));
+        this.subscribeToEvent(Editor.EditorPlayerResumedEvent((data) => this.handleResume()));
+        this.subscribeToEvent(Editor.EditorPlayerStoppedEvent((data) => this.handleStop()));
+        //this.subscribeToEvent(Atomic.PauseStepRequestedEvent((data) => console.log("step")));
+        //this.subscribeToEvent(Atomic.PauseResumeRequestedEvent((data) => console.log("step resume")));
+
+
+        //this.subscribeToEvent(Atomic.ScriptEvent(EditorEvents.IPCPlayerPauseResumeRequestEventType, (data) => console.log("step resume")));
+        this.subscribeToEvent(Atomic.ScriptEvent(EditorEvents.IPCPlayerPauseStepRequestEventType, (data) => this.handleStep()));
+
+
+    }
+
+    handleResourceClosedEvent(data: Editor.EditorResourceCloseEvent) {
+        // Remove the editor we are listening to
+        this.listeners = this.listeners.filter(l => {
+            if (data.editor.fullPath.lastIndexOf(l.name) == data.editor.fullPath.length - l.name.length) {
+                return false;
+            }
+            return true;
+        });
     }
 
     /**
@@ -127,11 +157,11 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
     handleWebMessage(webMessage: WebView.WebMessageEvent, messageType: string, data: any) {
         switch (messageType) {
             case "Debugger.AddBreakpoint":
-                this.addBreakpoint(data);
+                this.addBreakpoint(data, webMessage.handler.webClient);
                 this.webMessageEventResponse(webMessage);
                 break;
             case "Debugger.RemoveBreakpoint":
-                this.removeBreakpoint(data);
+                this.removeBreakpoint(data, webMessage.handler.webClient);
                 this.webMessageEventResponse(webMessage);
                 break;
             case "Debugger.ToggleBreakpoint":
@@ -147,6 +177,10 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
                 break;
             case "Debugger.RegisterDebuggerListener":
                 this.registerDebuggerListener(webMessage, data);
+                this.webMessageEventResponse(webMessage);
+                break;
+            case "Debugger.CurrentSourcePosition":
+                this.setCurrentSourcePosition(data);
                 this.webMessageEventResponse(webMessage);
                 break;
         }
@@ -181,10 +215,10 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
         this.listeners = this.listeners.filter(l => l.frame);
     }
 
-    addBreakpoint(bp: Breakpoint) {
+    addBreakpoint(bp: Breakpoint, sender: WebView.WebClient) {
         this.breakpointList.addBreakpoint(bp.fileName, bp.lineNumber);
         for (let listener of this.listeners) {
-            if (listener.frame) {
+            if (listener.frame && listener.frame != sender) {
                 console.log(`Adding breakpoint ${bp.fileName}:${bp.lineNumber} to ${listener.name}`);
                 this.proxyWebClientMethod(
                     listener.frame,
@@ -196,10 +230,10 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
         }
     }
 
-    removeBreakpoint(bp: Breakpoint) {
+    removeBreakpoint(bp: Breakpoint, sender: WebView.WebClient) {
         this.breakpointList.removeBreakpoint(bp.fileName, bp.lineNumber);
         for (let listener of this.listeners) {
-            if (listener.frame) {
+            if (listener.frame && listener.frame != sender) {
                 console.log(`Remove breakpoint ${bp.fileName}:${bp.lineNumber} to ${listener.name}`);
                 this.proxyWebClientMethod(
                     listener.frame,
@@ -226,9 +260,48 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
         }
     }
 
+    handleResume() {
+        for (let listener of this.listeners) {
+            if (listener.frame && listener.name == DUKTAPE_DEBUGGER_NAME) {
+                console.log(`Sending Pause to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.resume);
+            }
+        }
+    }
 
-    resume() {
+    handlePause() {
+        for (let listener of this.listeners) {
+            if (listener.frame && listener.name == DUKTAPE_DEBUGGER_NAME) {
+                console.log(`Sending Pause to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.pause);
+            }
+        }
+    }
 
+    handleStep() {
+        for (let listener of this.listeners) {
+            if (listener.frame && listener.name == DUKTAPE_DEBUGGER_NAME) {
+                console.log(`Sending Pause to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.step);
+            }
+        }
+    }
+
+    handleStop() {
+        for (let listener of this.listeners) {
+            if (listener.frame && listener.name == DUKTAPE_DEBUGGER_NAME) {
+                console.log(`Sending Pause to ${listener.name}`);
+                this.proxyWebClientMethod(
+                    listener.frame,
+                    listener.callbacks.stop);
+            }
+        }
     }
 
     attach() {
@@ -239,6 +312,13 @@ export default class DuktapeDebuggerExtension extends Atomic.ScriptObject implem
 
     }
 
+    setCurrentSourcePosition(bp: Breakpoint) {
+        console.log(`Trying to open: ${bp.fileName}:${bp.lineNumber}`);
+        this.sendEvent(Editor.EditorEditResourceEventData({
+            path: bp.fileName,
+            lineNumber: bp.lineNumber
+        }));
+    }
     /**
      * Utility function that will compose a method call to the web client and execute it
      * It will construct it in the form of "MethodName(....);"
