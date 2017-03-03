@@ -113,7 +113,7 @@ public:
         return true;
     }
 
-#ifndef ATOMIC_PLATFORM_WINDOWS
+#ifdef ATOMIC_OPENGL
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
@@ -329,8 +329,6 @@ public:
 
 #endif
 
-    }
-
 #endif
 
 private:
@@ -390,6 +388,14 @@ void WebTexture2D::SetSize(int width, int height)
     textureUsage = TEXTURE_STATIC;
     format = DXGI_FORMAT_B8G8R8A8_UNORM;
 
+#endif
+
+#if defined(ATOMIC_OPENGL) && defined(ATOMIC_PLATFORM_WINDOWS) 
+	//Force width and height to multiples of 2 so that we don't squish pixels
+	//This doesn't seem to make the text completely sharp but it makes it usable for now.
+	width = (width | 2) + 1;
+	height = (height | 2) + 1;
+	texture_->SetFilterMode(TextureFilterMode::FILTER_NEAREST);
 #endif
 
     if (!texture_->SetSize(width, height, format, textureUsage))
