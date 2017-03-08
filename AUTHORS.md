@@ -51,6 +51,8 @@
 
 - Borislav Parvanov (https://github.com/bparvanov)
 
+- Manuel Freiberger (https://github.com/ombre5733)
+
 ### Contribution Copyright and Licensing
 
 Atomic Game Engine contribution copyrights are held by their authors.  Each author retains the copyright to their contribution and agrees to irrevocably license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`.  Please see `CONTRIBUTING.md` for more details.
