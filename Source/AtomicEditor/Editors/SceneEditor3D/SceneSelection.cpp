@@ -66,7 +66,7 @@ SceneSelection::~SceneSelection()
 
 Node* SceneSelection::GetSelectedNode(unsigned index) const
 {
-    if (index > nodes_.Size())
+    if (index >= nodes_.Size())
         return 0;
 
     return nodes_[index];
