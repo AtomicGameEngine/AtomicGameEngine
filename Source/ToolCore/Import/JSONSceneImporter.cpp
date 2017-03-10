@@ -165,9 +165,9 @@ JSONMeshRenderer::JSONMeshRenderer(JSONSceneImporter* importer, const rapidjson:
         }
         else if (!strcmp(oitr->name.GetString(), "materials"))
         {
-            for (Value::ConstValueIterator mitr = oitr->value.Begin(); mitr != oitr->value.End(); mitr++)
+            for (Value::ConstValueIterator mitr = oitr->value.Begin(); mitr != oitr->value.End(); ++mitr)
             {
-                JSONMaterial* material = importer->GetMaterial((*mitr).GetString());
+                JSONMaterial* material = importer->GetMaterial(mitr->GetString());
                 assert(material);
                 materials_.Push(material);
             }
@@ -191,7 +191,7 @@ JSONAnimation::JSONAnimation(JSONSceneImporter* importer, const rapidjson::Value
 
     assert(jclips != value.MemberEnd());
 
-    for (Value::ConstValueIterator clipitr = jclips->value.Begin(); clipitr != jclips->value.End(); clipitr++)
+    for (Value::ConstValueIterator clipitr = jclips->value.Begin(); clipitr != jclips->value.End(); ++clipitr)
     {
         const Value::ConstMemberIterator clipname = clipitr->FindMember("name");
         const Value::ConstMemberIterator clipnodes = clipitr->FindMember("nodes");
@@ -199,7 +199,7 @@ JSONAnimation::JSONAnimation(JSONSceneImporter* importer, const rapidjson::Value
         AnimationClip* aclip = new AnimationClip();
         aclip->name_ = clipname->value.GetString();
 
-        for (Value::ConstValueIterator nodeitr = clipnodes->value.Begin(); nodeitr != clipnodes->value.End(); nodeitr++)
+        for (Value::ConstValueIterator nodeitr = clipnodes->value.Begin(); nodeitr != clipnodes->value.End(); ++nodeitr)
         {
             AnimationNode* node = new AnimationNode();
             const Value::ConstMemberIterator nodename = nodeitr->FindMember("name");
@@ -207,7 +207,7 @@ JSONAnimation::JSONAnimation(JSONSceneImporter* importer, const rapidjson::Value
 
             node->name_ = nodename->value.GetString();
 
-            for (Value::ConstValueIterator keyitr = keyframes->value.Begin(); keyitr != keyframes->value.End(); keyitr++)
+            for (Value::ConstValueIterator keyitr = keyframes->value.Begin(); keyitr != keyframes->value.End(); ++keyitr)
             {
                 Keyframe* keyframe = new Keyframe();
 
@@ -423,9 +423,9 @@ JSONNode::JSONNode(JSONSceneImporter* importer, const rapidjson::Value& value) :
         }
         else if (!strcmp(oitr->name.GetString(), "children"))
         {
-            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); citr++)
+            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); ++citr)
             {
-                if (!(*citr).IsObject())
+                if (!citr->IsObject())
                     continue;
 
                 AddChild(new JSONNode(importer, *citr));
@@ -433,9 +433,9 @@ JSONNode::JSONNode(JSONSceneImporter* importer, const rapidjson::Value& value) :
         }
         else if (!strcmp(oitr->name.GetString(), "components"))
         {
-            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); citr++)
+            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); ++citr)
             {
-                if (!(*citr).IsObject())
+                if (!citr->IsObject())
                     continue;
 
                 const Value::ConstMemberIterator jtype = citr->FindMember("type");
@@ -579,9 +579,9 @@ bool JSONSceneImporter::ParseMaterials(const rapidjson::Value& value)
     const Value::ConstMemberIterator jmaterials = value.FindMember("materials");
     if (jmaterials != value.MemberEnd() && jmaterials->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jmaterials->value.Begin(); itr != jmaterials->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jmaterials->value.Begin(); itr != jmaterials->value.End(); ++itr)
         {
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
                 String name = "Anonymous Material";
                 String shader;
@@ -592,8 +592,8 @@ bool JSONSceneImporter::ParseMaterials(const rapidjson::Value& value)
                 int renderQueue = 0;
                 Color color(1, 1, 1, 1);
 
-                for (Value::ConstMemberIterator oitr = (*itr).MemberBegin();
-                     oitr != (*itr).MemberEnd(); ++oitr)
+                for (Value::ConstMemberIterator oitr = itr->MemberBegin();
+                     oitr != itr->MemberEnd(); ++oitr)
                 {
 
                     if (!strcmp(oitr->name.GetString(), "name"))
@@ -655,14 +655,14 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
     const Value::ConstMemberIterator jmeshes = value.FindMember("meshes");
     if (jmeshes != value.MemberEnd() && jmeshes->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jmeshes->value.Begin(); itr != jmeshes->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jmeshes->value.Begin(); itr != jmeshes->value.End(); ++itr)
         {
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
                 JSONMesh* mesh = new JSONMesh("Anonymous Mesh");
 
-                for (Value::ConstMemberIterator oitr = (*itr).MemberBegin();
-                     oitr != (*itr).MemberEnd(); ++oitr)
+                for (Value::ConstMemberIterator oitr = itr->MemberBegin();
+                     oitr != itr->MemberEnd(); ++oitr)
                 {
 
                     if (!strcmp(oitr->name.GetString(), "name"))
@@ -674,14 +674,14 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         if (oitr->value.IsArray())
                         {
                             for (Value::ConstValueIterator triangleArrayItr = oitr->value.Begin();
-                                 triangleArrayItr != oitr->value.End(); triangleArrayItr++)
+                                 triangleArrayItr != oitr->value.End(); ++triangleArrayItr)
                             {
                                 PODVector<int>& triangles = mesh->AddSubMesh();
 
                                 for (Value::ConstValueIterator vertexItr = triangleArrayItr->Begin();
-                                     vertexItr != triangleArrayItr->End(); vertexItr++)
+                                     vertexItr != triangleArrayItr->End(); ++vertexItr)
                                 {
-                                    triangles.Push((*vertexItr).GetInt());
+                                    triangles.Push(vertexItr->GetInt());
                                 }
 
                             }
@@ -692,7 +692,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector3 pos;
                         PODVector<Vector3>& vpos = mesh->GetVertexPositions();
                         for (Value::ConstValueIterator vertexItr = oitr->value.Begin();
-                             vertexItr != oitr->value.End(); vertexItr++)
+                             vertexItr != oitr->value.End(); ++vertexItr)
                         {
 
                             ReadVector3FromArray(*vertexItr, pos);
@@ -705,7 +705,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector3 pos;
                         PODVector<Vector3>& vnorm = mesh->GetVertexNormals();
                         for (Value::ConstValueIterator vertexItr = oitr->value.Begin();
-                             vertexItr != oitr->value.End(); vertexItr++)
+                             vertexItr != oitr->value.End(); ++vertexItr)
                         {
 
                             ReadVector3FromArray(*vertexItr, pos);
@@ -718,7 +718,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector4 tangent;
                         PODVector<Vector4>& vtangents = mesh->GetVertexTangents();
                         for (Value::ConstValueIterator vertexItr = oitr->value.Begin();
-                             vertexItr != oitr->value.End(); vertexItr++)
+                             vertexItr != oitr->value.End(); ++vertexItr)
                         {
 
                             ReadVector4FromArray(*vertexItr, tangent);
@@ -731,7 +731,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         PODVector<JSONMesh::BoneWeight>& boneWeights = mesh->GetBoneWeights();
 
                         for (Value::ConstValueIterator bitr = oitr->value.Begin();
-                             bitr != oitr->value.End(); bitr++)
+                             bitr != oitr->value.End(); ++bitr)
                         {
                             JSONMesh::BoneWeight bw;
                             const Value::ConstMemberIterator indexes = bitr->FindMember("indexes");
@@ -757,7 +757,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector<Matrix4>& bindPoses = mesh->GetBindPoses();
 
                         for (Value::ConstValueIterator bitr = oitr->value.Begin();
-                             bitr != oitr->value.End(); bitr++)
+                             bitr != oitr->value.End(); ++bitr)
                         {
                             Matrix4 m;
                             ReadMatrix4FromArray(*bitr, m);
@@ -772,7 +772,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         if (!oitr->value.IsNull())
                         {
                             for (Value::ConstValueIterator bitr = oitr->value.Begin();
-                                 bitr != oitr->value.End(); bitr++)
+                                 bitr != oitr->value.End(); ++bitr)
                             {
                                 const Value::ConstMemberIterator pos = bitr->FindMember("localPosition");
                                 const Value::ConstMemberIterator rot = bitr->FindMember("localRotation");
@@ -801,7 +801,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                                     mesh->GetUVSet(0) : mesh->GetUVSet(1);
 
                         for (Value::ConstValueIterator uvItr = oitr->value.Begin();
-                             uvItr != oitr->value.End(); uvItr++)
+                             uvItr != oitr->value.End(); ++uvItr)
                         {
 
                             ReadVector2FromArray(*uvItr, uv);
@@ -968,9 +968,9 @@ bool JSONSceneImporter::ParseResources(const rapidjson::Value& value)
 
 bool JSONSceneImporter::ParseHierarchy(const rapidjson::Value& value)
 {
-    for (Value::ConstValueIterator itr = value.Begin(); itr != value.End(); itr++)
+    for (Value::ConstValueIterator itr = value.Begin(); itr != value.End(); ++itr)
     {
-        if ((*itr).IsObject())
+        if (itr->IsObject())
         {
             hierarchy_.Push(new JSONNode(this, *itr));
         }
