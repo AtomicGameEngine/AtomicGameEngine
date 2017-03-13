@@ -27,6 +27,7 @@ class PlayerOutput extends Atomic.UIWindow {
 
     output: Atomic.UIEditField;
     closeOnStop: Atomic.UICheckBox;
+    errorsFileLine: Array<string>;
 
     constructor() {
 
@@ -43,6 +44,8 @@ class PlayerOutput extends Atomic.UIWindow {
         this.closeOnStop = <Atomic.UICheckBox> this.getWidget("closeonstop");
 
         this.closeOnStop.value = Preferences.getInstance().editorFeatures.closePlayerLog ? 1 : 0;
+
+        this.errorsFileLine = new Array();
 
         (<Atomic.UIButton>this.getWidget("closebutton")).onClick = () => {
 
@@ -66,7 +69,8 @@ class PlayerOutput extends Atomic.UIWindow {
         if (text.length > 32768)
             this.output.text = "";
 
-        this.output.appendText(ev.message + "\n");
+
+        this.output.appendText( this.wakeOnError(ev.message) + "\n");
         this.output.scrollTo(0, 0xffffff);
     }
 
@@ -79,9 +83,54 @@ class PlayerOutput extends Atomic.UIWindow {
                 Preferences.getInstance().editorFeatures.closePlayerLog = this.closeOnStop.value > 0 ? true : false;
                 Preferences.getInstance().write();
                 return true;
+            } else {
+                if ( id.indexOf("ERR") > -1 ) {  // ERRxxx this is an encoded error index id
+                    var indx = parseInt( id.replace ("ERR", ""));  // remove the ERR string so it will parse
+                    var colonpos = this.errorsFileLine[indx].indexOf( ":");  // split the filename and line
+                    var fn = ToolCore.toolSystem.project.projectPath + "Resources/" + this.errorsFileLine[indx].substr(0, colonpos) + ".js";
+                    var ln = this.errorsFileLine[indx].substr(colonpos + 1, (this.errorsFileLine[indx].length - colonpos));
+                    var line = parseInt(ln);
+                    this.sendEvent(Editor.EditorEditResourceEventData({ path: fn, lineNumber: line }));
+                }
             }
         }
     }
+
+    wakeOnError ( message: string ) {  // look for Errors in the transcript, insert links to bring up the offending file
+
+        if ( message.indexOf("Error") == -1 ) return message;  // send it back if no "Error" string is present
+
+        if ( this.errorsFileLine.length > 100 ) return message;  // limit the number of unique errors, geez
+
+        var linenum;
+        var linepos = message.indexOf("Line");  // find the Line token to harvest the line number
+        if ( linepos > -1 ) { // we found it
+           var lnsrt = message.indexOf(" ", linepos + 1 );  // find the next 2 spaces, and substr it
+           var lnstp = message.indexOf(" ", lnsrt + 1 );
+           linenum = ":" + message.substr(lnsrt, lnstp - lnsrt).trim();  // create our next search string
+        }
+        else return message;  // send it back original if the Line signature is not present
+
+        var fnpos = message.indexOf( linenum );  // find the :linenumber position
+        var fnsrt = fnpos - 1;  // find the start of the string, the hard way.
+        while (message.charAt(fnsrt) != " " && message.charAt(fnsrt) != "\n" && fnsrt > 0)
+            fnsrt--;
+        var fnstp = fnpos + 1; // find the end of the string
+        while (message.charAt(fnstp) != " " && message.charAt(fnstp) != "\n" && fnstp < message.length - 1 )
+            fnstp++;
+        var errFnLn = message.substr(fnsrt, fnstp - fnsrt).trim();  // and this is your problem, right there.
+
+        var link = this.errorsFileLine.indexOf(errFnLn);  // see if we already have this signature 
+        if ( link == -1 ) {  // if not logged yet, do so, otherwise use an existing link
+            this.errorsFileLine.push(errFnLn);
+            link = this.errorsFileLine.length - 1;
+        }
+
+        var lnkwidget = ` <widget TBSkinImage: skin: MagnifierBitmap, text: "..." id: ERR` + link.toString() + ` > `;
+        var newMessage = message.replace(errFnLn, errFnLn + lnkwidget);
+
+        return newMessage;
+    };
 
 }
 
