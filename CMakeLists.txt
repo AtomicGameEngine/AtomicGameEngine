@@ -24,6 +24,10 @@ endif()
 
 add_link_libraries_exported (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL)
 
+if (MSVC)
+option(ATOMIC_D3D11 "This force D3D11 on for AGE as the default rendering backend, we don't plan to support D3D9 but if you need it just opt out" ON)   
+endif()
+
 if (NOT ATOMIC_BUILD_2D)
     add_definitions_exported (-DATOMIC_PHYSICS -DATOMIC_3D)
     add_link_libraries_exported (Bullet StanHull)
