@@ -37,6 +37,7 @@
 
 #ifdef _WIN32
 
+#include <locale.h>
 #include <stdlib.h>
 
 static
