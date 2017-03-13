@@ -209,7 +209,7 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
                 const char* name = i->first_.CString();
                 rapidjson::Value value;
                 ToRapidjsonValue(value, i->second_, allocator);
-                rapidjsonValue.AddMember(name, value, allocator);                
+                rapidjsonValue.AddMember(rapidjson::Value::StringRefType(name), value, allocator);                
 // ATOMIC END
             }
         }
@@ -231,7 +231,9 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     ToRapidjsonValue(document, root_, document.GetAllocator());
 
     StringBuffer buffer;
-    PrettyWriter<StringBuffer> writer(buffer, &(document.GetAllocator()));
+// ATOMIC BEGIN
+    PrettyWriter<StringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>, rapidjson::MemoryPoolAllocator<> > writer(buffer, &(document.GetAllocator()));
+// ATOMIC END
     writer.SetIndent(!indendation.Empty() ? indendation.Front() : '\0', indendation.Length());
 
     document.Accept(writer);

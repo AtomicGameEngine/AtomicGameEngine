@@ -20,18 +20,11 @@
 // THE SOFTWARE.
 //
 
-// before resource system exists so use rapidjson directly
-#include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/filestream.h>
-
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/File.h>
 
 #include "ToolEnvironment.h"
-
-using namespace rapidjson;
 
 
 namespace ToolCore

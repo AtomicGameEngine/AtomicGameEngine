@@ -20,10 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <rapidjson/document.h>
-#include <rapidjson/filestream.h>
-#include <rapidjson/prettywriter.h>
-
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
@@ -41,8 +37,6 @@
 #include "ProjectBuildSettings.h"
 #include "ProjectUserPrefs.h"
 #include "Project.h"
-
-using namespace rapidjson;
 
 namespace ToolCore
 {

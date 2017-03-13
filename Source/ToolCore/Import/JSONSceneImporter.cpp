@@ -165,9 +165,9 @@ JSONMeshRenderer::JSONMeshRenderer(JSONSceneImporter* importer, const rapidjson:
         }
         else if (!strcmp(oitr->name.GetString(), "materials"))
         {
-            for (Value::ConstValueIterator mitr = oitr->value.Begin(); mitr != oitr->value.End(); mitr++)
+            for (Value::ConstValueIterator mitr = oitr->value.Begin(); mitr != oitr->value.End(); ++mitr)
             {
-                JSONMaterial* material = importer->GetMaterial((*mitr).GetString());
+                JSONMaterial* material = importer->GetMaterial(mitr->GetString());
                 assert(material);
                 materials_.Push(material);
             }
@@ -187,34 +187,34 @@ JSONAnimation::JSONAnimation(JSONSceneImporter* importer, const rapidjson::Value
 {
     JSONComponent::Parse(value);
 
-    const Value::Member* jclips = value.FindMember("clips");
+    const Value::ConstMemberIterator jclips = value.FindMember("clips");
 
-    assert(jclips);
+    assert(jclips != value.MemberEnd());
 
-    for (Value::ConstValueIterator clipitr = jclips->value.Begin(); clipitr != jclips->value.End(); clipitr++)
+    for (Value::ConstValueIterator clipitr = jclips->value.Begin(); clipitr != jclips->value.End(); ++clipitr)
     {
-        const Value::Member* clipname = clipitr->FindMember("name");
-        const Value::Member* clipnodes = clipitr->FindMember("nodes");
+        const Value::ConstMemberIterator clipname = clipitr->FindMember("name");
+        const Value::ConstMemberIterator clipnodes = clipitr->FindMember("nodes");
 
         AnimationClip* aclip = new AnimationClip();
         aclip->name_ = clipname->value.GetString();
 
-        for (Value::ConstValueIterator nodeitr = clipnodes->value.Begin(); nodeitr != clipnodes->value.End(); nodeitr++)
+        for (Value::ConstValueIterator nodeitr = clipnodes->value.Begin(); nodeitr != clipnodes->value.End(); ++nodeitr)
         {
             AnimationNode* node = new AnimationNode();
-            const Value::Member* nodename = nodeitr->FindMember("name");
-            const Value::Member* keyframes = nodeitr->FindMember("keyframes");
+            const Value::ConstMemberIterator nodename = nodeitr->FindMember("name");
+            const Value::ConstMemberIterator keyframes = nodeitr->FindMember("keyframes");
 
             node->name_ = nodename->value.GetString();
 
-            for (Value::ConstValueIterator keyitr = keyframes->value.Begin(); keyitr != keyframes->value.End(); keyitr++)
+            for (Value::ConstValueIterator keyitr = keyframes->value.Begin(); keyitr != keyframes->value.End(); ++keyitr)
             {
                 Keyframe* keyframe = new Keyframe();
 
-                const Value::Member* jpos = keyitr->FindMember("pos");
-                const Value::Member* jscale = keyitr->FindMember("scale");
-                const Value::Member* jrot = keyitr->FindMember("rot");
-                const Value::Member* jtime = keyitr->FindMember("time");
+                const Value::ConstMemberIterator jpos = keyitr->FindMember("pos");
+                const Value::ConstMemberIterator jscale = keyitr->FindMember("scale");
+                const Value::ConstMemberIterator jrot = keyitr->FindMember("rot");
+                const Value::ConstMemberIterator jtime = keyitr->FindMember("time");
 
                 keyframe->time_ = (float) jtime->value.GetDouble();
                 importer_->ReadVector3FromArray(jpos->value, keyframe->pos_);
@@ -241,12 +241,12 @@ JSONTimeOfDay::JSONTimeOfDay(JSONSceneImporter* importer, const rapidjson::Value
 {
     JSONComponent::Parse(value);
 
-    const Value::Member* jtimeOn = value.FindMember("timeOn");
-    if (jtimeOn)
+    const Value::ConstMemberIterator jtimeOn = value.FindMember("timeOn");
+    if (jtimeOn != value.MemberEnd())
         timeOn_ = (float) jtimeOn->value.GetDouble();
 
-    const Value::Member* jtimeOff = value.FindMember("timeOff");
-    if (jtimeOff)
+    const Value::ConstMemberIterator jtimeOff = value.FindMember("timeOff");
+    if (jtimeOff != value.MemberEnd())
         timeOff_ = (float) jtimeOff->value.GetDouble();
 }
 
@@ -260,24 +260,24 @@ JSONLight::JSONLight(JSONSceneImporter* importer, const rapidjson::Value& value)
 {
     JSONComponent::Parse(value);
 
-    const Value::Member* jlightType = value.FindMember("lightType");
-    if (jlightType)
+    const Value::ConstMemberIterator jlightType = value.FindMember("lightType");
+    if (jlightType != value.MemberEnd())
         lightType_ = jlightType->value.GetString();
 
-    const Value::Member* jrange = value.FindMember("range");
-    if (jrange)
+    const Value::ConstMemberIterator jrange = value.FindMember("range");
+    if (jrange != value.MemberEnd())
         range_ = (float) jrange->value.GetDouble();
 
-    const Value::Member* jcolor = value.FindMember("color");
-    if (jcolor)
+    const Value::ConstMemberIterator jcolor = value.FindMember("color");
+    if (jcolor != value.MemberEnd())
         importer->ReadColorFromArray(jcolor->value, color_);
 
-    const Value::Member* jcastsShadows = value.FindMember("castsShadows");
-    if (jcastsShadows)
+    const Value::ConstMemberIterator jcastsShadows = value.FindMember("castsShadows");
+    if (jcastsShadows != value.MemberEnd())
         castsShadows_ = jcastsShadows->value.GetBool();
 
-    const Value::Member* jrealtime = value.FindMember("realtime");
-    if (jrealtime)
+    const Value::ConstMemberIterator jrealtime = value.FindMember("realtime");
+    if (jrealtime != value.MemberEnd())
         realtime_ = jrealtime->value.GetBool();
 }
 
@@ -288,8 +288,8 @@ JSONRigidBody::JSONRigidBody(JSONSceneImporter* importer, const rapidjson::Value
 {
     JSONComponent::Parse(value);
 
-    const Value::Member* jmass = value.FindMember("mass");
-    if (jmass)
+    const Value::ConstMemberIterator jmass = value.FindMember("mass");
+    if (jmass != value.MemberEnd())
         mass_ = (float) jmass->value.GetDouble();
 }
 
@@ -306,12 +306,12 @@ JSONBoxCollider::JSONBoxCollider(JSONSceneImporter* importer, const rapidjson::V
 {
     JSONComponent::Parse(value);
 
-    const Value::Member* jcenter= value.FindMember("center");
-    if (jcenter)
+    const Value::ConstMemberIterator jcenter= value.FindMember("center");
+    if (jcenter != value.MemberEnd())
         importer->ReadVector3FromArray(jcenter->value, center_);
 
-    const Value::Member* jsize= value.FindMember("size");
-    if (jsize)
+    const Value::ConstMemberIterator jsize= value.FindMember("size");
+    if (jsize != value.MemberEnd())
         importer->ReadVector3FromArray(jsize->value, size_);
 }
 
@@ -423,9 +423,9 @@ JSONNode::JSONNode(JSONSceneImporter* importer, const rapidjson::Value& value) :
         }
         else if (!strcmp(oitr->name.GetString(), "children"))
         {
-            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); citr++)
+            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); ++citr)
             {
-                if (!(*citr).IsObject())
+                if (!citr->IsObject())
                     continue;
 
                 AddChild(new JSONNode(importer, *citr));
@@ -433,14 +433,14 @@ JSONNode::JSONNode(JSONSceneImporter* importer, const rapidjson::Value& value) :
         }
         else if (!strcmp(oitr->name.GetString(), "components"))
         {
-            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); citr++)
+            for (Value::ConstValueIterator citr = oitr->value.Begin(); citr != oitr->value.End(); ++citr)
             {
-                if (!(*citr).IsObject())
+                if (!citr->IsObject())
                     continue;
 
-                const Value::Member* jtype = citr->FindMember("type");
+                const Value::ConstMemberIterator jtype = citr->FindMember("type");
 
-                if (!jtype)
+                if (jtype == value.MemberEnd())
                     continue;
 
                 String type = jtype->value.GetString();
@@ -576,12 +576,12 @@ void JSONSceneImporter::ReadMatrix4FromArray(const rapidjson::Value& value, Matr
 
 bool JSONSceneImporter::ParseMaterials(const rapidjson::Value& value)
 {
-    const Value::Member* jmaterials = value.FindMember("materials");
-    if (jmaterials && jmaterials->value.IsArray())
+    const Value::ConstMemberIterator jmaterials = value.FindMember("materials");
+    if (jmaterials != value.MemberEnd() && jmaterials->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jmaterials->value.Begin(); itr != jmaterials->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jmaterials->value.Begin(); itr != jmaterials->value.End(); ++itr)
         {
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
                 String name = "Anonymous Material";
                 String shader;
@@ -592,8 +592,8 @@ bool JSONSceneImporter::ParseMaterials(const rapidjson::Value& value)
                 int renderQueue = 0;
                 Color color(1, 1, 1, 1);
 
-                for (Value::ConstMemberIterator oitr = (*itr).MemberBegin();
-                     oitr != (*itr).MemberEnd(); ++oitr)
+                for (Value::ConstMemberIterator oitr = itr->MemberBegin();
+                     oitr != itr->MemberEnd(); ++oitr)
                 {
 
                     if (!strcmp(oitr->name.GetString(), "name"))
@@ -652,17 +652,17 @@ bool JSONSceneImporter::ParseMaterials(const rapidjson::Value& value)
 
 bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
 {
-    const Value::Member* jmeshes = value.FindMember("meshes");
-    if (jmeshes && jmeshes->value.IsArray())
+    const Value::ConstMemberIterator jmeshes = value.FindMember("meshes");
+    if (jmeshes != value.MemberEnd() && jmeshes->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jmeshes->value.Begin(); itr != jmeshes->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jmeshes->value.Begin(); itr != jmeshes->value.End(); ++itr)
         {
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
                 JSONMesh* mesh = new JSONMesh("Anonymous Mesh");
 
-                for (Value::ConstMemberIterator oitr = (*itr).MemberBegin();
-                     oitr != (*itr).MemberEnd(); ++oitr)
+                for (Value::ConstMemberIterator oitr = itr->MemberBegin();
+                     oitr != itr->MemberEnd(); ++oitr)
                 {
 
                     if (!strcmp(oitr->name.GetString(), "name"))
@@ -674,14 +674,14 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         if (oitr->value.IsArray())
                         {
                             for (Value::ConstValueIterator triangleArrayItr = oitr->value.Begin();
-                                 triangleArrayItr != oitr->value.End(); triangleArrayItr++)
+                                 triangleArrayItr != oitr->value.End(); ++triangleArrayItr)
                             {
                                 PODVector<int>& triangles = mesh->AddSubMesh();
 
                                 for (Value::ConstValueIterator vertexItr = triangleArrayItr->Begin();
-                                     vertexItr != triangleArrayItr->End(); vertexItr++)
+                                     vertexItr != triangleArrayItr->End(); ++vertexItr)
                                 {
-                                    triangles.Push((*vertexItr).GetInt());
+                                    triangles.Push(vertexItr->GetInt());
                                 }
 
                             }
@@ -692,7 +692,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector3 pos;
                         PODVector<Vector3>& vpos = mesh->GetVertexPositions();
                         for (Value::ConstValueIterator vertexItr = oitr->value.Begin();
-                             vertexItr != oitr->value.End(); vertexItr++)
+                             vertexItr != oitr->value.End(); ++vertexItr)
                         {
 
                             ReadVector3FromArray(*vertexItr, pos);
@@ -705,7 +705,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector3 pos;
                         PODVector<Vector3>& vnorm = mesh->GetVertexNormals();
                         for (Value::ConstValueIterator vertexItr = oitr->value.Begin();
-                             vertexItr != oitr->value.End(); vertexItr++)
+                             vertexItr != oitr->value.End(); ++vertexItr)
                         {
 
                             ReadVector3FromArray(*vertexItr, pos);
@@ -718,7 +718,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector4 tangent;
                         PODVector<Vector4>& vtangents = mesh->GetVertexTangents();
                         for (Value::ConstValueIterator vertexItr = oitr->value.Begin();
-                             vertexItr != oitr->value.End(); vertexItr++)
+                             vertexItr != oitr->value.End(); ++vertexItr)
                         {
 
                             ReadVector4FromArray(*vertexItr, tangent);
@@ -731,11 +731,11 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         PODVector<JSONMesh::BoneWeight>& boneWeights = mesh->GetBoneWeights();
 
                         for (Value::ConstValueIterator bitr = oitr->value.Begin();
-                             bitr != oitr->value.End(); bitr++)
+                             bitr != oitr->value.End(); ++bitr)
                         {
                             JSONMesh::BoneWeight bw;
-                            const Value::Member* indexes = bitr->FindMember("indexes");
-                            const Value::Member* weights = bitr->FindMember("weights");
+                            const Value::ConstMemberIterator indexes = bitr->FindMember("indexes");
+                            const Value::ConstMemberIterator weights = bitr->FindMember("weights");
 
                             for (int i = 0; i < 4; i++)
                             {
@@ -757,7 +757,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         Vector<Matrix4>& bindPoses = mesh->GetBindPoses();
 
                         for (Value::ConstValueIterator bitr = oitr->value.Begin();
-                             bitr != oitr->value.End(); bitr++)
+                             bitr != oitr->value.End(); ++bitr)
                         {
                             Matrix4 m;
                             ReadMatrix4FromArray(*bitr, m);
@@ -772,13 +772,13 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                         if (!oitr->value.IsNull())
                         {
                             for (Value::ConstValueIterator bitr = oitr->value.Begin();
-                                 bitr != oitr->value.End(); bitr++)
+                                 bitr != oitr->value.End(); ++bitr)
                             {
-                                const Value::Member* pos = bitr->FindMember("localPosition");
-                                const Value::Member* rot = bitr->FindMember("localRotation");
-                                const Value::Member* scale = bitr->FindMember("localScale");
-                                const Value::Member* name = bitr->FindMember("name");
-                                const Value::Member* parentName = bitr->FindMember("parentName");
+                                const Value::ConstMemberIterator pos = bitr->FindMember("localPosition");
+                                const Value::ConstMemberIterator rot = bitr->FindMember("localRotation");
+                                const Value::ConstMemberIterator scale = bitr->FindMember("localScale");
+                                const Value::ConstMemberIterator name = bitr->FindMember("name");
+                                const Value::ConstMemberIterator parentName = bitr->FindMember("parentName");
 
                                 JSONMesh::Bone bone;
 
@@ -801,7 +801,7 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
                                     mesh->GetUVSet(0) : mesh->GetUVSet(1);
 
                         for (Value::ConstValueIterator uvItr = oitr->value.Begin();
-                             uvItr != oitr->value.End(); uvItr++)
+                             uvItr != oitr->value.End(); ++uvItr)
                         {
 
                             ReadVector2FromArray(*uvItr, uv);
@@ -822,18 +822,18 @@ bool JSONSceneImporter::ParseMeshes(const rapidjson::Value& value)
 
 bool JSONSceneImporter::ParseShaders(const rapidjson::Value& value)
 {
-    const Value::Member* jshaders = value.FindMember("shaders");
-    if (jshaders && jshaders->value.IsArray())
+    const Value::ConstMemberIterator jshaders = value.FindMember("shaders");
+    if (jshaders != value.MemberEnd() && jshaders->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jshaders->value.Begin(); itr != jshaders->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jshaders->value.Begin(); itr != jshaders->value.End(); ++itr)
         {
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
                 String name = "Anonymous Shader";
                 int renderQueue = 0;
 
-                for (Value::ConstMemberIterator oitr = (*itr).MemberBegin();
-                     oitr != (*itr).MemberEnd(); ++oitr)
+                for (Value::ConstMemberIterator oitr = itr->MemberBegin();
+                     oitr != itr->MemberEnd(); ++oitr)
                 {
                     if (!strcmp(oitr->name.GetString(), "name"))
                     {
@@ -856,29 +856,29 @@ bool JSONSceneImporter::ParseShaders(const rapidjson::Value& value)
 
 bool JSONSceneImporter::ParseTextures(const rapidjson::Value& value)
 {
-    const Value::Member* jtextures = value.FindMember("textures");
-    if (jtextures && jtextures->value.IsArray())
+    const Value::ConstMemberIterator jtextures = value.FindMember("textures");
+    if (jtextures != value.MemberEnd() && jtextures->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jtextures->value.Begin(); itr != jtextures->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jtextures->value.Begin(); itr != jtextures->value.End(); ++itr)
         {
             String name;
             String base64PNG;
             int base64PNGLength = 0;
 
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
-                const Value::Member* jname = (*itr).FindMember("name");
-                if (jname && jname->value.IsString())
+                const Value::ConstMemberIterator jname = itr->FindMember("name");
+                if (jname != itr->MemberEnd() && jname->value.IsString())
                 {
                     name = jname->value.GetString();
                 }
-                const Value::Member* jbase64PNG = (*itr).FindMember("base64PNG");
-                if (jbase64PNG)
+                const Value::ConstMemberIterator jbase64PNG = itr->FindMember("base64PNG");
+                if (jbase64PNG != itr->MemberEnd())
                 {
                     base64PNG = jbase64PNG->value.GetString();
                 }
-                const Value::Member* jbase64PNGLength = (*itr).FindMember("base64PNGLength");
-                if (jbase64PNGLength)
+                const Value::ConstMemberIterator jbase64PNGLength = itr->FindMember("base64PNGLength");
+                if (jbase64PNGLength != itr->MemberEnd())
                 {
                     base64PNGLength = jbase64PNGLength->value.GetInt();
                 }
@@ -906,29 +906,29 @@ bool JSONSceneImporter::ParseTextures(const rapidjson::Value& value)
 
 bool JSONSceneImporter::ParseLightmaps(const rapidjson::Value& value)
 {
-    const Value::Member* jlightmaps = value.FindMember("lightmaps");
-    if (jlightmaps && jlightmaps->value.IsArray())
+    const Value::ConstMemberIterator jlightmaps = value.FindMember("lightmaps");
+    if (jlightmaps != value.MemberEnd() && jlightmaps->value.IsArray())
     {
-        for (Value::ConstValueIterator itr = jlightmaps->value.Begin(); itr != jlightmaps->value.End(); itr++)
+        for (Value::ConstValueIterator itr = jlightmaps->value.Begin(); itr != jlightmaps->value.End(); ++itr)
         {
             String name;
             String base64PNG;
             int base64PNGLength = 0;
 
-            if ((*itr).IsObject())
+            if (itr->IsObject())
             {
-                const Value::Member* jname = (*itr).FindMember("filename");
-                if (jname && jname->value.IsString())
+                const Value::ConstMemberIterator jname = itr->FindMember("filename");
+                if (jname != itr->MemberEnd() && jname->value.IsString())
                 {
                     name = jname->value.GetString();
                 }
-                const Value::Member* jbase64PNG = (*itr).FindMember("base64PNG");
-                if (jbase64PNG)
+                const Value::ConstMemberIterator jbase64PNG = itr->FindMember("base64PNG");
+                if (jbase64PNG != itr->MemberEnd() )
                 {
                     base64PNG = jbase64PNG->value.GetString();
                 }
-                const Value::Member* jbase64PNGLength = (*itr).FindMember("base64PNGLength");
-                if (jbase64PNGLength)
+                const Value::ConstMemberIterator jbase64PNGLength = itr->FindMember("base64PNGLength");
+                if (jbase64PNGLength != itr->MemberEnd() )
                 {
                     base64PNGLength = jbase64PNGLength->value.GetInt();
                 }
@@ -968,9 +968,9 @@ bool JSONSceneImporter::ParseResources(const rapidjson::Value& value)
 
 bool JSONSceneImporter::ParseHierarchy(const rapidjson::Value& value)
 {
-    for (Value::ConstValueIterator itr = value.Begin(); itr != value.End(); itr++)
+    for (Value::ConstValueIterator itr = value.Begin(); itr != value.End(); ++itr)
     {
-        if ((*itr).IsObject())
+        if (itr->IsObject())
         {
             hierarchy_.Push(new JSONNode(this, *itr));
         }
@@ -992,16 +992,16 @@ bool JSONSceneImporter::Import(const String& path)
         ATOMIC_LOGERRORF("Could not parse JSON data from %s", path.CString());
         return false;
     }
-    const Value::Member* name = document_->FindMember("name");
-    if (name)
+    const Value::ConstMemberIterator name = document_->FindMember("name");
+    if (name != document_->MemberEnd())
         sceneName_ = name->value.GetString();
 
-    const Value::Member* jresources = document_->FindMember("resources");
-    if (jresources)
+    const Value::ConstMemberIterator jresources = document_->FindMember("resources");
+    if (jresources != document_->MemberEnd())
         ParseResources(jresources->value);
 
-    const Value::Member* jhierarchy = document_->FindMember("hierarchy");
-    if (jhierarchy)
+    const Value::ConstMemberIterator jhierarchy = document_->FindMember("hierarchy");
+    if (jhierarchy != document_->MemberEnd())
         ParseHierarchy(jhierarchy->value);
 
     return true;
