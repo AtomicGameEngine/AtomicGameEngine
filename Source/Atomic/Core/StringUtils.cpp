@@ -25,7 +25,6 @@
 #include "../Core/StringUtils.h"
 
 #include <cstdio>
-#include <locale.h>
 
 #include "../DebugNew.h"
 
@@ -35,6 +34,27 @@
 // we need to parse floating point values the same way on all platforms no matter what
 // locale is set. The strtod_c_locale() is a workaround using the "C" locale explicitly,
 // which uses a dot as decimal separator.
+
+#ifdef _WIN32
+
+#include <stdlib.h>
+
+static
+_locale_t get_c_locale()
+{
+    static _locale_t loc = _create_locale(LC_ALL, "C");
+    return loc;
+}
+
+static
+double strtod_c_locale(const char* nptr, char** endptr)
+{
+    return _strtod_l(nptr, endptr, get_c_locale());
+}
+
+#else
+
+#include <locale.h>
 
 static
 locale_t get_c_locale()
@@ -46,12 +66,10 @@ locale_t get_c_locale()
 static
 double strtod_c_locale(const char* nptr, char** endptr)
 {
-#ifdef _WIN32
-    return _strtod_l(nptr, endptr, get_c_locale());
-#else
     return strtod_l(nptr, endptr, get_c_locale());
-#endif
 }
+
+#endif // _WIN32
 
 
 namespace Atomic
