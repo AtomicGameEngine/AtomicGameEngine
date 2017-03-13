@@ -204,7 +204,7 @@ double ToDouble(const char* source)
     if (!source)
         return 0;
 
-    return strtod(source, 0);
+    return strtod_c_locale(source, 0);
 }
 
 Color ToColor(const String& source)
