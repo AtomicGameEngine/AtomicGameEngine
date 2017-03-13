@@ -46,7 +46,11 @@ locale_t get_c_locale()
 static
 double strtod_c_locale(const char* nptr, char** endptr)
 {
-  return strtod_l(nptr, endptr, get_c_locale());
+#ifdef _WIN32
+    return _strtod_l(nptr, endptr, get_c_locale());
+#else
+    return strtod_l(nptr, endptr, get_c_locale());
+#endif
 }
 
 
