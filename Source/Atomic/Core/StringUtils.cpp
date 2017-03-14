@@ -56,9 +56,9 @@ static double strtod_c_locale(const char* nptr, char** endptr)
     return _strtod_l(nptr, endptr, get_c_locale());
 }
 
-#elif defined(ATOMIC_PLATFORM_ANDROID)
+#elif defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
 
-// Android doesn't do locale via NDK, so just revert to strtod
+// Android NDK/iOS don't do locale, so just revert to strtod
 
 static double strtod_c_locale(const char* nptr, char** endptr)
 {
