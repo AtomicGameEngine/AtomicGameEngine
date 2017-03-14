@@ -120,8 +120,6 @@ private:
 
     void CaptureInstances(MetricsSnapshot* snapshot);
 
-    void PruneExpiredInstances();
-
     static void OnRefCountedCreated(RefCounted* refCounted);
     static void OnRefCountedDeleted(RefCounted* refCounted);
 
@@ -131,7 +129,7 @@ private:
 
     bool enabled_;
 
-    Vector<WeakPtr<RefCounted>> instances_;
+    Vector<RefCounted*> instances_;
 
 };
 
