@@ -141,8 +141,6 @@ Metrics::~Metrics()
 
 void Metrics::CaptureInstances(MetricsSnapshot* snapshot)
 {
-    PruneExpiredInstances();
-
     const String unkClassName("-Unknown Class-");
 
     for (unsigned i = 0; i < instances_.Size(); i++)
@@ -215,22 +213,6 @@ void Metrics::Disable()
     RefCounted::RemoveRefCountedDeletedFunction(Metrics::OnRefCountedDeleted);
 }
 
-void Metrics::PruneExpiredInstances()
-{
-    Vector<WeakPtr<RefCounted>> cinstances = instances_;
-
-    instances_.Clear();
-
-    for (unsigned i = 0; i < cinstances.Size(); i++)
-    {
-        if (!cinstances[i].Expired())
-        {
-            instances_.Push(cinstances[i]);
-        }
-    }
-
-}
-
 void Metrics::OnRefCountedCreated(RefCounted* refCounted)
 {
     if (!metrics_)
@@ -240,13 +222,7 @@ void Metrics::OnRefCountedCreated(RefCounted* refCounted)
     }
 
     // We're called from the RefCounted constructor, so we don't know whether we're an object, etc
-    metrics_->instances_.Push(WeakPtr<RefCounted>(refCounted));
-
-    // prune expired whenever 8k boundry is crossed
-    if (!(metrics_->instances_.Size() % 8192))
-    {
-        metrics_->PruneExpiredInstances();
-    }
+    metrics_->instances_.Push(refCounted);
 
 }
 
@@ -258,7 +234,7 @@ void Metrics::OnRefCountedDeleted(RefCounted* refCounted)
         return;
     }
 
-    Vector<WeakPtr<RefCounted>>::Iterator itr = metrics_->instances_.Find(WeakPtr<RefCounted>(refCounted));
+    Vector<RefCounted*>::Iterator itr = metrics_->instances_.Find(refCounted);
 
     if (itr != metrics_->instances_.End())
     {
