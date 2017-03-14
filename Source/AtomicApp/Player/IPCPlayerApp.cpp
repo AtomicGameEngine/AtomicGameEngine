@@ -1120,6 +1120,8 @@ void duk_trans_socket_write_flush_cb(void *udata) {
 
     void IPCPlayerApp::HandleExitRequest(StringHash eventType, VariantMap& eventData)
     {
+        // we are exiting, so let's clear out the debugger object
+        arobj = NULL;
         UnsubscribeFromEvent(E_LOGMESSAGE);
         SendEvent(E_PLAYERQUIT);
     }
