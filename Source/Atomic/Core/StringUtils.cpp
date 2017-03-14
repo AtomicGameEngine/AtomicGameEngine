@@ -37,43 +37,48 @@
 // which uses a dot as decimal separator.
 
 #include <locale.h>
-#ifdef __APPLE__
+#ifdef ATOMIC_PLATFORM_OSX
 #include <xlocale.h>
 #endif
 
 #include <stdlib.h>
 
-#ifdef _WIN32
+#ifdef ATOMIC_PLATFORM_WINDOWS
 
-static
-_locale_t get_c_locale()
+static _locale_t get_c_locale()
 {
     static _locale_t loc = _create_locale(LC_ALL, "C");
     return loc;
 }
 
-static
-double strtod_c_locale(const char* nptr, char** endptr)
+static double strtod_c_locale(const char* nptr, char** endptr)
 {
     return _strtod_l(nptr, endptr, get_c_locale());
 }
 
+#elif defined(ATOMIC_PLATFORM_ANDROID)
+
+// Android doesn't do locale via NDK, so just revert to strtod
+
+static double strtod_c_locale(const char* nptr, char** endptr)
+{
+    return strtod(nptr, endptr);
+}
+
 #else
 
-static
-locale_t get_c_locale()
+static locale_t get_c_locale()
 {
     static locale_t loc = newlocale(LC_ALL_MASK, "C", NULL);
     return loc;
 }
 
-static
-double strtod_c_locale(const char* nptr, char** endptr)
+static double strtod_c_locale(const char* nptr, char** endptr)
 {
     return strtod_l(nptr, endptr, get_c_locale());
 }
 
-#endif // _WIN32
+#endif // ATOMIC_PLATFORM_WINDOWS
 
 // ATOMIC END
 
