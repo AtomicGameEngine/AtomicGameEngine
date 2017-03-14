@@ -35,9 +35,10 @@
 // locale is set. The strtod_c_locale() is a workaround using the "C" locale explicitly,
 // which uses a dot as decimal separator.
 
+#include <locale.h>
+
 #ifdef _WIN32
 
-#include <locale.h>
 #include <stdlib.h>
 
 static
@@ -55,7 +56,9 @@ double strtod_c_locale(const char* nptr, char** endptr)
 
 #else
 
-#include <locale.h>
+#ifdef __APPLE__
+#include <xlocale.h>
+#endif
 
 static
 locale_t get_c_locale()
