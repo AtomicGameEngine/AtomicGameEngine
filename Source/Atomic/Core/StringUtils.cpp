@@ -36,6 +36,10 @@
 // which uses a dot as decimal separator.
 
 #include <locale.h>
+#ifdef __APPLE__
+#include <xlocale.h>
+#endif
+
 #include <stdlib.h>
 
 #ifdef _WIN32
@@ -54,10 +58,6 @@ double strtod_c_locale(const char* nptr, char** endptr)
 }
 
 #else
-
-#ifdef __APPLE__
-#include <xlocale.h>
-#endif
 
 static
 locale_t get_c_locale()
