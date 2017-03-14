@@ -36,10 +36,9 @@
 // which uses a dot as decimal separator.
 
 #include <locale.h>
+#include <stdlib.h>
 
 #ifdef _WIN32
-
-#include <stdlib.h>
 
 static
 _locale_t get_c_locale()
