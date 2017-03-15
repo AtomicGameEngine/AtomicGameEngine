@@ -28,6 +28,10 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "../Core/Io.h"
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -313,8 +317,10 @@ Quaternion Quaternion::Nlerp(Quaternion rhs, float t, bool shortestPath) const
 
 String Quaternion::ToString() const
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", w_, x_, y_, z_);
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];    
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%g %g %g %g", w_, x_, y_, z_);
+    // ATOMIC END
     return String(tempBuffer);
 }
 

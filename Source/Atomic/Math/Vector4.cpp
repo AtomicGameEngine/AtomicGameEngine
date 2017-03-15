@@ -28,6 +28,10 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "../Core/Io.h"
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -37,7 +41,9 @@ const Vector4 Vector4::ONE(1.0f, 1.0f, 1.0f, 1.0f);
 String Vector4::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", x_, y_, z_, w_);
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%g %g %g %g", x_, y_, z_, w_);
+    // ATOMIC END
     return String(tempBuffer);
 }
 
