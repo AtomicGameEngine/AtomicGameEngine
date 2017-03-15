@@ -28,6 +28,11 @@ namespace AtomicPlayer
             {
                 if (loadedScenes.Contains(e.Scene))
                     loadedScenes.Remove(e.Scene);
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                NativeCore.ExpireNatives();                
+
             });
 
         }

@@ -226,7 +226,7 @@ namespace AtomicEngine
 
         }
 
-        static void ExpireNatives()
+        internal static void ExpireNatives()
         {
             var watch = new Stopwatch();
             watch.Start();
