@@ -28,6 +28,10 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "../Core/Io.h"
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -39,8 +43,10 @@ const IntRect IntRect::ZERO(0, 0, 0, 0);
 
 String Rect::ToString() const
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", min_.x_, min_.y_, max_.x_, max_.y_);
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];    
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%g %g %g %g", min_.x_, min_.y_, max_.x_, max_.y_);
+    // ATOMIC END
     return String(tempBuffer);
 }
 

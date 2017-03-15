@@ -28,6 +28,10 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "../Core/Io.h"
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -224,7 +228,9 @@ Color Color::Lerp(const Color& rhs, float t) const
 String Color::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", r_, g_, b_, a_);
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%g %g %g %g", r_, g_, b_, a_);
+    // ATOMIC END
     return String(tempBuffer);
 }
 

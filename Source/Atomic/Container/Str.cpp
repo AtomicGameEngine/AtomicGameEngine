@@ -32,6 +32,13 @@
 #pragma warning(disable:6293)
 #endif
 
+
+// ATOMIC BEGIN
+
+#include "../Core/Io.h"
+
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -133,7 +140,9 @@ String::String(float value) :
     buffer_(&endZero)
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g", value);
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%g", value);
+    // ATOMIC END
     *this = tempBuffer;
 }
 
@@ -143,7 +152,9 @@ String::String(double value) :
     buffer_(&endZero)
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%.15g", value);
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%.15g", value);
+    // ATOMIC END
     *this = tempBuffer;
 }
 

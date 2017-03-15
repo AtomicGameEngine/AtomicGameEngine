@@ -29,6 +29,10 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "../Core/Io.h"
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -136,8 +140,10 @@ Matrix4 Matrix4::Inverse() const
 String Matrix4::ToString() const
 {
     char tempBuffer[MATRIX_CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g", m00_, m01_, m02_, m03_, m10_, m11_, m12_, m13_, m20_,
+    // ATOMIC BEGIN
+    Atomic_sprintf(tempBuffer, "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g", m00_, m01_, m02_, m03_, m10_, m11_, m12_, m13_, m20_,
         m21_, m22_, m23_, m30_, m31_, m32_, m33_);
+    // ATOMIC END
     return String(tempBuffer);
 }
 
