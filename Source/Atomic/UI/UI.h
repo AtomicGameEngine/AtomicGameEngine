@@ -107,6 +107,9 @@ public:
 
     void SetDebugHudExtents(bool useRootExtents = true, const IntVector2& position = IntVector2::ZERO, const IntVector2& size = IntVector2::ZERO);
 
+    /// Set the DebugHud refresh interval for performance and metrics in seconds
+    void SetDebugHudRefreshInterval(float seconds);
+
     void ShowConsole(bool value);
     void ToggleConsole();
 

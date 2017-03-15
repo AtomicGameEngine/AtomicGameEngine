@@ -946,6 +946,16 @@ void UI::SetDebugHudProfileMode(DebugHudProfileMode mode)
     hud->SetProfilerMode(mode);
 }
 
+void UI::SetDebugHudRefreshInterval(float seconds)
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (!hud)
+        return;
+
+    hud->SetProfilerInterval(seconds);
+}
+
 void UI::ShowConsole(bool value)
 {
     SystemUI::Console* console = GetSubsystem<SystemUI::Console>();

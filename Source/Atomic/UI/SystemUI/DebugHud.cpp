@@ -277,6 +277,12 @@ void DebugHud::SetProfilerMode(DebugHudProfileMode mode)
 
         if (!metrics)
             size = 32;
+        else
+        {
+            // Enable metrics immediately
+            if (!metrics->GetEnabled())
+                metrics->Enable();
+        }
 
         if (profilerText_.NotNull())
         {
