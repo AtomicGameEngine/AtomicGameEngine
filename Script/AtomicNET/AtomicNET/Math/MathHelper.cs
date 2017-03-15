@@ -337,6 +337,18 @@ namespace AtomicEngine
                 (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
         }
 
+        /// <summary>
+        /// Calculates the acceleration
+        /// </summary>
+        /// <param name="vO">Initial Velocity.</param>
+        /// <param name="t">Total time.</param>
+        /// <param name="xO">Initial Position.</param>
+        /// <param name="xF">Final Position.</param>
+        /// <returns>Acceleration based on equation of motion: Xf = Xo + Vot + 0.5at^2</returns>
+        public static float Acceleration(float vO, float t, Vector3 xO, Vector3 xF)
+        {
+            return ((2 / (t * t)) * ((xF - xO).Length - (vO * t)));
+        }
 
     }
 }
