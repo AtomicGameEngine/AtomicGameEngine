@@ -830,9 +830,9 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 // for cached resources, use the asset name, otherwise use the resource path name
                 var resource: Atomic.Resource;
                 if (this.refListIndex != -1) {
-                    resource = object.getAttribute(this.attrInfo.name).resources[this.refListIndex, this.arrayIndex];
+                    resource = object.getAttribute(this.attrInfo.name).resources[this.refListIndex];
                 } else {
-                    resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name, this.arrayIndex);
+                    resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
                 }
 
                 var text = "";
