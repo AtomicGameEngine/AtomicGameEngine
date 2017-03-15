@@ -63,6 +63,7 @@ double Atomic_strtod(const char* nptr, char** endptr)
 
 #elif defined(ATOMIC_PLATFORM_OSX)
 
+#include <locale.h>
 #include <xlocale.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,7 +90,7 @@ locale_t GetCLocale();
 
 double Atomic_strtod(const char* nptr, char** endptr);
 
-#define Atomic_sprintf(buffer, format, ...)                            \
+#define Atomic_sprintf(buffer, format, ...)                     \
     do {                                                        \
         locale_t oldLocale = uselocale(::Atomic::GetCLocale()); \
         sprintf(buffer, format, __VA_ARGS__);                   \
