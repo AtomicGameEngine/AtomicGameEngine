@@ -166,12 +166,18 @@ void PackageFile::Scan(Vector<String>& result, const String& pathName, const Str
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
+    bool caseSensitive = true;
+#ifdef _WIN32
+    // On Windows ignore case in string comparisons
+    caseSensitive = false;
+#endif
+
     const StringVector& entryNames = GetEntryNames();
     for (StringVector::ConstIterator i = entryNames.Begin(); i != entryNames.End(); ++i)
     {
         String entryName = GetSanitizedPath(*i);
-        if ((filterExtension.Empty() || entryName.EndsWith(filterExtension)) &&
-            entryName.StartsWith(sanitizedPath))
+        if ((filterExtension.Empty() || entryName.EndsWith(filterExtension, caseSensitive)) &&
+            entryName.StartsWith(sanitizedPath, caseSensitive))
         {
             String fileName = entryName.Substring(sanitizedPath.Length());
             if (fileName.StartsWith("\\") || fileName.StartsWith("/"))
