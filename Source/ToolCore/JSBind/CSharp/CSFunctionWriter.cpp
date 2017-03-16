@@ -213,7 +213,6 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
         }
     }
 
-
     bool returnValue = false;
     bool sharedPtrReturn = false;
 
@@ -231,7 +230,7 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     }
     else if (function_->GetReturnClass() && function_->GetReturnType()->isSharedPtr_)
     {
-        returnStatement = ToString("SharedPtr<%s> returnValue = ", function_->GetReturnClass()->GetNativeName().CString());
+        returnStatement = ToString("SharedPtr<%s> returnValuePtr = ", function_->GetReturnClass()->GetNativeName().CString());
         sharedPtrReturn = true;
     }
     else if (function_->GetReturnType() && function_->GetReturnType()->type_->asVectorType())
@@ -351,7 +350,22 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
     if (sharedPtrReturn)
     {
-        source += IndentLine("if (returnValue.NotNull()) returnValue->AddRef();\n");
+        // We need to keep the shared ptr return value alive through the call, without adding an unwanted reference
+
+        source += IndentLine(ToString("%s* returnValue = returnValuePtr;\n", function_->GetReturnClass()->GetNativeName().CString()));
+        source += IndentLine("if (returnValue)\n");
+        source += IndentLine("{\n");
+
+        Indent();
+
+        source += IndentLine("returnValue->AddRefSilent();\n");
+        source += IndentLine("returnValuePtr = 0;\n");
+        source += IndentLine("returnValue->ReleaseRefSilent();\n");
+
+        Dedent();
+
+        source += IndentLine("}\n");
+
         source += IndentLine("return returnValue;\n");
     }
     else if (returnType == "const char*")
