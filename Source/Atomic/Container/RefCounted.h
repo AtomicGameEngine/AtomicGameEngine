@@ -119,8 +119,11 @@ public:
 
     virtual const String& GetTypeName() const = 0;
 
-    /// Increment reference count. Do not call any lifetime book keeping
+    /// Increment reference count. Do not call any lifetime bookkeeping
     void AddRefSilent();
+
+    /// Decrement reference count, do not call any lifetime bookkeeping, don't delete at refcount == 0
+    void ReleaseRefSilent();
 
     virtual ClassID GetClassID() const  = 0;
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }

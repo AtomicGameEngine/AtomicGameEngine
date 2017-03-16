@@ -131,6 +131,11 @@ void RefCounted::AddRefSilent()
     (refCount_->refs_)++;
 }
 
+void RefCounted::ReleaseRefSilent()
+{
+    assert(refCount_->refs_ > 0);
+    (refCount_->refs_)--;
+}
 
 void RefCounted::AddRefCountChangedFunction(RefCountChangedFunction function)
 {
