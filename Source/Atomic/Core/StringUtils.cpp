@@ -28,60 +28,6 @@
 
 #include "../DebugNew.h"
 
-// ATOMIC BEGIN
-
-// The built-in strtod() function uses the current locale for parsing strings. On certain
-// locales (German, Swedish, ...) a comma is used as decimal separator. For portable XML,
-// we need to parse floating point values the same way on all platforms no matter what
-// locale is set. The strtod_c_locale() is a workaround using the "C" locale explicitly,
-// which uses a dot as decimal separator.
-
-#include <locale.h>
-#ifdef ATOMIC_PLATFORM_OSX
-#include <xlocale.h>
-#endif
-
-#include <stdlib.h>
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
-static _locale_t get_c_locale()
-{
-    static _locale_t loc = _create_locale(LC_ALL, "C");
-    return loc;
-}
-
-static double strtod_c_locale(const char* nptr, char** endptr)
-{
-    return _strtod_l(nptr, endptr, get_c_locale());
-}
-
-#elif defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
-
-// Android NDK/iOS don't do locale, so just revert to strtod
-
-static double strtod_c_locale(const char* nptr, char** endptr)
-{
-    return strtod(nptr, endptr);
-}
-
-#else
-
-static locale_t get_c_locale()
-{
-    static locale_t loc = newlocale(LC_ALL_MASK, "C", NULL);
-    return loc;
-}
-
-static double strtod_c_locale(const char* nptr, char** endptr)
-{
-    return strtod_l(nptr, endptr, get_c_locale());
-}
-
-#endif // ATOMIC_PLATFORM_WINDOWS
-
-// ATOMIC END
-
 namespace Atomic
 {
 
@@ -200,9 +146,7 @@ float ToFloat(const char* source)
     if (!source)
         return 0;
 
-    // ATOMIC BEGIN
-    return (float)strtod_c_locale(source, 0);
-    // ATOMIC END
+    return (float)strtod(source, 0);
 }
 
 double ToDouble(const String& source)
@@ -215,9 +159,7 @@ double ToDouble(const char* source)
     if (!source)
         return 0;
 
-    // ATOMIC BEGIN
-    return strtod_c_locale(source, 0);
-    // ATOMIC END
+    return strtod(source, 0);
 }
 
 Color ToColor(const String& source)
@@ -234,14 +176,11 @@ Color ToColor(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.r_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.g_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.b_ = (float)strtod_c_locale(ptr, &ptr);
+    ret.r_ = (float)strtod(ptr, &ptr);
+    ret.g_ = (float)strtod(ptr, &ptr);
+    ret.b_ = (float)strtod(ptr, &ptr);
     if (elements > 3)
-        ret.a_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+        ret.a_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }
@@ -302,13 +241,10 @@ Rect ToRect(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.min_.x_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.min_.y_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.max_.x_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.max_.y_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+    ret.min_.x_ = (float)strtod(ptr, &ptr);
+    ret.min_.y_ = (float)strtod(ptr, &ptr);
+    ret.max_.x_ = (float)strtod(ptr, &ptr);
+    ret.max_.y_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }
@@ -329,12 +265,9 @@ Quaternion ToQuaternion(const char* source)
     {
         // 3 coords specified: conversion from Euler angles
         float x, y, z;
-
-        // ATOMIC BEGIN
-        x = (float)strtod_c_locale(ptr, &ptr);
-        y = (float)strtod_c_locale(ptr, &ptr);
-        z = (float)strtod_c_locale(ptr, &ptr);
-        // ATOMIC END
+        x = (float)strtod(ptr, &ptr);
+        y = (float)strtod(ptr, &ptr);
+        z = (float)strtod(ptr, &ptr);
 
         return Quaternion(x, y, z);
     }
@@ -342,13 +275,10 @@ Quaternion ToQuaternion(const char* source)
     {
         // 4 coords specified: full quaternion
         Quaternion ret;
-
-        // ATOMIC BEGIN
-        ret.w_ = (float)strtod_c_locale(ptr, &ptr);
-        ret.x_ = (float)strtod_c_locale(ptr, &ptr);
-        ret.y_ = (float)strtod_c_locale(ptr, &ptr);
-        ret.z_ = (float)strtod_c_locale(ptr, &ptr);
-        // ATOMIC END
+        ret.w_ = (float)strtod(ptr, &ptr);
+        ret.x_ = (float)strtod(ptr, &ptr);
+        ret.y_ = (float)strtod(ptr, &ptr);
+        ret.z_ = (float)strtod(ptr, &ptr);
 
         return ret;
     }
@@ -368,11 +298,8 @@ Vector2 ToVector2(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.x_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.y_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+    ret.x_ = (float)strtod(ptr, &ptr);
+    ret.y_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }
@@ -391,12 +318,9 @@ Vector3 ToVector3(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.x_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.y_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.z_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+    ret.x_ = (float)strtod(ptr, &ptr);
+    ret.y_ = (float)strtod(ptr, &ptr);
+    ret.z_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }
@@ -413,33 +337,31 @@ Vector4 ToVector4(const char* source, bool allowMissingCoords)
     unsigned elements = CountElements(source, ' ');
     char* ptr = (char*)source;
 
-    // ATOMIC BEGIN
     if (!allowMissingCoords)
     {
         if (elements < 4)
             return ret;
 
-        ret.x_ = (float)strtod_c_locale(ptr, &ptr);
-        ret.y_ = (float)strtod_c_locale(ptr, &ptr);
-        ret.z_ = (float)strtod_c_locale(ptr, &ptr);
-        ret.w_ = (float)strtod_c_locale(ptr, &ptr);
+        ret.x_ = (float)strtod(ptr, &ptr);
+        ret.y_ = (float)strtod(ptr, &ptr);
+        ret.z_ = (float)strtod(ptr, &ptr);
+        ret.w_ = (float)strtod(ptr, &ptr);
 
         return ret;
     }
     else
     {
         if (elements > 0)
-            ret.x_ = (float)strtod_c_locale(ptr, &ptr);
+            ret.x_ = (float)strtod(ptr, &ptr);
         if (elements > 1)
-            ret.y_ = (float)strtod_c_locale(ptr, &ptr);
+            ret.y_ = (float)strtod(ptr, &ptr);
         if (elements > 2)
-            ret.z_ = (float)strtod_c_locale(ptr, &ptr);
+            ret.z_ = (float)strtod(ptr, &ptr);
         if (elements > 3)
-            ret.w_ = (float)strtod_c_locale(ptr, &ptr);
+            ret.w_ = (float)strtod(ptr, &ptr);
 
         return ret;
     }
-    // ATOMIC END
 }
 
 Variant ToVectorVariant(const String& source)
@@ -504,18 +426,15 @@ Matrix3 ToMatrix3(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.m00_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m01_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m02_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m10_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m11_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m12_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m20_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m21_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m22_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+    ret.m00_ = (float)strtod(ptr, &ptr);
+    ret.m01_ = (float)strtod(ptr, &ptr);
+    ret.m02_ = (float)strtod(ptr, &ptr);
+    ret.m10_ = (float)strtod(ptr, &ptr);
+    ret.m11_ = (float)strtod(ptr, &ptr);
+    ret.m12_ = (float)strtod(ptr, &ptr);
+    ret.m20_ = (float)strtod(ptr, &ptr);
+    ret.m21_ = (float)strtod(ptr, &ptr);
+    ret.m22_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }
@@ -534,21 +453,18 @@ Matrix3x4 ToMatrix3x4(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.m00_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m01_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m02_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m03_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m10_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m11_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m12_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m13_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m20_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m21_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m22_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m23_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+    ret.m00_ = (float)strtod(ptr, &ptr);
+    ret.m01_ = (float)strtod(ptr, &ptr);
+    ret.m02_ = (float)strtod(ptr, &ptr);
+    ret.m03_ = (float)strtod(ptr, &ptr);
+    ret.m10_ = (float)strtod(ptr, &ptr);
+    ret.m11_ = (float)strtod(ptr, &ptr);
+    ret.m12_ = (float)strtod(ptr, &ptr);
+    ret.m13_ = (float)strtod(ptr, &ptr);
+    ret.m20_ = (float)strtod(ptr, &ptr);
+    ret.m21_ = (float)strtod(ptr, &ptr);
+    ret.m22_ = (float)strtod(ptr, &ptr);
+    ret.m23_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }
@@ -567,25 +483,22 @@ Matrix4 ToMatrix4(const char* source)
         return ret;
 
     char* ptr = (char*)source;
-
-    // ATOMIC BEGIN
-    ret.m00_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m01_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m02_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m03_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m10_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m11_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m12_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m13_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m20_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m21_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m22_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m23_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m30_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m31_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m32_ = (float)strtod_c_locale(ptr, &ptr);
-    ret.m33_ = (float)strtod_c_locale(ptr, &ptr);
-    // ATOMIC END
+    ret.m00_ = (float)strtod(ptr, &ptr);
+    ret.m01_ = (float)strtod(ptr, &ptr);
+    ret.m02_ = (float)strtod(ptr, &ptr);
+    ret.m03_ = (float)strtod(ptr, &ptr);
+    ret.m10_ = (float)strtod(ptr, &ptr);
+    ret.m11_ = (float)strtod(ptr, &ptr);
+    ret.m12_ = (float)strtod(ptr, &ptr);
+    ret.m13_ = (float)strtod(ptr, &ptr);
+    ret.m20_ = (float)strtod(ptr, &ptr);
+    ret.m21_ = (float)strtod(ptr, &ptr);
+    ret.m22_ = (float)strtod(ptr, &ptr);
+    ret.m23_ = (float)strtod(ptr, &ptr);
+    ret.m30_ = (float)strtod(ptr, &ptr);
+    ret.m31_ = (float)strtod(ptr, &ptr);
+    ret.m32_ = (float)strtod(ptr, &ptr);
+    ret.m33_ = (float)strtod(ptr, &ptr);
 
     return ret;
 }

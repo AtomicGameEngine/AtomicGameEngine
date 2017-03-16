@@ -46,6 +46,7 @@
 
 #ifdef ATOMIC_PLATFORM_LINUX
 
+#include <locale>
 #include <X11/Xlib.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -208,12 +209,23 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     d_ = new WebBrowserHostPrivate(this);
 
+#ifdef ATOMIC_PLATFORM_LINUX
+    // On Linux systems, CEF ignores the locale in CefSettings and sets it based on environment variables.
+    // On non-English systems this changes the decimal separator to a comma (e.g. with a German
+    // locale such as de-AT), which in turn breaks the cross-platform behavior of strtod() and sprintf().
+    std::locale oldLocale;
+#endif
+
     // If losing OSX system menu, it means we're calling this
     // before initializing graphics subsystem
     if (!CefInitialize(args, settings, d_->app_, nullptr))
     {
         ATOMIC_LOGERROR("CefInitialize - Error");
     }
+
+#ifdef ATOMIC_PLATFORM_LINUX
+    std::locale::global(oldLocale);
+#endif
 
     RegisterWebSchemeHandlers(this);
 
