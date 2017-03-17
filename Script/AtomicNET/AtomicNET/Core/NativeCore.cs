@@ -226,7 +226,17 @@ namespace AtomicEngine
 
         }
 
-        internal static void ExpireNatives()
+        /// <summary>
+        ///  Runs a GC collection, waits for any finalizers, and then expires any natives collected 
+        /// </summary>
+        public static void RunGC()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            ExpireNatives();
+        }
+
+        private static void ExpireNatives()
         {
             var watch = new Stopwatch();
             watch.Start();

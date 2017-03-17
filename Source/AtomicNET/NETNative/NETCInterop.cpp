@@ -1,4 +1,6 @@
 
+
+#include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Script/ScriptVariant.h>
 #include <Atomic/Script/ScriptVariantMap.h>
 #include <Atomic/IPC/IPC.h>
@@ -671,6 +673,16 @@ namespace Atomic
             return self->Distance(*point);
         }
 
+        // Native method is suppressed from automated bindings, for additional GC logic in C# version of method
+        ATOMIC_EXPORT_API void csi_Atomic_ResourceCache_ReleaseAllResources(ResourceCache* self, bool force)
+        {
+            if (!self)
+            {
+                return;
+            }
+
+            self->ReleaseAllResources(force);
+        }
 
 #ifdef ATOMIC_PLATFORM_IOS
         ATOMIC_EXPORT_API void SDL_IOS_Init(const char *resourceDir, const char *documentsDir)
