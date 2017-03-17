@@ -1423,7 +1423,7 @@
  */
 #if defined(DUK_F_X86) || defined(DUK_F_X32) || \
     defined(DUK_F_M68K) || defined(DUK_F_PPC32) || \
-    defined(DUK_F_BCC) || \
+    defined(DUK_F_BCC) || defined(__ANDROID__) || \
     (defined(__WORDSIZE) && (__WORDSIZE == 32))
 #define DUK_F_32BIT_PTRS
 #elif defined(DUK_F_X64) || \
