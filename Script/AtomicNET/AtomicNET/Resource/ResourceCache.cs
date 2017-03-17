@@ -1,3 +1,6 @@
+using System;
+using System.Runtime.InteropServices;
+
 namespace AtomicEngine
 {
 
@@ -25,5 +28,21 @@ namespace AtomicEngine
 
             return null;
         }
+
+        /// <summary>
+        ///  Release all resources. When called with the force flag false, releases all currently unused resources.
+        /// </summary>
+        public void ReleaseAllResources(bool force = false)
+        {
+            // We need to GC before calling native ResourceCache::ReleaseAllResources, to ensure all managed resource references are down
+            // otherwise, the cache will hold onto the resource
+            NativeCore.RunGC();
+
+            csi_Atomic_ResourceCache_ReleaseAllResources(nativeInstance, force);
+        }
+
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private static extern void csi_Atomic_ResourceCache_ReleaseAllResources(IntPtr self, bool force);
+
     }
 }
