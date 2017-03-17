@@ -24,7 +24,6 @@
 
 #include <Duktape/duktape.h>
 #include <Duktape/duk_logging.h>
-#include <Duktape/duk_v1_compat.h>
 
 namespace Atomic
 {

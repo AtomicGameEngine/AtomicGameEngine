@@ -194,7 +194,7 @@ namespace Atomic
         gJSVMExports.duk_push_pointer = duk_push_pointer;
         gJSVMExports.duk_push_sprintf = duk_push_sprintf;
         gJSVMExports.duk_push_vsprintf = duk_push_vsprintf;
-        gJSVMExports.duk_push_string_file_raw = duk_push_string_file_raw;
+        //gJSVMExports.duk_push_string_file_raw = duk_push_string_file_raw;
 
         gJSVMExports.duk_push_this = duk_push_this;
         gJSVMExports.duk_push_current_function = duk_push_current_function;
