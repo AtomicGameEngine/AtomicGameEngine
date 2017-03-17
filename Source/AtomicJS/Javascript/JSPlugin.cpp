@@ -150,8 +150,8 @@ namespace Atomic
         gJSVMExports.duk_get_memory_functions = duk_get_memory_functions;
         gJSVMExports.duk_gc = duk_gc;
 
-        gJSVMExports.duk_throw = duk_throw;
-        gJSVMExports.duk_fatal = duk_fatal;
+        gJSVMExports.duk_throw_raw = duk_throw_raw;
+        gJSVMExports.duk_fatal_raw = duk_fatal_raw;
         gJSVMExports.duk_error_raw = duk_error_raw;
         gJSVMExports.duk_error_va_raw = duk_error_va_raw;
 
@@ -227,7 +227,7 @@ namespace Atomic
 
         gJSVMExports.duk_is_undefined = duk_is_undefined;
         gJSVMExports.duk_is_null = duk_is_null;
-        gJSVMExports.duk_is_null_or_undefined = duk_is_null_or_undefined;
+        //gJSVMExports.duk_is_null_or_undefined = duk_is_null_or_undefined;   This is a macro in Duktape 2.0.
         gJSVMExports.duk_is_boolean = duk_is_boolean;
         gJSVMExports.duk_is_number = duk_is_number;
         gJSVMExports.duk_is_nan = duk_is_nan;
@@ -291,7 +291,7 @@ namespace Atomic
         gJSVMExports.duk_to_buffer_raw = duk_to_buffer_raw;
         gJSVMExports.duk_to_pointer = duk_to_pointer;
         gJSVMExports.duk_to_object = duk_to_object;
-        gJSVMExports.duk_to_defaultvalue = duk_to_defaultvalue;
+        gJSVMExports.duk_to_defaultvalue = duk_to_primitive;  // In Duktape 2.0 duk_to_defaultvalue() has to be replaced by duk_to_primitive().
         gJSVMExports.duk_to_primitive = duk_to_primitive;
 
         gJSVMExports.duk_safe_to_lstring = duk_safe_to_lstring;

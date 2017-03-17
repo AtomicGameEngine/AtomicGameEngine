@@ -21,6 +21,8 @@
 //
 
 #include <Duktape/duktape.h>
+#include <Duktape/duk_logging.h>
+#include <Duktape/duk_module_duktape.h>
 
 #include <Atomic/Core/Profiler.h>
 #include <Atomic/Core/CoreEvents.h>
@@ -85,6 +87,8 @@ JSVM::~JSVM()
 void JSVM::InitJSContext()
 {
     ctx_ = duk_create_heap_default();
+    duk_logging_init(ctx_, 0);
+    duk_module_duktape_init(ctx_);
 
     jsapi_init_atomic(this);
 
