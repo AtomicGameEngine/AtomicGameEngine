@@ -8,6 +8,7 @@ python2 configure.py \
     --option-file ../config/examples/performance_sensitive.yaml \
     --option-file ../config/examples/timing_sensitive.yaml
 
-An 'extern "C"' block has to be added to the headers duk_logging.h, duk_module_duktape.h and
-duk_v1_compat.h (from the directory ${DUKTAPE}/extras) to avoid C++ decoration of the function
-names.
+An 'extern "C"' block has to be added to the headers duk_logging.h and duk_module_duktape.h
+(from the directory ${DUKTAPE}/extras) to avoid C++ decoration of the function names.
+This is tracked in https://github.com/svaarala/duktape/issues/1405.
+
