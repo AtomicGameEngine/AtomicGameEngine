@@ -14,14 +14,13 @@
     "express": "~4.10.1",
     "http": "0.0.0",
     "minimist": "~1.1.0",
-    "monaco-editor": "^0.8.1",
     "readline": "0.0.5",
+    "recursive-readdir-sync": "^1.0.6",
     "socket.io": "~1.2.1",
     "sprintf": "~0.1.5",
     "stream": "0.0.2",
     "utf8": "~2.0.0",
     "util": "~0.10.3",
-    "wrench": "~1.5.8",
     "yamljs": "~0.2.1"
   },
   "main": "duk_debug.js"

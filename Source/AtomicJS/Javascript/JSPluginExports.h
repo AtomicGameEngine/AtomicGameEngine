@@ -23,6 +23,7 @@
 #pragma once
 
 #include <Duktape/duktape.h>
+#include <Duktape/duk_logging.h>
 
 namespace Atomic
 {
@@ -51,8 +52,8 @@ namespace Atomic
         typedef void(*__duk_get_memory_functions)(duk_context *ctx, duk_memory_functions *out_funcs);
         typedef void(*__duk_gc)(duk_context *ctx, duk_uint_t flags);
 
-        typedef void(*__duk_throw)(duk_context *ctx);
-        typedef void(*__duk_fatal)(duk_context *ctx, duk_errcode_t err_code, const char *err_msg);
+        typedef void(*__duk_throw_raw)(duk_context *ctx);
+        typedef void(*__duk_fatal_raw)(duk_context *ctx, const char *err_msg);
         typedef void(*__duk_error_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, ...);
         typedef void(*__duk_error_va_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, va_list ap);
 
@@ -261,7 +262,7 @@ namespace Atomic
         typedef duk_int_t(*__duk_pcall_method)(duk_context *ctx, duk_idx_t nargs);
         typedef duk_int_t(*__duk_pcall_prop)(duk_context *ctx, duk_idx_t obj_index, duk_idx_t nargs);
         typedef void(*__duk_new)(duk_context *ctx, duk_idx_t nargs);
-        typedef duk_int_t(*__duk_safe_call)(duk_context *ctx, duk_safe_call_function func, duk_idx_t nargs, duk_idx_t nrets);
+        typedef duk_int_t(*__duk_safe_call)(duk_context *ctx, duk_safe_call_function func, void* data, duk_idx_t nargs, duk_idx_t nrets);
 
         typedef duk_int_t(*__duk_eval_raw)(duk_context *ctx, const char *src_buffer, duk_size_t src_length, duk_uint_t flags);
         typedef duk_int_t(*__duk_compile_raw)(duk_context *ctx, const char *src_buffer, duk_size_t src_length, duk_uint_t flags);
@@ -297,8 +298,8 @@ namespace Atomic
             __duk_get_memory_functions duk_get_memory_functions;
             __duk_gc duk_gc;
 
-            __duk_throw duk_throw;
-            __duk_fatal duk_fatal;
+            __duk_throw_raw duk_throw_raw;
+            __duk_fatal_raw duk_fatal_raw;
             __duk_error_raw duk_error_raw;
             __duk_error_va_raw duk_error_va_raw;
 

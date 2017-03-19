@@ -827,7 +827,7 @@ void duk_trans_socket_write_flush_cb(void *udata) {
     }
 #endif // OSX ad LINUX
 
-    void debugger_detached (void *udata) {
+    void debugger_detached (duk_context* ctx, void *udata) {
 
         fflush(stderr);
 
@@ -1031,6 +1031,7 @@ void duk_trans_socket_write_flush_cb(void *udata) {
             duk_trans_socket_peek_cb,
             duk_trans_socket_read_flush_cb,
             duk_trans_socket_write_flush_cb,
+            NULL, // duk_debug_request_function - no custom application specific request functions
             debugger_detached,
             NULL);
     }

@@ -27,8 +27,8 @@ var util = require('util');
 var readline = require('readline');
 var sprintf = require('sprintf').sprintf;
 var utf8 = require('utf8');
-var wrench = require('wrench');  // https://github.com/ryanmcgrath/wrench-js
 var yaml = require('yamljs');
+var recursiveReadSync = require('recursive-readdir-sync');
 
 // Command line options (defaults here, overwritten if necessary)
 var optTargetHost = '127.0.0.1';
@@ -47,12 +47,13 @@ var UI_MESSAGE_CLIPLEN = 128;
 var LOCALS_CLIPLEN = 64;
 var EVAL_CLIPLEN = 4096;
 var GETVAR_CLIPLEN = 4096;
+var SUPPORTED_DEBUG_PROTOCOL_VERSION = 2;
 
 // Commands initiated by Duktape
 var CMD_STATUS = 0x01;
-var CMD_PRINT = 0x02;
-var CMD_ALERT = 0x03;
-var CMD_LOG = 0x04;
+var CMD_UNUSED_2 = 0x02;  // Duktape 1.x: print notify
+var CMD_UNUSED_3 = 0x03;  // Duktape 1.x: alert notify
+var CMD_UNUSED_4 = 0x04;  // Duktape 1.x: log notify
 var CMD_THROW = 0x05;
 var CMD_DETACHING = 0x06;
 
@@ -106,9 +107,9 @@ debugCommandNames.forEach(function (k, i) {
 });
 
 // Duktape heaphdr type constants, must match C headers
-var DUK_HTYPE_STRING = 1;
-var DUK_HTYPE_OBJECT = 2;
-var DUK_HTYPE_BUFFER = 3;
+var DUK_HTYPE_STRING = 0;
+var DUK_HTYPE_OBJECT = 1;
+var DUK_HTYPE_BUFFER = 2;
 
 // Duktape internal class numbers, must match C headers
 var dukClassNameMeta = yaml.load('duk_classnames.yaml');
@@ -116,11 +117,8 @@ var dukClassNames = dukClassNameMeta.class_names;
 
 // Bytecode opcode/extraop metadata
 var dukOpcodes = yaml.load('duk_opcodes.yaml');
-if (dukOpcodes.opcodes.length != 64) {
+if (dukOpcodes.opcodes.length != 256) {
     throw new Error('opcode metadata length incorrect');
-}
-if (dukOpcodes.extra.length != 256) {
-    throw new Error('extraop metadata length incorrect');
 }
 
 /*
@@ -445,7 +443,7 @@ SourceFileManager.prototype.scan = function () {
     this.directories.forEach(function (dir) {
         console.log('Scanning source files: ' + dir);
         try {
-            wrench.readdirSyncRecursive(dir).forEach(function (fn) {
+            recursiveReadSync(dir).forEach(function (fn) {
                 var absFn = path.normalize(path.join(dir, fn));   // './foo/bar.js' -> 'foo/bar.js'
                 var ent;
 
@@ -1066,44 +1064,49 @@ Debugger.prototype.decodeBytecodeFromBuffer = function (buf, consts, funcs) {
             ins = buf.readInt32BE(i) >>> 0;
         }
 
-        op = dukOpcodes.opcodes[ins & 0x3f];
-        if (op.extra) {
-            op = dukOpcodes.extra[(ins >> 6) & 0xff];
-        }
+        op = dukOpcodes.opcodes[ins & 0xff];
 
         args = [];
         comments = [];
         if (op.args) {
             for (j = 0, m = op.args.length; j < m; j++) {
+                var A = (ins >>> 8) & 0xff;
+                var B = (ins >>> 16) & 0xff;
+                var C = (ins >>> 24) & 0xff;
+                var BC = (ins >>> 16) & 0xffff;
+                var ABC = (ins >>> 8) & 0xffffff;
+                var Bconst = op & 0x01;
+                var Cconst = op & 0x02;
+
                 switch (op.args[j]) {
-                case 'A_R':   args.push('r' + ((ins >>> 6) & 0xff)); break;
-                case 'A_RI':  args.push('r' + ((ins >>> 6) & 0xff) + '(indirect)'); break;
-                case 'A_C':   args.push('c' + ((ins >>> 6) & 0xff)); break;
-                case 'A_H':   args.push('0x' + ((ins >>> 6) & 0xff).toString(16)); break;
-                case 'A_I':   args.push(((ins >>> 6) & 0xff).toString(10)); break;
-                case 'A_B':   args.push(((ins >>> 6) & 0xff) ? 'true' : 'false'); break;
-                case 'B_RC':  args.push((ins & (1 << 22) ? 'c' : 'r') + ((ins >>> 14) & 0x0ff)); break;
-                case 'B_R':   args.push('r' + ((ins >>> 14) & 0x1ff)); break;
-                case 'B_RI':  args.push('r' + ((ins >>> 14) & 0x1ff) + '(indirect)'); break;
-                case 'B_C':   args.push('c' + ((ins >>> 14) & 0x1ff)); break;
-                case 'B_H':   args.push('0x' + ((ins >>> 14) & 0x1ff).toString(16)); break;
-                case 'B_I':   args.push(((ins >>> 14) & 0x1ff).toString(10)); break;
-                case 'C_RC':  args.push((ins & (1 << 31) ? 'c' : 'r') + ((ins >>> 23) & 0x0ff)); break;
-                case 'C_R':   args.push('r' + ((ins >>> 23) & 0x1ff)); break;
-                case 'C_RI':  args.push('r' + ((ins >>> 23) & 0x1ff) + '(indirect)'); break;
-                case 'C_C':   args.push('c' + ((ins >>> 23) & 0x1ff)); break;
-                case 'C_H':   args.push('0x' + ((ins >>> 23) & 0x1ff).toString(16)); break;
-                case 'C_I':   args.push(((ins >>> 23) & 0x1ff).toString(10)); break;
-                case 'BC_R':  args.push('r' + ((ins >>> 14) & 0x3ffff)); break;
-                case 'BC_C':  args.push('c' + ((ins >>> 14) & 0x3ffff)); break;
-                case 'BC_H':  args.push('0x' + ((ins >>> 14) & 0x3ffff).toString(16)); break;
-                case 'BC_I':  args.push(((ins >>> 14) & 0x3ffff).toString(10)); break;
-                case 'ABC_H': args.push(((ins >>> 6) & 0x03ffffff).toString(16)); break;
-                case 'ABC_I': args.push(((ins >>> 6) & 0x03ffffff).toString(10)); break;
-                case 'BC_LDINT': args.push(((ins >>> 14) & 0x3ffff) - (1 << 17)); break;
-                case 'BC_LDINTX': args.push(((ins >>> 14) & 0x3ffff) - 0); break;  // no bias in LDINTX
+                case 'A_R':   args.push('r' + A); break;
+                case 'A_RI':  args.push('r' + A + '(indirect)'); break;
+                case 'A_C':   args.push('c' + A); break;
+                case 'A_H':   args.push('0x' + A.toString(16)); break;
+                case 'A_I':   args.push(A.toString(10)); break;
+                case 'A_B':   args.push(A ? 'true' : 'false'); break;
+                case 'B_RC':  args.push((Bconst ? 'c' : 'r') + B); break;
+                case 'B_R':   args.push('r' + B); break;
+                case 'B_RI':  args.push('r' + B + '(indirect)'); break;
+                case 'B_C':   args.push('c' + B); break;
+                case 'B_H':   args.push('0x' + B.toString(16)); break;
+                case 'B_I':   args.push(B.toString(10)); break;
+                case 'C_RC':  args.push((Cconst ? 'c' : 'r') + C); break;
+                case 'C_R':   args.push('r' + C); break;
+                case 'C_RI':  args.push('r' + C + '(indirect)'); break;
+                case 'C_C':   args.push('c' + C); break;
+                case 'C_H':   args.push('0x' + C.toString(16)); break;
+                case 'C_I':   args.push(C.toString(10)); break;
+                case 'BC_R':  args.push('r' + BC); break;
+                case 'BC_C':  args.push('c' + BC); break;
+                case 'BC_H':  args.push('0x' + BC.toString(16)); break;
+                case 'BC_I':  args.push(BC.toString(10)); break;
+                case 'ABC_H': args.push(ABC.toString(16)); break;
+                case 'ABC_I': args.push(ABC.toString(10)); break;
+                case 'BC_LDINT': args.push(BC - (1 << 15)); break;
+                case 'BC_LDINTX': args.push(BC - 0); break;  // no bias in LDINTX
                 case 'ABC_JUMP': {
-                    var pc_add = ((ins >>> 6) & 0x03ffffff) - (1 << 25) + 1;  // pc is preincremented before adding
+                    var pc_add = ABC - (1 << 23) + 1;  // pc is preincremented before adding
                     var pc_dst = pc + pc_add;
                     args.push(pc_dst + ' (' + (pc_add >= 0 ? '+' : '') + pc_add + ')');
                     break;
@@ -1214,14 +1217,14 @@ Debugger.prototype.sendBasicInfoRequest = function () {
 
 Debugger.prototype.sendGetVarRequest = function (varname, level) {
     var _this = this;
-    return this.sendRequest([ DVAL_REQ, CMD_GETVAR, varname, (typeof level === 'number' ? level : -1), DVAL_EOM ]).then(function (msg) {
+    return this.sendRequest([ DVAL_REQ, CMD_GETVAR, (typeof level === 'number' ? level : -1), varname, DVAL_EOM ]).then(function (msg) {
         return { found: msg[1] === 1, value: msg[2] };
     });
 };
 
 Debugger.prototype.sendPutVarRequest = function (varname, varvalue, level) {
     var _this = this;
-    return this.sendRequest([ DVAL_REQ, CMD_PUTVAR, varname, varvalue, (typeof level === 'number' ? level : -1), DVAL_EOM ]);
+    return this.sendRequest([ DVAL_REQ, CMD_PUTVAR, (typeof level === 'number' ? level : -1), varname, varvalue, DVAL_EOM ]);
 };
 
 Debugger.prototype.sendInvalidCommandTestRequest = function () {
@@ -1318,7 +1321,13 @@ Debugger.prototype.sendResumeRequest = function () {
 
 Debugger.prototype.sendEvalRequest = function (evalInput, level) {
     var _this = this;
-    return this.sendRequest([ DVAL_REQ, CMD_EVAL, evalInput, (typeof level === 'number' ? level : -1), DVAL_EOM ]).then(function (msg) {
+    // Use explicit level if given.  If no level is given, use null if the call
+    // stack is empty, -1 otherwise.  This works well when we're paused and the
+    // callstack information is not liable to change before we do an Eval.
+    if (typeof level !== 'number') {
+        level = this.callstack && this.callstack.length > 0 ? -1 : null;
+    }
+    return this.sendRequest([ DVAL_REQ, CMD_EVAL, level, evalInput, DVAL_EOM ]).then(function (msg) {
         return { error: msg[1] === 1 /*error*/, value: msg[2] };
     });
 };
@@ -1398,7 +1407,7 @@ Debugger.prototype.sendDumpHeapRequest = function () {
 Debugger.prototype.sendGetBytecodeRequest = function () {
     var _this = this;
 
-    return this.sendRequest([ DVAL_REQ, CMD_GETBYTECODE, DVAL_EOM ]).then(function (msg) {
+    return this.sendRequest([ DVAL_REQ, CMD_GETBYTECODE, -1 /* level; could be other than -1 too */, DVAL_EOM ]).then(function (msg) {
         var idx = 1;
         var nconst;
         var nfunc;
@@ -1591,7 +1600,8 @@ Debugger.prototype.connectDebugger = function () {
         console.log('Debug version identification:', msg.versionIdentification);
         _this.protocolVersion = ver;
         _this.uiMessage('debugger-info', 'Debug version identification: ' + msg.versionIdentification);
-        if (ver !== 1) {
+        if (ver !== SUPPORTED_DEBUG_PROTOCOL_VERSION) {
+            console.log('Unsupported debug protocol version (got ' + ver + ', support ' + SUPPORTED_DEBUG_PROTOCOL_VERSION + ')');
             _this.uiMessage('debugger-info', 'Protocol version ' + ver + ' unsupported, dropping connection');
             _this.targetStream.destroy();
         } else {
@@ -1701,12 +1711,6 @@ Debugger.prototype.processDebugMessage = function (msg) {
             }
 
             this.emit('exec-status-update');
-        } else if (msg[1] === CMD_PRINT) {
-            this.uiMessage('print', prettyUiStringUnquoted(msg[2], UI_MESSAGE_CLIPLEN));
-        } else if (msg[1] === CMD_ALERT) {
-            this.uiMessage('alert', prettyUiStringUnquoted(msg[2], UI_MESSAGE_CLIPLEN));
-        } else if (msg[1] === CMD_LOG) {
-            this.uiMessage({ type: 'log', level: msg[2], message: prettyUiStringUnquoted(msg[3], UI_MESSAGE_CLIPLEN) });
         } else if (msg[1] === CMD_THROW) {
             this.uiMessage({ type: 'throw', fatal: msg[2], message: (msg[2] ? 'UNCAUGHT: ' : 'THROW: ') + prettyUiStringUnquoted(msg[3], UI_MESSAGE_CLIPLEN), fileName: msg[4], lineNumber: msg[5] });
         } else if (msg[1] === CMD_DETACHING) {
