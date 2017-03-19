@@ -47,6 +47,8 @@ namespace Atomic
 
         virtual void ProcessArguments();
 
+        void Reconnect();
+
     protected:
 
     private:
