@@ -362,8 +362,9 @@ namespace Atomic
         gJSVMExports.duk_log = duk_log;
         gJSVMExports.duk_log_va = duk_log_va;
         gJSVMExports.duk_push_context_dump = duk_push_context_dump;
+        gJSVMExports.duk_debugger_attach = duk_debugger_attach;
         gJSVMExports.duk_debugger_detach = duk_debugger_detach;
-        gJSVMExports.duk_debugger_attach_custom = duk_debugger_attach;
+
         gJSVMExports.duk_debugger_cooperate = duk_debugger_cooperate;
 
     }

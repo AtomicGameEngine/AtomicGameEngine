@@ -160,7 +160,9 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
             }
         }
     }
+
     handler->Success();
+
 }
 
 void JSResourceEditor::FormatCode()

@@ -272,7 +272,8 @@ namespace Atomic
 
         typedef void(*__duk_push_context_dump)(duk_context *ctx);
 
-        typedef void(*__duk_debugger_attach_custom)(duk_context *ctx,
+
+        typedef void(*__duk_debugger_attach)(duk_context *ctx,
             duk_debug_read_function read_cb,
             duk_debug_write_function write_cb,
             duk_debug_peek_function peek_cb,
@@ -510,8 +511,8 @@ namespace Atomic
             __duk_log duk_log;
             __duk_log_va duk_log_va;
             __duk_push_context_dump duk_push_context_dump;
+            __duk_debugger_attach duk_debugger_attach;
             __duk_debugger_detach duk_debugger_detach;
-            __duk_debugger_attach_custom duk_debugger_attach_custom;
             __duk_debugger_cooperate duk_debugger_cooperate;
 
             JSVMImports()
