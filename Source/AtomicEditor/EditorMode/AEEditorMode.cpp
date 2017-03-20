@@ -240,7 +240,7 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
 
     Vector<String> vargs;
 
-    String args = ToString("--player --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
+    String args = ToString("--atomiceditor --player --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
 
     vargs = args.Split(' ');
 

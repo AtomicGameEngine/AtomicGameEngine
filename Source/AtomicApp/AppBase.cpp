@@ -232,4 +232,16 @@ namespace Atomic
 
     }
 
+    bool AppBase::GetDebuggerAttached()
+    {
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+        return IsDebuggerPresent() ? true : false;
+#else
+        return false;
+#endif
+
+
+    }
+
 }

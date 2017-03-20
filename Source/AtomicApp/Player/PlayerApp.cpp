@@ -42,6 +42,8 @@ namespace AtomicPlayer
 namespace Atomic
 {
 
+    PlayerLaunchMode PlayerApp::launchMode_ = PLAYER_LAUNCH_STANDALONE;
+
     PlayerApp::PlayerApp(Context* context) :
         AppBase(context),
         executeJSMain_(true),
