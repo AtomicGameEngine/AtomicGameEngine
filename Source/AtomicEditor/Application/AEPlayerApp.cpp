@@ -35,7 +35,6 @@ namespace AtomicEditor
     AEPlayerApplication::AEPlayerApplication(Context* context) :
         IPCPlayerApp(context)
     {
-
     }
 
     AEPlayerApplication::~AEPlayerApplication()
@@ -54,6 +53,10 @@ namespace AtomicEditor
         JSVM::RegisterPackage(jsapi_init_webview, engineParameters_);
 #endif
 
+        StringVector args = GetArguments();
+
+        // Set whether we're launched from the Atomic Editor or from an external tool
+        SetLaunchMode(args.Contains("--atomiceditor") ? PLAYER_LAUNCH_ATOMICEDITOR : PLAYER_LAUNCH_EXTERNALEDITOR);
     }
 
     void AEPlayerApplication::Start()

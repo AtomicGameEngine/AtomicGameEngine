@@ -58,6 +58,11 @@ namespace Atomic
             engineParameters_["ResourcePrefixPaths"] = "AtomicPlayer_Resources";
             engineParameters_["ResourcePaths"] = "AtomicResources";
         }
+        else
+        {
+            // Set whether we're launched from the Atomic Editor or from an external tool
+            SetLaunchMode(args.Contains("--atomiceditor") ? PLAYER_LAUNCH_ATOMICEDITOR : PLAYER_LAUNCH_EXTERNALEDITOR);
+        }
     }
 
     int NETIPCPlayerApp::Initialize()

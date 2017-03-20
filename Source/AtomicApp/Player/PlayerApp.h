@@ -26,6 +26,16 @@
 
 namespace Atomic
 {
+    /// Player launch mode
+    enum PlayerLaunchMode
+    {
+        /// Standalone redistributable player
+        PLAYER_LAUNCH_STANDALONE = 0,
+        /// Editor binary play mode
+        PLAYER_LAUNCH_ATOMICEDITOR,
+        /// Launched from an external IDE such as Visual Studio
+        PLAYER_LAUNCH_EXTERNALEDITOR
+    };
 
     class PlayerApp : public AppBase
     {
@@ -45,7 +55,15 @@ namespace Atomic
 
         virtual void ProcessArguments();
 
+        /// Get the player launch mode
+        static PlayerLaunchMode GetLaunchMode() { return launchMode_; }
+
     protected:
+
+        /// Set the player launch mode
+        static void SetLaunchMode(PlayerLaunchMode launchMode) { launchMode_ = launchMode; }
+
+        static PlayerLaunchMode launchMode_;
 
         bool executeJSMain_;
 

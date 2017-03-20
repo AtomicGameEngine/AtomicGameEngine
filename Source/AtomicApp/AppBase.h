@@ -57,6 +57,9 @@ namespace Atomic
 
         static void AddEngineConfigSearchPath(const String& path) { engineConfigSearchPaths_.Push(path); }
 
+        /// Returns whether a debugger is attached to the process
+        static bool GetDebuggerAttached();
+
     protected:
 
         void ReadEngineConfig();
