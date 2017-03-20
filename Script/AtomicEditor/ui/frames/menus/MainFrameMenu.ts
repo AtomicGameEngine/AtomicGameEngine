@@ -292,6 +292,26 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            // Development UI adjustments for Project Frame
+
+            if (refid.indexOf("developer ui width") != -1) {
+
+                let scale = 1;
+                scale = refid.indexOf("1.5x") == -1 ? scale : 1.5;
+                scale = refid.indexOf("2x") == -1 ? scale : 2;
+                scale = refid.indexOf("3x") == -1 ? scale : 3;
+                scale = refid.indexOf("4x") == -1 ? scale : 4;
+
+                EditorUI.getEditor().setApplicationPreference( "developmentUI", "projectFrameWidthScalar", scale.toString());
+
+                this.sendEvent("DevelopmentUIEvent", {
+                    "subEvent" : "ScaleFrameWidth",
+                    "arg0" : "projectframe",
+                    "arg1" : scale
+                });
+
+            }
+
             // If we got here, then we may have been injected by a plugin.  Notify the plugins
             return ServiceLocator.uiServices.menuItemClicked(refid);
 
@@ -424,9 +444,19 @@ var buildItems = {
 
 
 var developerItems = {
-
-    "Toggle Theme": ["toggle theme"],
-    "Toggle Code Editor Theme": ["toggle codeeditor"],
+    "UI": {
+        "Project Frame": {
+            "1x": ["developer ui width project 1x"],
+            "1.5x": ["developer ui width project 1.5x"],
+            "2x": ["developer ui width project 2x"],
+            "3x": ["developer ui width project 3x"],
+            "4x": ["developer ui width project 4x"]
+        }
+    },     
+    "Theme": {
+        "Toggle Theme": ["toggle theme"],
+        "Toggle Code Editor Theme": ["toggle codeeditor"]
+    }, 
     "ScreenShot": ["screenshot", StringID.ShortcutScreenshot],
     "Show Console": ["developer show console"],
     "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list

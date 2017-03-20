@@ -89,6 +89,13 @@ class ProjectFrame extends ScriptWidget {
 
         }));
 
+        // Development support for project frame resizing, including hierarchy frame
+        this.subscribeToEvent("DevelopmentUIEvent", (data) => {
+            if (data.subEvent == "ScaleFrameWidth" && data.arg0 == "projectframe") {
+                this.handleScaleWidth(data.arg1);
+            }
+        });
+                
     }
 
     handleAssetRenamed(ev: ToolCore.AssetRenamedEvent) {
@@ -415,7 +422,13 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    handleScaleWidth(scale:number) {
+        this.getWidget("projectframe").layoutMinWidth = 220 * scale;
+    }
+
     handleProjectLoaded(data: ToolCore.ProjectLoadedEvent) {
+
+        this.handleScaleWidth(parseFloat(AtomicEditor.instance.getApplicationPreference( "developmentUI", "projectFrameWidthScalar", "1")));
 
         this.folderList.rootList.value = 0;
         this.folderList.setExpanded(this.resourcesID, true);
@@ -424,6 +437,8 @@ class ProjectFrame extends ScriptWidget {
     }
 
     handleProjectUnloaded(data) {
+
+        this.handleScaleWidth(1);
 
         this.folderList.deleteAllItems();
         this.resourceFolder = null;

@@ -48,7 +48,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.load("AtomicEditor/editor/ui/hierarchyframe.tb.txt");
 
-        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_TOP_BOTTOM;
+        this.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_ALL;
 
         this.searchEdit = <Atomic.UIEditField>this.getWidget("filter");
 
