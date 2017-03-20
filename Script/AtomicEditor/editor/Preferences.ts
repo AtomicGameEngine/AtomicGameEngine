@@ -420,6 +420,10 @@ interface EditorFeatures {
     screenshotFormat: string;
 }
 
+interface DevelopmentUI {
+    projectFrameWidthScalar: number;
+}
+
 class PreferencesFormat {
 
     constructor() {
@@ -484,6 +488,10 @@ class PreferencesFormat {
             screenshotPath: userDocuments,
             screenshotFormat: "png"
         };
+
+        this.developmentUI = {
+            projectFrameWidthScalar: 1
+        }
 
     }
 
@@ -550,6 +558,11 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
+        if (!prefs.developmentUI) {
+            prefs.developmentUI = this.developmentUI;
+            updatedMissingDefaults = true;
+        }
+        
         return updatedMissingDefaults;
     }
 
@@ -561,6 +574,7 @@ class PreferencesFormat {
     editorBuildData: EditorBuildData;
     colorHistory: string[];
     editorFeatures: EditorFeatures;
+    developmentUI: DevelopmentUI;
 }
 
 export = Preferences;
