@@ -113,7 +113,7 @@ public:
         return true;
     }
 
-#ifndef ATOMIC_PLATFORM_WINDOWS
+#ifdef ATOMIC_OPENGL
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
@@ -270,67 +270,65 @@ public:
 
     }
 
-    void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
-                 const void *buffer, int width, int height) OVERRIDE
-    {
+	void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
+		const void *buffer, int width, int height) OVERRIDE
+	{
 
-        if (type == PET_VIEW)
-        {
-            if (dirtyRects.size() == 1 &&
-                    dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
-            {
-                D3DBlit(IntRect(0, 0, width, height), (unsigned char*) buffer, width * 4, true);
-                return;
-            }
+		if (type == PET_VIEW)
+		{
+			if (dirtyRects.size() == 1 &&
+				dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
+			{
+				D3DBlit(IntRect(0, 0, width, height), (unsigned char*)buffer, width * 4, true);
+				return;
+			}
 
-            // Update just the dirty rectangles
-            CefRenderHandler::RectList::const_iterator i = dirtyRects.begin();
+			// Update just the dirty rectangles
+			CefRenderHandler::RectList::const_iterator i = dirtyRects.begin();
 
-            for (; i != dirtyRects.end(); ++i)
-            {
-                const CefRect& rect = *i;
-                unsigned char* src = (unsigned char*) buffer;
-                src += rect.y * (width * 4) + (rect.x * 4);
-                D3DBlit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
-            }
+			for (; i != dirtyRects.end(); ++i)
+			{
+				const CefRect& rect = *i;
+				unsigned char* src = (unsigned char*)buffer;
+				src += rect.y * (width * 4) + (rect.x * 4);
+				D3DBlit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
+			}
 
-        }
-        else if (type == PET_POPUP && popupRect_.width > 0 && popupRect_.height > 0)
-        {
-            int  x = popupRect_.x;
-            int  y = popupRect_.y;
-            int w = width;
-            int h = height;
-            int viewwidth = webTexture2D_->GetWidth();
-            int viewheight = webTexture2D_->GetHeight();
+		}
+		else if (type == PET_POPUP && popupRect_.width > 0 && popupRect_.height > 0)
+		{
+			int  x = popupRect_.x;
+			int  y = popupRect_.y;
+			int w = width;
+			int h = height;
+			int viewwidth = webTexture2D_->GetWidth();
+			int viewheight = webTexture2D_->GetHeight();
 
-            // Adjust the popup to fit inside the view.
-            if (x < 0)
-            {
-                x = 0;
-            }
-            if (y < 0)
-            {
-                y = 0;
-            }
-            if (x + w > viewwidth)
-            {
-                w -= x + w - viewwidth;
-            }
-            if (y + h > viewheight)
-            {
-                h -= y + h - viewheight;
-            }
+			// Adjust the popup to fit inside the view.
+			if (x < 0)
+			{
+				x = 0;
+			}
+			if (y < 0)
+			{
+				y = 0;
+			}
+			if (x + w > viewwidth)
+			{
+				w -= x + w - viewwidth;
+			}
+			if (y + h > viewheight)
+			{
+				h -= y + h - viewheight;
+			}
 
-            unsigned char* src = (unsigned char*) buffer;
-            D3DBlit(IntRect(x, y, x + w, y + h), src, width * 4, false);
+			unsigned char* src = (unsigned char*)buffer;
+			D3DBlit(IntRect(x, y, x + w, y + h), src, width * 4, false);
 
-        }
+		}
 
 #endif
-
-    }
-
+	}
 #endif
 
 private:
@@ -390,6 +388,14 @@ void WebTexture2D::SetSize(int width, int height)
     textureUsage = TEXTURE_STATIC;
     format = DXGI_FORMAT_B8G8R8A8_UNORM;
 
+#endif
+
+#if defined(ATOMIC_OPENGL) && defined(ATOMIC_PLATFORM_WINDOWS) 
+	//Force width and height to multiples of 2 so that we don't squish pixels
+	//This doesn't seem to make the text completely sharp but it makes it usable for now.
+	width = (width | 2) + 1;
+	height = (height | 2) + 1;
+	texture_->SetFilterMode(TextureFilterMode::FILTER_NEAREST);
 #endif
 
     if (!texture_->SetSize(width, height, format, textureUsage))
