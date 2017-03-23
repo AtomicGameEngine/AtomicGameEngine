@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace AtomicEngine
@@ -27,6 +28,20 @@ namespace AtomicEngine
             }
 
             return null;
+        }
+
+        public List<string> GetResourceDirs()
+        {
+            List<string> resourceDirs = new List<string>();
+
+            ResourceCache cache = AtomicNET.GetSubsystem<ResourceCache>();
+
+            for (uint i = 0; i < cache.GetNumResourceDirs(); i++)
+            {
+                resourceDirs.Add(cache.GetResourceDir(i));
+            }
+
+            return resourceDirs;
         }
 
         /// <summary>
