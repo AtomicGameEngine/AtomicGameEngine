@@ -212,6 +212,11 @@ namespace Atomic
 
     void IPCPlayerApp::Stop()
     {
+        if (debugPlayer_)
+        {
+            context_->GetSubsystem<JSDebugger>()->Shutdown();
+        }
+
         PlayerApp::Stop();
     }
 

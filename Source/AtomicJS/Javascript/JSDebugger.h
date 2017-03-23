@@ -45,6 +45,9 @@ public:
     /// Reconnect to debugger socket (blocks main thread currently)
     void Reconnect() const;
 
+    /// Shut down the debugger
+    void Shutdown() const;
+
     /// Get the JSDebugger subsystem from external code
     static JSDebugger* GetInstance() { return instance_; }
 

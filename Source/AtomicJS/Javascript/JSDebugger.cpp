@@ -27,6 +27,10 @@ JSDebugger::~JSDebugger()
     instance_ = NULL;
 }
 
+void JSDebugger::Shutdown() const
+{
+    instance_ = NULL;
+}
 
 void JSDebugger::Reconnect() const
 {
