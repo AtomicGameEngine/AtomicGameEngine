@@ -45,7 +45,7 @@ BindCmd::~BindCmd()
 
 }
 
-bool BindCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
+bool BindCmd::ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
 {
     String argument = arguments[startIndex].ToLower();
     sourceRootFolder_ = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;

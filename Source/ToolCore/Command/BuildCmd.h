@@ -38,9 +38,11 @@ public:
     BuildCmd(Context* context);
     virtual ~BuildCmd();
 
-    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
-
     void Run();
+
+protected:
+
+    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
 private:
 

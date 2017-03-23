@@ -52,7 +52,7 @@ ProjectCmd::~ProjectCmd()
 }
 
 // usage: project <projectPath> [cache (-clean)]
-bool ProjectCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
+bool ProjectCmd::ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
 {
     String argument = arguments[startIndex].ToLower();
     if (argument != "project")

@@ -48,7 +48,7 @@ ImportCmd::~ImportCmd()
 
 }
 
-bool ImportCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
+bool ImportCmd::ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
 {
     String argument = arguments[startIndex].ToLower();
     String value = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;

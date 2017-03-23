@@ -31,27 +31,26 @@ namespace ToolCore
 
 class ProjectCmd: public Command
 {
-    ATOMIC_OBJECT(ProjectCmd, Command);
+    ATOMIC_OBJECT(ProjectCmd, Command)
 
 public:
 
     ProjectCmd(Context* context);
     virtual ~ProjectCmd();
 
-    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
-
     void Run();
 
-    bool RequiresProjectLoad() { return requiresProjectLoad_; }
+    bool RequiresProjectLoad() { return requiresProjectLoad_; }    
 
-    const String& GetProjectPath() const { return projectPath_; }
+protected:
+
+    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
 private:
 
     void HandleProjectBeginLoad(StringHash eventType, VariantMap& eventData);
     void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
 
-    String projectPath_;
     String command_;
     bool requiresProjectLoad_;
     int options_;
