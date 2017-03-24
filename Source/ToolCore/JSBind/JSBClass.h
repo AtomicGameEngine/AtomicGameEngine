@@ -191,6 +191,12 @@ public:
     unsigned GetNumHaxeDecl() { return haxeDecls_.Size(); }
     const String& GetHaxeDecl(unsigned idx) { return haxeDecls_[idx]; }
 
+    /// CSharp bindings can add NET interfaces to native classes, for example IDisposable, IEquatable, etc
+    void AddCSharpInterface(const String& interface) { csharpInterfacesDecls_.Push(interface); }
+
+    /// Gets the C# interfaces implemented by this class
+    const StringVector& GetCSharpInterfaces() const { return csharpInterfacesDecls_; }
+
     void Preprocess();
     void Process();
     void PostProcess();
@@ -217,6 +223,7 @@ private:
 
     Vector<String> typeScriptDecls_;
     Vector<String> haxeDecls_;
+    Vector<String> csharpInterfacesDecls_;
 
     bool isAbstract_;
     bool isObject_;

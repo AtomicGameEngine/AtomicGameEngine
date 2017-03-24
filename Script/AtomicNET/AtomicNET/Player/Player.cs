@@ -28,6 +28,8 @@ namespace AtomicPlayer
             {
                 if (loadedScenes.Contains(e.Scene))
                     loadedScenes.Remove(e.Scene);
+
+                e.Scene.Dispose();
             });
 
         }

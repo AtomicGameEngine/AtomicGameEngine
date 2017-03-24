@@ -233,17 +233,34 @@ void DebugHud::Update(float timeStep)
                 {
                     Metrics* metrics = GetSubsystem<Metrics>();
 
-                    if (metrics)
-                    {
-                        if (!metrics->GetEnabled())
-                            metrics->Enable();
+                    int size = profilerText_->GetFontSize();
 
-                        SharedPtr<MetricsSnapshot> snapshot(new MetricsSnapshot());
-                        metrics->Capture(snapshot);
-                        profilerOutput = snapshot->PrintData(2);
+                    if (metrics)
+                    {                        
+
+                        if (metrics->GetEnabled())
+                        {
+                            if (size != 8)
+                                profilerText_->SetFont(profilerText_->GetFont(), 8);
+
+                            SharedPtr<MetricsSnapshot> snapshot(new MetricsSnapshot());
+                            metrics->Capture(snapshot);
+                            profilerOutput = snapshot->PrintData(2);
+                        }
+                        else
+                        {
+                            if (size != 32)
+                                profilerText_->SetFont(profilerText_->GetFont(), 32);
+
+                            profilerOutput = "Metrics system not enabled";
+                        }
+
                     }
                     else
                     {
+                        if (size != 32)
+                            profilerText_->SetFont(profilerText_->GetFont(), 32);
+
                         profilerOutput = "Metrics subsystem not found";
                     }
 
@@ -271,23 +288,9 @@ void DebugHud::SetProfilerMode(DebugHudProfileMode mode)
     }
     else
     {
-        int size = 8;
-
-        Metrics* metrics = GetSubsystem<Metrics>();
-
-        if (!metrics)
-            size = 32;
-        else
-        {
-            // Enable metrics immediately
-            if (!metrics->GetEnabled())
-                metrics->Enable();
-        }
-
         if (profilerText_.NotNull())
         {
-            profilerText_->SetText("");
-            profilerText_->SetFont(profilerText_->GetFont(), size);
+            profilerText_->SetText("");            
         }
     }
 

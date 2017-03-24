@@ -8,6 +8,17 @@ namespace AtomicEngine
 {
     public partial class Scene : Node
     {
+        override protected void Dispose(bool disposing)
+        {
+            UnsubscribeFromAllEvents();
+
+            if (disposing)
+                RefCountedCache.DisposeScene(this);
+
+            base.Dispose(disposing);            
+
+        }
+
         internal override void PostNativeUpdate()
         {    
             SubscribeToEvent<NodeAddedEvent>(this, e =>

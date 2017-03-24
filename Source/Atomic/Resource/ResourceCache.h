@@ -245,6 +245,9 @@ public:
     /// Scan specified files, returning them as an iterator
     SharedPtr<ResourceNameIterator> Scan(const String& pathName, const String& filter, unsigned flags, bool recursive) const;
 
+    /// Returns a formatted string containing the currently loaded resources with optional type name filter.
+    String PrintResources(const String& typeName = String::EMPTY) const;
+
     // ATOMIC END
 
 private:

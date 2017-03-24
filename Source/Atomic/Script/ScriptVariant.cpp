@@ -39,6 +39,8 @@ Resource* ScriptVariant::GetResource() const
 
         return cache->GetResource(ref.type_, ref.name_);       
     }
+
+    return 0;
 }
 
 void ScriptVariant::SetResource(Resource* resource)
