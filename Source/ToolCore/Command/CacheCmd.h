@@ -63,7 +63,6 @@ private:
 
     bool cleanCache_;
     bool generateCache_;
-    String cachePath_;
 
 };
 
