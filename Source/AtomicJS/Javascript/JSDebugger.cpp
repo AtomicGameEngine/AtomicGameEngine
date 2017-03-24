@@ -11,6 +11,7 @@ static duk_size_t duk_trans_socket_peek_cb(void *udata);
 static void duk_trans_socket_read_flush_cb(void *udata);
 static void duk_trans_socket_write_flush_cb(void *udata);
 static void debugger_detached (duk_context* ctx, void *udata);
+static void duk_trans_socket_finish(void);
 
 namespace Atomic
 {
@@ -20,6 +21,7 @@ JSDebugger* JSDebugger::instance_ = NULL;
 JSDebugger::JSDebugger(Context* context) : Object(context)
 {
     instance_ = this;
+    this->AutoReconnect = false;
 }
 
 JSDebugger::~JSDebugger()
@@ -29,7 +31,7 @@ JSDebugger::~JSDebugger()
 
 void JSDebugger::Shutdown() const
 {
-    instance_ = NULL;
+    duk_trans_socket_finish();
 }
 
 void JSDebugger::Reconnect() const
@@ -66,7 +68,7 @@ void JSDebugger::Reconnect() const
 
 static void do_reconnect()
 {
-    if (Atomic::JSDebugger::GetInstance())
+    if (Atomic::JSDebugger::GetInstance() && Atomic::JSDebugger::GetInstance()->AutoReconnect)
     {
         Atomic::JSDebugger::GetInstance()->Reconnect();
     }
@@ -241,7 +243,7 @@ void duk_trans_socket_finish(void) {
         wsa_inited = 0;
     }
 
-    // auto-restart
+    // try to auto-restart
     do_reconnect();
 
 }
@@ -632,8 +634,7 @@ void duk_trans_socket_finish(void) {
         server_sock = -1;
     }
 
-    //
-    // auto-restart
+    // try to auto-restart
     do_reconnect();
 }
 

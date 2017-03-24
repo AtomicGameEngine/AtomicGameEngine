@@ -200,6 +200,7 @@ namespace Atomic
         {
             ATOMIC_LOGDEBUG("Starting JSDebugger Subsystem");
             context_->RegisterSubsystem(new JSDebugger(context_));
+            context_->GetSubsystem<JSDebugger>()->AutoReconnect = true;
             context_->GetSubsystem<JSDebugger>()->Reconnect();
         }
 
@@ -214,6 +215,7 @@ namespace Atomic
     {
         if (debugPlayer_)
         {
+            context_->GetSubsystem<JSDebugger>()->AutoReconnect = false;
             context_->GetSubsystem<JSDebugger>()->Shutdown();
         }
 
