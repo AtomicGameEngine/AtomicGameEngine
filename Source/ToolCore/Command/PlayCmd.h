@@ -36,11 +36,13 @@ class PlayCmd: public Command
 public:
 
     PlayCmd(Context* context);
-    virtual ~PlayCmd();
-
-    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
+    virtual ~PlayCmd();    
 
     void Run();
+
+protected:
+
+    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
 private:
 

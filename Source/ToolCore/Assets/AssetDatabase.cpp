@@ -44,7 +44,8 @@ namespace ToolCore
 
 AssetDatabase::AssetDatabase(Context* context) : Object(context),
     assetScanDepth_(0),
-    assetScanImport_(false)
+    assetScanImport_(false),
+    cacheEnabled_(true)
 {
     SubscribeToEvent(E_LOADFAILED, ATOMIC_HANDLER(AssetDatabase, HandleResourceLoadFailed));
     SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(AssetDatabase, HandleProjectLoaded));
@@ -536,15 +537,10 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
 
     ReadImportConfig();
 
-    FileSystem* fs = GetSubsystem<FileSystem>();
-
-    if (!fs->DirExists(GetCachePath()))
-        fs->CreateDir(GetCachePath());
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    cache->AddResourceDir(GetCachePath());
-
-    Scan();
+    if (cacheEnabled_)
+    {
+        InitCache();
+    }
 
     SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(AssetDatabase, HandleFileChanged));
 }
@@ -593,7 +589,6 @@ void AssetDatabase::HandleResourceLoadFailed(StringHash eventType, VariantMap& e
     evData[AssetImportError::P_GUID] = asset->guid_;
     evData[AssetImportError::P_ERROR] = ToString("Asset %s Failed to Load", asset->path_.CString());
     SendEvent(E_ASSETIMPORTERROR, evData);
-
 
 }
 
@@ -703,5 +698,74 @@ void AssetDatabase::ReimportAllAssetsInDirectory(const String& directoryPath)
 
 }
 
+
+bool AssetDatabase::InitCache()
+{
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (!fs->DirExists(GetCachePath()))
+        fs->CreateDir(GetCachePath());
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    cache->AddResourceDir(GetCachePath());
+
+    Scan();
+
+    return true;
+}
+
+bool AssetDatabase::CleanCache()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    String cachePath = GetCachePath();
+
+    if (fileSystem->DirExists(cachePath))
+    {
+        ATOMIC_LOGINFOF("Cleaning cache directory %s", cachePath.CString());
+
+        fileSystem->RemoveDir(cachePath, true);
+
+        if (fileSystem->DirExists(cachePath))
+        {
+            ATOMIC_LOGERRORF("Unable to remove cache directory %s", cachePath.CString());
+            return false;
+        }
+    }
+
+    fileSystem->CreateDir(cachePath);
+
+    if (!fileSystem->DirExists(cachePath))
+    {
+        ATOMIC_LOGERRORF("Unable to create cache directory %s", cachePath.CString());
+        return false;
+    }
+
+    return true;
+
+}
+
+bool AssetDatabase::GenerateCache(bool clean)
+{
+    ATOMIC_LOGINFO("Generating cache... hold on");
+
+    if (clean)
+    {
+        if (!CleanCache())
+            return false;
+    }
+
+    ReimportAllAssets();
+
+    ATOMIC_LOGINFO("Cache generated");
+
+    return true;
+
+}
+
+void AssetDatabase::SetCacheEnabled(bool cacheEnabled)
+{
+    cacheEnabled_ = cacheEnabled;
+}
 
 }

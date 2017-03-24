@@ -42,22 +42,21 @@ public:
     NETCmd(Context* context);
     virtual ~NETCmd();
 
-    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
-
     void Run();
 
     bool RequiresProjectLoad() { return requiresProjectLoad_; }
 
     const String& GetProjectPath() const { return projectPath_; }
 
+protected:
+
+    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
+
 private:
 
     void HandleNETBuildResult(StringHash eventType, VariantMap& eventData);
 
     String command_;
-
-    // genresources command
-    String projectPath_;
 
     // parse command
     String assemblyPath_;
