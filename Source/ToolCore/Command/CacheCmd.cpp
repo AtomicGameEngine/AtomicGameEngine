@@ -40,7 +40,8 @@ CacheCmd::CacheCmd(Context* context) : Command(context),
     cleanCache_(false),
     generateCache_(false)
 {
-
+    // We disable the AssetDatabase cache, as will be cleaning, regenerating, etc
+    GetSubsystem<AssetDatabase>()->SetCacheEnabled(false);
 }
 
 CacheCmd::~CacheCmd()
@@ -83,92 +84,17 @@ bool CacheCmd::ParseInternal(const Vector<String>& arguments, unsigned startInde
     return true;
 }
 
-
-bool CacheCmd::CreateCacheDirectory() const
-{
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
-    if (fileSystem->DirExists(cachePath_))
-        return true;
-
-    fileSystem->CreateDir(cachePath_);
-
-    if (!fileSystem->DirExists(cachePath_))
-    {
-        ATOMIC_LOGERRORF("Unable to create cache directory %s", cachePath_.CString());
-        return false;
-    }
-
-    return true;
-}
-
-bool CacheCmd::RemoveCacheDirectory() const
-{
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
-    if (!fileSystem->DirExists(cachePath_))
-        return true;
-
-    fileSystem->RemoveDir(cachePath_, true);
-
-    if (fileSystem->DirExists(cachePath_))
-    {
-        ATOMIC_LOGERRORF("Unable to remove cache directory %s", cachePath_.CString());
-        return false;
-    }
-
-    return true;
-}
-
-bool CacheCmd::CleanCache() const
-{
-    ATOMIC_LOGINFO("Cleaning Cache...");
-
-    if (!RemoveCacheDirectory())
-        return false;
-
-    if (!CreateCacheDirectory())
-        return false;
-
-   return true;
-}
-
-bool CacheCmd::GenerateCache() const
-{
-    ATOMIC_LOGINFO("Generating Cache... hold on");
-
-    AssetDatabase* database = GetSubsystem<AssetDatabase>();
-    database->ReimportAllAssets();
-
-    ATOMIC_LOGINFO("Cache Generated");
-
-    return true;
-}
-
 void CacheCmd::Run()
 {
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-    ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
-    Project* project = tsystem->GetProject();
-
-    cachePath_ = AddTrailingSlash(project->GetProjectPath()) + "Cache";
-
-    if (cleanCache_)
-    {
-        if (!CleanCache())
-        {
-            Error("Unable to clean cache");
-            return;
-        }
-    }
-
+    AssetDatabase* database = GetSubsystem<AssetDatabase>();
+    
     if (generateCache_)
     {
-        if (!GenerateCache())
-        {
-            Error("Unable to generate cache");
-            return;
-        }
+        database->GenerateCache(cleanCache_);
+    }
+    else if (cleanCache_)
+    {
+        database->CleanCache();
     }
 
     Finished();
