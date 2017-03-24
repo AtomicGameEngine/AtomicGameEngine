@@ -18,20 +18,25 @@ namespace Atomic
 
 JSDebugger* JSDebugger::instance_ = NULL;
 
-JSDebugger::JSDebugger(Context* context) : Object(context)
+JSDebugger::JSDebugger(Context* context) :
+    Object(context),
+    autoReconnect_(true)
 {
     instance_ = this;
-    this->AutoReconnect = false;
 }
 
 JSDebugger::~JSDebugger()
 {
+    duk_trans_socket_finish();
     instance_ = NULL;
 }
 
 void JSDebugger::Shutdown() const
 {
-    duk_trans_socket_finish();
+    if (Atomic::JSDebugger::GetInstance())
+    {
+        Atomic::JSDebugger::GetInstance()->SetAutoReconnect(false);
+    }
 }
 
 void JSDebugger::Reconnect() const
@@ -68,9 +73,10 @@ void JSDebugger::Reconnect() const
 
 static void do_reconnect()
 {
-    if (Atomic::JSDebugger::GetInstance() && Atomic::JSDebugger::GetInstance()->AutoReconnect)
+    Atomic::JSDebugger* dbg = Atomic::JSDebugger::GetInstance();
+    if (dbg && dbg->GetAutoReconnect())
     {
-        Atomic::JSDebugger::GetInstance()->Reconnect();
+        dbg->Reconnect();
     }
 }
 

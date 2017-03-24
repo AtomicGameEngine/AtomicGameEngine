@@ -51,12 +51,17 @@ public:
     /// Get the JSDebugger subsystem from external code
     static JSDebugger* GetInstance() { return instance_; }
 
-    /// Automatically listen for a new connection when disconnected
-    bool AutoReconnect;
+    /// Set the Auto Reconnect value
+    void SetAutoReconnect(bool value) { autoReconnect_ = value; }
+
+    /// Get the Auto Reconnect value
+    bool GetAutoReconnect() { return autoReconnect_; }
+
 
 private:
 
     static JSDebugger* instance_;
+    bool autoReconnect_;
 
 };
 
