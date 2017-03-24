@@ -30,15 +30,18 @@ namespace AtomicEngine
             return null;
         }
 
-        public List<string> GetResourceDirs()
+        /// <summary>
+        ///  Gets all resource directories and places it within an array.
+        /// </summary>
+        public string[] GetResourceDirs()
         {
-            List<string> resourceDirs = new List<string>();
+            ResourceCache cache = GetSubsystem<ResourceCache>();
 
-            ResourceCache cache = AtomicNET.GetSubsystem<ResourceCache>();
+             string[] resourceDirs = new string[cache.GetNumResourceDirs()];
 
             for (uint i = 0; i < cache.GetNumResourceDirs(); i++)
             {
-                resourceDirs.Add(cache.GetResourceDir(i));
+                resourceDirs[i] = cache.GetResourceDir(i);
             }
 
             return resourceDirs;
