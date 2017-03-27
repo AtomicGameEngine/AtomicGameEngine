@@ -12,15 +12,17 @@ The Atomic Game Engine is powerful 2D/3D technology developed by industry vetera
 Atomic is lean, full source, technology for mobile and desktop.  It has a powerful core API with access to raw, down to the metal, native performance.  Atomic technology leverages **industry standard languages and tooling** for use in games, education/training, serious applications, and new growth areas such as AR/VR.
 
 <img align="right" src="http://atomicgameengine.com/images/home/WorldInstallMapHome.png"/>
+
 The Atomic Editor is **installed in over 75 countries** and is being used in production environments.  It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.  
 
 If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="http://atomicgameengine.com/#download-the-atomic-editor">download the Atomic Editor</a> or fork us on GitHub!
 
 #### Atomic Technology
 
-<img src="http://atomicgameengine.com/images/home/RoboBeach2017.png"/>
+<img src="http://atomicgameengine.com/images/home/RoboBeach2017.png"/>  
 
 <img align="right" src="http://atomicgameengine.com/images/PlatformBox.png"/>
+
 - Consistent **2D/3D API** available in **JavaScript, TypeScript, C#, and C++**
 - Built-in Monaco JavaScript/TypeScript editor and support for **VSCode** and **Atom**
 - C# IDE integration with **Visual Studio**, **Xamarin Studio**, and **MonoDevelop**
@@ -65,7 +67,9 @@ Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and schedule
 ---
 
 ### How to Help
+
 <img align="right" src="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/atomic/wecandoit.jpg" style="margin-left:20px;"/>
+
 - Let others know about the Atomic Game Engine!
 - Answer questions and provide feedback in the [Atomic Community Support Forum](https://discourse.atomicgameengine.com/c/atomic-community-support) and [Atomic Chat](https://gitter.im/AtomicGameEngine/AtomicGameEngine)
 

@@ -49,9 +49,8 @@ public:
     Command(Context* context);
     virtual ~Command();
 
-    bool Parse(const String& command);
-
-    virtual bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg) = 0;
+    /// Parse a command from given arguments and startIndex, return false on failure with errorMsg set
+    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
     virtual void Run() = 0;
 
@@ -63,13 +62,23 @@ public:
 
     virtual bool RequiresProjectLoad() { return true; }
 
-    virtual const String& GetProjectPath() const { return String::EMPTY; }
+    /// Loads project into ToolSystem returning true on success
+    bool LoadProject();
+
+    /// Returns the project path specified by the --project common argument
+    virtual const String& GetProjectPath() const { return projectPath_; }
 
     virtual bool RequiresLicenseValidation() { return false; }
 
-private:
+protected:
 
-    float timeOut_;
+    virtual bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg) = 0;
+
+    void ParseCommonArguments(const Vector<String>& arguments, String &errorMsg);
+
+    float timeOut_;    
+
+    String projectPath_;
 
 };
 

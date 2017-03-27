@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace AtomicEngine
@@ -27,6 +28,23 @@ namespace AtomicEngine
             }
 
             return null;
+        }
+
+        /// <summary>
+        ///  Gets all resource directories and places it within an array.
+        /// </summary>
+        public string[] GetResourceDirs()
+        {
+            ResourceCache cache = GetSubsystem<ResourceCache>();
+
+             string[] resourceDirs = new string[cache.GetNumResourceDirs()];
+
+            for (uint i = 0; i < cache.GetNumResourceDirs(); i++)
+            {
+                resourceDirs[i] = cache.GetResourceDir(i);
+            }
+
+            return resourceDirs;
         }
 
         /// <summary>

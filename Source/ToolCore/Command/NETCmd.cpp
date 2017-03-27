@@ -56,7 +56,7 @@ NETCmd::~NETCmd()
 
 }
 
-bool NETCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
+bool NETCmd::ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
 {
     String argument = arguments[startIndex].ToLower();
     command_ = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1].ToLower() : String::EMPTY;

@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <Atomic/IO/Log.h>
+
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
 
@@ -39,12 +41,88 @@ Command::~Command()
 
 }
 
-bool Command::Parse(const String& command)
+bool Command::LoadProject()
 {
-    Vector<String> args = command.Split(' ');
-    String errorMsg;
+    if (!projectPath_.Length())
+        return false;
 
-    return Parse(args, 0, errorMsg);
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    // default to current directly if command doesn't provide the path
+    if (!projectPath_.Length())
+        projectPath_ = fileSystem->GetCurrentDir();
+
+    String projectFile;
+    if (projectPath_.EndsWith(".atomic", false))
+    {
+        projectFile = projectPath_;
+        projectPath_ = GetPath(projectPath_);
+    }
+    else
+    {
+        Vector<String> projectFiles;
+        fileSystem->ScanDir(projectFiles, projectPath_, "*.atomic", SCAN_FILES, false);
+        if (!projectFiles.Size())
+        {
+            ATOMIC_LOGERRORF("No .atomic project file in %s", projectPath_.CString());
+            return false;
+        }
+        else if (projectFiles.Size() > 1)
+        {
+            ATOMIC_LOGERRORF("Multiple .atomic project files found in %s", projectPath_.CString());
+            return false;
+        }
+        projectFile = projectPath_ + "/" + projectFiles[0];
+    }
+
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
+    if (!tsystem->LoadProject(projectFile))
+    {
+        ATOMIC_LOGERRORF("Failed to load project: %s", projectFile.CString());
+        return false;
+    }
+
+    return true;
+
+}
+
+void Command::ParseCommonArguments(const Vector<String> &arguments, String &errorMsg)
+{
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
+        {
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            // eat additonal argument '-'
+            while (argument.StartsWith("-"))
+            {
+                argument.Erase(0);
+            }
+
+            if (argument == "project" && value.Length())
+            {
+                projectPath_ = value;
+            }
+        }
+    }
+
+}
+
+bool Command::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
+{
+    errorMsg = String::EMPTY;
+
+    ParseCommonArguments(arguments, errorMsg);
+
+    if (errorMsg.Length())
+    {
+        return false;
+    }
+
+    return ParseInternal(arguments, startIndex, errorMsg);
 }
 
 void Command::Error(const String& errorMsg)

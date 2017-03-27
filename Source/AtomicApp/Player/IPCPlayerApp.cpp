@@ -31,13 +31,13 @@
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/IPC/IPC.h>
 #include <AtomicJS/Javascript/Javascript.h>
+#include <AtomicJS/Javascript/JSDebugger.h>
 #include <Atomic/UI/SystemUI/DebugHud.h>
 
 #include "IPCPlayerApp.h"
 
 namespace Atomic
 {
-
     IPCPlayerApp::IPCPlayerApp(Context* context) :
         PlayerApp(context),
         subprocess_(false),
@@ -196,6 +196,12 @@ namespace Atomic
 
         GetSubsystem<Graphics>()->RaiseWindow();
 
+        if (debugPlayer_)
+        {
+            ATOMIC_LOGDEBUG("Starting JSDebugger Subsystem");
+            context_->RegisterSubsystem(new JSDebugger(context_));
+            context_->GetSubsystem<JSDebugger>()->Reconnect();
+        }
 
     }
 
@@ -206,6 +212,11 @@ namespace Atomic
 
     void IPCPlayerApp::Stop()
     {
+        if (debugPlayer_)
+        {
+            context_->GetSubsystem<JSDebugger>()->Shutdown();
+        }
+
         PlayerApp::Stop();
     }
 

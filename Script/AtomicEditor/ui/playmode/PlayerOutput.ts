@@ -97,26 +97,28 @@ class PlayerOutput extends Atomic.UIWindow {
     }
 
     wakeOnError ( message: string ) {  // look for Errors in the transcript, insert links to bring up the offending file
-
-        if ( message.indexOf("Error") == -1 ) return message;  // send it back if no "Error" string is present
+        var ecnum = message.indexOf("ERROR");
+        if ( ecnum == -1 ) return message;  // send it back if no "Error" string is present
 
         if ( this.errorsFileLine.length > 100 ) return message;  // limit the number of unique errors, geez
 
         var linenum;
-        var linepos = message.indexOf("Line");  // find the Line token to harvest the line number
+        var linepos = message.indexOf("Line", ecnum);  // find the Line token to harvest the line number
         if ( linepos > -1 ) { // we found it
            var lnsrt = message.indexOf(" ", linepos + 1 );  // find the next 2 spaces, and substr it
            var lnstp = message.indexOf(" ", lnsrt + 1 );
-           linenum = ":" + message.substr(lnsrt, lnstp - lnsrt).trim();  // create our next search string
+           linenum = ":" + message.substr(lnsrt, lnstp - lnsrt).trim() + ")";  // create our next search string
         }
         else return message;  // send it back original if the Line signature is not present
 
-        var fnpos = message.indexOf( linenum );  // find the :linenumber position
+        var fnpos = message.indexOf( linenum );  // find the :linenumber) position
+        if ( fnpos == -1 ) return message;  // more checking
         var fnsrt = fnpos - 1;  // find the start of the string, the hard way.
-        while (message.charAt(fnsrt) != " " && message.charAt(fnsrt) != "\n" && fnsrt > 0)
+        while (message.charAt(fnsrt) != "(" && message.charAt(fnsrt) != " " && message.charAt(fnsrt) != "\n" && fnsrt > 0)
             fnsrt--;
+        if (message.charAt(fnsrt) == "(")  fnsrt++; // get rid of the open paren that is there now with Duk 2.x  
         var fnstp = fnpos + 1; // find the end of the string
-        while (message.charAt(fnstp) != " " && message.charAt(fnstp) != "\n" && fnstp < message.length - 1 )
+        while (message.charAt(fnstp) != ")" && message.charAt(fnstp) != " " && message.charAt(fnstp) != "\n" && fnstp < message.length - 1 )
             fnstp++;
         var errFnLn = message.substr(fnsrt, fnstp - fnsrt).trim();  // and this is your problem, right there.
 

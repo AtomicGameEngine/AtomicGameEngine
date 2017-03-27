@@ -38,10 +38,13 @@ public:
     ImportCmd(Context* context);
     virtual ~ImportCmd();
 
-    bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
     void Run();
 
     bool RequiresProjectLoad() { return true; }
+
+protected:
+
+    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
 private:
 

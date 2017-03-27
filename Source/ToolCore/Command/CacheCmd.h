@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2014-2017 THUNDERBEAST GAMES LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,18 +29,24 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-class NewProjectCmd: public Command
+
+/// Command for cleaning and regenerating a Project resource cache
+class CacheCmd: public Command
 {
-    ATOMIC_OBJECT(NewProjectCmd, Command);
+
+    /// Example usage:
+    /// AtomicTool cache --clean --project C:\Path\To\MyProject (cleans cache folder)
+    /// AtomicTool cache generate --project C:\Path\To\MyProject (regenerates the project cache)
+    /// AtomicTool cache generate --clean --project C:\Path\To\MyProject (cleans and then regenerates the project cache)
+
+    ATOMIC_OBJECT(CacheCmd, Command)
 
 public:
 
-    NewProjectCmd(Context* context);
-    virtual ~NewProjectCmd();
+    CacheCmd(Context* context);
+    virtual ~CacheCmd();
 
     void Run();
-
-    bool RequiresProjectLoad() { return false; }
 
 protected:
 
@@ -48,7 +54,15 @@ protected:
 
 private:
 
-    String projectPath_;
+    bool CreateCacheDirectory() const;
+    bool RemoveCacheDirectory() const;
+
+    bool CleanCache() const;
+
+    bool GenerateCache() const;
+
+    bool cleanCache_;
+    bool generateCache_;
 
 };
 

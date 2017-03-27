@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2014-2017, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,33 +22,46 @@
 
 #pragma once
 
-#include "Command.h"
+#include <Atomic/Core/Object.h>
 
-using namespace Atomic;
-
-namespace ToolCore
+namespace Atomic
 {
 
-class NewProjectCmd: public Command
+
+/// JavaScript/TypeScript Debugger Subsystem
+class ATOMIC_API JSDebugger : public Object
 {
-    ATOMIC_OBJECT(NewProjectCmd, Command);
+
+    ATOMIC_OBJECT(JSDebugger, Object)
 
 public:
 
-    NewProjectCmd(Context* context);
-    virtual ~NewProjectCmd();
+    /// Construct.
+    JSDebugger(Context* context);
 
-    void Run();
+    /// Destruct.
+    virtual ~JSDebugger();
 
-    bool RequiresProjectLoad() { return false; }
+    /// Reconnect to debugger socket (blocks main thread currently)
+    void Reconnect() const;
 
-protected:
+    /// Shut down the debugger
+    void Shutdown() const;
 
-    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
+    /// Get the JSDebugger subsystem from external code
+    static JSDebugger* GetInstance() { return instance_; }
+
+    /// Set the Auto Reconnect value
+    void SetAutoReconnect(bool value) { autoReconnect_ = value; }
+
+    /// Get the Auto Reconnect value
+    bool GetAutoReconnect() { return autoReconnect_; }
+
 
 private:
 
-    String projectPath_;
+    static JSDebugger* instance_;
+    bool autoReconnect_;
 
 };
 

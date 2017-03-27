@@ -223,47 +223,19 @@ void AtomicTool::Start()
 
     if (cmd->RequiresProjectLoad())
     {
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        if (!cmd->LoadProject())
+        {
+            ErrorExit(ToString("Failed to load project: %s", cmd->GetProjectPath().CString()));
+            return;
+        }
 
         String projectPath = cmd->GetProjectPath();
-            
-        // default to current directly if command doesn't provide the path
-        if (!projectPath.Length())
-            projectPath = fileSystem->GetCurrentDir();
-
-        String projectFile;
-        if (projectPath.EndsWith(".atomic", false))
-        {
-            projectFile = projectPath;
-            projectPath = GetPath(projectPath);
-        }
-        else
-        {
-            Vector<String> projectFiles;
-            fileSystem->ScanDir(projectFiles, projectPath, "*.atomic", SCAN_FILES, false);
-            if (!projectFiles.Size())
-            {
-                ErrorExit(ToString("No .atomic project file in %s", projectPath.CString()));
-                return;
-            }
-            else if (projectFiles.Size() > 1)
-            {
-                ErrorExit(ToString("Multiple .atomic project files found in %s", projectPath.CString()));
-                return;
-            }
-            projectFile = projectPath + "/" + projectFiles[0];
-        }
-
-        if (!tsystem->LoadProject(projectFile))
-        {
-            //ErrorExit(ToString("Failed to load project: %s", projectFile.CString()));
-            //return;
-        }
 
         // Set the build path
         String buildFolder = projectPath + "/" + "Build";
         buildSystem->SetBuildPath(buildFolder);
 
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
         if (!fileSystem->DirExists(buildFolder))
         {
             fileSystem->CreateDir(buildFolder);
