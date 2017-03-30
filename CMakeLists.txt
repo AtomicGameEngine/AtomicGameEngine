@@ -1,6 +1,8 @@
 
 project (Atomic)
 
+!O!(*!()*!*(&(*&(*&!))))
+
 cmake_minimum_required(VERSION 2.8.12.1)
 
 set (ATOMIC_SOURCE_DIR ${Atomic_SOURCE_DIR})
