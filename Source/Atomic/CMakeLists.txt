@@ -10,7 +10,7 @@ file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 file (GLOB WEB_SOURCE Web/*.cpp Web/*.h)
 file (GLOB SCRIPT_SOURCE Script/*.cpp Script/*.h)
 file (GLOB METRICS_SOURCE Metrics/*.cpp Metrics/*.h)
-if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
+if (NOT WEB AND NOT IOS AND NOT ANDROID)
     file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
 endif()
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
@@ -48,7 +48,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${WEB_SOURCE} ${SCRIPT_SOURCE} ${METRICS_SOURCE}
                   ${PLATFORM_SOURCE})
 
-if (NOT EMSCRIPTEN)
+if (NOT WEB)
   set (SOURCE_FILES ${SOURCE_FILES} ${NETWORK_SOURCE} ${NAVIGATION_SOURCE})
 endif()
 
@@ -152,7 +152,7 @@ if (ATOMIC_DESKTOP)
     endif ()
 endif ()
 
-if (NOT EMSCRIPTEN)
+if (NOT WEB)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_THREADING=1 -DATOMIC_NETWORK=1 -DATOMIC_WEB=1)
     target_link_libraries (Atomic libcurl Civetweb kNet)
 endif()
@@ -184,7 +184,7 @@ endif ()
 
 # TODO: enable shared library builds.
 target_compile_definitions (Atomic PUBLIC -DATOMIC_STATIC_DEFINE=1 -DATOMIC_API=)
-if (NOT APPLE OR IOS OR EMSCRIPTEN)
+if (NOT APPLE OR IOS OR WEB)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_TBUI=1)
 endif ()
 

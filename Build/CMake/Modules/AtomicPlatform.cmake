@@ -11,7 +11,7 @@ elseif (LINUX)
     include(AtomicLinux)
 elseif (ANDROID)
     include(AtomicAndroid)
-elseif (EMSCRIPTEN)
+elseif (WEB)
     include(AtomicWeb)
 endif ()
 

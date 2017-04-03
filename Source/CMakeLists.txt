@@ -16,14 +16,14 @@ if (ATOMIC_WEBVIEW)
 endif ()
 
 
-if (NOT EMSCRIPTEN)
+if (NOT WEB)
     add_subdirectory(AtomicApp)
     if (ATOMIC_DOTNET)
         add_subdirectory(AtomicNET)
     endif ()
 endif ()
 
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
+if (NOT IOS AND NOT ANDROID AND NOT WEB)
     add_subdirectory(AtomicTool)
     add_subdirectory(Tools)
     add_subdirectory(ToolCore)
