@@ -1,10 +1,4 @@
-include_directories (${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
-                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Assimp/include
-                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/nativefiledialog
-                     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
-
-add_definitions(-DCPLUSPLUS_WITHOUT_QT -DCURL_STATICLIB)
+add_definitions(-DCPLUSPLUS_WITHOUT_QT)
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
@@ -15,7 +9,11 @@ endif()
 
 add_library(ToolCore ${SOURCE_FILES})
 
-target_link_libraries(ToolCore Assimp Poco libcurl)
+target_link_libraries(ToolCore Assimp Poco Atomic)
+
+if (ATOMIC_XCODE)
+    target_compile_definitions(ToolCore PRIVATE -DATOMIC_XCODE)
+endif ()
 
 GroupSources("Assets")
 GroupSources("Build")

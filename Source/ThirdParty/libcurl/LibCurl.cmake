@@ -95,7 +95,7 @@ if(BUILD_DASHBOARD_REPORTS)
   include(CTest)
 endif(BUILD_DASHBOARD_REPORTS)
 
-if(MSVC)
+if(WIN32)
   option(BUILD_RELEASE_DEBUG_DIRS "Set OFF to build each configuration to a separate directory" OFF)
   mark_as_advanced(BUILD_RELEASE_DEBUG_DIRS)
 endif()

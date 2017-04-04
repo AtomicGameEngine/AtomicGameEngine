@@ -1,18 +1,4 @@
-
-include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/zlib)
-
-if (ATOMIC_PROJECT_ARCH STREQUAL "x86")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/32bit)
-else()
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/64bit)
-endif()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-
-add_definitions(-DBUILDING_LIBCURL -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_WIN32_WINNT=0x0501)
-add_definitions(-DUSE_SCHANNEL -DUSE_WINDOWS_SSPI -DHAVE_CONFIG_H)
-
-set (LIBCURL_SOURCE_FILES lib/file.c
+set(LIBCURL_SOURCE_FILES lib/file.c
     lib/timeval.c
     lib/base64.c
     lib/hostip.c
@@ -126,8 +112,21 @@ set (LIBCURL_SOURCE_FILES lib/file.c
     lib/vtls/cyassl.c
     lib/vtls/curl_schannel.c
     lib/vtls/curl_darwinssl.c
-    lib/vtls/gskit.c )
+    lib/vtls/gskit.c)
 
-add_library(libcurl ${LIBCURL_SOURCE_FILES} )
-
+add_library(libcurl ${LIBCURL_SOURCE_FILES})
 target_link_libraries(libcurl zlib)
+
+if (CURL_STATICLIB)
+    target_compile_definitions(libcurl PUBLIC -DCURL_STATICLIB=1)
+endif ()
+target_compile_definitions(libcurl PRIVATE -DBUILDING_LIBCURL -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_WIN32_WINNT=0x0501)
+target_compile_definitions(libcurl PUBLIC -DUSE_SCHANNEL -DUSE_WINDOWS_SSPI PRIVATE -DHAVE_CONFIG_H)
+
+if (ATOMIC_PROJECT_ARCH STREQUAL "x86")
+    target_include_directories(libcurl SYSTEM BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/32bit)
+else ()
+    target_include_directories(libcurl SYSTEM BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/64bit)
+endif ()
+
+target_include_directories(libcurl SYSTEM BEFORE PUBLIC include PRIVATE lib)

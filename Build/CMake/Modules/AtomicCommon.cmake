@@ -20,59 +20,20 @@
 # THE SOFTWARE.
 #
 
-include (CMakeParseArguments)
-
-# Following three `*_exported()` macros are used defining global cmake variables with game engine include directories,
-# link libraries and definitions. These variables are "CACHE INTERNAL" therefore they are visible through entire build
-# system and by projects that add engine using `add_subdirectory()`.
-
-# Macro for including and exporting game engine include directories. Behaves exactly like include_directories(). Adds
-# specified directories to ATOMIC_INCLUDE_DIRS cache variable.
-# Macro arguments:
-#  List of include directories
-macro (include_directories_exported)
-    include_directories(${ARGV})
-    set (ATOMIC_INCLUDE_DIRS ${ATOMIC_INCLUDE_DIRS} ${ARGV} CACHE INTERNAL "Atomic game engine include directories" FORCE)
-endmacro ()
-
-# Macro for adding and exporting game engine definitions. Behaves exactly like add_definitions(). Adds
-# specified definitions to ATOMIC_DEFINITIONS cache variable.
-# Macro arguments:
-#  List of definitions
-macro (add_definitions_exported)
-    add_definitions(${ARGV})
-    set (ATOMIC_DEFINITIONS ${ATOMIC_DEFINITIONS} ${ARGV} CACHE INTERNAL "Atomic game engine definitions" FORCE)
-endmacro ()
-
-# Macro for exporting game engine link libraries. Adds specified targets/libraries to ATOMIC_LINK_LIBRARIES cache
-# variable. This macro does not implicitly add link libraries to any target.
-# Macro arguments:
-#  List of definitions
-macro (add_link_libraries_exported)
-    set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} ${ARGV} CACHE INTERNAL "Atomic game engine link libraries" FORCE)
-endmacro ()
+include(CMakeParseArguments)
 
 if ($ENV{ATOMIC_BUILD_DIST})
-  add_definitions_exported(-DATOMIC_BUILD_DIST=1)
-endif()
+    add_definitions(-DATOMIC_BUILD_DIST=1)
+endif ()
 
-# Urho compatibility
-add_definitions_exported(-DATOMIC_CXX11=1)
-
-set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DATOMIC_DEBUG")
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DATOMIC_DEBUG")
-if(CMAKE_SIZEOF_VOID_P MATCHES 8)
-  set(ATOMIC_PROJECT_ARCH "x86_64")
-  set(ATOMIC_64BIT 1)
-  add_definitions_exported(-DATOMIC_64BIT=1)
-else()
-  set(ATOMIC_PROJECT_ARCH "x86")
-endif()
-
-# THIS IS JUST TO KEEP COMPATIBILITY WITH URHO3D CMAKE
-macro (install_header_files)
-
-endmacro()
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DATOMIC_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DATOMIC_DEBUG")
+if (CMAKE_SIZEOF_VOID_P MATCHES 8)
+    set(ATOMIC_PROJECT_ARCH "x86_64")
+    set(ATOMIC_64BIT 1)
+else ()
+    set(ATOMIC_PROJECT_ARCH "x86")
+endif ()
 
 # Macro for defining source files with optional arguments as follows:
 #  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp
@@ -84,95 +45,94 @@ endmacro()
 #  PARENT_SCOPE - Glob source files in current directory but set the result in parent-scope's variable ${DIR}_CPP_FILES and ${DIR}_H_FILES instead
 #  RECURSE - Option to glob recursively
 #  GROUP - Option to group source files based on its relative path to the corresponding parent directory (only works when PARENT_SCOPE option is not in use)
-macro (define_source_files)
+macro(define_source_files)
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
-    cmake_parse_arguments (ARG "PARENT_SCOPE;RECURSE;GROUP" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
+    cmake_parse_arguments(ARG "PARENT_SCOPE;RECURSE;GROUP" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
     if (NOT ARG_GLOB_CPP_PATTERNS)
-        set (ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
+        set(ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
     endif ()
     if (NOT ARG_GLOB_H_PATTERNS)
-        set (ARG_GLOB_H_PATTERNS *.h)
+        set(ARG_GLOB_H_PATTERNS *.h)
     endif ()
     if (ARG_RECURSE)
-        set (ARG_RECURSE _RECURSE)
+        set(ARG_RECURSE _RECURSE)
     else ()
-        unset (ARG_RECURSE)
+        unset(ARG_RECURSE)
     endif ()
-    file (GLOB${ARG_RECURSE} CPP_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ARG_GLOB_CPP_PATTERNS})
-    file (GLOB${ARG_RECURSE} H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ARG_GLOB_H_PATTERNS})
+    file(GLOB${ARG_RECURSE} CPP_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ARG_GLOB_CPP_PATTERNS})
+    file(GLOB${ARG_RECURSE} H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ARG_GLOB_H_PATTERNS})
     if (ARG_EXCLUDE_PATTERNS)
-        set (CPP_FILES_WITH_SENTINEL ";${CPP_FILES};")  # Stringify the lists
-        set (H_FILES_WITH_SENTINEL ";${H_FILES};")
+        set(CPP_FILES_WITH_SENTINEL ";${CPP_FILES};")  # Stringify the lists
+        set(H_FILES_WITH_SENTINEL ";${H_FILES};")
         foreach (PATTERN ${ARG_EXCLUDE_PATTERNS})
             foreach (LOOP RANGE 1)
-                string (REGEX REPLACE ";${PATTERN};" ";;" CPP_FILES_WITH_SENTINEL "${CPP_FILES_WITH_SENTINEL}")
-                string (REGEX REPLACE ";${PATTERN};" ";;" H_FILES_WITH_SENTINEL "${H_FILES_WITH_SENTINEL}")
+                string(REGEX REPLACE ";${PATTERN};" ";;" CPP_FILES_WITH_SENTINEL "${CPP_FILES_WITH_SENTINEL}")
+                string(REGEX REPLACE ";${PATTERN};" ";;" H_FILES_WITH_SENTINEL "${H_FILES_WITH_SENTINEL}")
             endforeach ()
         endforeach ()
-        set (CPP_FILES ${CPP_FILES_WITH_SENTINEL})      # Convert strings back to lists, extra sentinels are harmless
-        set (H_FILES ${H_FILES_WITH_SENTINEL})
+        set(CPP_FILES ${CPP_FILES_WITH_SENTINEL})      # Convert strings back to lists, extra sentinels are harmless
+        set(H_FILES ${H_FILES_WITH_SENTINEL})
     endif ()
-    list (APPEND CPP_FILES ${ARG_EXTRA_CPP_FILES})
-    list (APPEND H_FILES ${ARG_EXTRA_H_FILES})
-    set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+    list(APPEND CPP_FILES ${ARG_EXTRA_CPP_FILES})
+    list(APPEND H_FILES ${ARG_EXTRA_H_FILES})
+    set(SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
     # Optionally enable PCH
     if (ARG_PCH)
-        enable_pch (${ARG_PCH})
+        enable_pch(${ARG_PCH})
     endif ()
 
     # Optionally accumulate source files at parent scope
     if (ARG_PARENT_SCOPE)
-        get_filename_component (NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-        set (${NAME}_CPP_FILES ${CPP_FILES} PARENT_SCOPE)
-        set (${NAME}_H_FILES ${H_FILES} PARENT_SCOPE)
-    # Optionally put source files into further sub-group (only works when PARENT_SCOPE option is not in use)
+        get_filename_component(NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+        set(${NAME}_CPP_FILES ${CPP_FILES} PARENT_SCOPE)
+        set(${NAME}_H_FILES ${H_FILES} PARENT_SCOPE)
+        # Optionally put source files into further sub-group (only works when PARENT_SCOPE option is not in use)
     elseif (ARG_GROUP)
         foreach (CPP_FILE ${CPP_FILES})
-            get_filename_component (PATH ${CPP_FILE} PATH)
+            get_filename_component(PATH ${CPP_FILE} PATH)
             if (PATH)
-                string (REPLACE / \\ PATH ${PATH})
-                source_group ("Source Files\\${PATH}" FILES ${CPP_FILE})
+                string(REPLACE / \\ PATH ${PATH})
+                source_group("Source Files\\${PATH}" FILES ${CPP_FILE})
             endif ()
         endforeach ()
         foreach (H_FILE ${H_FILES})
-            get_filename_component (PATH ${H_FILE} PATH)
+            get_filename_component(PATH ${H_FILE} PATH)
             if (PATH)
-                string (REPLACE / \\ PATH ${PATH})
-                source_group ("Header Files\\${PATH}" FILES ${H_FILE})
+                string(REPLACE / \\ PATH ${PATH})
+                source_group("Header Files\\${PATH}" FILES ${H_FILE})
             endif ()
         endforeach ()
     endif ()
-endmacro ()
+endmacro()
 
 
 # Macro for setting up dependency lib for compilation and linking of a target
-macro (setup_target)
+macro(setup_target)
     # Include directories
-    include_directories (${INCLUDE_DIRS})
+    target_include_directories(${TARGET_NAME} SYSTEM BEFORE PUBLIC ${INCLUDE_DIRS})
     # Link libraries
-    target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
+    target_link_libraries(${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
     # Enable PCH if requested
     if (${TARGET_NAME}_HEADER_PATHNAME)
-        enable_pch (${${TARGET_NAME}_HEADER_PATHNAME})
+        enable_pch(${${TARGET_NAME}_HEADER_PATHNAME})
     endif ()
     # Set additional linker dependencies (only work for Makefile-based generator according to CMake documentation)
     if (LINK_DEPENDS)
-        string (REPLACE ";" "\;" LINK_DEPENDS "${LINK_DEPENDS}")        # Stringify for string replacement
-        list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
-        unset (LINK_DEPENDS)
+        string(REPLACE ";" "\;" LINK_DEPENDS "${LINK_DEPENDS}")        # Stringify for string replacement
+        list(APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
+        unset(LINK_DEPENDS)
     endif ()
     if (TARGET_PROPERTIES)
-        set_target_properties (${TARGET_NAME} PROPERTIES ${TARGET_PROPERTIES})
-        unset (TARGET_PROPERTIES)
+        set_target_properties(${TARGET_NAME} PROPERTIES ${TARGET_PROPERTIES})
+        unset(TARGET_PROPERTIES)
     endif ()
-
-endmacro ()
+endmacro()
 
 # Macro for checking the SOURCE_FILES variable is properly initialized
-macro (check_source_files)
+macro(check_source_files)
     if (NOT SOURCE_FILES)
-        message (FATAL_ERROR "Could not configure and generate the project file because no source files have been defined yet. "
+        message(FATAL_ERROR "Could not configure and generate the project file because no source files have been defined yet. "
             "You can define the source files explicitly by setting the SOURCE_FILES variable in your CMakeLists.txt; or "
             "by calling the define_source_files() macro which would by default glob all the C++ source files found in the same scope of "
             "CMakeLists.txt where the macro is being called and the macro would set the SOURCE_FILES variable automatically. "
@@ -180,7 +140,7 @@ macro (check_source_files)
             "more than just C++ language then you probably have to pass in extra arguments when calling the macro in order to make it works. "
             "See the define_source_files() macro definition in the CMake/Modules/Urho3D-CMake-common.cmake for more detail.")
     endif ()
-endmacro ()
+endmacro()
 
 # Macro for setting up a library target
 # Macro arguments:
@@ -193,22 +153,20 @@ endmacro ()
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 #  LINK_DEPENDS - list of additional files on which a target binary depends for linking (Makefile-based generator only)
 #  TARGET_PROPERTIES - list of target properties
-macro (setup_library)
+macro(setup_library)
+    cmake_parse_arguments(ARG NODEPS "" "" ${ARGN})
+    check_source_files()
+    add_library(${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
+    get_target_property(LIB_TYPE ${TARGET_NAME} TYPE)
 
-    cmake_parse_arguments (ARG NODEPS "" "" ${ARGN})
-    check_source_files ()
-    add_library (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
-    get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
-
-    setup_target ()
+    setup_target()
 
     # Setup the compiler flags for building shared library
     if (LIB_TYPE STREQUAL SHARED_LIBRARY)
         # Hide the symbols that are not explicitly marked for export
-        add_compiler_export_flags ()
+        add_compiler_export_flags()
     endif ()
-
-endmacro ()
+endmacro()
 
 # Macro for setting up an executable target
 # Macro arguments:
@@ -223,13 +181,11 @@ endmacro ()
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 #  LINK_DEPENDS - list of additional files on which a target binary depends for linking (Makefile-based generator only)
 #  TARGET_PROPERTIES - list of target properties
-macro (setup_executable)
+macro(setup_executable)
+    cmake_parse_arguments(ARG "PRIVATE;TOOL;NODEPS" "" "" ${ARGN})
+    check_source_files()
 
-    cmake_parse_arguments (ARG "PRIVATE;TOOL;NODEPS" "" "" ${ARGN})
-    check_source_files ()
+    add_executable(${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
 
-    add_executable (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
-
-    setup_target ()
-
-endmacro ()
+    setup_target()
+endmacro()

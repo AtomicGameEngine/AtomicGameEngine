@@ -64,7 +64,8 @@ set (INCLUDE_DIRS include)
 # Setup target
 setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for Urho3D/Network/Connection.h and Urho3D/Network/Network.h)
-install_header_files (DIRECTORY include/kNet/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet FILES_MATCHING PATTERN *.h *.inl USE_FILE_SYMLINK)     # Note: the trailing slash is significant
-file (GLOB kNetHeaderFiles include/*.h)
-install_header_files (FILES ${kNetHeaderFiles} DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet)
+# ATOMIC BEGIN
+if (UNIX)
+   target_compile_definitions(${TARGET_NAME} PUBLIC  -DKNET_UNIX)
+endif ()
+# ATOMIC END

@@ -1,30 +1,37 @@
-
-include_directories_exported(${CMAKE_CURRENT_SOURCE_DIR})
+option(ATOMIC_JAVASCRIPT "Build JS Bindings" ON)
+option(ATOMIC_DOTNET "Build .NET Bindings" ON)
+option(ATOMIC_EDITOR "Build Editor" ON)
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
-add_subdirectory(AtomicJS)
+add_subdirectory(AtomicPlayer)
 
+if (ATOMIC_JAVASCRIPT)
+    add_subdirectory(AtomicJS)
+    add_subdirectory(AtomicPlayerJS)
+endif ()
 
 if (ATOMIC_WEBVIEW)
     add_subdirectory(AtomicWebView)
-endif()
+endif ()
 
-add_subdirectory(AtomicPlayer)
-add_subdirectory(AtomicPlayerJS)
-
-if (NOT EMSCRIPTEN)
+if (NOT WEB)
     add_subdirectory(AtomicApp)
-    add_subdirectory(AtomicNET)
-endif()
+    if (ATOMIC_DOTNET)
+        add_subdirectory(AtomicNET)
+    endif ()
+endif ()
 
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-    add_subdirectory(ToolCore)
-    add_subdirectory(ToolCoreJS)
-    add_subdirectory(AtomicEditor)
+if (ATOMIC_DESKTOP)
     add_subdirectory(AtomicTool)
     add_subdirectory(Tools)
-endif()
-
+    add_subdirectory(ToolCore)
+    if (ATOMIC_JAVASCRIPT)
+        add_subdirectory(ToolCoreJS)
+    endif ()
+    if (ATOMIC_WEBVIEW AND ATOMIC_EDITOR)
+        add_subdirectory(AtomicEditor)
+    endif ()
+endif ()
 
 include(AtomicDocList)

@@ -26,8 +26,9 @@ set (TARGET_NAME JO)
 # Define source files
 define_source_files ()
 
+# ATOMIC BEGIN
+set (INCLUDE_DIRS .)
+# ATOMIC END
+
 # Setup target
 setup_library ()
-
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/JO FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
