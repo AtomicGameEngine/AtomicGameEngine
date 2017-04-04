@@ -86,7 +86,7 @@ add_library(Atomic ${SOURCE_FILES})
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(Atomic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
-target_link_libraries (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL ASIO rapidjson WebSocketPP Recast Detour DetourCrowd DetourTileCache Bullet StanHull)
+target_link_libraries (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL ASIO rapidjson WebSocketPP)
 target_compile_definitions (Atomic PUBLIC -DATOMIC_CXX11=1)
 if (ATOMIC_64BIT)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_64BIT=1)
@@ -162,24 +162,33 @@ if (ATOMIC_PROFILING)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_PROFILING=1)
 endif ()
 
-option (ATOMIC_ATOMIC2D "Enable 2D subsystem" ON)
-if (ATOMIC_ATOMIC2D)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_ATOMIC2D=1)
-endif ()
-
-option (ATOMIC_PHYSICS "Enable physics subsystem" ON)
-if (ATOMIC_PHYSICS)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_PHYSICS=1)
-endif ()
-
-option (ATOMIC_NAVIGATION "Enable navigation subsystem" ON)
-if (ATOMIC_NAVIGATION)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_NAVIGATION=1)
-endif ()
-
 option (ATOMIC_LOGGING "Enable logging" ON)
 if (ATOMIC_LOGGING)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_LOGGING=1)
+endif ()
+
+option (ATOMIC_2D_ONLY "Build only with 2D support" OFF)
+if (ATOMIC_2D_ONLY)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_ATOMIC2D=1)
+else ()
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_3D)
+
+    option (ATOMIC_ATOMIC2D "Enable 2D subsystem" ON)
+    if (ATOMIC_ATOMIC2D)
+        target_compile_definitions (Atomic PUBLIC -DATOMIC_ATOMIC2D=1)
+    endif ()
+
+    option (ATOMIC_PHYSICS "Enable physics subsystem" ON)
+    if (ATOMIC_PHYSICS)
+        target_compile_definitions (Atomic PUBLIC -DATOMIC_PHYSICS=1)
+        target_link_libraries (Atomic Bullet StanHull)
+    endif ()
+
+    option (ATOMIC_NAVIGATION "Enable navigation subsystem" ON)
+    if (ATOMIC_NAVIGATION)
+        target_compile_definitions (Atomic PUBLIC -DATOMIC_NAVIGATION=1)
+        target_link_libraries (Atomic Recast Detour DetourCrowd DetourTileCache)
+    endif ()
 endif ()
 
 # TODO: enable shared library builds.
@@ -187,7 +196,6 @@ target_compile_definitions (Atomic PUBLIC -DATOMIC_STATIC_DEFINE=1 -DATOMIC_API=
 if (NOT APPLE OR IOS OR WEB)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_TBUI=1)
 endif ()
-
 
 target_include_directories (Atomic PUBLIC
     ${ATOMIC_SOURCE_DIR}/Source
