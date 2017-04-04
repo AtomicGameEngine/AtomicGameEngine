@@ -9,7 +9,7 @@ endif()
 
 add_library(ToolCore ${SOURCE_FILES})
 
-target_link_libraries(ToolCore Assimp Poco libcurl Atomic)
+target_link_libraries(ToolCore Assimp Poco Atomic)
 
 if (ATOMIC_XCODE)
     target_compile_definitions(ToolCore PRIVATE -DATOMIC_XCODE)

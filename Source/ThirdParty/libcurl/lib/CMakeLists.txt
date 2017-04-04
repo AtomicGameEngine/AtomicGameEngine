@@ -81,6 +81,8 @@ endif()
 
 target_link_libraries(${LIB_NAME} ${CURL_LIBS})
 
+target_include_directories(${LIB_NAME} SYSTEM BEFORE PUBLIC ../include)
+
 #if(WIN32)
 #  add_definitions( -D_USRDLL )
 #endif()

@@ -78,7 +78,3 @@ set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()
-
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY include/freetype DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)
-install_header_files (FILES include/ft2build.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)

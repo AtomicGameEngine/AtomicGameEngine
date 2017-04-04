@@ -15,7 +15,6 @@ if (APPLE)
     set(ATOMIC_EDITOR_ICON ${ATOMIC_SOURCE_DIR}/Build/CMake/Modules/AtomicEditor.icns)
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 else ()
-    include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
     # We want a console for development builds
     if (${ATOMIC_DEV_BUILD} EQUAL 1)
         add_definitions(-DATOMIC_WIN32_CONSOLE)

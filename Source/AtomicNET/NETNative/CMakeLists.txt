@@ -20,7 +20,6 @@ if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
 endif()
 
 if (ANDROID)
-	include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/include)
 	set (SOURCE_FILES ${SOURCE_FILES} ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 endif()
 

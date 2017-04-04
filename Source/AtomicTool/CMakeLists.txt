@@ -9,10 +9,9 @@ add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 target_link_libraries(AtomicTool ToolCore AtomicNETScript Poco Atomic)
 
 if (WIN32)
-    target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
-else()
-    target_link_libraries(AtomicTool libcurl)
+    target_link_libraries(AtomicTool Iphlpapi Wldap32)
 endif()
+target_link_libraries(AtomicTool libcurl)
 
 # Custom target which is always considered out of date, checks for zero size/missing script bindings and generates
 add_custom_target( AtomicToolCheckScripts

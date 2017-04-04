@@ -35,10 +35,6 @@ else ()
     set(ATOMIC_PROJECT_ARCH "x86")
 endif ()
 
-# THIS IS JUST TO KEEP COMPATIBILITY WITH URHO3D CMAKE
-macro(install_header_files)
-endmacro()
-
 # Macro for defining source files with optional arguments as follows:
 #  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp
 #  GLOB_H_PATTERNS <list> - Use the provided globbing patterns for H_FILES instead of the default *.h
@@ -114,7 +110,7 @@ endmacro()
 # Macro for setting up dependency lib for compilation and linking of a target
 macro(setup_target)
     # Include directories
-    target_include_directories(${TARGET_NAME} PRIVATE ${INCLUDE_DIRS})
+    target_include_directories(${TARGET_NAME} SYSTEM BEFORE PUBLIC ${INCLUDE_DIRS})
     # Link libraries
     target_link_libraries(${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
     # Enable PCH if requested

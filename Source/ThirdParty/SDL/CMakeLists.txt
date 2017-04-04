@@ -211,6 +211,13 @@ add_definitions(-DUSING_GENERATED_CONFIG_H)
 # Urho3D - use 'generated' path suffix for generated config header file, the suffic prevents overwriting the header file with the same name in the source tree in case of non out-of-source build tree is being used
 set (INCLUDE_DIRS ${SDL2_BINARY_DIR}/include/generated ${SDL2_SOURCE_DIR}/include)
 
+# ATOMIC BEGIN
+# Install dependency for SDL_android_main.c
+if (ANDROID)
+  list (APPEND INCLUDE_DIRS src/main/android src src/dynapi)
+endif ()
+# ATOMIC END
+
 # All these ENABLED_BY_DEFAULT vars will default to ON if not specified, so
 #  you only need to have a platform override them if they are disabling.
 # Urho3D - bug fix - commented out double initialization of the OPT_DEF_ASM variable, it has been initialized properly in "Compiler info" section above
@@ -1387,12 +1394,3 @@ set (TARGET_NAME SDL)
 # Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
 setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for InputEvents.h)
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-install_header_files (FILES ${SDL2_BINARY_DIR}/include/generated/SDL_config.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-# Install dependency for SDL_android_main.c
-if (ANDROID)
-  install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-  install_header_files (FILES src/SDL_internal.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-  install_header_files (DIRECTORY src/dynapi DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h)
-endif ()

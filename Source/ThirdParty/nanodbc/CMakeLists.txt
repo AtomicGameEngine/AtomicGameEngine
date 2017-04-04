@@ -26,16 +26,14 @@ set (TARGET_NAME nanodbc)
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h)
 
+# ATOMIC BEGIN
+set (INCLUDE_DIRS src)
+
 # Define dependency libs
-if (ODBC_INCLUDE_DIRS)
-    set (INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
-endif ()
 if (ODBC_DEFINES)
-    add_definitions (${ODBC_DEFINES})
+    target_compile_definitions (${TARGET_NAME} PUBLIC ${ODBC_DEFINES})
 endif ()
+# ATOMIC END
 
 # Setup target
 setup_library ()
-
-# Install headers for building and using the Urho3D library
-install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/nanodbc FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant

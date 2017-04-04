@@ -10,22 +10,16 @@ file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 file (GLOB WEB_SOURCE Web/*.cpp Web/*.h)
 file (GLOB SCRIPT_SOURCE Script/*.cpp Script/*.h)
 file (GLOB METRICS_SOURCE Metrics/*.cpp Metrics/*.h)
-
 if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
-  file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
+    file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
 endif()
-
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
 file (GLOB SYSTEM_UI_SOURCE UI/SystemUI/*.cpp UI/SystemUI/*.h)
-
-if (NOT ATOMIC_BUILD_2D)
-  file (GLOB PHYSICS_SOURCE Physics/*.cpp Physics/*.h)
-  file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
-  file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
-endif()
-
+file (GLOB PHYSICS_SOURCE Physics/*.cpp Physics/*.h)
+file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
+file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
 
 if (WIN32)
@@ -40,11 +34,8 @@ else()
     file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
 endif()
 
-if (APPLE)
-    if (NOT IOS)
-        set (PLATFORM_SOURCE IO/MacFileWatcher.mm UI/UIDragDropMac.mm)
-    else()
-    endif()
+if (APPLE AND NOT IOS)
+    set (PLATFORM_SOURCE IO/MacFileWatcher.mm UI/UIDragDropMac.mm)
 endif()
 
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
@@ -95,7 +86,7 @@ add_library(Atomic ${SOURCE_FILES})
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(Atomic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
-target_link_libraries (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL)
+target_link_libraries (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL ASIO rapidjson WebSocketPP Recast Detour DetourCrowd DetourTileCache Bullet StanHull)
 target_compile_definitions (Atomic PUBLIC -DATOMIC_CXX11=1)
 if (ATOMIC_64BIT)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_64BIT=1)
@@ -150,25 +141,20 @@ if (ATOMIC_OPENGL)
 endif ()
 
 if (ATOMIC_DESKTOP)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_PLATFORM_DESKTOP=1 -DATOMIC_NAVIGATION=1 -DATOMIC_FILEWATCHER=1
-        -DPOCO_NO_AUTOMATIC_LIBS=1 -DPOCO_STATIC=1)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_PLATFORM_DESKTOP=1)
     target_link_libraries (Atomic libsquish)
     if (NOT LINUX)
         target_link_libraries (Atomic LibCpuId)
     endif()
+    option (ATOMIC_FILEWATCHER "Enable file watcher" ON)
+    if (ATOMIC_FILEWATCHER)
+        target_compile_definitions(Atomic PUBLIC -DATOMIC_FILEWATCHER=1)
+    endif ()
 endif ()
 
-option (ATOMIC_BUILD_2D "Enable 2D support" OFF)
-if (ATOMIC_BUILD_2D)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_ATOMIC2D=1)
-else ()
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_PHYSICS=1 -DATOMIC_3D=1)
-    target_link_libraries (Atomic Bullet StanHull)
-endif()
-
 if (NOT EMSCRIPTEN)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_THREADING=1 -DATOMIC_NETWORK=1)
-    target_link_libraries (Atomic Civetweb Recast Detour DetourCrowd DetourTileCache kNet libcurl)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_THREADING=1 -DATOMIC_NETWORK=1 -DATOMIC_WEB=1)
+    target_link_libraries (Atomic libcurl Civetweb kNet)
 endif()
 
 option (ATOMIC_PROFILING "Enable profiler" ON)
@@ -176,14 +162,24 @@ if (ATOMIC_PROFILING)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_PROFILING=1)
 endif ()
 
-option (ATOMIC_LOGGING "Enable logging" ON)
-if (ATOMIC_PROFILING)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_LOGGING=1)
+option (ATOMIC_ATOMIC2D "Enable 2D subsystem" ON)
+if (ATOMIC_ATOMIC2D)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_ATOMIC2D=1)
 endif ()
 
-option (ATOMIC_WEB "Enable web subsystem" ON)
-if (ATOMIC_PROFILING)
-    target_compile_definitions (Atomic PUBLIC -DATOMIC_WEB=1)
+option (ATOMIC_PHYSICS "Enable physics subsystem" ON)
+if (ATOMIC_PHYSICS)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_PHYSICS=1)
+endif ()
+
+option (ATOMIC_NAVIGATION "Enable navigation subsystem" ON)
+if (ATOMIC_NAVIGATION)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_NAVIGATION=1)
+endif ()
+
+option (ATOMIC_LOGGING "Enable logging" ON)
+if (ATOMIC_LOGGING)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_LOGGING=1)
 endif ()
 
 # TODO: enable shared library builds.
@@ -196,38 +192,6 @@ endif ()
 target_include_directories (Atomic PUBLIC
     ${ATOMIC_SOURCE_DIR}/Source
     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/ASIO/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Assimp/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Bullet/src
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Civetweb/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Detour/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/DetourCrowd/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/DetourTileCache/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Duktape
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/GLEW
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/JO
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/LibCpuId/src
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libcurl/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libsquish
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/LZ4
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/MojoShader
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Mustache
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/nanodbc/src
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/nativefiledialog
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Poco/Foundation/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/PugiXml/src
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Recast/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SQLite/src
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/StanHull
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/STB
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/TurboBadger
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/WebSocketPP/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/zlib
 )
 
 include(AtomicDoc)
