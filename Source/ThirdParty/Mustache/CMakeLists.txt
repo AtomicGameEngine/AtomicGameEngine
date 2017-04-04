@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2017 the Atomic project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,5 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Mustache)
-
-# Setup target
-add_custom_target (${TARGET_NAME} ALL)   # Dummy target just so that its post-build step can install headers to the build tree
-set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
-
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Mustache FILES_MATCHING PATTERN *.hpp USE_FILE_SYMLINK BUILD_TREE_ONLY)
+add_library(Mustache INTERFACE)
+target_include_directories(Mustache SYSTEM BEFORE INTERFACE .)

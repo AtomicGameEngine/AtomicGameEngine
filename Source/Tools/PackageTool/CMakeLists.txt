@@ -2,7 +2,7 @@
 
 add_executable(PackageTool PackageTool.cpp)
 
-target_link_libraries(PackageTool ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(PackageTool Atomic)
 
 
 file (GLOB_RECURSE EDITORDATA_FILES ${ATOMIC_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData/*)
@@ -13,7 +13,7 @@ if (ATOMIC_BUILD_PAK_FILES)
 set (EDITORDATA_PAK "${ATOMIC_SOURCE_DIR}/Bin/EditorData.pak")
 set (COREDATA_PAK "${ATOMIC_SOURCE_DIR}/Bin/CoreData.pak")
 
-if (MSVC)
+if (WIN32)
 
     add_custom_command(OUTPUT "${EDITORDATA_PAK}"
                        COMMAND $<TARGET_FILE:PackageTool> "${ATOMIC_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData" "${EDITORDATA_PAK}" -c

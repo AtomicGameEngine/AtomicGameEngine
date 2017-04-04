@@ -84,7 +84,7 @@ macro(CheckDLOPEN)
            #include <dlfcn.h>
            int main(int argc, char **argv) {
              void *handle = dlopen(\"\", RTLD_NOW);
-             const char *loaderror = (char *) dlerror();
+             // ATOMIC FIX: const char *loaderror = (char *) dlerror();
            }" HAVE_DLOPEN)
         set(CMAKE_REQUIRED_LIBRARIES)
       endif()

@@ -15,3 +15,4 @@ file (GLOB H_FILES *.h image/*.h animation/*.h parser/*.h renderers/*.h utf8/*.h
 set (SOURCE_FILES ${C_FILES} ${H_FILES})
 
 add_library(TurboBadger ${SOURCE_FILES})
+target_include_directories(TurboBadger SYSTEM BEFORE PUBLIC .)

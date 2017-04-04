@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Portions Copyright (c) 2017 the Atomic project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,16 +19,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-
-# Define target name
-set (TARGET_NAME LZ4)
-
-# Define source files
-define_source_files (GLOB_CPP_PATTERNS *.c)
-
-# ATOMIC BEGIN
-set (INCLUDE_DIRS .)
-# ATOMIC END
-
-# Setup target
-setup_library ()
+add_library(WebSocketPP INTERFACE)
+target_include_directories(WebSocketPP SYSTEM BEFORE INTERFACE include)

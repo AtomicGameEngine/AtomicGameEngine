@@ -761,4 +761,7 @@ ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
 set (TARGET_NAME Assimp)
 list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)   # Since we only build AssetImporter as a single-arch native tool, there is no point to build Assimp as universal binary library
+# ATOMIC BEGIN
+set (INCLUDE_DIRS include)
+# ATOMIC END
 setup_library ()

@@ -1,6 +1,5 @@
 
 add_definitions(-DHAVE_STDINT_H )
-
 set (SOURCE_FILES
     Foundation/src/Pipe.cpp
     Foundation/src/Process.cpp
@@ -178,9 +177,14 @@ set (SOURCE_FILES
     Foundation/src/trees.c
     Foundation/src/zutil.c )
 
-if (MSVC)
+if (WIN32)  # ATOMIC FIX
     # Add windows registry key from Utils
     set (SOURCE_FILES ${SOURCE_FILES} Foundation/src/WinRegistryKey.cpp )
 endif()
 
 add_library(Poco ${SOURCE_FILES})
+
+# ATOMIC BEGIN
+target_compile_definitions(Poco PUBLIC -DPOCO_NO_AUTOMATIC_LIBS=1 -DPOCO_STATIC=1)
+target_include_directories(Poco SYSTEM BEFORE PUBLIC Foundation/include)
+# ATOMIC END
