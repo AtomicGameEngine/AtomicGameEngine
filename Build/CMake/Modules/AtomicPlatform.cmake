@@ -4,28 +4,28 @@ if (WIN32)
 elseif (APPLE)
     if (IOS)
         include(AtomicIOS)
-    else()
+    else ()
         include(AtomicMac)
-    endif()
+    endif ()
 elseif (LINUX)
     include(AtomicLinux)
 elseif (ANDROID)
     include(AtomicAndroid)
 elseif (EMSCRIPTEN)
-	include(AtomicWeb)
+    include(AtomicWeb)
 endif ()
 
 if (NOT WIN32)
-    set (ATOMIC_OPENGL 1)
+    set(ATOMIC_OPENGL 1)
 endif ()
 
 message(STATUS "Atomic platform: ${JAVASCRIPT_BINDINGS_PLATFORM}")
 
-set (JAVASCRIPT_BINDINGS_PLATFORM_ROOT "${ATOMIC_SOURCE_DIR}/Artifacts/Build/Source/Generated")
+set(JAVASCRIPT_BINDINGS_PLATFORM_ROOT "${ATOMIC_SOURCE_DIR}/Artifacts/Build/Source/Generated")
 
-if(NOT EXISTS "${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/Javascript")
-    execute_process ( COMMAND ${ATOMIC_NODE_JAKE};build:precreateScriptBindings[${JAVASCRIPT_BINDINGS_PLATFORM}]
-                      WORKING_DIRECTORY "${ATOMIC_SOURCE_DIR}" )
-endif()
+if (NOT EXISTS "${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/Javascript")
+    execute_process(COMMAND ${ATOMIC_NODE_JAKE};build:precreateScriptBindings[${JAVASCRIPT_BINDINGS_PLATFORM}]
+        WORKING_DIRECTORY "${ATOMIC_SOURCE_DIR}")
+endif ()
 
-file (GLOB_RECURSE JAVASCRIPT_BINDINGS_NATIVE_FILENAMES ${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/*.cpp ${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/*.h)
+file(GLOB_RECURSE JAVASCRIPT_BINDINGS_NATIVE_FILENAMES ${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/*.cpp ${JAVASCRIPT_BINDINGS_PLATFORM_ROOT}/*.h)
