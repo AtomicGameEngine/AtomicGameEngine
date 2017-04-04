@@ -9,16 +9,6 @@ add_subdirectory(STB)
 add_subdirectory(TurboBadger)
 add_subdirectory(zlib)
 
-include_directories_exported(
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/WebSocketPP/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/libcurl/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D
-    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/ASIO/include)
-
 if (NOT ATOMIC_BUILD_2D)
     add_subdirectory(Bullet)
     add_subdirectory(StanHull)
@@ -33,9 +23,10 @@ if (NOT EMSCRIPTEN)
     add_subdirectory(DetourCrowd)
     add_subdirectory(DetourTileCache)
     add_subdirectory(kNet)
-if (NOT MSVC)
-    add_subdirectory(openssl)
-endif()
+    if (NOT WIN32)
+        add_subdirectory(openssl)
+    endif()
+    set (CURL_STATICLIB 1)
     add_subdirectory(libcurl)
 endif()
 
@@ -54,6 +45,6 @@ if (LINUX OR APPLE OR ATOMIC_OPENGL AND NOT IOS)
     add_subdirectory(GLEW)
 endif()
 
-if (MSVC)
+if (WIN32)
     add_subdirectory(MojoShader)
 endif()

@@ -1,20 +1,7 @@
-
-include(AtomicCommon)
-
 set (ATOMIC_DESKTOP TRUE)
 
-include_directories_exported(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Poco/Foundation/include)
-
-add_definitions_exported( -DATOMIC_PLATFORM_DESKTOP -DATOMIC_NAVIGATION -DATOMIC_TBUI -DATOMIC_FILEWATCHER -DPOCO_NO_AUTOMATIC_LIBS -DPOCO_STATIC )
-
-set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} libsquish)
-
-if (NOT LINUX)
-    add_link_libraries_exported (LibCpuId)
-endif()
-
 # Check whether the CEF submodule is available
-if (EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF)
+if (NOT DEFINED ATOMIC_WEBVIEW AND EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF)
     #Check if CEF got pulled by looking if the foldes is empty
     file(GLOB CEF_FILES ${ATOMIC_SOURCE_DIR}/Submodules/CEF/*)
 
@@ -32,3 +19,4 @@ if (EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF)
     set(ATOMIC_WEBVIEW TRUE)
     add_definitions( -DATOMIC_WEBVIEW )
 endif()
+add_definitions(-DPOCO_NO_AUTOMATIC_LIBS=1 -DPOCO_STATIC=1)

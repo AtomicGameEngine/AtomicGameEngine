@@ -1,17 +1,9 @@
-
-include_directories(${ATOMIC_SOURCE_DIR}/Source)
-include_directories ( ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
-                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
-                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-                              ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D )
-
 # Define source files
 file (GLOB SOURCE_FILES *.cpp *.h )
 
 # set (SOURCE_FILES ${SOURCE_FILES}) ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
-if (MSVC)
+if (WIN32)
     set (EXE_TYPE WIN32)
     set (SOURCE_FILES ${SOURCE_FILES} ${ATOMIC_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
 elseif(APPLE)
@@ -25,7 +17,6 @@ endif()
 endif()
 
 if (ANDROID)
-	include_directories(${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/include)
 	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 else()
 
@@ -36,16 +27,16 @@ endif()
 endif()
 
 if (NOT IOS)
-target_link_libraries(AtomicPlayer AtomicJS AtomicPlayerLib AtomicPlayerJS ${ATOMIC_LINK_LIBRARIES})
+    target_link_libraries(AtomicPlayer AtomicJS AtomicPlayerLib AtomicPlayerJS Atomic)
 endif()
 
-if (MSVC)
+if (WIN32)
   # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
   add_custom_command (TARGET AtomicPlayer POST_BUILD
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicPlayer>/D3DCompiler_47.dll\")
 
-endif(MSVC)
+endif(WIN32)
 
 
 if (APPLE)

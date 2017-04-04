@@ -1,6 +1,6 @@
 macro(GroupSources curdir)
 
-    if (MSVC)
+    if (WIN32)
 
     file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${curdir} ${CMAKE_CURRENT_SOURCE_DIR}/${curdir}/*)
 

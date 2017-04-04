@@ -22,57 +22,22 @@
 
 include (CMakeParseArguments)
 
-# Following three `*_exported()` macros are used defining global cmake variables with game engine include directories,
-# link libraries and definitions. These variables are "CACHE INTERNAL" therefore they are visible through entire build
-# system and by projects that add engine using `add_subdirectory()`.
-
-# Macro for including and exporting game engine include directories. Behaves exactly like include_directories(). Adds
-# specified directories to ATOMIC_INCLUDE_DIRS cache variable.
-# Macro arguments:
-#  List of include directories
-macro (include_directories_exported)
-    include_directories(${ARGV})
-    set (ATOMIC_INCLUDE_DIRS ${ATOMIC_INCLUDE_DIRS} ${ARGV} CACHE INTERNAL "Atomic game engine include directories" FORCE)
-endmacro ()
-
-# Macro for adding and exporting game engine definitions. Behaves exactly like add_definitions(). Adds
-# specified definitions to ATOMIC_DEFINITIONS cache variable.
-# Macro arguments:
-#  List of definitions
-macro (add_definitions_exported)
-    add_definitions(${ARGV})
-    set (ATOMIC_DEFINITIONS ${ATOMIC_DEFINITIONS} ${ARGV} CACHE INTERNAL "Atomic game engine definitions" FORCE)
-endmacro ()
-
-# Macro for exporting game engine link libraries. Adds specified targets/libraries to ATOMIC_LINK_LIBRARIES cache
-# variable. This macro does not implicitly add link libraries to any target.
-# Macro arguments:
-#  List of definitions
-macro (add_link_libraries_exported)
-    set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} ${ARGV} CACHE INTERNAL "Atomic game engine link libraries" FORCE)
-endmacro ()
-
 if ($ENV{ATOMIC_BUILD_DIST})
-  add_definitions_exported(-DATOMIC_BUILD_DIST=1)
+  add_definitions (-DATOMIC_BUILD_DIST=1)
 endif()
-
-# Urho compatibility
-add_definitions_exported(-DATOMIC_CXX11=1)
 
 set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DATOMIC_DEBUG")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DATOMIC_DEBUG")
 if(CMAKE_SIZEOF_VOID_P MATCHES 8)
   set(ATOMIC_PROJECT_ARCH "x86_64")
   set(ATOMIC_64BIT 1)
-  add_definitions_exported(-DATOMIC_64BIT=1)
 else()
   set(ATOMIC_PROJECT_ARCH "x86")
 endif()
 
 # THIS IS JUST TO KEEP COMPATIBILITY WITH URHO3D CMAKE
 macro (install_header_files)
-
-endmacro()
+endmacro ()
 
 # Macro for defining source files with optional arguments as follows:
 #  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp

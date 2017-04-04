@@ -29,5 +29,7 @@ define_source_files (GLOB_CPP_PATTERNS *.c *.cpp *.h)
 # Setup target
 setup_library ()
 
+target_include_directories(STB PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+
 # Install headers for building the Urho3D library
 install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/STB FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK BUILD_TREE_ONLY)  # Note: the trailing slash is significant

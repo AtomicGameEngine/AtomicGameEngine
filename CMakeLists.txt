@@ -12,8 +12,6 @@ include(AtomicCommon)
 
 add_definitions(-DATOMIC_ROOT_SOURCE_DIR="${ATOMIC_SOURCE_DIR}" -DATOMIC_ROOT_BUILD_DIR="${CMAKE_BINARY_DIR}")
 
-add_definitions( -DATOMIC_API= -DATOMIC_STATIC_DEFINE -DATOMIC_ATOMIC2D -DATOMIC_LOGGING -DATOMIC_PROFILING)
-
 if (NOT DEFINED ATOMIC_DEV_BUILD)
     set(ATOMIC_DEV_BUILD 1)
 ENDIF()
@@ -21,20 +19,6 @@ ENDIF()
 if (ATOMIC_DEV_BUILD)
     add_definitions("-DATOMIC_DEV_BUILD=1")
 endif()
-
-add_link_libraries_exported (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL)
-
-if (NOT ATOMIC_BUILD_2D)
-    add_definitions_exported (-DATOMIC_PHYSICS -DATOMIC_3D)
-    add_link_libraries_exported (Bullet StanHull)
-endif()
-
-if (NOT EMSCRIPTEN)
-    add_definitions_exported (-DATOMIC_THREADING -DATOMIC_NETWORK)
-    add_link_libraries_exported (Civetweb Recast Detour DetourCrowd DetourTileCache kNet libcurl)
-endif()
-
-add_definitions_exported (-DATOMIC_WEB)
 
 include (AtomicPlatform)
 
@@ -52,7 +36,7 @@ if (ATOMIC_WEBVIEW)
       cmake_policy(SET CMP0037 OLD)
     endif()
     set(CEF_ROOT "${ATOMIC_SOURCE_DIR}/Submodules/CEF/MacOSX")
-  elseif(MSVC)
+  elseif(WIN32)
     if (ATOMIC_PROJECT_ARCH STREQUAL "x86")
     else()
       set(CEF_ROOT "${ATOMIC_SOURCE_DIR}/Submodules/CEF/Windows/64bit")
@@ -68,7 +52,6 @@ if (ATOMIC_WEBVIEW)
   add_subdirectory(${CEF_LIBCEF_DLL_WRAPPER_PATH} libcef_dll_wrapper)
 endif()
 
-add_definitions(${ATOMIC_DEFINITIONS})
 add_subdirectory(Source)
 
 if (ATOMIC_DESKTOP AND ATOMIC_DEV_BUILD)

@@ -1,11 +1,7 @@
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${ATOMIC_SOURCE_DIR}/Source/ThirdParty )
-
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
 add_library(AtomicApp ${SOURCE_FILES})
-
+target_link_libraries(AtomicApp Atomic)
 add_dependencies(AtomicApp AtomicToolCheckScripts)
 
 GroupSources("Player")

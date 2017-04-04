@@ -1,10 +1,3 @@
-include_directories ( ${ATOMIC_SOURCE_DIR}/Source/ThirdParty
-                      ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                      ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/kNet/include
-                      ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-                      ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/Box2D
-                      ${ATOMIC_SOURCE_DIR}/Source/ThirdParty/nativefiledialog )
-
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
 # Remove the web helper sources
@@ -100,7 +93,7 @@ if(APPLE)
   add_executable(${CEF_HELPER_TARGET} MACOSX_BUNDLE "${CMAKE_CURRENT_SOURCE_DIR}/WebView/WebProcessHelperMac.cpp")
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_HELPER_TARGET})
   add_dependencies(${CEF_HELPER_TARGET} libcef_dll_wrapper)
-  target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} Atomic AtomicWebView ${ATOMIC_LINK_LIBRARIES})
+  target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} Atomic AtomicWebView)
 
   set_target_properties(${CEF_HELPER_TARGET} PROPERTIES
       MACOSX_BUNDLE_INFO_PLIST "${ATOMIC_SOURCE_DIR}/Build/CMake/Modules/AtomicEditor-HelperInfo.plist.template"
@@ -168,7 +161,7 @@ endif()
 
 endif(ATOMIC_WEBVIEW)
 
-target_link_libraries(${CEF_TARGET} ToolCore AtomicApp AtomicWebView AtomicJS AtomicPlayerJS ToolCoreJS AtomicNETScriptBindings AtomicNETScript Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(${CEF_TARGET} ToolCore AtomicApp AtomicWebView AtomicJS AtomicPlayerJS ToolCoreJS AtomicNETScriptBindings AtomicNETScript Poco nativefiledialog Atomic)
 
 
 if (APPLE)
@@ -196,6 +189,7 @@ endif()
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
+target_link_libraries(AtomicEditor Atomic)
 
 add_dependencies(${CEF_TARGET} AtomicToolCheckScripts)
 
