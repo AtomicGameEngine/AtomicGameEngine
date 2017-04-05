@@ -4,9 +4,9 @@ option(ATOMIC_EDITOR "Build Editor" ON)
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
-add_subdirectory(AtomicPlayer)
 
 if (ATOMIC_JAVASCRIPT)
+    add_subdirectory(AtomicPlayer)
     add_subdirectory(AtomicJS)
     add_subdirectory(AtomicPlayerJS)
 endif ()
