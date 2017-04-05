@@ -24,13 +24,13 @@
 
 #include "../../Core/Variant.h"
 
-#include <nanodbc/nanodbc.h>
+#include <nanodbc.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Database query result.
-class URHO3D_API DbResult
+class ATOMIC_API DbResult
 {
     friend class DbConnection;
 

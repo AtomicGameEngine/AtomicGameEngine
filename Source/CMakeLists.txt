@@ -1,6 +1,8 @@
 option(ATOMIC_JAVASCRIPT "Build JS Bindings" ON)
 option(ATOMIC_DOTNET "Build .NET Bindings" ON)
 option(ATOMIC_EDITOR "Build Editor" ON)
+option(ATOMIC_DATABASE_SQLITE "Enable SQLite database subsystem" OFF)
+option(ATOMIC_DATABASE_ODBC "Enable ODBC database subsystem" OFF)
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)

@@ -33,7 +33,7 @@
 
 #include <sqlext.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 DbConnection::DbConnection(Context* context, const String& connectionString) :
@@ -158,7 +158,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 void DbConnection::HandleRuntimeError(const char* message, const char* cause)
 {
     StringVector tokens = (String(cause) + "::").Split(':');      // Added "::" as sentinels against unexpected cause format
-    URHO3D_LOGERRORF("%s: nanodbc:%s:%s", message, tokens[1].CString(), tokens[2].CString());
+    ATOMIC_LOGERRORF("%s: nanodbc:%s:%s", message, tokens[1].CString(), tokens[2].CString());
 }
 
 }

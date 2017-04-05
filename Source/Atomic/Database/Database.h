@@ -25,7 +25,7 @@
 #include "../Core/Object.h"
 #include "../Database/DbConnection.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Supported database API.
@@ -38,9 +38,9 @@ enum DBAPI
 class DbConnection;
 
 /// %Database subsystem. Manage database connections.
-class URHO3D_API Database : public Object
+class ATOMIC_API Database : public Object
 {
-    URHO3D_OBJECT(Database, Object);
+    ATOMIC_OBJECT(Database, Object);
 
 public:
     /// Construct.
