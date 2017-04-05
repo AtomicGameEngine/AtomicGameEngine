@@ -25,7 +25,7 @@
 #include "../Core/Profiler.h"
 #include "../Database/Database.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Database::Database(Context* context_) :
@@ -40,7 +40,7 @@ Database::Database(Context* context_) :
 
 DBAPI Database::GetAPI()
 {
-#ifdef URHO3D_DATABASE_ODBC
+#ifdef ATOMIC_DATABASE_ODBC
     return DBAPI_ODBC;
 #else
     return DBAPI_SQLITE;
@@ -49,7 +49,7 @@ DBAPI Database::GetAPI()
 
 DbConnection* Database::Connect(const String& connectionString)
 {
-    URHO3D_PROFILE(DatabaseConnect);
+    ATOMIC_PROFILE(DatabaseConnect);
 
     SharedPtr<DbConnection> connection;
     if (IsPooling())
@@ -80,7 +80,7 @@ void Database::Disconnect(DbConnection* connection)
     if (!connection)
         return;
 
-    URHO3D_PROFILE(DatabaseDisconnect);
+    ATOMIC_PROFILE(DatabaseDisconnect);
 
     SharedPtr<DbConnection> dbConnection(connection);
     connections_.Remove(dbConnection);

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#ifdef URHO3D_DATABASE_ODBC
+#ifdef ATOMIC_DATABASE_ODBC
 #include "ODBC/ODBCConnection.h"
-#elif defined(URHO3D_DATABASE_SQLITE)
+#elif defined(ATOMIC_DATABASE_SQLITE)
 #include "SQLite/SQLiteConnection.h"
 #else
 #error "Database subsystem not enabled"

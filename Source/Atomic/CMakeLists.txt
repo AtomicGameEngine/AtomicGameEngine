@@ -22,6 +22,12 @@ file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
 file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
 
+if (ATOMIC_DATABASE_SQLITE)
+    file (GLOB DATABASE_SOURCE Database/*.cpp Database/*.h Database/SQLite/*.cpp Database/SQLite/*.h)
+elseif (ATOMIC_DATABASE_ODBC)
+    file (GLOB DATABASE_SOURCE Database/*.cpp Database/*.h Database/ODBC/*.cpp Database/ODBC/*.h)
+endif ()
+
 if (WIN32)
     if (ATOMIC_D3D11) # DirectX 11
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
@@ -46,7 +52,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
                   ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
                   ${WEB_SOURCE} ${SCRIPT_SOURCE} ${METRICS_SOURCE}
-                  ${PLATFORM_SOURCE})
+                  ${PLATFORM_SOURCE} ${DATABASE_SOURCE})
 
 if (NOT WEB)
   set (SOURCE_FILES ${SOURCE_FILES} ${NETWORK_SOURCE} ${NAVIGATION_SOURCE})
@@ -197,6 +203,13 @@ if (NOT APPLE OR IOS OR WEB)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_TBUI=1)
 endif ()
 
+if (ATOMIC_DATABASE_SQLITE)
+    target_link_libraries(Atomic sqlite)
+    target_compile_definitions(Atomic PUBLIC -DATOMIC_DATABASE=1 -DATOMIC_DATABASE_SQLITE=1)
+elseif (ATOMIC_DATABASE_ODBC)
+    target_link_libraries(Atomic nanodbc)
+    target_compile_definitions(Atomic PUBLIC -DATOMIC_DATABASE=1 -DATOMIC_DATABASE_ODBC=1)
+endif ()
 target_include_directories (Atomic PUBLIC
     ${ATOMIC_SOURCE_DIR}/Source
     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty

@@ -25,15 +25,15 @@
 #include "../../Core/Object.h"
 #include "../../Database/DbResult.h"
 
-#include <SQLite/sqlite3.h>
+#include <sqlite3.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Database connection.
-class URHO3D_API DbConnection : public Object
+class ATOMIC_API DbConnection : public Object
 {
-    URHO3D_OBJECT(DbConnection, Object);
+    ATOMIC_OBJECT(DbConnection, Object);
 
 public:
     /// Construct.

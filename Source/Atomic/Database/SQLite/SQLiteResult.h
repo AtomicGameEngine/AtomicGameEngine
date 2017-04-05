@@ -24,13 +24,13 @@
 
 #include "../../Core/Variant.h"
 
-#include <SQLite/sqlite3.h>
+#include <sqlite3.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Database query result.
-class URHO3D_API DbResult
+class ATOMIC_API DbResult
 {
     friend class DbConnection;
 
