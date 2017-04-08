@@ -122,10 +122,10 @@ void BuildAndroid::RunADBInstall()
 
     Vector<String> args;
 
-    if ( prefs->GetReleaseCheck() > 0 ) // install release apk
+    if ( prefs->GetReleaseCheck() > 2 ) // install release apk
         args = String("install -r ./bin/Atomic-release.apk").Split(' ');
     else
-        args = String("install -r ./bin/Atomic-debug-unaligned.apk").Split(' ');
+        args = String("install -r ./bin/Atomic-debug.apk").Split(' ');
 
     currentBuildPhase_ = ADBInstall;
     Subprocess* subprocess = subs->Launch(adbCommand, args, buildPath_);
@@ -253,7 +253,7 @@ void BuildAndroid::RunAntDebug()
 
     String buildApk = "debug";  // the default
 
-    if ( tprefs->GetReleaseCheck() > 0 ) // create release apk
+    if ( tprefs->GetReleaseCheck() > 2 ) // create release apk
         buildApk = "release";
 
 

@@ -36,7 +36,8 @@ ToolPrefs::ToolPrefs(Context* context) : Object(context),
     jdkRootPath_(),
     antPath_(),
     releasePath_(),
-    releaseCheck_(false)
+    releaseCheck_(0),
+    ndkPath_()
 {
 
 }
@@ -101,6 +102,7 @@ void ToolPrefs::Load()
         antPath_ = androidRoot.Get("antPath").GetString();
         releasePath_ = androidRoot.Get("releasePath").GetString();
         releaseCheck_ = androidRoot.Get("releaseCheck").GetInt();
+        ndkPath_ = androidRoot.Get("ndkPath").GetString();
     }
 
 }
@@ -119,7 +121,8 @@ void ToolPrefs::Save()
     androidRoot["antPath"] = antPath_;
     androidRoot["releasePath"] = releasePath_;
     androidRoot["releaseCheck"] = releaseCheck_;
-   root["android"] = androidRoot;
+    androidRoot["ndkPath"] = ndkPath_;
+    root["android"] = androidRoot;
 
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
     jsonFile->Save(*file, "   ");

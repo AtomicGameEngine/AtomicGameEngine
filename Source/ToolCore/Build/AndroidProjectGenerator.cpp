@@ -69,6 +69,9 @@ bool AndroidProjectGenerator::Generate()
     if (!CopyUserIcons())
         return false;
 
+    if (!CopyDebugGdbserver())
+        return false;
+
     return true;
 }
 
@@ -149,7 +152,7 @@ bool AndroidProjectGenerator::GenerateLocalProperties( )
     file.Write(props.CString(), props.Length());
 
 
-    if ( prefs->GetReleaseCheck() > 0 ) // if release flag is set ...
+    if ( prefs->GetReleaseCheck() > 2 ) // if release index is set ...
     {
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
         String Reldir = prefs->GetReleasePath();
@@ -368,6 +371,51 @@ bool AndroidProjectGenerator::CopyUserIcons()
             return false;
     }
 
+    return true;
+}
+
+bool AndroidProjectGenerator::CopyDebugGdbserver()
+{
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    ToolPrefs* prefs = tenv->GetToolPrefs();
+
+    // include gdbserver in APK
+    if ( prefs->GetReleaseCheck() == 1 || prefs->GetReleaseCheck() == 2 ) 
+    {
+        String ndkPath = prefs->GetNdkPath();    
+        if (ndkPath.Empty())
+        {
+            errorText_ = "NDK path not entered, this is required to add gdbserver to APK";
+            return false;
+        }
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        if (!fileSystem->DirExists(ndkPath))
+        {
+            errorText_ = "Invalid NDK Path, can not add gdbserver to APK.";
+            return false;
+        }
+
+        // copy gdbserver file
+        String gsstring = ndkPath + "/prebuilt/android-arm/gdbserver/gdbserver";  // assume arm type abi
+        String destDir = buildPath_ + "/libs/armeabi-v7a"; // assume armeabi-v7a abi type
+        if ( !fileSystem->FileExists (gsstring) )
+        {
+            errorText_ = "gdbserver not found as " + gsstring;
+            return false;
+        }
+        
+        if ( prefs->GetReleaseCheck() == 1 ) // Debug Source with gdbserver
+        {
+            if ( !buildBase_->BuildCopyFile ( gsstring, destDir + "/gdbserver"))
+                return false;
+        } 
+        else if ( prefs->GetReleaseCheck() == 2 ) // Debug Source with libgdbserver.so
+        {
+            if ( !buildBase_->BuildCopyFile ( gsstring, destDir + "/libgdbserver.so"))
+                return false;
+        } 
+    }
     return true;
 }
 

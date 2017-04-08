@@ -117,6 +117,12 @@ public class SDLActivity extends Activity {
                 @Override
                 public boolean accept(File dir, String filename) {
                     // Only list libraries, i.e. exclude gdbserver when it presents
+                    // ATOMIC BEGIN
+                    // Do not load any file as a library that contains the word gdbserver, ever!
+                    if ( filename.contains("gdbserver")) {
+                        return false;
+                    }
+                    // ATOMIC END
                     return filename.matches("^lib.*\\.so$");
                 }
             });
