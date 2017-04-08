@@ -438,7 +438,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
                     "isBackground": true
                 },
                 {
-                    "taskName": "Lauch Atomic Player",
+                    "taskName": "Launch Atomic Player",
                     "command": `${ToolCore.toolEnvironment.editorBinary}`,
                     "args": [
                         "--player",
