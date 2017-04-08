@@ -60,8 +60,8 @@ export default class ProjectBasedExtensionLoader extends Atomic.ScriptObject imp
      * file system and manually pull these in to provide to duktape
      */
     private rewriteModSearch() {
-        Duktape.modSearch = (function(origModSearch) {
-            return function(id: string, require, exports, module) {
+        Duktape.modSearch = (function (origModSearch) {
+            return function (id: string, require, exports, module) {
                 let system = ToolCore.getToolSystem();
                 if (id.indexOf(ProjectBasedExtensionLoader.duktapeRequirePrefix) == 0) {
                     let path = id.substr(ProjectBasedExtensionLoader.duktapeRequirePrefix.length) + ".js";
@@ -75,7 +75,10 @@ export default class ProjectBasedExtensionLoader extends Atomic.ScriptObject imp
                         if (Atomic.fileSystem.fileExists(path)) {
                             let include = new Atomic.File(path, Atomic.FileMode.FILE_READ);
                             try {
-                                return include.readText();
+                                // add a newline to handle situations where sourcemaps are used.  Duktape
+                                // doesn't like not having a trailing newline and the sourcemap process doesn't
+                                // add one.
+                                return include.readText() + "\n";
                             } finally {
                                 include.close();
                             }
@@ -107,7 +110,7 @@ export default class ProjectBasedExtensionLoader extends Atomic.ScriptObject imp
                 filenames.forEach((filename) => {
                     // Filtered search in Atomic doesn't due true wildcarding, only handles extension filters
                     // in the future this may be better handled with some kind of manifest file
-                    if (filename.toLowerCase().lastIndexOf(".plugin.js") >= 0) {
+                    if (filename.search(/\.plugin.js$/i) != -1) {
                         var extensionPath = editorScriptsPath + filename;
                         extensionPath = extensionPath.substring(0, extensionPath.length - 3);
 
