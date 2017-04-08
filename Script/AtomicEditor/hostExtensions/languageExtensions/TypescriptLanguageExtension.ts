@@ -397,6 +397,19 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
 
             tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
             tsconfigFile.close();
+        } else {
+            const jsconfigFile = new Atomic.File(projectDir + "jsconfig.json", Atomic.FileMode.FILE_WRITE);
+            let jsconfig = {
+                "compilerOptions": {
+                    "target": "es5"
+                }
+            };
+
+            // Don't use fully qualified path in the persistent jsconfig file, just use a relative path from the jsconfig
+            jsconfig.compilerOptions["baseUrl"] = "./Resources";
+
+            jsconfigFile.writeString(JSON.stringify(jsconfig, null, 4));
+            jsconfigFile.close();
         }
 
         this.generateVsCodeFiles();
@@ -411,47 +424,51 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
         Atomic.fileSystem.createDir(vscodeDir);
 
         // Build out the vscode tasks.json
-        const tasks = {
+        const taskFile = {
             "version": "0.1.0",
-            "tasks": [
-                {
-                    "taskName": "Build",
-                    "command": "tsc",
-                    "isShellCommand": true,
-                    "args": [
-                        "-p",
-                        "."
-                    ],
-                    "showOutput": "always",
-                    "problemMatcher": "$tsc",
-                    "isBuildCommand": true
-                },
-                {
-                    "taskName": "Debug Atomic Player",
-                    "command": `${ToolCore.toolEnvironment.editorBinary}`,
-                    "args": [
-                        "--player",
-                        "--debug",
-                        "--project",
-                        "${workspaceRoot}"
-                    ],
-                    "isBackground": true
-                },
-                {
-                    "taskName": "Launch Atomic Player",
-                    "command": `${ToolCore.toolEnvironment.editorBinary}`,
-                    "args": [
-                        "--player",
-                        "--project",
-                        "${workspaceRoot}"
-                    ],
-                    "isBackground": true
-                }
-            ]
+            "tasks": []
         };
 
+        if (this.isTypescriptProject) {
+            taskFile.tasks.push({
+                "taskName": "Build",
+                "command": "tsc",
+                "isShellCommand": true,
+                "args": [
+                    "-p",
+                    "."
+                ],
+                "showOutput": "always",
+                "problemMatcher": "$tsc",
+                "isBuildCommand": true
+            });
+        };
+
+        taskFile.tasks.push({
+            "taskName": "Debug Atomic Player",
+            "command": `${ToolCore.toolEnvironment.editorBinary}`,
+            "args": [
+                "--player",
+                "--debug",
+                "--project",
+                "${workspaceRoot}"
+            ],
+            "isBackground": true
+        });
+
+        taskFile.tasks.push({
+            "taskName": "Launch Atomic Player",
+            "command": `${ToolCore.toolEnvironment.editorBinary}`,
+            "args": [
+                "--player",
+                "--project",
+                "${workspaceRoot}"
+            ],
+            "isBackground": true
+        });
+
         const tasksFile = new Atomic.File(vscodeDir + "tasks.json", Atomic.FileMode.FILE_WRITE);
-        tasksFile.writeString(JSON.stringify(tasks, null, 4));
+        tasksFile.writeString(JSON.stringify(taskFile, null, 4));
         tasksFile.close();
 
         // Build vscode launch.json
@@ -503,10 +520,10 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             const webClient = new WebView.WebClient();
             this.webClient = webClient;
             //this.webClient.loadURL(url);
-
+ 
             const webTexture = new WebView.WebTexture2D();
             webClient.webRenderHandler = webTexture;
-
+ 
             // doesn't work because atomicquery doesn't seem to be exposed to WebView.WebClient instances
             webClient.subscribeToEvent(EditorEvents.WebMessage, (data) => {
                 switch (data.message) {
@@ -516,7 +533,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
                         break;
                 }
             });
-
+ 
             webClient.createBrowser(url, 1, 1);
         */
     }
