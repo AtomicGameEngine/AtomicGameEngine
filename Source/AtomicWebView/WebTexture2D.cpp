@@ -113,7 +113,7 @@ public:
         return true;
     }
 
-#ifndef ATOMIC_PLATFORM_WINDOWS
+#ifdef ATOMIC_OPENGL
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
@@ -271,15 +271,15 @@ public:
     }
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
-                 const void *buffer, int width, int height) OVERRIDE
+        const void *buffer, int width, int height) OVERRIDE
     {
 
         if (type == PET_VIEW)
         {
             if (dirtyRects.size() == 1 &&
-                    dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
+                dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
             {
-                D3DBlit(IntRect(0, 0, width, height), (unsigned char*) buffer, width * 4, true);
+                D3DBlit(IntRect(0, 0, width, height), (unsigned char*)buffer, width * 4, true);
                 return;
             }
 
@@ -289,7 +289,7 @@ public:
             for (; i != dirtyRects.end(); ++i)
             {
                 const CefRect& rect = *i;
-                unsigned char* src = (unsigned char*) buffer;
+                unsigned char* src = (unsigned char*)buffer;
                 src += rect.y * (width * 4) + (rect.x * 4);
                 D3DBlit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
             }
@@ -322,15 +322,13 @@ public:
                 h -= y + h - viewheight;
             }
 
-            unsigned char* src = (unsigned char*) buffer;
+            unsigned char* src = (unsigned char*)buffer;
             D3DBlit(IntRect(x, y, x + w, y + h), src, width * 4, false);
 
         }
 
 #endif
-
     }
-
 #endif
 
 private:
