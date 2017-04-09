@@ -57,6 +57,7 @@ private:
     bool GenerateProjectProperties();
     bool GenerateActivitySource();
     bool CopyUserIcons( );
+    bool CopyDebugGdbserver();
 
     WeakPtr<BuildBase> buildBase_;
     String buildPath_;

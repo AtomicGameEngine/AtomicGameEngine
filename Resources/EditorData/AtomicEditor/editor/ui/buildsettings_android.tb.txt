@@ -57,11 +57,28 @@ TBLayout: axis: y, distribution: gravity, position: left
 				tooltip May be left blank if installed locally
 	TBLayout: axis: y, position: left, distribution: gravity
 		TBLayout: gravity: left, distribution-position: right bottom
-			TBClickLabel: text: "Release Path", skin: DarkGrayText
-				TBCheckBox: id: and_auth_check, lp: min-height: 20
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: auth_root, autofocus: 0
+			TBTextField: text: "APK:", skin: DarkGrayText
+			TBSelectDropdown: id: and_auth_check
+				tooltip Select type of APK to build
 				lp: min-width: 250
-				tooltip Select Release Path for a release version APK
+				items:
+					item: text: "Debug"
+					item: text: "Debug Source with gdbserver"
+					item: text: "Debug Source with libgdbserver.so"
+					item: text: "Release"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBTextField: text: "REL:", skin: DarkGrayText
+				lp: min-width: 30
+			TBEditField: id: auth_root, autofocus: 0
+				lp: min-width: 220
+				tooltip Select path for release APK support files
 			TBButton: text: "Choose", id: choose_and_auth
-				tooltip Directory containing the ant.properties
+				tooltip Directory containing ant.properties
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBTextField: text: "NDK:", skin: DarkGrayText
+				lp: min-width: 30
+			TBEditField: id: ndk_root, autofocus: 0
+				lp: min-width: 220
+				tooltip Select NDK path, only needed for Source Debug
+			TBButton: text: "Choose", id: choose_ndk_auth
+				tooltip Directory containing Android NDK 

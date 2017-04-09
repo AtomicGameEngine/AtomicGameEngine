@@ -43,12 +43,14 @@ public:
     const String& GetAntPath();
     const String& GetReleasePath() { return releasePath_; }
     const int GetReleaseCheck() { return releaseCheck_; }
+    const String& GetNdkPath() { return ndkPath_; }
 
     void SetAndroidSDKPath(const String& path) { androidSDKPath_ = path; }
     void SetJDKRootPath(const String& path) { jdkRootPath_ = path; }
     void SetAntPath(const String& path) { antPath_ = path; }
     void SetReleasePath(const String& path) { releasePath_ = path; }
     void SetReleaseCheck(const int value) { releaseCheck_ = value; }
+    void SetNdkPath(const String& path) { ndkPath_ = path; }
 
     String GetPrefsPath();
     void Load();
@@ -61,6 +63,7 @@ private:
     String antPath_;
     String releasePath_;
     int releaseCheck_;
+    String ndkPath_;
 };
 
 }

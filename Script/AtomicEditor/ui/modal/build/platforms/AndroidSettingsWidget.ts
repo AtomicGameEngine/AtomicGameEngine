@@ -47,10 +47,12 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         this.releaseChooseButton = <Atomic.UIButton>this.getWidget("choose_and_auth");
         this.releaseNameEdit = <Atomic.UIEditField>this.getWidget("auth_root");
-        this.releaseCheck = <Atomic.UICheckBox>this.getWidget("and_auth_check");
+        this.releaseCheck = <Atomic.UISelectDropdown>this.getWidget("and_auth_check");
         this.iconNameEdit = <Atomic.UIEditField>this.getWidget("icon_root");
         this.iconChooseButton = <Atomic.UIButton>this.getWidget("choose_icon");
         this.iconImage = <Atomic.UIImageWidget>this.getWidget("and_icon");
+        this.ndkChooseButton = <Atomic.UIButton>this.getWidget("choose_ndk_auth");
+        this.ndkPathEdit = <Atomic.UIEditField>this.getWidget("ndk_root");
 
         if (Atomic.platform == "Windows") {
 
@@ -123,7 +125,15 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
                }
                 return true;
 
-           }
+            }  else if (ev.target.id == "choose_ndk_auth") {
+                var fileUtils = new Editor.FileUtils();
+                var currauth = this.ndkPathEdit.text;
+                var path = fileUtils.findPath( "Please choose the folder of your NDK", currauth );
+                if ( path.length > 0 )
+                    this.ndkPathEdit.text = path;
+                return true;
+
+            }
 
         }
 
@@ -186,6 +196,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         this.jdkRootEdit.text = toolPrefs.jDKRootPath;
         this.releaseNameEdit.text = toolPrefs.releasePath;
         this.releaseCheck.value = toolPrefs.releaseCheck;
+        this.ndkPathEdit.text = toolPrefs.ndkPath;
 
         this.appNameEdit.text = this.settings.appName;
         this.packageNameEdit.text = this.settings.packageName;
@@ -210,6 +221,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         ToolCore.toolEnvironment.toolPrefs.jDKRootPath = this.jdkRootEdit.text;
         ToolCore.toolEnvironment.toolPrefs.releasePath = this.releaseNameEdit.text;
         ToolCore.toolEnvironment.toolPrefs.releaseCheck = this.releaseCheck.value;
+        ToolCore.toolEnvironment.toolPrefs.ndkPath = this.ndkPathEdit.text;
 
         ToolCore.toolEnvironment.saveToolPrefs();
     }
@@ -230,10 +242,13 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
     releaseNameEdit : Atomic.UIEditField;
     releaseChooseButton : Atomic.UIButton;
-    releaseCheck : Atomic.UICheckBox;
+    releaseCheck : Atomic.UISelectDropdown;
     iconNameEdit : Atomic.UIEditField;
     iconChooseButton : Atomic.UIButton;
     iconImage : Atomic.UIImageWidget;
+    ndkPathEdit : Atomic.UIEditField;
+    ndkChooseButton : Atomic.UIButton;
+
 }
 
 export = AndroidSettingsWidget;
