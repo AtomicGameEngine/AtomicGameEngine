@@ -114,7 +114,7 @@ public:
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
-#ifndef ATOMIC_D3D11
+#if !defined(ATOMIC_D3D11) && !defined(ATOMIC_OPENGL)
         //Direct3D9 Adjustment
         x += 0.5f;
         y += 0.5f;
