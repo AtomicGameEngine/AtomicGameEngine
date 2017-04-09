@@ -26,19 +26,22 @@
  * then the one in the project will overwrite these
  * @type {ts.CompilerOptions}
  */
-const defaultCompilerOptions = {
-    noEmitOnError: true,
-    noImplicitAny: false,
-    target: "es5",
-    module: "commonjs",
-    declaration: false,
-    inlineSourceMap: false,
-    removeComments: false,
-    noLib: false,
-    forceConsistentCasingInFileNames: true,
-    allowJs: true,
-    lib: ["es5"]
-};
+function getDefaultCompilerOptions() {
+    return {
+        noEmitOnError: true,
+        noImplicitAny: false,
+        target: "es5",
+        module: "commonjs",
+        declaration: false,
+        inlineSourceMap: false,
+        sourceMap: false,
+        removeComments: false,
+        noLib: false,
+        forceConsistentCasingInFileNames: true,
+        allowJs: true,
+        lib: ["es5"]
+    };
+}
 
 /**
  * Resource extension that supports the web view typescript extension
@@ -99,7 +102,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             }
         });
 
-        let compilerOptions = defaultCompilerOptions;
+        let compilerOptions = getDefaultCompilerOptions();
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
             // if the .js file matches up to a .ts file already loaded, then skip it
@@ -177,17 +180,24 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
      * Configures the project to be a Typescript Project
      * @return {[type]}
      */
-    private configureTypescriptProjectMenu() {
-        if (this.isTypescriptProject && !this.menuCreated) {
-            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+    private configureProjectMenu() {
+        if (!this.menuCreated) {
+            if (this.isTypescriptProject) {
+                const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
 
-            // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
-            const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
-            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
-            menu.addItem(this.compileOnSaveMenuItem);
-            menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
-            menu.addItem(new Atomic.UIMenuItem("Generate External Editor Project", `${this.name}.generateexternalproject`));
-            this.menuCreated = true;
+                // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
+                const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
+                this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
+                menu.addItem(this.compileOnSaveMenuItem);
+                menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+                menu.addItem(new Atomic.UIMenuItem("Generate External Editor Project", `${this.name}.generateexternalproject`));
+                this.menuCreated = true;
+            } else {
+                // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
+                const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("JavaScript", {});
+                menu.addItem(new Atomic.UIMenuItem("Generate External Editor Project", `${this.name}.generateexternalproject`));
+                this.menuCreated = true;
+            }
         }
     }
 
@@ -213,10 +223,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             // update ts config in case we have a new resource
             let tsConfig = this.buildTsConfig();
             this.setTsConfigOnWebView(tsConfig);
-
-            if (this.isTypescriptProject) {
-                this.configureTypescriptProjectMenu();
-            }
+            this.configureProjectMenu();
         }
     }
 
@@ -235,7 +242,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
                 console.log(`${this.name}: deleting corresponding .js file`);
                 ToolCore.assetDatabase.deleteAsset(jsFileAsset);
 
-                let eventData : Editor.EditorDeleteResourceNotificationEvent = {
+                let eventData: Editor.EditorDeleteResourceNotificationEvent = {
                     path: jsFile
                 };
 
@@ -300,8 +307,9 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
         //scan all the files in the project for any typescript files so we can determine if this is a typescript project
         if (Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).length > 0) {
             this.isTypescriptProject = true;
-            this.configureTypescriptProjectMenu();
         };
+
+        this.configureProjectMenu();
     }
 
 
@@ -310,7 +318,12 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
      */
     projectUnloaded() {
         // Clean up
-        this.serviceRegistry.uiServices.removePluginMenuItemSource("TypeScript");
+        if (this.isTypescriptProject) {
+            this.serviceRegistry.uiServices.removePluginMenuItemSource("TypeScript");
+        } else {
+            this.serviceRegistry.uiServices.removePluginMenuItemSource("JavaScript");
+        }
+
         this.compileOnSaveMenuItem = null;
         this.menuCreated = false;
         this.isTypescriptProject = false;
@@ -362,47 +375,131 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
         WebView.WebBrowserHost.setGlobalStringProperty("TypeScriptLanguageExtension", "tsConfig", JSON.stringify(tsConfig));
     }
 
-    generateExternalProject () {
-      const projectDir = ToolCore.toolSystem.project.projectPath;
+    generateExternalProject() {
+        const projectDir = ToolCore.toolSystem.project.projectPath;
 
-      // Create the typings folder in project root
-      const projectDirTypings = Atomic.addTrailingSlash(projectDir + "typings/ambient/atomicgameengine");
-      Atomic.getFileSystem().createDir(projectDirTypings);
+        // Create the typings folder in project root
+        const projectDirTypings = Atomic.addTrailingSlash(projectDir + "typings/ambient/atomicgameengine");
+        Atomic.getFileSystem().createDir(projectDirTypings);
 
-      // Copy the Atomic.d.ts definition file to the typings folder
-      const toolDataDir = ToolCore.toolEnvironment.toolDataDir;
-      const typescriptSupportDir = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
-      Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
+        // Copy the Atomic.d.ts definition file to the typings folder
+        const toolDataDir = ToolCore.toolEnvironment.toolDataDir;
+        const typescriptSupportDir = Atomic.addTrailingSlash(toolDataDir + "TypeScriptSupport");
+        Atomic.getFileSystem().copy(typescriptSupportDir + "Atomic.d.ts", projectDirTypings + "Atomic.d.ts");
 
-      // Generate a tsconfig.json file
-      const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FileMode.FILE_WRITE);
-      let tsconfig = {
-        compilerOptions: defaultCompilerOptions
-      };
+        // Generate a tsconfig.json file
+        if (this.isTypescriptProject) {
+            const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FileMode.FILE_WRITE);
 
-      // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig
-      tsconfig.compilerOptions["baseUrl"] = "./Resources";
-      tsconfig.compilerOptions.allowJs = false;
+            let tsconfig = {
+                compilerOptions: getDefaultCompilerOptions()
+            };
 
-      tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
-      tsconfigFile.close();
+            // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig
+            tsconfig.compilerOptions["baseUrl"] = "./Resources";
+            tsconfig.compilerOptions.allowJs = false;
+            tsconfig.compilerOptions.sourceMap = true;
 
-      // Build out the vscode tasks.json
-      const tasks = {
-         "command": "tsc",
-         "isShellCommand": true,
-         "args": ["-p", "."],
-         "showOutput": "always",
-         "problemMatcher": "$tsc"
-     };
+            tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
+            tsconfigFile.close();
+        } else {
+            const jsconfigFile = new Atomic.File(projectDir + "jsconfig.json", Atomic.FileMode.FILE_WRITE);
+            let jsconfig = {
+                "compilerOptions": {
+                    "target": "es5"
+                }
+            };
 
-     const tasksDir = Atomic.addTrailingSlash(projectDir + ".vscode");
-     Atomic.fileSystem.createDir(tasksDir);
-     const tasksFile = new Atomic.File(tasksDir + "tasks.json", Atomic.FileMode.FILE_WRITE);
-     tasksFile.writeString(JSON.stringify(tasks, null, 4));
-     tasksFile.close();
+            // Don't use fully qualified path in the persistent jsconfig file, just use a relative path from the jsconfig
+            jsconfig.compilerOptions["baseUrl"] = "./Resources";
 
+            jsconfigFile.writeString(JSON.stringify(jsconfig, null, 4));
+            jsconfigFile.close();
+        }
+
+        this.generateVsCodeFiles();
     }
+
+    /**
+     * Generates the extra vscode files for launching the debugger, the player, etc
+     */
+    generateVsCodeFiles() {
+        const projectDir = ToolCore.toolSystem.project.projectPath;
+        const vscodeDir = Atomic.addTrailingSlash(projectDir + ".vscode");
+        Atomic.fileSystem.createDir(vscodeDir);
+
+        // Build out the vscode tasks.json
+        const taskFile = {
+            "version": "0.1.0",
+            "tasks": []
+        };
+
+        if (this.isTypescriptProject) {
+            taskFile.tasks.push({
+                "taskName": "Build",
+                "command": "tsc",
+                "isShellCommand": true,
+                "args": [
+                    "-p",
+                    "."
+                ],
+                "showOutput": "always",
+                "problemMatcher": "$tsc",
+                "isBuildCommand": true
+            });
+        };
+
+        taskFile.tasks.push({
+            "taskName": "Debug Atomic Player",
+            "command": `${ToolCore.toolEnvironment.editorBinary}`,
+            "args": [
+                "--player",
+                "--debug",
+                "--project",
+                "${workspaceRoot}"
+            ],
+            "isBackground": true
+        });
+
+        taskFile.tasks.push({
+            "taskName": "Launch Atomic Player",
+            "command": `${ToolCore.toolEnvironment.editorBinary}`,
+            "args": [
+                "--player",
+                "--project",
+                "${workspaceRoot}"
+            ],
+            "isBackground": true
+        });
+
+        const tasksFile = new Atomic.File(vscodeDir + "tasks.json", Atomic.FileMode.FILE_WRITE);
+        tasksFile.writeString(JSON.stringify(taskFile, null, 4));
+        tasksFile.close();
+
+        // Build vscode launch.json
+        const launch = {
+            "version": "0.2.0",
+            "configurations": [
+                {
+                    "name": "Attach",
+                    "type": "duk",
+                    "request": "attach",
+                    "address": "localhost",
+                    "port": 9091,
+                    "localRoot": "${workspaceRoot}/Resources",
+                    "sourceMaps": this.isTypescriptProject, // turn on source maps if we are a TypeScript project
+                    "outDir": "${workspaceRoot}/Resources",
+                    "stopOnEntry": false,
+                    "debugLog": true
+                }
+            ]
+        };
+
+        const launchFile = new Atomic.File(vscodeDir + "launch.json", Atomic.FileMode.FILE_WRITE);
+        launchFile.writeString(JSON.stringify(launch, null, 4));
+        launchFile.close();
+    }
+
     /**
      * Perform a full compile of the TypeScript
      */
@@ -410,9 +507,9 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
         const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
         if (editor && editor.typeName == "JSResourceEditor" && this.isValidFiletype(editor.fullPath)) {
             this.sendEvent(Editor.EditorModalEventData({
-              type: Editor.EDITOR_MODALINFO,
-              title: "Compiling TypeScript",
-              message: "Compiling TypeScript..."
+                type: Editor.EDITOR_MODALINFO,
+                title: "Compiling TypeScript",
+                message: "Compiling TypeScript..."
             }));
 
             const jsEditor = <Editor.JSResourceEditor>editor;
@@ -501,15 +598,15 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
 
         if (errors) {
             this.sendEvent(Editor.EditorModalEventData({
-              type: Editor.EDITOR_MODALINFO,
-              title: "Compiling TypeScript",
-              message: "Errors detected while compiling TypeScript."
+                type: Editor.EDITOR_MODALINFO,
+                title: "Compiling TypeScript",
+                message: "Errors detected while compiling TypeScript."
             }));
         } else {
             this.sendEvent(Editor.EditorModalEventData({
-              type: Editor.EDITOR_MODALINFO,
-              title: "Compiling TypeScript",
-              message: "Successfully compiled TypeScript."
+                type: Editor.EDITOR_MODALINFO,
+                title: "Compiling TypeScript",
+                message: "Successfully compiled TypeScript."
             }));
         }
 
@@ -522,10 +619,10 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             `Compilation Completed in ${results.duration}ms`
         ].join("\n");
 
-        let window = this.serviceRegistry.uiServices.showNonModalWindow("TypeScript Compilation Results", "AtomicEditor/editor/ui/typescriptresults.tb.txt", (ev:Atomic.UIWidgetEvent) => {
+        let window = this.serviceRegistry.uiServices.showNonModalWindow("TypeScript Compilation Results", "AtomicEditor/editor/ui/typescriptresults.tb.txt", (ev: Atomic.UIWidgetEvent) => {
             if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
                 if (ev.target.id == "close") {
-                  window.close();
+                    window.close();
                 } else {
                     let diag = links[ev.target.id];
                     if (diag) {
