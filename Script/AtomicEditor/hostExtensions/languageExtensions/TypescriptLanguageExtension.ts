@@ -26,19 +26,22 @@
  * then the one in the project will overwrite these
  * @type {ts.CompilerOptions}
  */
-const defaultCompilerOptions = {
-    noEmitOnError: true,
-    noImplicitAny: false,
-    target: "es5",
-    module: "commonjs",
-    declaration: false,
-    inlineSourceMap: false,
-    removeComments: false,
-    noLib: false,
-    forceConsistentCasingInFileNames: true,
-    allowJs: true,
-    lib: ["es5"]
-};
+function getDefaultCompilerOptions() {
+    return {
+        noEmitOnError: true,
+        noImplicitAny: false,
+        target: "es5",
+        module: "commonjs",
+        declaration: false,
+        inlineSourceMap: false,
+        sourceMap: false,
+        removeComments: false,
+        noLib: false,
+        forceConsistentCasingInFileNames: true,
+        allowJs: true,
+        lib: ["es5"]
+    };
+}
 
 /**
  * Resource extension that supports the web view typescript extension
@@ -99,7 +102,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             }
         });
 
-        let compilerOptions = defaultCompilerOptions;
+        let compilerOptions = getDefaultCompilerOptions();
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
             // if the .js file matches up to a .ts file already loaded, then skip it
@@ -387,13 +390,15 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
         // Generate a tsconfig.json file
         if (this.isTypescriptProject) {
             const tsconfigFile = new Atomic.File(projectDir + "tsconfig.json", Atomic.FileMode.FILE_WRITE);
+
             let tsconfig = {
-                compilerOptions: defaultCompilerOptions
+                compilerOptions: getDefaultCompilerOptions()
             };
 
             // Don't use fully qualified path in the persistent tsconfig file, just use a relative path from the tsconfig
             tsconfig.compilerOptions["baseUrl"] = "./Resources";
             tsconfig.compilerOptions.allowJs = false;
+            tsconfig.compilerOptions.sourceMap = true;
 
             tsconfigFile.writeString(JSON.stringify(tsconfig, null, 4));
             tsconfigFile.close();
@@ -482,7 +487,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
                     "address": "localhost",
                     "port": 9091,
                     "localRoot": "${workspaceRoot}/Resources",
-                    "sourceMaps": false,
+                    "sourceMaps": this.isTypescriptProject, // turn on source maps if we are a TypeScript project
                     "outDir": "${workspaceRoot}/Resources",
                     "stopOnEntry": false,
                     "debugLog": true
@@ -520,10 +525,10 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             const webClient = new WebView.WebClient();
             this.webClient = webClient;
             //this.webClient.loadURL(url);
- 
+
             const webTexture = new WebView.WebTexture2D();
             webClient.webRenderHandler = webTexture;
- 
+
             // doesn't work because atomicquery doesn't seem to be exposed to WebView.WebClient instances
             webClient.subscribeToEvent(EditorEvents.WebMessage, (data) => {
                 switch (data.message) {
@@ -533,7 +538,7 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
                         break;
                 }
             });
- 
+
             webClient.createBrowser(url, 1, 1);
         */
     }
