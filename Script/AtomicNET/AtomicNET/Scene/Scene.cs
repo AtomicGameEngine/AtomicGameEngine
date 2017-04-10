@@ -14,30 +14,39 @@ namespace AtomicEngine
 
             if (disposing)
             {
+                // list of nodes/components to dispose
                 var disposeList = new List<RefCounted>();
 
-                // get all children of scene
-                var nodes = new Vector<Node>();               
-                GetChildren(nodes, true);
+                // IMPORTANT: Care must be taken to clear these vectors
+                // otherwise, references will be held until the Vector is GC'd
+                // and the child nodes/components/resources will not be immediately disposed
+                var components = new Vector<Component>();
+                var nodes = new Vector<Node>();
 
+                // Get scene components and add to dispose list
+                GetComponents(components);
+                disposeList.AddRange(components);
+                components.Clear();
+
+                // get all children of scene and add their components to the dispose list
+                GetChildren(nodes, true);                
                 foreach (var node in nodes)
                 {
-
-                    node.GetComponents(componentVector);
-
-                    disposeList.AddRange(componentVector);
-
-                    componentVector.Clear();
-
+                    node.GetComponents(components);
+                    disposeList.AddRange(components);
+                    components.Clear();
                 }
 
+                // add nodes to the back of the list
                 disposeList.AddRange(nodes);
 
-                RefCountedCache.Dispose(disposeList);
-            }
+                nodes.Clear();
 
-                
-            // dispose ourselves
+                // dispose of list
+                RefCountedCache.Dispose(disposeList);                
+            }
+                            
+            // dispose ourself
             base.Dispose(disposing);            
 
         }

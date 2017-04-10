@@ -90,6 +90,7 @@ namespace AtomicEngine
 
         public void GetComponents<T>(Vector<T> dest, bool recursive = false) where T : Component
         {
+            dest.Clear();
             GetComponents(ComponentVector, typeof(T).Name, recursive);
             for (int i = 0; i < ComponentVector.Size; i++)
             {
@@ -101,6 +102,7 @@ namespace AtomicEngine
 
         public void GetDerivedComponents<T>(Vector<T> dest, bool recursive = false) where T : Component
         {
+            dest.Clear();
             GetComponents(ComponentVector, typeof(Component).Name, recursive);
             for (int i = 0; i < ComponentVector.Size; ++i)
             {
@@ -131,6 +133,7 @@ namespace AtomicEngine
 
         public void GetCSComponents<T>(Vector<T> dest, bool recursive = false) where T : CSComponent
         {
+            dest.Clear();
             GetComponents(ComponentVector, nameof(CSComponent), recursive);
             for (int i = 0; i < ComponentVector.Size; i++)
             {
@@ -144,6 +147,7 @@ namespace AtomicEngine
 
         public void GetDerivedCSComponents<T>(Vector<T> dest, bool recursive = false) where T : CSComponent
         {
+            dest.Clear();
             GetComponents(ComponentVector, nameof(CSComponent), recursive);
             for (int i = 0; i < ComponentVector.Size; ++i)
             {

@@ -1262,7 +1262,7 @@ String ResourceCache::PrintResources(const String& typeName) const
             if (typeName.Length() && resource->GetType() != typeNameHash)
                 continue;
 
-            output.AppendWithFormat("%-14s %i   %i   %s\n", resource->GetTypeName().CString(), resource->Refs(), resource->WeakRefs(), resource->GetName().CString());
+            output.AppendWithFormat("%s     %i     %i     %s\n",resource->GetTypeName().CString(), resource->Refs(), resource->WeakRefs(), resource->GetName().CString());
         }
 
     }
