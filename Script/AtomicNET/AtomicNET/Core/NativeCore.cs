@@ -312,7 +312,7 @@ namespace AtomicEngine
             }
 
             r.InstantiationType = instantiationType;
-            r.Init();
+            r.InternalInit();
 
             refCountedCache.Add(r);
 

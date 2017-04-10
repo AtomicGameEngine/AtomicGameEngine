@@ -85,7 +85,7 @@ namespace AtomicEngine
             nativeInstance = native;
         }
 
-        internal void Init()
+        internal void InternalInit()
         {   
             if (refHandle != null)
                 throw new InvalidOperationException("RefCounted.Init - refHandle already initialized");

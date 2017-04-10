@@ -59,14 +59,14 @@ namespace AtomicEngine
 
                 // The NodeAdded event is generated when adding a node as a child
 
-                e.Node.GetComponents<CSComponent>(componentVector);
+                e.Node.GetComponents<CSComponent>(csComponentVector);
 
-                for (uint i = 0; i < componentVector.Size; i++)
+                for (uint i = 0; i < csComponentVector.Size; i++)
                 {
-                    AddCSComponent(componentVector[i]);
+                    AddCSComponent(csComponentVector[i]);
                 }
 
-                componentVector.Clear();
+                csComponentVector.Clear();
 
             });
 
@@ -77,14 +77,14 @@ namespace AtomicEngine
                 // The NodeRemoved event is generated when explicitly removing nodes from a scene
                 // For general cleanup, it will not be generated
                 
-                e.Node.GetComponents<CSComponent>(componentVector);
+                e.Node.GetComponents<CSComponent>(csComponentVector);
 
-                for (uint i = 0; i < componentVector.Size; i++)
+                for (uint i = 0; i < csComponentVector.Size; i++)
                 {
-                    HandleComponentRemoved(componentVector[i]);
+                    HandleComponentRemoved(csComponentVector[i]);
                 }
 
-                componentVector.Clear();
+                csComponentVector.Clear();
 
             });
 
@@ -415,7 +415,7 @@ namespace AtomicEngine
 
         }
 
-        Vector<CSComponent> componentVector = new Vector<CSComponent>();
+        Vector<CSComponent> csComponentVector = new Vector<CSComponent>();
 
         Dictionary<CSComponentInfo, List<CSComponent>> cscomponents = new Dictionary<CSComponentInfo, List<CSComponent>>();
         List<CSComponent> cscomponentStart = new List<CSComponent>();        
