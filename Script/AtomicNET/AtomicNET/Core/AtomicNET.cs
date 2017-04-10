@@ -67,6 +67,14 @@ namespace AtomicEngine
             NativeCore.RunGC();
         }
 
+        /// <summary>
+        ///  Returns true if called on main engine thread, false if on another thread
+        /// </summary>
+        public static bool IsMainThread()
+        {
+            return csi_AtomicEngine_IsMainThread();
+        }
+
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern uint csi_Atomic_AtomicNET_StringToStringHash(string name);
 
@@ -130,6 +138,10 @@ namespace AtomicEngine
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern IntPtr csi_Atomic_NETCore_Initialize(EventDispatchDelegate eventDispatch, UpdateDispatchDelegate updateDispatch, RefCountedDeletedDelegate refCountedDeleted, ThrowManagedExceptionDelegate throwManagedException);
+
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool csi_AtomicEngine_IsMainThread();
 
         private static Context context;
         private static Dictionary<Type, AObject> subSystems = new Dictionary<Type, AObject>();

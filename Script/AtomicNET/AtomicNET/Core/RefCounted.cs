@@ -35,7 +35,7 @@ namespace AtomicEngine
             }
 
             // We can be called from Dispose in main thread or from finalizers, which aren't in the main thread
-            if (NativeCore.csi_AtomicEngine_IsMainThread())
+            if (AtomicNET.IsMainThread())
             {
                 NativeCore.csi_AtomicEngine_ReleaseRef(handle);
             }
