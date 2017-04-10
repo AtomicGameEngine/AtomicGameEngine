@@ -117,58 +117,17 @@ namespace AtomicEngine
         }
 
         /// <summary>
-        /// WORK IN PROGRESS: Disposes a scene, component, and nodes
+        /// Dispose a list of RefCounted instances
         /// </summary>
-        internal static void DisposeScene(Scene scene)
+        internal static void Dispose(List<RefCounted> disposeList)
         {
             lock (knownObjects)
             {
-                List<Component> disposeComponents = new List<Component>();
-                List<Node> disposeNodes = new List<Node>();
 
-                // Gather nodes/components first as disposing them can remove from scene and children 
-                // won't pass scene test, and thus won't be disposed
-                foreach (var item in knownObjects.Values)
+                foreach (var refCounted in disposeList)
                 {
-                    var refCounted = item.Reference;
-
-                    if (refCounted == null)
-                    {
-                        // This is relatively infrequent and could be the result of a weakref going away, keeping a 
-                        // warning as it needs to be looked into...
-                        Log.Warn("RefCountedCache.DisposeScene, null RefCounted in known objects");
-                        continue;
-                    }
-
-                    var component = refCounted as Component;
-
-                    if (component != null && !component.Disposed && component.Scene == scene)
-                    {
-                        disposeComponents.Add(component);
-                    }
-
-                    if (component != null)
-                        continue;
-
-                    var node = (Node)(refCounted.GetType() == typeof(Node) ? refCounted : null);
-
-                    if (node != null && !node.Disposed && node.Scene == scene)
-                    {
-                        disposeNodes.Add(node);
-                    }
-
-                }
-
-                foreach (var component in disposeComponents)
-                {
-                    knownObjects.Remove(component);
-                    component.Dispose();
-                }
-
-                foreach (var node in disposeNodes)
-                {
-                    knownObjects.Remove(node);
-                    node.Dispose();
+                    knownObjects.Remove(refCounted);
+                    refCounted.Dispose();
                 }
 
             }

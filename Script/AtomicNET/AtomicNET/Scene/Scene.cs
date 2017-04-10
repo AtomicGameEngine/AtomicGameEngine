@@ -13,8 +13,31 @@ namespace AtomicEngine
             UnsubscribeFromAllEvents();
 
             if (disposing)
-                RefCountedCache.DisposeScene(this);
+            {
+                var disposeList = new List<RefCounted>();
 
+                // get all children of scene
+                var nodes = new Vector<Node>();               
+                GetChildren(nodes, true);
+
+                foreach (var node in nodes)
+                {
+
+                    node.GetComponents(componentVector);
+
+                    disposeList.AddRange(componentVector);
+
+                    componentVector.Clear();
+
+                }
+
+                disposeList.AddRange(nodes);
+
+                RefCountedCache.Dispose(disposeList);
+            }
+
+                
+            // dispose ourselves
             base.Dispose(disposing);            
 
         }
