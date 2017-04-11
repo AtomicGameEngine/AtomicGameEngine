@@ -80,20 +80,22 @@ String StringHash::ToString() const
 // Lookup for significant strings, not a member of StringHash so don't need to drag hashmap into header
 static HashMap<unsigned, String> gSignificantLookup;
 
-void StringHash::RegisterSignificantString(const char* str)
+StringHash StringHash::RegisterSignificantString(const char* str)
 {
     unsigned hash = Calculate(str);
 
     if (gSignificantLookup.Contains(hash))
-        return;
+        return StringHash(hash);
 
     gSignificantLookup[hash] = String(str);
 
+    return StringHash(hash);
+
 }
 
-void StringHash::RegisterSignificantString(const String& str)
+StringHash StringHash::RegisterSignificantString(const String& str)
 {
-    RegisterSignificantString(str.CString());
+    return RegisterSignificantString(str.CString());
 }
 
 bool StringHash::GetSignificantString(unsigned hash, String& strOut)

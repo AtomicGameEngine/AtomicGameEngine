@@ -221,24 +221,32 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         source += IndentLine("/// </summary>\n");
     }
 
-    if (klass_->GetBaseClass())
+    JSBClass* baseClass = klass_->GetBaseClass();
+    const StringVector& csharpInterfaces = klass_->GetCSharpInterfaces();
+
+    if (baseClass || csharpInterfaces.Size())
     {
+        StringVector baseStrings;
 
-        String baseString = klass_->GetBaseClass()->GetName();
-
-        const PODVector<JSBClass*>& interfaces = klass_->GetInterfaces();
-
-        if (interfaces.Size())
+        if (baseClass)
         {
-            StringVector baseStrings;
-            baseStrings.Push(baseString);
-            for (unsigned i = 0; i < interfaces.Size(); i++)
-            {
-                baseStrings.Push(interfaces.At(i)->GetName());
-            }
-
-            baseString = String::Joined(baseStrings, ",");
+            baseStrings.Push(baseClass->GetName());
         }
+        
+        const PODVector<JSBClass*>& nativeInterfaces = klass_->GetInterfaces();
+
+        for (unsigned i = 0; i < nativeInterfaces.Size(); i++)
+        {
+            baseStrings.Push(nativeInterfaces.At(i)->GetName());
+        }
+
+        for (unsigned i = 0; i < csharpInterfaces.Size(); i++)
+        {
+            baseStrings.Push(csharpInterfaces[i]);
+        }
+
+
+        String baseString = String::Joined(baseStrings, ",");
 
         line = ToString("public partial class %s%s : %s\n", klass_->GetName().CString(), klass_->IsGeneric() ? "<T>" : "", baseString.CString());
     }

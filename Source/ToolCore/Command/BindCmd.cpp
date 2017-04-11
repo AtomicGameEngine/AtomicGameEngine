@@ -24,6 +24,7 @@
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
@@ -69,6 +70,9 @@ bool BindCmd::ParseInternal(const Vector<String>& arguments, unsigned startIndex
         errorMsg = "Unable to parse bind command";
         return false;
     }
+
+    sourceRootFolder_ = AddTrailingSlash(sourceRootFolder_);
+    packageFolder_ = AddTrailingSlash(packageFolder_);
 
     return true;
 }

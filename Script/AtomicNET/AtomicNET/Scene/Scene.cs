@@ -8,6 +8,49 @@ namespace AtomicEngine
 {
     public partial class Scene : Node
     {
+        override protected void Dispose(bool disposing)
+        {
+            UnsubscribeFromAllEvents();
+
+            if (disposing)
+            {
+                // list of nodes/components to dispose
+                var disposeList = new List<RefCounted>();
+
+                // IMPORTANT: Care must be taken to clear these vectors
+                // otherwise, references will be held until the Vector is GC'd
+                // and the child nodes/components/resources will not be immediately disposed
+                var components = new Vector<Component>();
+                var nodes = new Vector<Node>();
+
+                // Get scene components and add to dispose list
+                GetComponents(components);
+                disposeList.AddRange(components);
+                components.Clear();
+
+                // get all children of scene and add their components to the dispose list
+                GetChildren(nodes, true);                
+                foreach (var node in nodes)
+                {
+                    node.GetComponents(components);
+                    disposeList.AddRange(components);
+                    components.Clear();
+                }
+
+                // add nodes to the back of the list
+                disposeList.AddRange(nodes);
+
+                nodes.Clear();
+
+                // dispose of list
+                RefCountedCache.Dispose(disposeList);                
+            }
+                            
+            // dispose ourself
+            base.Dispose(disposing);            
+
+        }
+
         internal override void PostNativeUpdate()
         {    
             SubscribeToEvent<NodeAddedEvent>(this, e =>
@@ -16,14 +59,14 @@ namespace AtomicEngine
 
                 // The NodeAdded event is generated when adding a node as a child
 
-                e.Node.GetComponents<CSComponent>(componentVector);
+                e.Node.GetComponents<CSComponent>(csComponentVector);
 
-                for (uint i = 0; i < componentVector.Size; i++)
+                for (uint i = 0; i < csComponentVector.Size; i++)
                 {
-                    AddCSComponent(componentVector[i]);
+                    AddCSComponent(csComponentVector[i]);
                 }
 
-                componentVector.Clear();
+                csComponentVector.Clear();
 
             });
 
@@ -34,14 +77,14 @@ namespace AtomicEngine
                 // The NodeRemoved event is generated when explicitly removing nodes from a scene
                 // For general cleanup, it will not be generated
                 
-                e.Node.GetComponents<CSComponent>(componentVector);
+                e.Node.GetComponents<CSComponent>(csComponentVector);
 
-                for (uint i = 0; i < componentVector.Size; i++)
+                for (uint i = 0; i < csComponentVector.Size; i++)
                 {
-                    HandleComponentRemoved(componentVector[i]);
+                    HandleComponentRemoved(csComponentVector[i]);
                 }
 
-                componentVector.Clear();
+                csComponentVector.Clear();
 
             });
 
@@ -372,7 +415,7 @@ namespace AtomicEngine
 
         }
 
-        Vector<CSComponent> componentVector = new Vector<CSComponent>();
+        Vector<CSComponent> csComponentVector = new Vector<CSComponent>();
 
         Dictionary<CSComponentInfo, List<CSComponent>> cscomponents = new Dictionary<CSComponentInfo, List<CSComponent>>();
         List<CSComponent> cscomponentStart = new List<CSComponent>();        

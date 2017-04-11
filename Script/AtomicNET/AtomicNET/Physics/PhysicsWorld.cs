@@ -13,7 +13,7 @@ namespace AtomicEngine
         public float HitFraction;
 
         IntPtr bodyPtr;
-        public RigidBody Body => NativeCore.WrapNative<RigidBody>(bodyPtr);
+        public RigidBody Body => bodyPtr == IntPtr.Zero ? null : NativeCore.WrapNative<RigidBody>(bodyPtr);
     }
 
     public partial class PhysicsWorld : Component

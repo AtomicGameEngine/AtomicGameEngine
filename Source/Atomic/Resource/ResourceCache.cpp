@@ -1244,6 +1244,32 @@ SharedPtr<ResourceNameIterator> ResourceCache::Scan(const String& pathName, cons
 
     return enumerator;
 }
+
+String ResourceCache::PrintResources(const String& typeName) const
+{
+
+    StringHash typeNameHash(typeName);
+
+    String output = "Resource Type         Refs   WeakRefs  Name\n\n";
+
+    for (HashMap<StringHash, ResourceGroup>::ConstIterator cit = resourceGroups_.Begin(); cit != resourceGroups_.End(); ++cit)
+    {
+        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
+        {
+            Resource* resource = resIt->second_;
+
+            // filter
+            if (typeName.Length() && resource->GetType() != typeNameHash)
+                continue;
+
+            output.AppendWithFormat("%s     %i     %i     %s\n",resource->GetTypeName().CString(), resource->Refs(), resource->WeakRefs(), resource->GetName().CString());
+        }
+
+    }
+
+    return output;
+}
+
 // ATOMIC END
 
 }

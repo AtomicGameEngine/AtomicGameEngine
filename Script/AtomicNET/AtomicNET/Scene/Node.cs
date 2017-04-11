@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using static System.Reflection.IntrospectionExtensions;
 
 namespace AtomicEngine
@@ -92,62 +90,80 @@ namespace AtomicEngine
 
         public void GetComponents<T>(Vector<T> dest, bool recursive = false) where T : Component
         {
-            Vector<Component> components = new Vector<Component>();
-            GetComponents(components, typeof(T).Name, recursive);
-            for (int i = 0; i < components.Size; i++)
+            dest.Clear();
+            GetComponents(ComponentVector, typeof(T).Name, recursive);
+            for (int i = 0; i < ComponentVector.Size; i++)
             {
-                dest.Push((T)components[i]);
+                if (ComponentVector[i] != null)
+                    dest.Push((T)ComponentVector[i]);
             }
+            ComponentVector.Clear();
         }
 
         public void GetDerivedComponents<T>(Vector<T> dest, bool recursive = false) where T : Component
         {
-            Vector<Component> components = new Vector<Component>();
-            GetComponents(components, recursive);
-            for (int i = 0; i < components.Size; ++i)
+            dest.Clear();
+            GetComponents(ComponentVector, typeof(Component).Name, recursive);
+            for (int i = 0; i < ComponentVector.Size; ++i)
             {
-                T t = components[i] as T;
+                T t = ComponentVector[i] as T;
                 if (t != null)
                     dest.Push(t);
             }
+            ComponentVector.Clear();
         }
 
         public T GetCSComponent<T>(bool recursive = false) where T : CSComponent
         {
-            Vector<Component> components = new Vector<Component>();
-            GetComponents(components, nameof(CSComponent), recursive);
-            for (int i = 0; i < components.Size; i++)
+            GetComponents(ComponentVector, nameof(CSComponent), recursive);
+            for (int i = 0; i < ComponentVector.Size; i++)
             {
-                if (components[i].GetType() == typeof(T))
-                    return (T) components[i];
+                Component component = ComponentVector[i];
+                if (component != null &&
+                    component.GetType() == typeof(T))
+                {
+                    ComponentVector.Clear();
+                    return (T)component;
+                }
             }
 
+            ComponentVector.Clear();
             return null;
         }
 
         public void GetCSComponents<T>(Vector<T> dest, bool recursive = false) where T : CSComponent
         {
-            Vector<Component> components = new Vector<Component>();
-            GetComponents(components, nameof(CSComponent), recursive);
-            for (int i = 0; i < components.Size; i++)
+            dest.Clear();
+            GetComponents(ComponentVector, nameof(CSComponent), recursive);
+            for (int i = 0; i < ComponentVector.Size; i++)
             {
-                Component component = components[i];
-                if (component.GetType() == typeof(T))
+                Component component = ComponentVector[i];
+                if (component != null &&
+                    component.GetType() == typeof(T))
                     dest.Push((T)component);
             }
+            ComponentVector.Clear();
         }
 
         public void GetDerivedCSComponents<T>(Vector<T> dest, bool recursive = false) where T : CSComponent
         {
-            Vector<Component> components = new Vector<Component>();
-            GetComponents(components, nameof(CSComponent), recursive);
-            for (int i = 0; i < components.Size; ++i)
+            dest.Clear();
+            GetComponents(ComponentVector, nameof(CSComponent), recursive);
+            for (int i = 0; i < ComponentVector.Size; ++i)
             {
-                T t = components[i] as T;
+                T t = ComponentVector[i] as T;
                 if (t != null)
                     dest.Push(t);
             }
+            ComponentVector.Clear();
         }
+
+        // Reuse vectors to avoid churn, but don't have one on every referenced node
+        // Wrapping in a static property, instead of just immediate static allocation,
+        // Because Runtime isn't ready at time of static initialization: 
+        // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1512
+        private static Vector<Component> ComponentVector => lazyComponentVector.Value;
+        private static Lazy<Vector<Component>> lazyComponentVector = new Lazy<Vector<Component>>();
     }
 
 }

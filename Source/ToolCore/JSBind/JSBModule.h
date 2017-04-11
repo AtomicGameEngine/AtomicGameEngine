@@ -114,6 +114,9 @@ private:
     void ProcessTypeScriptDecl();
     void ProcessHaxeDecl();
 
+    /// Process CSharp declarations, including interfaces
+    void ProcessCSharpDecl();
+
     void ScanHeaders();
 
     String name_;

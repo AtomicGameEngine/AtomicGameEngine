@@ -113,8 +113,15 @@ public:
     unsigned GetRenderBuffer() const { return renderBuffer_; }
 
 private:
+
+// ATOMIC BEGIN
+     
+    /// ATOMIC: changing to WeakPtr to prevent double release when parentTexture is deleted first
     /// Parent texture.
-    Texture* parentTexture_;
+    WeakPtr<Texture> parentTexture_;
+
+    // ATOMIC_END
+
 
     union
     {

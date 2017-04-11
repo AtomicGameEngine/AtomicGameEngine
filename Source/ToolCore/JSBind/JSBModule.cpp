@@ -108,6 +108,7 @@ void JSBModule::VisitHeaders()
     ProcessClassExcludes();
     ProcessTypeScriptDecl();
     ProcessHaxeDecl();
+    ProcessCSharpDecl();
 }
 
 void JSBModule::PreprocessClasses()
@@ -362,6 +363,40 @@ void JSBModule::ProcessHaxeDecl()
             }
         }
     }
+}
+
+void JSBModule::ProcessCSharpDecl()
+{
+    // C# declarations
+
+    JSONValue& root = moduleJSON_->GetRoot();
+
+    JSONValue interfaceDecl = root.Get("csharp_interface_decl");
+
+    if (interfaceDecl.IsObject())
+    {
+        Vector<String> childNames = interfaceDecl.GetObject().Keys();
+
+        for (unsigned j = 0; j < childNames.Size(); j++)
+        {
+            String classname = childNames.At(j);
+
+            JSBClass* klass = GetClass(classname);
+
+            if (!klass)
+            {
+                ErrorExit("Bad csharp decl class");
+            }
+
+            JSONArray interfaces = interfaceDecl.Get(classname).GetArray();
+
+            for (unsigned k = 0; k < interfaces.Size(); k++)
+            {
+                klass->AddCSharpInterface(interfaces[k].GetString());
+            }
+        }
+    }
+
 }
 
 void JSBModule::ScanHeaders()

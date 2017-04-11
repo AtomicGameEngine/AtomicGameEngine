@@ -29,22 +29,28 @@ namespace AtomicEngine
                 throw new InvalidOperationException($"CSComponent() - Recursive CSComponent instantiation in default constructor during load type: { GetType().Name} ");
             }
 
+            // detect instantiation type
+            InstantiationType itype = InstantiationType.INSTANTIATION_NATIVE;
+
+            IntPtr ninstance = IntPtr.Zero;
+
             if (nativeLoadOverride == IntPtr.Zero)
             {
-                // We are being "new'd" in script
-                nativeInstance = csi_Atomic_CSComponent_Constructor();                
+                // We are being "new'd" in managed code
+                ninstance = csi_Atomic_CSComponent_Constructor();
+                itype = InstantiationType.INSTANTIATION_NET;
             }
             else
             {
                 // We are loading from a serialized CSComponent
-                nativeInstance = nativeLoadOverride;
+                ninstance = nativeInstance = nativeLoadOverride;
 
                 // validation bookkeeping
                 nativeLoadOverrideValidate = nativeLoadOverride;
                 nativeLoadOverride = IntPtr.Zero;
             }
 
-            NativeCore.RegisterNative(nativeInstance, this);
+            NativeCore.RegisterNative(ninstance, this, itype);
 
 
         }

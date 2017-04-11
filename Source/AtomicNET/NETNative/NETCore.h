@@ -31,12 +31,14 @@ namespace Atomic
 typedef void (*NETCoreEventDispatchFunction)(Object* refCounted, unsigned eventID, VariantMap* eventData);
 typedef void (*NETCoreUpdateDispatchFunction)(float timeStep);
 typedef void (*NETCoreRefCountedDeletedFunction)(RefCounted* refCounted);
+typedef void(*NETCoreThrowManagedExceptionFunction)(const char* errorMsg);
 
 struct NETCoreDelegates
 {
     NETCoreEventDispatchFunction eventDispatch;
     NETCoreUpdateDispatchFunction updateDispatch;
     NETCoreRefCountedDeletedFunction refCountedDeleted;
+    NETCoreThrowManagedExceptionFunction throwManagedException;
 };
 
 class ATOMIC_API NETCore : public Object
@@ -54,10 +56,15 @@ public:
 
     static void Shutdown();
 
+    static bool EnsureMainThread(const String& throwMsg);
+
     static void RegisterNETEventType(unsigned eventType);
 
     inline static void DispatchEvent(Object* refCounted, unsigned eventID, VariantMap* eventData = nullptr) { eventDispatch_(refCounted, eventID, eventData); }
     inline static void DispatchUpdateEvent(float timeStep) { if (updateDispatch_) updateDispatch_(timeStep); }
+
+    /// Throws a managed exception in managed code from native code
+    inline static void ThrowManagedException(const String& errorMsg) { if (throwManagedException_) throwManagedException_(errorMsg.CString()); }
 
     /// We access this directly in binding code, where there isn't a context
     /// to get a reference from
@@ -72,6 +79,7 @@ private:
     static NETCoreUpdateDispatchFunction updateDispatch_;
     static NETCoreEventDispatchFunction eventDispatch_;
     static NETCoreRefCountedDeletedFunction refCountedDeleted_;
+    static NETCoreThrowManagedExceptionFunction throwManagedException_;
 
 };
 

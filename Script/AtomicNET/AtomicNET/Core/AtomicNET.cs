@@ -59,6 +59,22 @@ namespace AtomicEngine
             return csi_Atomic_AtomicNET_StringToStringHash(value);
         }
 
+        /// <summary>
+        ///  Runs a GC collection and waits for any finalizers
+        /// </summary>
+        public static void RunGC()
+        {
+            NativeCore.RunGC();
+        }
+
+        /// <summary>
+        ///  Returns true if called on main engine thread, false if on another thread
+        /// </summary>
+        public static bool IsMainThread()
+        {
+            return csi_AtomicEngine_IsMainThread();
+        }
+
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern uint csi_Atomic_AtomicNET_StringToStringHash(string name);
 
@@ -66,6 +82,7 @@ namespace AtomicEngine
         private static EventDispatchDelegate eventDispatchDelegate = NativeCore.EventDispatch;
         private static UpdateDispatchDelegate updateDispatchDelegate = NativeCore.UpdateDispatch;
         private static RefCountedDeletedDelegate refCountedDeletedDelegate = NativeCore.RefCountedDeleted;
+        private static ThrowManagedExceptionDelegate throwManagedExceptionDelegate = NativeCore.ThrowManagedException;
 
         public static void Initialize()
         {
@@ -99,7 +116,7 @@ namespace AtomicEngine
 
             PlayerModule.Initialize();
 
-            IntPtr coreptr = csi_Atomic_NETCore_Initialize(eventDispatchDelegate, updateDispatchDelegate, refCountedDeletedDelegate);
+            IntPtr coreptr = csi_Atomic_NETCore_Initialize(eventDispatchDelegate, updateDispatchDelegate, refCountedDeletedDelegate, throwManagedExceptionDelegate);
 
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
@@ -120,7 +137,11 @@ namespace AtomicEngine
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csi_Atomic_NETCore_Initialize(EventDispatchDelegate eventDispatch, UpdateDispatchDelegate updateDispatch, RefCountedDeletedDelegate refCountedDeleted);
+        private static extern IntPtr csi_Atomic_NETCore_Initialize(EventDispatchDelegate eventDispatch, UpdateDispatchDelegate updateDispatch, RefCountedDeletedDelegate refCountedDeleted, ThrowManagedExceptionDelegate throwManagedException);
+
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        private static extern bool csi_AtomicEngine_IsMainThread();
 
         private static Context context;
         private static Dictionary<Type, AObject> subSystems = new Dictionary<Type, AObject>();

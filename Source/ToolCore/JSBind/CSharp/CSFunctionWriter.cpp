@@ -816,7 +816,18 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
         }
         else if (function_->GetReturnType()->type_->asVectorType())
         {
-            source += IndentLine(ToString("var returnScriptVector = %s%s%uReturnValue.GetScriptVector();\n", klass->GetName().CString(), function_->GetName().CString(), function_->GetID()));
+            JSBVectorType* vtype = function_->GetReturnType()->type_->asVectorType();
+            
+            String marshalName = ToString("%s%s%uReturnValue", function_->GetClass()->GetName().CString(), function_->GetName().CString(), function_->GetID());
+            
+            // Defer creation of ScriptVector return value until method is called
+            if (vtype->vectorType_->asClassType())
+            {
+                String classname = vtype->vectorType_->asClassType()->class_->GetName();
+                source += IndentLine(ToString("if (%s == null) %s = new Vector<%s>();\n", marshalName.CString(), marshalName.CString(), classname.CString()));
+            }
+
+            source += IndentLine(ToString("var returnScriptVector = %s.GetScriptVector();\n", marshalName.CString()));
         }
         else if (CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
             line += "return ";
@@ -944,7 +955,7 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
 
                     marshal += managedType + " ";
 
-                    marshal += ToString("%s%s%uReturnValue = new %s();\n", klass->GetName().CString(), function_->GetName().CString(), function_->GetID(), managedType.CString());
+                    marshal += ToString("%s%s%uReturnValue;\n", klass->GetName().CString(), function_->GetName().CString(), function_->GetID());
 
                     sourceOut += IndentLine(marshal);
                 }
@@ -961,7 +972,7 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
 
                 String marshal = "private " + typestring + " ";
 
-                marshal += ToString("%s%s%uReturnValue = new %s();\n", function_->GetClass()->GetName().CString(), function_->GetName().CString(), function_->GetID(), typestring.CString());
+                marshal += ToString("%s%s%uReturnValue = null;\n", function_->GetClass()->GetName().CString(), function_->GetName().CString(), function_->GetID());
 
                 sourceOut += IndentLine(marshal);
 

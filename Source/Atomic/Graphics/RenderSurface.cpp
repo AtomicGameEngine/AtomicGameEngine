@@ -36,7 +36,14 @@ namespace Atomic
 
 RenderSurface::~RenderSurface()
 {
-    Release();
+    // ATOMIC BEGIN
+    // only release if parent texture hasn't expired, in that case 
+    // parent texture was deleted and will have called release on render surface
+    if (!parentTexture_.Expired())
+    {
+        Release();
+    }
+    // ATOMIC END
 }
 
 void RenderSurface::SetNumViewports(unsigned num)
