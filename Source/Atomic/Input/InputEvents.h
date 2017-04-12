@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,8 +93,14 @@ ATOMIC_EVENT(E_KEYUP, KeyUp)
 ATOMIC_EVENT(E_TEXTINPUT, TextInput)
 {
     ATOMIC_PARAM(P_TEXT, Text);                    // String
-    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
-    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
+/// Text editing event.
+ATOMIC_EVENT(E_TEXTEDITING, TextEditing)
+{
+    ATOMIC_PARAM(P_COMPOSITION, Composition);      // String
+    ATOMIC_PARAM(P_CURSOR, Cursor);                // int
+    ATOMIC_PARAM(P_SELECTION_LENGTH, SelectionLength);  // int
 }
 
 /// Joystick connected.

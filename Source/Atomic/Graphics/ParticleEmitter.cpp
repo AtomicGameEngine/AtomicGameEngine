@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -177,16 +177,16 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     for (unsigned i = 0; i < particles_.Size(); ++i)
     {
         Particle& particle = particles_[i];
-        Billboard* billboard = billboards_[i];
+        Billboard& billboard = *billboards_[i];
 
-        if (billboard->enabled_)
+        if (billboard.enabled_)
         {
             needCommit = true;
 
             // Time to live
             if (particle.timer_ >= particle.timeToLive_)
             {
-                billboard->enabled_ = false;
+                billboard.enabled_ = false;
                 continue;
             }
             particle.timer_ += lastTimeStep_;
@@ -207,11 +207,11 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                 Vector3 force = -dampingForce * particle.velocity_;
                 particle.velocity_ += lastTimeStep_ * force;
             }
-            billboard->position_ += lastTimeStep_ * particle.velocity_ * scaleVector;
-            billboard->direction_ = particle.velocity_.Normalized();
+            billboard.position_ += lastTimeStep_ * particle.velocity_ * scaleVector;
+            billboard.direction_ = particle.velocity_.Normalized();
 
             // Rotation
-            billboard->rotation_ += lastTimeStep_ * particle.rotationSpeed_;
+            billboard.rotation_ += lastTimeStep_ * particle.rotationSpeed_;
 
             // Scaling
             float sizeAdd = effect_->GetSizeAdd();
@@ -223,7 +223,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                     particle.scale_ = 0.0f;
                 if (sizeMul != 1.0f)
                     particle.scale_ *= (lastTimeStep_ * (sizeMul - 1.0f)) + 1.0f;
-                billboard->size_ = particle.size_ * particle.scale_;
+                billboard.size_ = particle.size_ * particle.scale_;
             }
 
             // Color interpolation
@@ -237,9 +237,9 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                         ++index;
                 }
                 if (index < colorFrames_.Size() - 1)
-                    billboard->color_ = colorFrames_[index].Interpolate(colorFrames_[index + 1], particle.timer_);
+                    billboard.color_ = colorFrames_[index].Interpolate(colorFrames_[index + 1], particle.timer_);
                 else
-                    billboard->color_ = colorFrames_[index].color_;
+                    billboard.color_ = colorFrames_[index].color_;
             }
 
             // Texture animation
@@ -249,7 +249,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             {
                 if (particle.timer_ >= textureFrames_[texIndex + 1].time_)
                 {
-                    billboard->uv_ = textureFrames_[texIndex + 1].uv_;
+                    billboard.uv_ = textureFrames_[texIndex + 1].uv_;
                     ++texIndex;
                 }
             }
@@ -287,8 +287,6 @@ void ParticleEmitter::SetNumParticles(unsigned num)
     // Prevent negative value being assigned from the editor
     if (num > M_MAX_INT)
         num = 0;
-    if (num > MAX_BILLBOARDS)
-        num = MAX_BILLBOARDS;
 
     particles_.Resize(num);
     SetNumBillboards(num);
@@ -299,7 +297,9 @@ void ParticleEmitter::SetEmitting(bool enable)
     if (enable != emitting_)
     {
         emitting_ = enable;
-        sendFinishedEvent_ = enable;
+
+        // If stopping emission now, and there are active particles, send finish event once they are gone
+        sendFinishedEvent_ = enable || CheckActiveParticles();
         periodTimer_ = 0.0f;
         // Note: network update does not need to be marked as this is a file only attribute
     }
@@ -533,6 +533,20 @@ unsigned ParticleEmitter::GetFreeParticle() const
     return M_MAX_UNSIGNED;
 }
 
+bool ParticleEmitter::CheckActiveParticles() const
+{
+    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    {
+        if (billboards_[i]->enabled_)
+        {
+            return true;
+            break;
+        }
+    }
+
+    return false;
+}
+
 void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Store scene's timestep and use it instead of global timestep, as time scale may be other than 1
@@ -548,40 +562,26 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         MarkForUpdate();
     }
 
-    if (node_ && !emitting_ && sendFinishedEvent_)
+    // Send finished event only once all particles are gone
+    if (node_ && !emitting_ && sendFinishedEvent_ && !CheckActiveParticles())
     {
-        // Send finished event only once all billboards are gone
-        bool hasEnabledBillboards = false;
+        sendFinishedEvent_ = false;
 
-        for (unsigned i = 0; i < billboards_.Size(); ++i)
-        {
-            if (billboards_[i]->enabled_)
-            {
-                hasEnabledBillboards = true;
-                break;
-            }
-        }
+        // Make a weak pointer to self to check for destruction during event handling
+        WeakPtr<ParticleEmitter> self(this);
 
-        if (!hasEnabledBillboards)
-        {
-            sendFinishedEvent_ = false;
+        using namespace ParticleEffectFinished;
 
-            // Make a weak pointer to self to check for destruction during event handling
-            WeakPtr<ParticleEmitter> self(this);
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_EFFECT] = effect_;
 
-            using namespace ParticleEffectFinished;
+        node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
 
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_NODE] = node_;
-            eventData[P_EFFECT] = effect_;
+        if (self.Expired())
+            return;
 
-            node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
-
-            if (self.Expired())
-                return;
-
-            DoAutoRemove(autoRemove_);
-        }
+        DoAutoRemove(autoRemove_);
     }
 }
 

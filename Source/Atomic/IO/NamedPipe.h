@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,7 @@
 
 #include "../Container/ArrayPtr.h"
 #include "../Core/Object.h"
-#include "../IO/Deserializer.h"
-#include "../IO/Serializer.h"
+#include "../IO/AbstractFile.h"
 
 #ifdef __ANDROID__
 // ATOMIC BEGIN
@@ -37,7 +36,7 @@ namespace Atomic
 {
 
 /// Named pipe for interprocess communication.
-class ATOMIC_API NamedPipe : public Object, public Deserializer, public Serializer
+class ATOMIC_API NamedPipe : public Object, public AbstractFile
 {
     ATOMIC_OBJECT(NamedPipe, Object);
 

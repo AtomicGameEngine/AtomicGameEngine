@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -376,7 +376,25 @@ SharedPtr<Animation> Animation::Clone(const String& cloneName) const
     ret->SetMemoryUse(GetMemoryUse());
     
     return ret;
+} 
+
+AnimationTrack* Animation::GetTrack(unsigned index) 
+{ 
+    if (index >= GetNumTracks()) 
+        return (AnimationTrack*) 0;
+
+    int j = 0; 
+    for(HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Begin(); i != tracks_.End(); ++i) 
+    {
+        if (j == index) 
+            return &i->second_; 
+        
+        ++j;
+    }
+    
+    return (AnimationTrack*) 0;
 }
+
 
 AnimationTrack* Animation::GetTrack(const String& name)
 {

@@ -17,12 +17,10 @@ subject to the following restrictions:
 #ifndef BT_DYNAMIC_BOUNDING_VOLUME_TREE_H
 #define BT_DYNAMIC_BOUNDING_VOLUME_TREE_H
 
-// ATOMIC BEGIN
-#include "../../LinearMath/btAlignedObjectArray.h"
-#include "../../LinearMath/btVector3.h"
-#include "../../LinearMath/btTransform.h"
-#include "../../LinearMath/btAabbUtil2.h"
-// ATOMIC END
+#include "LinearMath/btAlignedObjectArray.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btTransform.h"
+#include "LinearMath/btAabbUtil2.h"
 
 //
 // Compile time configuration

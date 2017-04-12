@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -118,7 +118,7 @@ class ATOMIC_API Drawable : public Component
 public:
     /// Construct.
 // ATOMIC BEGIN
-    Drawable(Context* context, unsigned drawableFlags = DRAWABLE_UNDEFINED);
+    Drawable(Context* context, unsigned char drawableFlags = DRAWABLE_UNDEFINED);
 // ATOMIC END
     /// Destruct.
     virtual ~Drawable();

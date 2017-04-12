@@ -22,7 +22,7 @@
 # Modified by Yao Wei Tjong for Urho3D, the modified portion is licensed under below license
 
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,7 @@
 enable_language (C)
 set (SDL2_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set (SDL2_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+# Urho3D - commented out CheckTypeSize, FindPkgConfig, and GNUInstallDirs modules as the corresponding macros are not being used in our modified version
 include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
@@ -57,10 +58,8 @@ include(CheckIncludeFile)
 include(CheckSymbolExists)
 include(CheckCSourceRuns)
 include(CheckCCompilerFlag)
-# Urho3D - commented out CheckTypeSize.cmake module inclusion as the corresponding check macro is not being used in our modified version
 include(CheckStructHasMember)
 include(CMakeDependentOption)
-# Urho3D - bug fix - do not use pkg-config tool for detection as it only works for host environment and not for rooted environment when cross-compiling
 # Urho3D - commented out CMAKE_MODULE_PATH configuration so that it does not mess up with ours; besides below two include() use file signature instead of module signature
 include(${SDL2_SOURCE_DIR}/cmake/macros.cmake)
 include(${SDL2_SOURCE_DIR}/cmake/sdlchecks.cmake)
@@ -75,9 +74,9 @@ include(${SDL2_SOURCE_DIR}/cmake/sdlchecks.cmake)
 # set SDL_BINARY_AGE and SDL_INTERFACE_AGE to 0.
 set(SDL_MAJOR_VERSION 2)
 set(SDL_MINOR_VERSION 0)
-set(SDL_MICRO_VERSION 4)
-set(SDL_INTERFACE_AGE 0)
-set(SDL_BINARY_AGE 4)
+set(SDL_MICRO_VERSION 5)
+set(SDL_INTERFACE_AGE 1)
+set(SDL_BINARY_AGE 5)
 set(SDL_VERSION "${SDL_MAJOR_VERSION}.${SDL_MINOR_VERSION}.${SDL_MICRO_VERSION}")
 
 # Calculate a libtool-like version number
@@ -179,15 +178,14 @@ set (SDL_CFLAGS)
 # restore back to that afterwards. For check_function_exists() to work in
 # Emscripten, this value must be at its default value.
 # Urho3D - also due to a CMake's try_compile() bug on iOS platform, the CMAKE_REQUIRED_FLAGS contains our SmileyHack-injection on iOS platform
-set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+set (ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
 # Urho3D - save the original CMake global settings, do not leave them to chances
 set (ORIG_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
 set (ORIG_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
 
 if (RPI)
   # Urho3D - TODO - move the find_package(VideoCore REQUIRED) call from Urho3D common module to here later after we have refactored the library dependency handling
-  # Urho3D - bug fix - adjust the header search path for subsequent for pthread, EGL and OpenGLES2 checks
-  listtostr (VIDEOCORE_INCLUDE_DIRS VIDEO_RPI_INCLUDE_FLAGS "-I")
+  # Urho3D - bug fix - adjust the header search path for subsequent pthread, EGL and OpenGLES2 checks
   list (APPEND CMAKE_REQUIRED_INCLUDES ${VIDEOCORE_INCLUDE_DIRS})
 endif ()
 
@@ -294,14 +292,15 @@ dep_option(NAS_SHARED          "Dynamically load NAS audio API" ON NAS OFF)
 dep_option(SNDIO               "Support the Roar audio API" ON UNIX_SYS OFF)
 # Urho3D - commented out RPATH as an option because Urho3D is configured to always use RPATH, so init the variable to always TRUE
 set (RPATH TRUE)
-# Urho3D - prefer clock_gettime() when it is available (hide the option for Windows and Apple)
-dep_option(CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" ON "NOT WINDOWS AND NOT APPLE" OFF)
+# Urho3D - prefer clock_gettime() when it is available (hide the option for Windows)
+dep_option(CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" ON "NOT WINDOWS" OFF)
 set_option(INPUT_TSLIB         "Use the Touchscreen library for input" ${UNIX_SYS})
 dep_option(VIDEO_WAYLAND       "Use Wayland video driver" ON UNIX_SYS OFF)
 dep_option(WAYLAND_SHARED      "Dynamically load Wayland support" ON VIDEO_WAYLAND OFF)
 # Urho3D - change the VIDEO_WAYLAND_QT_TOUCH default value to FALSE (this is only needed by Sailfish[?] but we don't know way to auto-detect that yet)
 dep_option(VIDEO_WAYLAND_QT_TOUCH  "QtWayland server support for Wayland video driver" OFF VIDEO_WAYLAND OFF)
-dep_option(VIDEO_MIR           "Use Mir video driver" ON UNIX_SYS OFF)
+# Urho3D - change the VIDEO_MIR default value to FALSE (SDL requires the bleeding edge of MIR version which normal Linux distros do not provide)
+dep_option(VIDEO_MIR           "Use Mir video driver" OFF UNIX_SYS OFF)
 dep_option(MIR_SHARED          "Dynamically load Mir support" ON VIDEO_MIR OFF)
 # Urho3D - only make VIDEO_RPI option available on Raspberry-Pi platform
 dep_option(VIDEO_RPI           "Use Raspberry Pi video driver" ON RPI OFF)
@@ -337,6 +336,8 @@ set_option(VIDEO_VIVANTE       "Use Vivante EGL video driver" ${UNIX_SYS})
 set(SDL_SHARED ${SDL_SHARED_ENABLED_BY_DEFAULT} CACHE BOOL "Build a shared version of the library")
 set(SDL_STATIC ON CACHE BOOL "Build a static version of the library")
 
+dep_option(SDL_STATIC_PIC      "Static version of the library should be built with Position Independent Code" OFF "SDL_STATIC" OFF)
+
 # General source files
 set (SOURCE_FILE_PATTERNS
   ${SDL2_SOURCE_DIR}/src/*.c
@@ -354,7 +355,7 @@ foreach (_SUB AUDIO CPUINFO EVENTS FILE HAPTIC JOYSTICK POWER RENDER VIDEO)
   endif ()
 endforeach ()
 if (SDL_RENDER)
-  list (APPEND ${SDL2_SOURCE_DIR}/src/render/*/*.c)   # Recurse one more level
+  list (APPEND SOURCE_FILE_PATTERNS ${SDL2_SOURCE_DIR}/src/render/*/*.c)   # Recurse one more level
 endif ()
 file(GLOB SOURCE_FILES ${SOURCE_FILE_PATTERNS})
 
@@ -375,6 +376,27 @@ set(HAVE_ASSERTIONS ${ASSERTIONS})
 
 # Compiler option evaluation
 if(USE_GCC OR USE_CLANG)
+  # Check for -Wall first, so later things can override pieces of it.
+  check_c_compiler_flag(-Wall HAVE_GCC_WALL)
+  if(HAVE_GCC_WALL)
+    list(APPEND EXTRA_CFLAGS "-Wall")
+    if(HAIKU)
+      # Urho3D - TODO - since we do not support HAIKU for now, we can leave the cflags configuration here
+      #          However, when we do then it must be moved to our common module and/or just commented out
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-multichar")
+    endif()
+  endif()
+
+  check_c_compiler_flag(-Wdeclaration-after-statement HAVE_GCC_WDECLARATION_AFTER_STATEMENT)
+  if(HAVE_GCC_WDECLARATION_AFTER_STATEMENT)
+    check_c_compiler_flag(-Werror=declaration-after-statement HAVE_GCC_WERROR_DECLARATION_AFTER_STATEMENT)
+    # Urho3D - bug fix - SDL does not build cleanly for Android platform with this flag on, make a tweak here rather than changing on their code
+    if(HAVE_GCC_WERROR_DECLARATION_AFTER_STATEMENT AND NOT ANDROID)
+      list(APPEND EXTRA_CFLAGS "-Werror=declaration-after-statement")
+    endif()
+    list(APPEND EXTRA_CFLAGS "-Wdeclaration-after-statement")
+  endif()
+
   if(DEPENDENCY_TRACKING)
     check_c_source_compiles("
         #if !defined(__GNUC__) || __GNUC__ < 3
@@ -407,15 +429,6 @@ if(USE_GCC OR USE_CLANG)
 
 # Urho3D - we rely on GenerateExportHeader CMake module for configuring GCC/Clang visibility attribute support
 
-  check_c_compiler_flag(-Wall HAVE_GCC_WALL)
-  if(HAVE_GCC_WALL)
-    list(APPEND EXTRA_CFLAGS "-Wall")
-    if(HAIKU)
-      # Urho3D - TODO - since we do not support HAIKU for now, we can leave the cflags configuration here
-      #          However, when we do then it must be moved to our common module and/or just commented out
-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-multichar")
-    endif()
-  endif()
   check_c_compiler_flag(-Wshadow HAVE_GCC_WSHADOW)
   if(HAVE_GCC_WSHADOW)
     list(APPEND EXTRA_CFLAGS "-Wshadow")
@@ -495,13 +508,9 @@ if(LIBC)
     set(STDC_HEADERS 1)
   else()
     set(HAVE_LIBC TRUE)
-    # Urho3D - temporary bug fix - starting since Raspbian Jessie some of the headers are installed in the arch-specific directory and it seems that older CMake (prior to release 3.2.3) does not include this directory by default yet, so we have to do that manually
-    if (RPI AND CMAKE_LIBRARY_ARCHITECTURE)
-      include_directories (${SYSROOT}/usr/include/${CMAKE_LIBRARY_ARCHITECTURE})    # SYSROOT is empty when we are not cross-compiling
-    endif ()
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     set (CMAKE_REQUIRED_INCLUDES_SYS_TYPES_SAVED ${CMAKE_REQUIRED_INCLUDES})
-    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES sysroot)
+    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES --sysroot)
       find_path (SYS_TYPES_H_INCLUDE_DIRS NAMES sys/types.h)
       if (SYS_TYPES_H_INCLUDE_DIRS)
         # Assume the header search path has not been adjusted elsewhere yet, there is no harm anyway when a same entry is added twice into the list
@@ -725,11 +734,11 @@ elseif(APPLE)
 
   if(SDL_AUDIO)
     set(SDL_AUDIO_DRIVER_COREAUDIO 1)
-    file(GLOB AUDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/coreaudio/*.c)
+    file(GLOB AUDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/coreaudio/*.m)
     set(SOURCE_FILES ${SOURCE_FILES} ${AUDIO_SOURCES})
     set(HAVE_SDL_AUDIO TRUE)
     set(SDL_FRAMEWORK_COREAUDIO 1)
-    set(SDL_FRAMEWORK_AUDIOUNIT 1)
+    set(SDL_FRAMEWORK_AUDIOTOOLBOX 1)
   endif()
 
   if(SDL_JOYSTICK)
@@ -816,9 +825,9 @@ elseif(APPLE)
     find_library(COREAUDIO CoreAudio)
     list(APPEND EXTRA_LIBS ${COREAUDIO})
   endif()
-  if(SDL_FRAMEWORK_AUDIOUNIT)
-    find_library(AUDIOUNIT AudioUnit)
-    list(APPEND EXTRA_LIBS ${AUDIOUNIT})
+  if(SDL_FRAMEWORK_AUDIOTOOLBOX)
+    find_library(AUDIOTOOLBOX AudioToolbox)
+    list(APPEND EXTRA_LIBS ${AUDIOTOOLBOX})
   endif()
 
   # Urho3d - bug fix - make it work for iOS platform
@@ -971,18 +980,14 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
       set(SDL_INPUT_LINUXKD 1)
     endif()
 
-    # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
-    set (CMAKE_REQUIRED_INCLUDES_UDEV_DBUS_SAVED ${CMAKE_REQUIRED_INCLUDES})
-    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES sysroot)
-      find_path (UDEV_H_INCLUDE_DIRS libudev.h)
-      if (UDEV_H_INCLUDE_DIRS)
-        list (APPEND CMAKE_REQUIRED_INCLUDES ${UDEV_H_INCLUDE_DIRS} ${SYS_TYPES_H_INCLUDE_DIRS})
-      endif ()
+    # Urho3D - bug fix - use find_path() to detect udev's header file instead of check_include_file() because the latter requires the path to header file to be known which is not the case when cross-compiling
+    find_path (UDEV_H_INCLUDE_DIRS libudev.h)
+    if (UDEV_H_INCLUDE_DIRS)
+      set (HAVE_LIBUDEV_H TRUE)
+      include_directories (SYSTEM ${UDEV_H_INCLUDE_DIRS})
+      # TODO: find the shared library and store the result in the SDL_UDEV_DYNAMIC variable
     endif ()
-    check_include_file("libudev.h" HAVE_LIBUDEV_H)
-    if (HAVE_LIBUDEV_H AND UDEV_H_INCLUDE_DIRS)
-      include_directories (${UDEV_H_INCLUDE_DIRS})
-    endif ()
+
     # Urho3D - bug fix - dbus/dbus.h is installed under path suffix 'dbus-1.0', so the following find_path() is needed even when not cross-compiling
     find_path (DBUS_H_INCLUDE_DIRS NAMES dbus/dbus.h PATH_SUFFIXES dbus-1.0)
     # Cater for both multilib and multiarch, native and cross-compiling build
@@ -992,12 +997,35 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
       set (DBUS_INC_SEARCH_PATH /usr/lib/dbus-1.0/include)
     endif ()
     find_path (DBUS_ARCH_DEPS_H_INCLUDE_DIRS NAMES dbus/dbus-arch-deps.h PATHS ${DBUS_INC_SEARCH_PATH} /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/dbus-1.0/include)
-    set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_UDEV_DBUS_SAVED} ${DBUS_H_INCLUDE_DIRS} ${DBUS_ARCH_DEPS_H_INCLUDE_DIRS})
-    check_include_file("dbus/dbus.h" HAVE_DBUS_DBUS_H)
-    if (HAVE_DBUS_DBUS_H AND DBUS_H_INCLUDE_DIRS AND DBUS_ARCH_DEPS_H_INCLUDE_DIRS)
-      include_directories (${DBUS_H_INCLUDE_DIRS} ${DBUS_ARCH_DEPS_H_INCLUDE_DIRS})
+    if (DBUS_H_INCLUDE_DIRS AND DBUS_H_INCLUDE_DIRS AND DBUS_ARCH_DEPS_H_INCLUDE_DIRS)
+      set(HAVE_DBUS_DBUS_H TRUE)
+      include_directories (SYSTEM ${DBUS_H_INCLUDE_DIRS} ${DBUS_ARCH_DEPS_H_INCLUDE_DIRS})
+      list(APPEND EXTRA_LIBS dbus-1)
     endif ()
-    set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_UDEV_DBUS_SAVED})
+
+    # Urho3D - bug fix - ibus.h is installed under path suffix 'ibus-1.0', so the following find_path() is needed even when not cross-compiling
+    find_path (IBUS_H_INCLUDE_DIRS NAMES ibus.h PATH_SUFFIXES ibus-1.0)
+    find_path (GLIB_H_INCLUDE_DIRS NAMES glib.h PATH_SUFFIXES glib-2.0)
+    if (ATOMIC_64BIT)
+      set (GLIB_INC_SEARCH_PATH /usr/lib64/glib-2.0/include)
+    else ()
+      set (GLIB_INC_SEARCH_PATH /usr/lib/glib-2.0/include)
+    endif ()
+    find_path (GLIB_CONFIG_H_INCLUDE_DIRS NAMES glibconfig.h PATHS ${GLIB_INC_SEARCH_PATH} /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/glib-2.0/include)
+    if (IBUS_H_INCLUDE_DIRS AND GLIB_H_INCLUDE_DIRS AND GLIB_CONFIG_H_INCLUDE_DIRS)
+      set(HAVE_IBUS_IBUS_H TRUE)
+      include_directories(SYSTEM ${IBUS_H_INCLUDE_DIRS} ${GLIB_H_INCLUDE_DIRS} ${GLIB_CONFIG_H_INCLUDE_DIRS})
+      list(APPEND EXTRA_LIBS ibus-1.0)
+      set (SDL_USE_IME 1)
+    endif ()
+
+    # Urho3D - bug fix - use find_path() to detect fcitx's header file so it works for both native and cross-compiling builds
+    find_path (FCITX_H_INCLUDE_DIRS fcitx/frontend.h)
+    if (FCITX_H_INCLUDE_DIRS)
+      set (HAVE_FCITX_FRONTEND_H TRUE)
+      include_directories (SYSTEM ${FCITX_H_INCLUDE_DIRS})
+      set (SDL_USE_IME 1)
+    endif ()
 
     # Urho3D - bug fix - moved below logic from generic Unix block to Linux-specific block
     if(SDL_POWER)
@@ -1021,7 +1049,7 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
   if(INPUT_TSLIB)
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     set (CMAKE_REQUIRED_INCLUDES_TSLIB_SAVED ${CMAKE_REQUIRED_INCLUDES})
-    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES sysroot)
+    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES --sysroot)
       find_path (TSLIB_H_INCLUDE_DIRS NAMES tslib.h)
       if (TSLIB_H_INCLUDE_DIRS)
         # Assume the header search path has not been adjusted elsewhere yet, there is no harm anyway when a same entry is added twice into the list
@@ -1053,7 +1081,14 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
   if(RPATH)
     set(SDL_RLD_FLAGS "")
     if(BSDI OR FREEBSD OR LINUX OR NETBSD)
-      set(SDL_RLD_FLAGS "-Wl,-rpath,\${libdir}")
+      set(CMAKE_REQUIRED_FLAGS "-Wl,--enable-new-dtags ${ORIG_CMAKE_REQUIRED_FLAGS}")
+      check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
+      set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+      if(HAVE_ENABLE_NEW_DTAGS)
+        set(SDL_RLD_FLAGS "-Wl,-rpath,\${libdir} -Wl,--enable-new-dtags")
+      else()
+        set(SDL_RLD_FLAGS "-Wl,-rpath,\${libdir}")
+      endif()
     elseif(SOLARIS)
       set(SDL_RLD_FLAGS "-R\${libdir}")
     endif()
@@ -1193,7 +1228,7 @@ elseif(WINDOWS)
     set(SOURCE_FILES ${SOURCE_FILES} ${JOYSTICK_SOURCES})
     if(HAVE_DINPUT_H)
       set(SDL_JOYSTICK_DINPUT 1)
-      list(APPEND EXTRA_LIBS dinput8 dxguid)
+      list(APPEND EXTRA_LIBS dinput8)
       if(CMAKE_COMPILER_IS_MINGW)
         list(APPEND EXTRA_LIBS dxerr8)
       elseif (NOT USE_WINSDK_DIRECTX)

@@ -95,6 +95,16 @@ SDL_CondBroadcast(SDL_cond * cond)
     return retval;
 }
 
+// ATOMIC BEGIN
+
+// clock_gettime has issues on mac, disable for now
+// note that HAVE_CLOCK_GETTIME being defined links to clock_getime in civetweb.c
+#ifdef __APPLE__
+#undef HAVE_CLOCK_GETTIME
+#endif
+
+// ATOMIC END
+
 int
 SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
 {

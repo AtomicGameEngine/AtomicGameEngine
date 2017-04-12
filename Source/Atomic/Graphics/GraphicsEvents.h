@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,8 @@ ATOMIC_EVENT(E_SCREENMODE, ScreenMode)
     ATOMIC_PARAM(P_BORDERLESS, Borderless);        // bool
     ATOMIC_PARAM(P_RESIZABLE, Resizable);          // bool
     ATOMIC_PARAM(P_HIGHDPI, HighDPI);              // bool
+    ATOMIC_PARAM(P_MONITOR, Monitor);              // int
+    ATOMIC_PARAM(P_REFRESHRATE, RefreshRate);      // int
 }
 
 /// Window position changed.
@@ -90,7 +92,27 @@ ATOMIC_EVENT(E_BEGINVIEWRENDER, BeginViewRender)
     ATOMIC_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
-/// Render of a view ended.
+/// A view has allocated its screen buffers for rendering. They can be accessed now with View::FindNamedTexture().
+ATOMIC_EVENT(E_VIEWBUFFERSREADY, ViewBuffersReady)
+{
+    ATOMIC_PARAM(P_VIEW, View);                    // View pointer
+    ATOMIC_PARAM(P_TEXTURE, Texture);              // Texture pointer
+    ATOMIC_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// A view has set global shader parameters for a new combination of vertex/pixel shaders. Custom global parameters can now be set.
+ATOMIC_EVENT(E_VIEWGLOBALSHADERPARAMETERS, ViewGlobalShaderParameters)
+{
+    ATOMIC_PARAM(P_VIEW, View);                    // View pointer
+    ATOMIC_PARAM(P_TEXTURE, Texture);              // Texture pointer
+    ATOMIC_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// Render of a view ended. Its screen buffers are still accessible if needed.
 ATOMIC_EVENT(E_ENDVIEWRENDER, EndViewRender)
 {
     ATOMIC_PARAM(P_VIEW, View);                    // View pointer
@@ -98,6 +120,11 @@ ATOMIC_EVENT(E_ENDVIEWRENDER, EndViewRender)
     ATOMIC_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
     ATOMIC_PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// Render of all views is finished for the frame.
+ATOMIC_EVENT(E_ENDALLVIEWSRENDER, EndAllViewsRender)
+{
 }
 
 /// A render path event has occurred.

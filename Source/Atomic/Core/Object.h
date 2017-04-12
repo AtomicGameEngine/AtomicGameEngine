@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -337,6 +337,7 @@ public:
         EventHandler(receiver, userData),
         function_(function)
     {
+        assert(receiver_);
         assert(function_);
     }
 
@@ -365,14 +366,7 @@ class EventHandler11Impl : public EventHandler
 public:
     /// Construct with receiver and function pointers and userdata.
     EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = 0) :
-#ifdef ATOMIC_64BIT
-        EventHandler((Object*)0xDEADBEEFDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
-                                          * `function_` already and is not used by `EventHandler11Impl` */, userData),
-#else
-        EventHandler((Object*)0xDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
-                                         * `function_` already and is not used by `EventHandler11Impl` */, userData),
-#endif
-
+        EventHandler(0, userData),
         function_(function)
     {
         assert(function_);

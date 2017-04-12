@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 #include "../Resource/Decompress.h"
 
-// DXT decompression based on the Squish library, modified for Urho3D
+// DXT decompression based on the Squish library, modified for Atomic
 
 namespace Atomic
 {
@@ -269,7 +269,7 @@ void DecompressImageDXT(unsigned char* rgba, const void* blocks, int width, int 
     }
 }
 
-// ETC and PVRTC decompression based on the Oolong Engine, modified for Urho3D
+// ETC and PVRTC decompression based on the Oolong Engine, modified for Atomic
 
 /*
 Oolong Engine for the iPhone / iPod touch

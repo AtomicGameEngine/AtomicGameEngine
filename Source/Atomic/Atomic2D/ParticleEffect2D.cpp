@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,10 +44,8 @@ static const int srcBlendFuncs[] =
     0x0302, // GL_SRC_ALPHA
     1,      // GL_ONE
     0x0305, // GL_ONE_MINUS_DST_ALPHA
-// ATOMIC_BEGIN
     1,      // GL_ONE
     0x0302  // GL_SRC_ALPHA
-// ATOMIC END
 };
 
 static const int destBlendFuncs[] =
@@ -59,11 +57,16 @@ static const int destBlendFuncs[] =
     1,      // GL_ONE
     0x0303, // GL_ONE_MINUS_SRC_ALPHA
     0x0304, // GL_DST_ALPHA
-// ATOMIC_BEGIN
     1,      // GL_ONE
     1       // GL_ONE
-// ATOMIC END   
 };
+
+#if ATOMIC_CXX11
+// Make sure that there are are as many blend functions as we have blend modes.
+static_assert(sizeof(srcBlendFuncs) / sizeof(srcBlendFuncs[0]) == MAX_BLENDMODES, "");
+static_assert(sizeof(destBlendFuncs) / sizeof(destBlendFuncs[0]) == MAX_BLENDMODES, "");
+#endif
+
 
 ParticleEffect2D::ParticleEffect2D(Context* context) :
     Resource(context),
