@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Profiler.h"
+#include "../IO/File.h"
 #include "../IO/Log.h"
 #include "../Resource/Resource.h"
 
@@ -80,6 +81,18 @@ bool Resource::Save(Serializer& dest) const
 {
     ATOMIC_LOGERROR("Save not supported for " + GetTypeName());
     return false;
+}
+
+bool Resource::LoadFile(const String& fileName)
+{
+    File file(context_);
+    return file.Open(fileName, FILE_READ) && Load(file);
+}
+
+bool Resource::SaveFile(const String& fileName) const
+{
+    File file(context_);
+    return file.Open(fileName, FILE_WRITE) && Save(file);
 }
 
 void Resource::SetName(const String& name)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,11 +57,25 @@ const char* faceCameraModeNames[] =
     0
 };
 
+const char* billboardsStructureElementNames[] =
+{
+    "Billboard Count",
+    "   Position",
+    "   Size",
+    "   UV Coordinates",
+    "   Color",
+    "   Rotation",
+    "   Direction",
+    "   Is Enabled",
+    0
+};
+
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 {
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
 
+// ATOMIC BEGIN
 Billboard::Billboard()
 {
 
@@ -71,6 +85,7 @@ Billboard::~Billboard()
 {
 
 }
+// ATOMIC END
 
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
@@ -126,8 +141,9 @@ void BillboardSet::RegisterObject(Context* context)
     ATOMIC_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     ATOMIC_COPY_BASE_ATTRIBUTES(Drawable);
-    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
-        AM_FILE);
+    ATOMIC_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr,
+                                                            VariantVector, Variant::emptyVariantVector,
+                                                            billboardsStructureElementNames, AM_FILE);
     ATOMIC_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
@@ -151,6 +167,7 @@ void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
 
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
+        // ATOMIC billboards_[i] . to ->
         if (!billboards_[i]->enabled_)
             continue;
 
@@ -197,11 +214,11 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
             bufferDirty_ = true;
 
         hasOrthoCamera_ = frame.camera_->IsOrthographic();
-
-        // Calculate fixed screen size scale factor for billboards if needed
-        if (fixedScreenSize_)
-            CalculateFixedScreenSize(frame);
     }
+
+    // Calculate fixed screen size scale factor for billboards. Will not dirty the buffer unless actually changed
+    if (fixedScreenSize_)
+        CalculateFixedScreenSize(frame);
 
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
@@ -261,10 +278,10 @@ void BillboardSet::SetMaterial(Material* material)
 void BillboardSet::SetNumBillboards(unsigned num)
 {
     // Prevent negative value being assigned from the editor
-    if (num > M_MAX_INT)
-        num = 0;
+    // ATOMIC BEGIN
     if (num > MAX_BILLBOARDS)
         num = MAX_BILLBOARDS;
+    // ATOMIC END
 
     unsigned oldNum = billboards_.Size();
     if (num == oldNum)
@@ -275,16 +292,17 @@ void BillboardSet::SetNumBillboards(unsigned num)
     // Set default values to new billboards
     for (unsigned i = oldNum; i < num; ++i)
     {
-        Billboard *bb = new Billboard();
-        billboards_[i] = bb;
-        bb->position_ = Vector3::ZERO;
-        bb->size_ = Vector2::ONE;
-        bb->uv_ = Rect::POSITIVE;
-        bb->color_ = Color(1.0f, 1.0f, 1.0f);
-        bb->rotation_ = 0.0f;
-        bb->direction_ = Vector3::UP;
-        bb->enabled_ = false;
-        bb->screenScaleFactor_ = 1.0f;
+        // ATOMIC BEGIN
+        billboards_[i] = new Billboard();
+        billboards_[i]->position_ = Vector3::ZERO;
+        billboards_[i]->size_ = Vector2::ONE;
+        billboards_[i]->uv_ = Rect::POSITIVE;
+        billboards_[i]->color_ = Color(1.0f, 1.0f, 1.0f);
+        billboards_[i]->rotation_ = 0.0f;
+        billboards_[i]->direction_ = Vector3::UP;
+        billboards_[i]->enabled_ = false;
+        billboards_[i]->screenScaleFactor_ = 1.0f;
+        // ATOMIC END
     }
 
     bufferSizeDirty_ = true;
@@ -360,7 +378,7 @@ Material* BillboardSet::GetMaterial() const
 
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
-    return index < billboards_.Size() ? billboards_[index] : (Billboard*)0;
+    return index < billboards_.Size() ? billboards_[index].Get() : (Billboard*)0;   // ATOMIC .Get()
 }
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)
@@ -378,9 +396,11 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // Dealing with old billboard format
     if (value.Size() == billboards_.Size() * 6 + 1)
     {
-        for (Vector<SharedPtr<Billboard>>::Iterator ii = billboards_.Begin(); ii != billboards_.End() && index < value.Size(); ++ii)
+        // ATOMIC BEGIN
+        for (Vector<SharedPtr<Billboard>>::Iterator it = billboards_.Begin(); it != billboards_.End() && index < value.Size(); ++it)
         {
-            Billboard* i = *ii;
+            SharedPtr<Billboard> i = *it;
+        // ATOMIC END
             i->position_ = value[index++].GetVector3();
             i->size_ = value[index++].GetVector2();
             Vector4 uv = value[index++].GetVector4();
@@ -393,9 +413,11 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     // New billboard format
     else
     {
-        for (Vector<SharedPtr<Billboard>>::Iterator ii = billboards_.Begin(); ii != billboards_.End() && index < value.Size(); ++ii)
+        // ATOMIC BEGIN
+        for (Vector<SharedPtr<Billboard>>::Iterator it = billboards_.Begin(); it != billboards_.End() && index < value.Size(); ++it)
         {
-            Billboard* i = *ii;
+            SharedPtr<Billboard> i = *it;
+        // ATOMIC END
             i->position_ = value[index++].GetVector3();
             i->size_ = value[index++].GetVector2();
             Vector4 uv = value[index++].GetVector4();
@@ -416,9 +438,11 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
     unsigned numBillboards = buf.ReadVLE();
     SetNumBillboards(numBillboards);
 
-    for (Vector<SharedPtr<Billboard>>::Iterator ii = billboards_.Begin(); ii != billboards_.End(); ++ii)
+    // ATOMIC BEGIN
+    for (Vector<SharedPtr<Billboard>>::Iterator it = billboards_.Begin(); it != billboards_.End(); ++it)
     {
-        Billboard* i = *ii;
+        SharedPtr<Billboard> i = *it;
+    // ATOMIC END
         i->position_ = buf.ReadVector3();
         i->size_ = buf.ReadVector2();
         i->uv_ = buf.ReadRect();
@@ -442,9 +466,11 @@ VariantVector BillboardSet::GetBillboardsAttr() const
     ret.Reserve(billboards_.Size() * 7 + 1);
     ret.Push(billboards_.Size());
 
-    for (Vector<SharedPtr<Billboard>>::ConstIterator ii = billboards_.Begin(); ii != billboards_.End(); ++ii)
+    // ATOMIC BEGIN
+    for (Vector<SharedPtr<Billboard>>::ConstIterator it = billboards_.Begin(); it != billboards_.End(); ++it)
     {
-        const Billboard* i = *ii;
+        SharedPtr<Billboard> i = *it;
+    // ATOMIC END
         ret.Push(i->position_);
         ret.Push(i->size_);
         ret.Push(Vector4(i->uv_.min_.x_, i->uv_.min_.y_, i->uv_.max_.x_, i->uv_.max_.y_));
@@ -462,9 +488,11 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
     attrBuffer_.Clear();
     attrBuffer_.WriteVLE(billboards_.Size());
 
-    for (Vector<SharedPtr<Billboard>>::ConstIterator ii = billboards_.Begin(); ii != billboards_.End(); ++ii)
+    // ATOMIC BEGIN
+    for (Vector<SharedPtr<Billboard>>::ConstIterator it = billboards_.Begin(); it != billboards_.End(); ++it)
     {
-        const Billboard* i = *ii;
+        SharedPtr<Billboard> i = *it;
+    // ATOMIC END
         attrBuffer_.WriteVector3(i->position_);
         attrBuffer_.WriteVector2(i->size_);
         attrBuffer_.WriteRect(i->uv_);
@@ -487,6 +515,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
 
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
+        // ATOMIC billboards_[i] . to ->
         if (!billboards_[i]->enabled_)
             continue;
 
@@ -526,8 +555,11 @@ void BillboardSet::UpdateBufferSize()
         }
         geometryTypeUpdate_ = false;
     }
+    
+    bool largeIndices = (numBillboards * 4) >= 65536;
+
     if (indexBuffer_->GetIndexCount() != numBillboards * 6)
-        indexBuffer_->SetSize(numBillboards * 6, false);
+        indexBuffer_->SetSize(numBillboards * 6, largeIndices);
 
     bufferSizeDirty_ = false;
     bufferDirty_ = true;
@@ -537,22 +569,43 @@ void BillboardSet::UpdateBufferSize()
         return;
 
     // Indices do not change for a given billboard capacity
-    unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, numBillboards * 6, true);
-    if (!dest)
+    void* destPtr = indexBuffer_->Lock(0, numBillboards * 6, true);
+    if (!destPtr)
         return;
 
-    unsigned vertexIndex = 0;
-    while (numBillboards--)
+    if (!largeIndices)
     {
-        dest[0] = (unsigned short)vertexIndex;
-        dest[1] = (unsigned short)(vertexIndex + 1);
-        dest[2] = (unsigned short)(vertexIndex + 2);
-        dest[3] = (unsigned short)(vertexIndex + 2);
-        dest[4] = (unsigned short)(vertexIndex + 3);
-        dest[5] = (unsigned short)vertexIndex;
+        unsigned short* dest = (unsigned short*)destPtr;
+        unsigned short vertexIndex = 0;
+        while (numBillboards--)
+        {
+            dest[0] = vertexIndex;
+            dest[1] = vertexIndex + 1;
+            dest[2] = vertexIndex + 2;
+            dest[3] = vertexIndex + 2;
+            dest[4] = vertexIndex + 3;
+            dest[5] = vertexIndex;
+            
+            dest += 6;
+            vertexIndex += 4;
+        }
+    }
+    else
+    {
+        unsigned* dest = (unsigned*)destPtr;
+        unsigned vertexIndex = 0;
+        while (numBillboards--)
+        {
+            dest[0] = vertexIndex;
+            dest[1] = vertexIndex + 1;
+            dest[2] = vertexIndex + 2;
+            dest[3] = vertexIndex + 2;
+            dest[4] = vertexIndex + 3;
+            dest[5] = vertexIndex;
 
-        dest += 6;
-        vertexIndex += 4;
+            dest += 6;
+            vertexIndex += 4;
+        }
     }
 
     indexBuffer_->Unlock();
@@ -581,6 +634,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
 
+    // ATOMIC billboards_[i] . to ->
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)
     {
@@ -759,7 +813,9 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
 {
     float invViewHeight = 1.0f / frame.viewSize_.y_;
     float halfViewWorldSize = frame.camera_->GetHalfViewSize();
+    bool scaleFactorChanged = false;
 
+    // ATOMIC billboards_[i] . to ->
     if (!frame.camera_->IsOrthographic())
     {
         Matrix4 viewProj(frame.camera_->GetProjection() * frame.camera_->GetView());
@@ -769,18 +825,33 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
         for (unsigned i = 0; i < billboards_.Size(); ++i)
         {
             Vector4 projPos(viewProj * Vector4(billboardTransform * billboards_[i]->position_, 1.0f));
-            billboards_[i]->screenScaleFactor_ = invViewHeight * halfViewWorldSize * projPos.w_;
+            float newScaleFactor = invViewHeight * halfViewWorldSize * projPos.w_;
+            if (newScaleFactor != billboards_[i]->screenScaleFactor_)
+            {
+                billboards_[i]->screenScaleFactor_ = newScaleFactor;
+                scaleFactorChanged = true;
+            }
         }
     }
     else
     {
         for (unsigned i = 0; i < billboards_.Size(); ++i)
-            billboards_[i]->screenScaleFactor_ = invViewHeight * halfViewWorldSize;
+        {
+            float newScaleFactor = invViewHeight * halfViewWorldSize;
+            if (newScaleFactor != billboards_[i]->screenScaleFactor_)
+            {
+                billboards_[i]->screenScaleFactor_ = newScaleFactor;
+                scaleFactorChanged = true;
+            }
+        }
     }
 
-    bufferDirty_ = true;
-    forceUpdate_ = true;
-    worldBoundingBoxDirty_ = true;
+    if (scaleFactorChanged)
+    {
+        bufferDirty_ = true;
+        forceUpdate_ = true;
+        worldBoundingBoxDirty_ = true;
+    }
 }
 
 }

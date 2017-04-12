@@ -22,21 +22,12 @@
 
 #pragma once
 
+#include <rapidjson/document.h>
 #include <Atomic/Container/List.h>
 #include <Atomic/Core/Object.h>
 
 using namespace Atomic;
 
-namespace rapidjson
-{
-template<typename CharType> struct UTF8;
-class CrtAllocator;
-template <typename BaseAllocator> class MemoryPoolAllocator;
-template <typename Encoding, typename Allocator> class GenericValue;
-typedef GenericValue<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Value;
-template <typename Encoding, typename Allocator, typename StackAllocator> class GenericDocument;
-typedef GenericDocument<UTF8<char>, MemoryPoolAllocator<CrtAllocator>, CrtAllocator> Document;
-}
 
 
 namespace ToolCore

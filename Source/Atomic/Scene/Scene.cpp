@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -481,7 +481,7 @@ bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        JSONValue& rootVal = json->GetRoot();
+        JSONValue rootVal = json->GetRoot();
 
         // Preload resources if appropriate
         if (mode != LOAD_SCENE)
@@ -541,8 +541,8 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
     if (node->Load(source, resolver, true, true, mode))
     {
         resolver.Resolve();
-        node->ApplyAttributes();
         node->SetTransform(position, rotation);
+        node->ApplyAttributes();
         return node;
     }
     else
@@ -564,8 +564,8 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     if (node->LoadXML(source, resolver, true, true, mode))
     {
         resolver.Resolve();
-        node->ApplyAttributes();
         node->SetTransform(position, rotation);
+        node->ApplyAttributes();
         return node;
     }
     else
@@ -587,8 +587,8 @@ Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, c
     if (node->LoadJSON(source, resolver, true, true, mode))
     {
         resolver.Resolve();
-        node->ApplyAttributes();
         node->SetTransform(position, rotation);
+        node->ApplyAttributes();
         return node;
     }
     else
@@ -1371,7 +1371,6 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
 
 void Scene::PreloadResourcesXML(const XMLElement& element)
 {
-
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef ATOMIC_THREADING
     ResourceCache* cache = GetSubsystem<ResourceCache>();

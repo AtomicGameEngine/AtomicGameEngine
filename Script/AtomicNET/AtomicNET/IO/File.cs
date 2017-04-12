@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace AtomicEngine
 {
-    public partial class File : AObject, Deserializer, Serializer
+    public partial class File : AObject, AbstractFile
     {
         private class Stream : System.IO.Stream
         {

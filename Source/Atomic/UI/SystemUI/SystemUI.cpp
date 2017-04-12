@@ -1639,12 +1639,9 @@ void SystemUI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextInput;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
-
     UIElement* element = focusElement_;
     if (element)
-        element->OnTextInput(eventData[P_TEXT].GetString(), mouseButtons_, qualifiers_);
+        element->OnTextInput(eventData[P_TEXT].GetString(), 0, 0);
 }
 
 void SystemUI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

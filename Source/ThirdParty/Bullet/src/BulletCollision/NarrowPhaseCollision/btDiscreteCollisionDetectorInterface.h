@@ -17,10 +17,8 @@ subject to the following restrictions:
 #ifndef BT_DISCRETE_COLLISION_DETECTOR1_INTERFACE_H
 #define BT_DISCRETE_COLLISION_DETECTOR1_INTERFACE_H
 
-// ATOMIC BEGIN
-#include "../../LinearMath/btTransform.h"
-#include "../../LinearMath/btVector3.h"
-// ATOMIC END
+#include "LinearMath/btTransform.h"
+#include "LinearMath/btVector3.h"
 
 /// This interface is made to be used by an iterative approach to do TimeOfImpact calculations
 /// This interface allows to query for closest points and penetration depth between two (convex) objects
