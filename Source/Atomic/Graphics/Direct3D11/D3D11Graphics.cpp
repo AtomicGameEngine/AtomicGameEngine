@@ -488,7 +488,7 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image* destImage)
+bool Graphics::TakeScreenShot(Image* destImage_)
 {
     ATOMIC_PROFILE(TakeScreenShot);
 
