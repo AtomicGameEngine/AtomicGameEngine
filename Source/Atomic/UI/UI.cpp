@@ -998,6 +998,8 @@ SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String
 
 UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
 {
+    if (!initialized_)
+        return 0;
     return WrapWidget(rootWidget_->GetWidgetAt(x, y, include_children));
 }
 

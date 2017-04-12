@@ -83,6 +83,8 @@
 #cmakedefine HAVE_PTHREAD_NP_H 1
 #cmakedefine HAVE_LIBUDEV_H 1
 #cmakedefine HAVE_DBUS_DBUS_H 1
+#cmakedefine HAVE_IBUS_IBUS_H 1
+#cmakedefine HAVE_FCITX_FRONTEND_H 1
 
 /* C library functions */
 #cmakedefine HAVE_MALLOC 1
@@ -360,6 +362,15 @@
 /* Enable assembly routines */
 #cmakedefine SDL_ASSEMBLY_ROUTINES @SDL_ASSEMBLY_ROUTINES@
 #cmakedefine SDL_ALTIVEC_BLITTERS @SDL_ALTIVEC_BLITTERS@
+
+/* Enable ime support */
+#cmakedefine SDL_USE_IME @SDL_USE_IME@
+
+/* Enable dynamic udev support */
+#cmakedefine SDL_UDEV_DYNAMIC @SDL_UDEV_DYNAMIC@
+
+/* Enable dynamic libsamplerate support */
+#cmakedefine SDL_LIBSAMPLERATE_DYNAMIC @SDL_LIBSAMPLERATE_DYNAMIC@
 
 // Urho3D - needed on iOS platform
 #cmakedefine SDL_IPHONE_KEYBOARD @SDL_IPHONE_KEYBOARD@

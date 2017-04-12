@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -94,15 +94,13 @@ public:
     void SetMorphWeight(const String& name, float weight);
     /// Set vertex morph weight by name hash.
     void SetMorphWeight(StringHash nameHash, float weight);
-    /// Set bone creation override. Useful for previewing animations in the editor scene view.
-    void SetBoneCreationOverride(bool enabled) { boneCreationOverride_ = enabled; }
     /// Reset all vertex morphs to zero.
     void ResetMorphWeights();
+    /// Apply all animation states to nodes.
+    void ApplyAnimation();
 
     /// Return skeleton.
     Skeleton& GetSkeleton() { return skeleton_; }
-    /// Return the node of a skeleton bone (for script access)
-    Node* GetSkeletonBoneNode(const String& boneName);
 
     /// Return all animation states.
     const Vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
@@ -169,6 +167,16 @@ public:
 
     /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
     void UpdateBoneBoundingBox();
+
+    // ATOMIC BEGIN
+
+    /// Return the node of a skeleton bone (for script access)
+    Node* GetSkeletonBoneNode(const String& boneName);
+
+    /// Set bone creation override. Useful for previewing animations in the editor scene view.
+    void SetBoneCreationOverride(bool enabled) { boneCreationOverride_ = enabled; }
+
+    // ATOMIC END
 
 protected:
     /// Handle node being assigned.

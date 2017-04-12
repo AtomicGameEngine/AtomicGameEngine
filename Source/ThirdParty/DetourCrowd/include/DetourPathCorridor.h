@@ -18,9 +18,8 @@
 
 #ifndef DETOUTPATHCORRIDOR_H
 #define DETOUTPATHCORRIDOR_H
-// ATOMIC BEGIN
-#include "../../Detour/include/DetourNavMeshQuery.h"
-// ATOMIC END
+
+#include "DetourNavMeshQuery.h"
 
 /// Represents a dynamic polygon corridor used to plan agent movement.
 /// @ingroup crowd, detour

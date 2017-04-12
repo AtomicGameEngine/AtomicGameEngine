@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,18 @@ namespace Atomic
 {
 
 extern const char* GEOMETRY_CATEGORY;
+
+const char* animationStatesStructureElementNames[] =
+{
+    "Anim State Count",
+    "   Animation",
+    "   Start Bone",
+    "   Is Looped",
+    "   Weight",
+    "   Time",
+    "   Layer",
+    0
+};
 
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
@@ -108,8 +120,9 @@ void AnimatedModel::RegisterObject(Context* context)
     ATOMIC_COPY_BASE_ATTRIBUTES(Drawable);
     ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector,
-        Variant::emptyVariantVector, AM_FILE);
+    ATOMIC_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
+                                                            VariantVector, Variant::emptyVariantVector,
+                                                            animationStatesStructureElementNames, AM_FILE);
     ATOMIC_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
@@ -437,6 +450,10 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         SetSkeleton(model->GetSkeleton(), createBones);
         ResetLodLevels();
 
+        // Reserve space for skinning matrices
+        skinMatrices_.Resize(skeleton_.GetNumBones());
+        SetGeometryBoneMappings();
+
         // Enable skinning in batches
         for (unsigned i = 0; i < batches_.Size(); ++i)
         {
@@ -668,12 +685,6 @@ void AnimatedModel::ResetMorphWeights()
     MarkNetworkUpdate();
 }
 
-Node* AnimatedModel::GetSkeletonBoneNode(const String & boneName)
-{
-    Bone* bone = skeleton_.GetBone(boneName);
-    return (bone) ? bone->node_ : NULL;
-}
-
 float AnimatedModel::GetMorphWeight(unsigned index) const
 {
     return index < morphs_.Size() ? morphs_[index].weight_ : 0.0f;
@@ -864,10 +875,6 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             }
         }
     }
-
-    // Reserve space for skinning matrices
-    skinMatrices_.Resize(skeleton_.GetNumBones());
-    SetGeometryBoneMappings();
 
     assignBonesPending_ = !createBones;
 }
@@ -1354,6 +1361,11 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
             animationLodTimer_ = 0.0f;
     }
 
+    ApplyAnimation();
+}
+
+void AnimatedModel::ApplyAnimation()
+{
     // Make sure animations are in ascending priority order
     if (animationOrderDirty_)
     {
@@ -1521,5 +1533,15 @@ void AnimatedModel::HandleModelReloadFinished(StringHash eventType, VariantMap& 
     model_.Reset(); // Set null to allow to be re-set
     SetModel(currentModel);
 }
+
+// ATOMIC BEGIN
+
+Node* AnimatedModel::GetSkeletonBoneNode(const String & boneName)
+{
+    Bone* bone = skeleton_.GetBone(boneName);
+    return (bone) ? bone->node_ : NULL;
+}
+
+// ATOMIC END
 
 }

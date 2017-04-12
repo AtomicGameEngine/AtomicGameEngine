@@ -22,7 +22,7 @@
 # Modified by Yao Wei Tjong for Urho3D, the modified portion is licensed under below license
 
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,9 @@ macro(CheckDLOPEN)
       set (HAVE_DLOPEN TRUE)
     else ()
       # Urho3D - bug fix - use different variables for different checks because of CMake caches the result variable
-      check_function_exists(dlopen DLOPEN_FOUND)
+      # ATOMIC BEGIN
+      # check_function_exists(dlopen DLOPEN_FOUND)
+      # ATOMIC END
       if(NOT DLOPEN_FOUND)
         foreach(_LIBNAME dl tdl)
           check_library_exists("${_LIBNAME}" "dlopen" "" DLOPEN_LIB_${_LIBNAME}_FOUND)
@@ -76,6 +78,13 @@ macro(CheckDLOPEN)
           endif()
         endforeach()
       endif()
+      # ATOMIC BEGIN
+      # call check_function_exists() only after trying to locate dlopen in the libs. This provides lib
+      # in _DLLIB which is required for linking when calling check_c_source_compiles().
+      if(NOT DLOPEN_FOUND)
+        check_function_exists(dlopen DLOPEN_FOUND)
+      endif()
+      # ATOMIC END
       if(DLOPEN_FOUND)
         if(_DLLIB)
           set(CMAKE_REQUIRED_LIBRARIES ${_DLLIB})
@@ -84,7 +93,7 @@ macro(CheckDLOPEN)
            #include <dlfcn.h>
            int main(int argc, char **argv) {
              void *handle = dlopen(\"\", RTLD_NOW);
-             // ATOMIC FIX: const char *loaderror = (char *) dlerror();
+             const char *loaderror = (char *) dlerror();
            }" HAVE_DLOPEN)
         set(CMAKE_REQUIRED_LIBRARIES)
       endif()
@@ -108,7 +117,7 @@ macro(CheckOSS)
     find_package (OSS QUIET)    # silence warnings
     # ATOMIC END
     if(OSS_FOUND)
-      include_directories (${OSS_INCLUDE_DIRS})
+      include_directories (SYSTEM ${OSS_INCLUDE_DIRS})
       if (OSS_LIBRARIES)
         get_filename_component(NAME_WE ${OSS_LIBRARIES} NAME_WE)
         string (REGEX REPLACE ^lib "" NAME_WE "${NAME_WE}")    # Stringify for string replacement
@@ -144,7 +153,7 @@ macro(CheckALSA)
       get_filename_component (ALSA_INCLUDE_DIRS ${ALSA_INCLUDE_DIRS} PATH)
     endif ()
     if(ALSA_FOUND)
-      include_directories (${ALSA_INCLUDE_DIRS})
+      include_directories (SYSTEM ${ALSA_INCLUDE_DIRS})
       set(HAVE_ALSA TRUE)
       file(GLOB ALSA_SOURCES ${SDL2_SOURCE_DIR}/src/audio/alsa/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${ALSA_SOURCES})
@@ -177,7 +186,7 @@ macro(CheckPulseAudio)
     find_package (PulseAudio QUIET)    # silence warnings
     # ATOMIC END
     if(PULSEAUDIO_FOUND)
-      include_directories (${PULSEAUDIO_INCLUDE_DIRS})
+      include_directories (SYSTEM ${PULSEAUDIO_INCLUDE_DIRS})
       set(HAVE_PULSEAUDIO TRUE)
       file(GLOB PULSEAUDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/pulseaudio/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${PULSEAUDIO_SOURCES})
@@ -211,7 +220,7 @@ macro(CheckESD)
     find_package (Esound QUIET)    # silence warnings
     # ATOMIC END
     if(ESOUND_FOUND)
-      include_directories (${ESOUND_INCLUDE_DIRS})
+      include_directories (SYSTEM ${ESOUND_INCLUDE_DIRS})
       set(HAVE_ESD TRUE)
       file(GLOB ESD_SOURCES ${SDL2_SOURCE_DIR}/src/audio/esd/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${ESD_SOURCES})
@@ -244,7 +253,7 @@ macro(CheckARTS)
     find_package (aRts QUIET)    # silence warnings
     # ATOMIC END
     if(ARTS_FOUND)
-      include_directories (${ARTS_INCLUDE_DIRS})
+      include_directories (SYSTEM ${ARTS_INCLUDE_DIRS})
       file(GLOB ARTS_SOURCES ${SDL2_SOURCE_DIR}/src/audio/arts/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${ARTS_SOURCES})
       set(SDL_AUDIO_DRIVER_ARTS 1)
@@ -277,7 +286,7 @@ macro(CheckNAS)
     find_package (NetworkAudioSystem QUIET)    # silence warnings
     # ATOMIC END
     if(NAS_FOUND)
-      include_directories (${NAS_INCLUDE_DIRS})
+      include_directories (SYSTEM ${NAS_INCLUDE_DIRS})
       set(HAVE_NAS TRUE)
       file(GLOB NAS_SOURCES ${SDL2_SOURCE_DIR}/src/audio/nas/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${NAS_SOURCES})
@@ -310,7 +319,7 @@ macro(CheckSNDIO)
     find_package (RoarAudio QUIET)    # silence warnings
     # ATOMIC END
     if(SNDIO_FOUND)
-      include_directories (${SNDIO_INCLUDE_DIRS})
+      include_directories (SYSTEM ${SNDIO_INCLUDE_DIRS})
       set(HAVE_SNDIO TRUE)
       file(GLOB SNDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/sndio/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${SNDIO_SOURCES})
@@ -343,7 +352,7 @@ macro(CheckFusionSound)
     find_package (FusionSound 1.0.0 QUIET)    # silence warnings
     # ATOMIC END
     if(FUSIONSOUND_FOUND)
-      include_directories (${FUSIONSOUND_INCLUDE_DIRS})
+      include_directories (SYSTEM ${FUSIONSOUND_INCLUDE_DIRS})
       set(HAVE_FUSIONSOUND TRUE)
       file(GLOB FUSIONSOUND_SOURCES ${SDL2_SOURCE_DIR}/src/audio/fusionsound/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${FUSIONSOUND_SOURCES})
@@ -572,7 +581,7 @@ macro(CheckMir)
         find_package (Mir QUIET)    # silence warnings
         # ATOMIC END
         if (MIR_FOUND)
-            include_directories (${MIR_INCLUDE_DIRS})
+            include_directories (SYSTEM ${MIR_INCLUDE_DIRS})
             set(HAVE_VIDEO_MIR TRUE)
             set(HAVE_SDL_VIDEO TRUE)
 
@@ -598,6 +607,27 @@ macro(CheckMir)
     endif()
 endmacro()
 
+macro(WaylandProtocolGen _SCANNER _XML _PROTL)
+    set(_WAYLAND_PROT_C_CODE "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+    set(_WAYLAND_PROT_H_CODE "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-client-protocol.h")
+
+    add_custom_command(
+        OUTPUT "${_WAYLAND_PROT_H_CODE}"
+        DEPENDS "${_XML}"
+        COMMAND "${_SCANNER}"
+        ARGS client-header "${_XML}" "${_WAYLAND_PROT_H_CODE}"
+    )
+
+    add_custom_command(
+        OUTPUT "${_WAYLAND_PROT_C_CODE}"
+        DEPENDS "${_WAYLAND_PROT_H_CODE}"
+        COMMAND "${_SCANNER}"
+        ARGS code "${_XML}" "${_WAYLAND_PROT_C_CODE}"
+    )
+
+    set(SOURCE_FILES ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+endmacro()
+
 # Requires:
 # - EGL
 # Optional:
@@ -610,12 +640,23 @@ macro(CheckWayland)
     find_package (Wayland QUIET)    # silence warnings
     # ATOMIC END
     if(WAYLAND_FOUND)
-      include_directories (${WAYLAND_INCLUDE_DIRS})
+      include_directories (SYSTEM ${WAYLAND_INCLUDE_DIRS})
       set(HAVE_VIDEO_WAYLAND TRUE)
       set(HAVE_SDL_VIDEO TRUE)
 
       file(GLOB WAYLAND_SOURCES ${SDL2_SOURCE_DIR}/src/video/wayland/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${WAYLAND_SOURCES})
+
+      # We have to generate some protocol interface code for some unstable Wayland features.
+      file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols")
+      include_directories("${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols")
+
+      WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_CORE_PROTOCOL_DIR}/wayland.xml" "wayland")
+
+      foreach(_PROTL relative-pointer-unstable-v1 pointer-constraints-unstable-v1)
+        string(REGEX REPLACE "\\-unstable\\-.*$" "" PROTSUBDIR ${_PROTL})
+        WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_PROTOCOLS_DIR}/unstable/${PROTSUBDIR}/${_PROTL}.xml" "${_PROTL}")
+      endforeach()
 
       if(VIDEO_WAYLAND_QT_TOUCH)
           set(SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH 1)
@@ -659,7 +700,7 @@ macro(CheckDirectFB)
     find_package (DirectFB 1.0.0 QUIET)    # silence warnings
     # ATOMIC END
     if(DIRECTFB_FOUND)
-      include_directories (${DIRECTFB_INCLUDE_DIRS})
+      include_directories (SYSTEM ${DIRECTFB_INCLUDE_DIRS})
       set(HAVE_VIDEO_DIRECTFB TRUE)
       file(GLOB DIRECTFB_SOURCES ${SDL2_SOURCE_DIR}/src/video/directfb/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${DIRECTFB_SOURCES})
@@ -687,7 +728,7 @@ macro(CheckVivante)
   if(VIDEO_VIVANTE)
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     set (CMAKE_REQUIRED_INCLUDES_VIVANTE_SAVED ${CMAKE_REQUIRED_INCLUDES})
-    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES sysroot)
+    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES --sysroot)
       find_path (VIVANTE_INCLUDE_DIRS NAMES gc_vdk.h EGL/eglvivante.h)
       if (VIVANTE_INCLUDE_DIRS)
         # Assume the header search path has not been adjusted elsewhere yet, there is no harm anyway when a same entry is added twice into the list
@@ -726,10 +767,6 @@ endmacro(CheckVivante)
 # Urho3D - rename the macro to be generic OpenGL check and make it also work for OSX platform
 macro(CheckOpenGL)
   if(VIDEO_OPENGL)
-    # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" option or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
-    if (CMAKE_CROSSCOMPILING AND SYSROOT AND NOT CMAKE_REQUIRED_INCLUDES)
-      set (CMAKE_REQUIRED_FLAGS "--sysroot=\"${SYSROOT}\" ${ORIG_CMAKE_REQUIRED_FLAGS}")
-    endif ()
     if (APPLE)
       check_c_source_compiles ("
         #include <OpenGL/OpenGL.h>
@@ -751,9 +788,7 @@ macro(CheckOpenGL)
         set(SDL_VIDEO_OPENGL_GLX 1)
       endif ()
       set(SDL_VIDEO_RENDER_OGL 1)
-      list(APPEND EXTRA_LIBS GL)
     endif()
-    set (CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
   endif()
 endmacro()
 
@@ -762,10 +797,6 @@ endmacro()
 # Urho3D - rename the macro to be generic OpenGLES check and make it also work for iOS platform
 macro(CheckOpenGLES)
   if(VIDEO_OPENGLES)
-    # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" option or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
-    if (CMAKE_CROSSCOMPILING AND SYSROOT AND NOT CMAKE_REQUIRED_INCLUDES)
-      set (CMAKE_REQUIRED_FLAGS "--sysroot=\"${SYSROOT}\" ${ORIG_CMAKE_REQUIRED_FLAGS}")
-    endif ()
     check_c_source_compiles("
         #define EGL_API_FB
         #include <EGL/egl.h>
@@ -791,7 +822,6 @@ macro(CheckOpenGLES)
         set(SDL_VIDEO_OPENGL_ES2 1)
         set(SDL_VIDEO_RENDER_OGL_ES2 1)
     endif()
-    set (CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
   endif()
 endmacro()
 
@@ -799,63 +829,11 @@ endmacro()
 # - nada
 # Optional:
 # - THREADS opt
-# Sets:
-# PTHREAD_CFLAGS
-# PTHREAD_LIBS
 macro(CheckPTHREAD)
   if(PTHREADS)
-    # Urho3D - TODO - below hardcoding is ugly and should be refactored/removed, however, we/I don't have all the necessary means to verify the changes
-    if(LINUX)
-      set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "-pthread")
-    elseif(BSDI)
-      set(PTHREAD_CFLAGS "-D_REENTRANT -D_THREAD_SAFE")
-      set(PTHREAD_LDFLAGS "")
-    elseif(DARWIN)
-      set(PTHREAD_CFLAGS "-D_THREAD_SAFE")
-      # causes Carbon.p complaints?
-      # set(PTHREAD_CFLAGS "-D_REENTRANT -D_THREAD_SAFE")
-      set(PTHREAD_LDFLAGS "")
-    elseif(FREEBSD)
-      set(PTHREAD_CFLAGS "-D_REENTRANT -D_THREAD_SAFE")
-      set(PTHREAD_LDFLAGS "-pthread")
-    elseif(NETBSD)
-      set(PTHREAD_CFLAGS "-D_REENTRANT -D_THREAD_SAFE")
-      set(PTHREAD_LDFLAGS "-lpthread")
-    elseif(OPENBSD)
-      set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "-pthread")
-    elseif(SOLARIS)
-      set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "-pthread -lposix4")
-    elseif(SYSV5)
-      set(PTHREAD_CFLAGS "-D_REENTRANT -Kthread")
-      set(PTHREAD_LDFLAGS "")
-    elseif(AIX)
-      set(PTHREAD_CFLAGS "-D_REENTRANT -mthreads")
-      set(PTHREAD_LDFLAGS "-pthread")
-    elseif(HPUX)
-      set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "-L/usr/lib -pthread")
-    elseif(HAIKU)
-      set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "")
-    elseif(ANDROID)
-      # ATOMIC: Add android so -lpthread isn't appended to linker
-      set(PTHREAD_CFLAGS "")
-      set(PTHREAD_LDFLAGS "")
-    else()
-      set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "-lpthread")
-    endif()
-
-    # Run some tests
-    set(CMAKE_REQUIRED_FLAGS "${PTHREAD_CFLAGS} ${PTHREAD_LDFLAGS} ${ORIG_CMAKE_REQUIRED_FLAGS}")
-    # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" option or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
+    # Urho3D - remove hardcoding of pthread-related compiler and linker flags for each platform
+    set(CMAKE_REQUIRED_FLAGS "-pthread ${ORIG_CMAKE_REQUIRED_FLAGS}")   # Android does not need this flag but it does no harm (i.e. appears to be no-op on Android)
     if(CMAKE_CROSSCOMPILING)
-      if (SYSROOT AND NOT CMAKE_REQUIRED_INCLUDES)
-        set (CMAKE_REQUIRED_FLAGS "--sysroot=\"${SYSROOT}\" ${ORIG_CMAKE_REQUIRED_FLAGS}")
-      endif ()
       check_c_source_compiles("
         #include <pthread.h>
         int main(int argc, char** argv) {
@@ -874,9 +852,8 @@ macro(CheckPTHREAD)
     endif()
     if(HAVE_PTHREADS)
       set(SDL_THREAD_PTHREAD 1)
-      # Urho3D - we configure to use "-pthread" compiler flags globally (when it is supported) and expect the respective compiler toolchain to do the right things automatically
-      set(SDL_CFLAGS "${SDL_CFLAGS} ${PTHREAD_CFLAGS}")
-      list(APPEND SDL_LIBS ${PTHREAD_LDFLAGS})
+      # Urho3D - we configure to use "-pthread" compiler flags globally and expect the respective compiler toolchain to do the right things automatically
+      set(SDL_CFLAGS "${SDL_CFLAGS} -pthread")
 
       check_c_source_compiles("
         #include <pthread.h>
@@ -1086,14 +1063,10 @@ endmacro()
 # - n/a
 macro(CheckRPI)
   if(VIDEO_RPI)
-    # Urho3D - bug fix - when cross-compiling the headers are rooted
-    set(CMAKE_REQUIRED_FLAGS "${VIDEO_RPI_INCLUDE_FLAGS} ${ORIG_CMAKE_REQUIRED_FLAGS}")
     # Urho3D - bug fix - commented out CMAKE_REQUIRED_LIBRARIES as it actually causes the detection to fail
     check_c_source_compiles("
         #include <bcm_host.h>
         int main(int argc, char **argv) {}" HAVE_VIDEO_RPI)
-    set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
-
     if(SDL_VIDEO AND HAVE_VIDEO_RPI)
       set(HAVE_SDL_VIDEO TRUE)
       set(SDL_VIDEO_DRIVER_RPI 1)

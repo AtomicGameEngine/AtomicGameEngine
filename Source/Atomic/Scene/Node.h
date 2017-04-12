@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ namespace Atomic
 
 class Component;
 class Connection;
+class Node;
 class Scene;
 class SceneResolver;
 
@@ -49,6 +50,23 @@ enum TransformSpace
     TS_LOCAL = 0,
     TS_PARENT,
     TS_WORLD
+};
+
+/// Internal implementation structure for less performance-critical Node variables.
+struct ATOMIC_API NodeImpl
+{
+    /// Nodes this node depends on for network updates.
+    PODVector<Node*> dependencyNodes_;
+    /// Network owner connection.
+    Connection* owner_;
+    /// Name.
+    String name_;
+    /// Tag strings.
+    StringVector tags_;
+    /// Name hash.
+    StringHash nameHash_;
+    /// Attribute buffer for network updates.
+    mutable VectorBuffer attrBuffer_;
 };
 
 /// %Scene node that may contain components and child nodes.
@@ -143,6 +161,8 @@ public:
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// Set both position, rotation and scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /// Set node transformation in parent space as an atomic operation.
+    void SetTransform(const Matrix3x4& matrix);
 
     /// Set both position and rotation in parent space as an atomic operation (for Atomic2D).
     void SetTransform2D(const Vector2& position, float rotation) { SetTransform(Vector3(position), Quaternion(rotation)); }
@@ -262,7 +282,9 @@ public:
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
     /// Create a child scene node (with specified ID if provided).
-    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
+    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false);
+    /// Create a temporary child scene node (with specified ID if provided).
+    Node* CreateTemporaryChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Add a child scene node at a specific index. If index is not explicitly specified or is greater than current children size, append the new child at the end.
     void AddChild(Node* node, unsigned index = M_MAX_UNSIGNED);
     /// Remove a child scene node.
@@ -316,13 +338,13 @@ public:
     unsigned GetID() const { return id_; }
 
     /// Return name.
-    const String& GetName() const { return name_; }
+    const String& GetName() const { return impl_->name_; }
 
     /// Return name hash.
-    StringHash GetNameHash() const { return nameHash_; }
+    StringHash GetNameHash() const { return impl_->nameHash_; }
 
     /// Return all tags.
-    const StringVector& GetTags() const { return tags_; }
+    const StringVector& GetTags() const { return impl_->tags_; }
 
     /// Return whether has a specific tag.
     bool HasTag(const String& tag) const;
@@ -333,14 +355,17 @@ public:
     /// Return scene.
     Scene* GetScene() const { return scene_; }
 
+    /// Return whether is a direct or indirect child of specified node.
+    bool IsChildOf(Node* node) const;
+
     /// Return whether is enabled. Disables nodes effectively disable all their components.
     bool IsEnabled() const { return enabled_; }
 
-    /// Returns the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
+    /// Return the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
     bool IsEnabledSelf() const { return enabledPrev_; }
 
     /// Return owner connection in networking.
-    Connection* GetOwner() const { return owner_; }
+    Connection* GetOwner() const { return impl_->owner_; }
 
     /// Return position in parent space.
     const Vector3& GetPosition() const { return position_; }
@@ -479,10 +504,16 @@ public:
 
     /// Return child scene nodes, optionally recursive.
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
+    /// Return child scene nodes, optionally recursive.
+    PODVector<Node*> GetChildren(bool recursive) const;
     /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
+    /// Return child scene nodes with a specific component.
+    PODVector<Node*> GetChildrenWithComponent(StringHash type, bool recursive = false) const;
     /// Return child scene nodes with a specific tag.
     void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    /// Return child scene nodes with a specific tag.
+    PODVector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
@@ -564,7 +595,7 @@ public:
     bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
     /// Return the depended on nodes to order network updates.
-    const PODVector<Node*>& GetDependencyNodes() const { return dependencyNodes_; }
+    const PODVector<Node*>& GetDependencyNodes() const { return impl_->dependencyNodes_; }
 
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
@@ -573,7 +604,7 @@ public:
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
-    Node* CreateChild(unsigned id, CreateMode mode);
+    Node* CreateChild(unsigned id, CreateMode mode, bool temporary = false);
     /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
     /// Calculate number of non-temporary child nodes.
@@ -644,11 +675,6 @@ protected:
     /// Find target of an attribute animation from object hierarchy by name.
     virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
 
-    /// Network update queued flag.
-    bool networkUpdate_;
-    /// User variables.
-    VariantMap vars_;
-
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
     void SetEnabled(bool enable, bool recursive, bool storeSelf);
@@ -685,6 +711,12 @@ private:
     bool enabled_;
     /// Last SetEnabled flag before any SetDeepEnabled.
     bool enabledPrev_;
+
+protected:
+    /// Network update queued flag.
+    bool networkUpdate_;
+
+private:
     /// Parent scene node.
     Node* parent_;
     /// Scene (root node.)
@@ -705,18 +737,8 @@ private:
     Vector<SharedPtr<Node> > children_;
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
-    /// Nodes this node depends on for network updates.
-    PODVector<Node*> dependencyNodes_;
-    /// Network owner connection.
-    Connection* owner_;
-    /// Name.
-    String name_;
-    /// Tag strings.
-    StringVector tags_;
-    /// Name hash.
-    StringHash nameHash_;
-    /// Attribute buffer for network updates.
-    mutable VectorBuffer attrBuffer_;
+    /// Pointer to implementation.
+    UniquePtr<NodeImpl> impl_;
 
     // ATOMIC BEGIN
 
@@ -726,6 +748,10 @@ private:
     Component* CreateComponentInternal(StringHash type, CreateMode mode, unsigned id, const XMLElement& source = XMLElement::EMPTY);
 
     // ATOMIC END
+
+protected:
+    /// User variables.
+    VariantMap vars_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id)

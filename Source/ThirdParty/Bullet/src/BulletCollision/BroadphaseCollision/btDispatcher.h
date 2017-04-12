@@ -15,11 +15,7 @@ subject to the following restrictions:
 
 #ifndef BT_DISPATCHER_H
 #define BT_DISPATCHER_H
-
-// ATOMIC_BEGIN
-#include "../../LinearMath/btScalar.h"
-// ATOMIC_END
-
+#include "LinearMath/btScalar.h"
 
 class btCollisionAlgorithm;
 struct btBroadphaseProxy;

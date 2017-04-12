@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,10 @@
 // ATOMIC END
 
 #define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <STB/stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <STB/stb_image_write.h>
+
 #include "../DebugNew.h"
 
 #ifndef MAKEFOURCC
@@ -804,6 +805,19 @@ bool Image::Save(Serializer& dest) const
     return success;
 }
 
+bool Image::SaveFile(const String& fileName) const
+{
+    if (fileName.EndsWith(".dds", false))
+        return SaveDDS(fileName);
+    else if (fileName.EndsWith(".bmp", false))
+        return SaveBMP(fileName);
+    else if (fileName.EndsWith(".jpg", false) || fileName.EndsWith(".jpeg", false))
+        return SaveJPG(fileName, 100);
+    else if (fileName.EndsWith(".tga", false))
+        return SaveTGA(fileName);
+    else
+        return SavePNG(fileName);
+}
 
 bool Image::SetSize(int width, int height, unsigned components)
 {
@@ -1240,7 +1254,127 @@ bool Image::SaveJPG(const String& fileName, int quality) const
     else
         return false;
 }
+// ATOMIC BEGIN
+bool Image::SaveDDS(const String& fileName) const
+{
+#if !defined(ATOMIC_PLATFORM_DESKTOP)
 
+    ATOMIC_LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
+    return false;
+
+#else
+    ATOMIC_PROFILE(SaveImageDDS);
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        ATOMIC_LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        ATOMIC_LOGERROR("Can not save compressed image to DDS");
+        return false;
+    }
+
+    if (data_)
+    {
+        // #623 BEGIN TODO: Should have an abstract ImageReader and ImageWriter classes
+        // with subclasses for particular image output types. Also should have image settings in the image meta.
+        // ImageReader/Writers should also support a progress callback so UI can be updated.
+
+        if (!width_ || !height_)
+        {
+            ATOMIC_LOGERRORF("Attempting to save zero width/height DDS to %s", fileName.CString());
+            return false;
+        }
+
+        squish::u8 *inputData = (squish::u8 *) data_.Get();
+
+        SharedPtr<Image> tempImage;
+
+        // libsquish expects 4 channel RGBA, so create a temporary image if necessary
+        if (components_ != 4)
+        {
+            if (components_ != 3)
+            {
+                ATOMIC_LOGERROR("Can only save images with 3 or 4 components to DDS");
+                return false;
+            }
+
+            tempImage = new Image(context_);
+            tempImage->SetSize(width_, height_, 4);
+
+            squish::u8* srcBits = (squish::u8*) data_;
+            squish::u8* dstBits = (squish::u8*) tempImage->data_;
+
+            for (unsigned i = 0; i < (unsigned) width_ * (unsigned) height_; i++)
+            {
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = 255;
+            }
+
+            inputData = (squish::u8 *) tempImage->data_.Get();
+        }
+
+        unsigned squishFlags = HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1;
+
+        // Use a slow but high quality colour compressor (the default). (TODO: expose other settings as parameter)
+        squishFlags |= squish::kColourClusterFit;
+
+        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_,  squishFlags);
+
+        SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
+
+        squish::CompressImage(inputData, width_, height_, compressedData.Get(), squishFlags);
+
+        DDSurfaceDesc2 sdesc;
+
+        if (sizeof(sdesc) != 124)
+        {
+            ATOMIC_LOGERROR("Image::SaveDDS - sizeof(DDSurfaceDesc2) != 124");
+            return false;
+        }
+        memset(&sdesc, 0, sizeof(sdesc));
+        sdesc.dwSize_ = 124;
+        sdesc.dwFlags_ = DDSD_CAPS | DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT;
+        sdesc.dwWidth_ = width_;
+        sdesc.dwHeight_ = height_;
+
+        sdesc.ddpfPixelFormat_.dwSize_ = 32;
+        sdesc.ddpfPixelFormat_.dwFlags_ = DDPF_FOURCC | (HasAlphaChannel() ? DDPF_ALPHAPIXELS : 0);
+        sdesc.ddpfPixelFormat_.dwFourCC_ = HasAlphaChannel() ? FOURCC_DXT5 : FOURCC_DXT1;
+
+        SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
+
+        if (!dest->IsOpen())
+        {
+            ATOMIC_LOGERRORF("Failed to open DXT image file for writing %s", fileName.CString());
+            return false;
+        }
+        else
+        {
+
+            dest->Write((void*)"DDS ", 4);
+            dest->Write((void*)&sdesc, sizeof(sdesc));
+
+            bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
+
+            if (!success)
+                ATOMIC_LOGERRORF("Failed to write image to DXT, file size mismatch %s", fileName.CString());
+
+            return success;
+        }
+        // #623 END TODO
+    }
+#endif
+
+    return false;
+}
+// ATOMIC END
 Color Image::GetPixel(int x, int y) const
 {
     return GetPixel(x, y, 0);
@@ -1322,8 +1456,8 @@ Color Image::GetPixelBilinear(float x, float y) const
 
     int xI = (int)x;
     int yI = (int)y;
-    float xF = x - floorf(x);
-    float yF = y - floorf(y);
+    float xF = Fract(x);
+    float yF = Fract(y);
 
     Color topColor = GetPixel(xI, yI).Lerp(GetPixel(xI + 1, yI), xF);
     Color bottomColor = GetPixel(xI, yI + 1).Lerp(GetPixel(xI + 1, yI + 1), xF);
@@ -1344,9 +1478,9 @@ Color Image::GetPixelTrilinear(float x, float y, float z) const
     int zI = (int)z;
     if (zI == depth_ - 1)
         return GetPixelBilinear(x, y);
-    float xF = x - floorf(x);
-    float yF = y - floorf(y);
-    float zF = z - floorf(z);
+    float xF = Fract(x);
+    float yF = Fract(y);
+    float zF = Fract(z);
 
     Color topColorNear = GetPixel(xI, yI, zI).Lerp(GetPixel(xI + 1, yI, zI), xF);
     Color bottomColorNear = GetPixel(xI, yI + 1, zI).Lerp(GetPixel(xI + 1, yI + 1, zI), xF);
@@ -2105,125 +2239,6 @@ void Image::FreeImageData(unsigned char* pixelData)
 }
 
 // ATOMIC BEGIN
-bool Image::SaveDDS(const String& fileName) const
-{
-#if !defined(ATOMIC_PLATFORM_DESKTOP)
-
-    ATOMIC_LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
-    return false;
-
-#else
-    ATOMIC_PROFILE(SaveImageDDS);
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-    {
-        ATOMIC_LOGERROR("Access denied to " + fileName);
-        return false;
-    }
-
-    if (IsCompressed())
-    {
-        ATOMIC_LOGERROR("Can not save compressed image to DDS");
-        return false;
-    }
-
-    if (data_)
-    {
-        // #623 BEGIN TODO: Should have an abstract ImageReader and ImageWriter classes
-        // with subclasses for particular image output types. Also should have image settings in the image meta.
-        // ImageReader/Writers should also support a progress callback so UI can be updated.
-
-        if (!width_ || !height_)
-        {
-            ATOMIC_LOGERRORF("Attempting to save zero width/height DDS to %s", fileName.CString());
-            return false;
-        }
-
-        squish::u8 *inputData = (squish::u8 *) data_.Get();
-
-        SharedPtr<Image> tempImage;
-
-        // libsquish expects 4 channel RGBA, so create a temporary image if necessary
-        if (components_ != 4)
-        {
-            if (components_ != 3)
-            {
-                ATOMIC_LOGERROR("Can only save images with 3 or 4 components to DDS");
-                return false;
-            }
-
-            tempImage = new Image(context_);
-            tempImage->SetSize(width_, height_, 4);
-
-            squish::u8* srcBits = (squish::u8*) data_;
-            squish::u8* dstBits = (squish::u8*) tempImage->data_;
-
-            for (unsigned i = 0; i < (unsigned) width_ * (unsigned) height_; i++)
-            {
-                *dstBits++ = *srcBits++;
-                *dstBits++ = *srcBits++;
-                *dstBits++ = *srcBits++;
-                *dstBits++ = 255;
-            }
-
-            inputData = (squish::u8 *) tempImage->data_.Get();
-        }
-
-        unsigned squishFlags = HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1;
-
-        // Use a slow but high quality colour compressor (the default). (TODO: expose other settings as parameter)
-        squishFlags |= squish::kColourClusterFit;
-
-        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_,  squishFlags);
-
-        SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
-
-        squish::CompressImage(inputData, width_, height_, compressedData.Get(), squishFlags);
-
-        DDSurfaceDesc2 sdesc;
-
-        if (sizeof(sdesc) != 124)
-        {
-            ATOMIC_LOGERROR("Image::SaveDDS - sizeof(DDSurfaceDesc2) != 124");
-            return false;
-        }
-        memset(&sdesc, 0, sizeof(sdesc));
-        sdesc.dwSize_ = 124;
-        sdesc.dwFlags_ = DDSD_CAPS | DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT;
-        sdesc.dwWidth_ = width_;
-        sdesc.dwHeight_ = height_;
-
-        sdesc.ddpfPixelFormat_.dwSize_ = 32;
-        sdesc.ddpfPixelFormat_.dwFlags_ = DDPF_FOURCC | (HasAlphaChannel() ? DDPF_ALPHAPIXELS : 0);
-        sdesc.ddpfPixelFormat_.dwFourCC_ = HasAlphaChannel() ? FOURCC_DXT5 : FOURCC_DXT1;
-
-        SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
-
-        if (!dest->IsOpen())
-        {
-            ATOMIC_LOGERRORF("Failed to open DXT image file for writing %s", fileName.CString());
-            return false;
-        }
-        else
-        {
-
-            dest->Write((void*)"DDS ", 4);
-            dest->Write((void*)&sdesc, sizeof(sdesc));
-
-            bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
-
-            if (!success)
-                ATOMIC_LOGERRORF("Failed to write image to DXT, file size mismatch %s", fileName.CString());
-
-            return success;
-        }
-        // #623 END TODO
-    }
-#endif
-
-    return false;
-}
 
 bool Image::HasAlphaChannel() const
 {

@@ -10,7 +10,9 @@
 			"SendEvent" : ["StringHash"]
 		},
 		"Context" : {
-			"GetTypeName" : ["StringHash"]
+			"GetTypeName" : ["StringHash"],
+			"RequireIK" : [],
+			"ReleaseIK" : []
 		},
 		"CSharp" : {
 			"Object" : {

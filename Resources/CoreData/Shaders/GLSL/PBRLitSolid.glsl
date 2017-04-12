@@ -58,10 +58,10 @@ void VS()
     #endif
 
     #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
-        vec3 tangent = GetWorldTangent(modelMatrix);
-        vec3 bitangent = cross(tangent, vNormal) * iTangent.w;
+        vec4 tangent = GetWorldTangent(modelMatrix);
+        vec3 bitangent = cross(tangent.xyz, vNormal) * tangent.w;
         vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
-        vTangent = vec4(tangent, bitangent.z);
+        vTangent = vec4(tangent.xyz, bitangent.z);
     #else
         vTexCoord = GetTexCoord(iTexCoord);
     #endif
@@ -172,7 +172,16 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-        float atten = GetAtten(normal, vWorldPos.xyz, lightDir);
+        float atten = 1;
+
+        #if defined(DIRLIGHT)
+            atten = GetAtten(normal, vWorldPos.xyz, lightDir);
+        #elif defined(SPOTLIGHT)
+            atten = GetAttenSpot(normal, vWorldPos.xyz, lightDir);
+        #else
+            atten = GetAttenPoint(normal, vWorldPos.xyz, lightDir);
+        #endif
+
         float shadow = 1.0;
         #ifdef SHADOW
             shadow = GetShadow(vShadowPos, vWorldPos.w);
@@ -189,7 +198,7 @@ void PS()
         vec3 lightVec = normalize(lightDir);
         float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
 
-        vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
+        vec3 BRDF = GetBRDF(vWorldPos.xyz, lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
 
         finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 

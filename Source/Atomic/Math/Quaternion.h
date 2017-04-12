@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -434,9 +434,9 @@ public:
     /// Return the rotation matrix that corresponds to this quaternion.
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.
-    Quaternion Slerp(Quaternion rhs, float t) const;
+    Quaternion Slerp(const Quaternion& rhs, float t) const;
     /// Normalized linear interpolation with another quaternion.
-    Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath = false) const;
+    Quaternion Nlerp(const Quaternion& rhs, float t, bool shortestPath = false) const;
 
     /// Return float data.
     const float* Data() const { return &w_; }

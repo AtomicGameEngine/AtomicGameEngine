@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-// Modified by cosmy1 and Yao Wei Tjong for Urho3D
+// Modified by cosmy1, Yao Wei Tjong & Lasse Oorni for Urho3D
 
 #if defined(_WIN32)
 #if !defined(_CRT_SECURE_NO_WARNINGS)
@@ -132,71 +132,56 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach_time.h>
 #include <assert.h>
 
-/* clock_gettime is not implemented on OSX prior to 10.12 */
-int _civet_clock_gettime(int clk_id, struct timespec *t);
-
-int
-_civet_clock_gettime(int clk_id, struct timespec *t)
+// Urho3D - On Apple platform, use its clock_gettime() when it is available
+#ifndef HAVE_CLOCK_GETTIME
+int clock_gettime_impl(int clk_id, struct timespec *t)
 {
-    memset(t, 0, sizeof(*t));
-    if (clk_id == CLOCK_REALTIME) {
-        struct timeval now;
-        int rv = gettimeofday(&now, NULL);
-        if (rv) {
-            return rv;
-        }
-        t->tv_sec = now.tv_sec;
-        t->tv_nsec = now.tv_usec * 1000;
-        return 0;
+	if (clk_id == CLOCK_REALTIME) {
+		struct timeval now;
+		int rv = gettimeofday(&now, NULL);
+		if (rv) {
+			return rv;
+		}
+		t->tv_sec = now.tv_sec;
+		t->tv_nsec = now.tv_usec * 1000;
+		return 0;
 
-    } else if (clk_id == CLOCK_MONOTONIC) {
-        static uint64_t clock_start_time = 0;
-        static mach_timebase_info_data_t timebase_ifo = {0, 0};
+	} else if (clk_id == CLOCK_MONOTONIC) {
+		static uint64_t start_time = 0;
+		static mach_timebase_info_data_t timebase_ifo = {0, 0};
 
-        uint64_t now = mach_absolute_time();
+		uint64_t now = mach_absolute_time();
 
-        if (clock_start_time == 0) {
-            kern_return_t mach_status = mach_timebase_info(&timebase_ifo);
+		if (start_time == 0) {
+			kern_return_t mach_status = mach_timebase_info(&timebase_ifo);
 #if defined(DEBUG)
-            assert(mach_status == KERN_SUCCESS);
+			assert(mach_status == KERN_SUCCESS);
 #else
-            /* appease "unused variable" warning for release builds */
-            (void)mach_status;
+			/* appease "unused variable" warning for release builds */
+			(void)mach_status;
 #endif
-            clock_start_time = now;
-        }
+			start_time = now;
+		}
 
-        now = (uint64_t)((double)(now - clock_start_time)
-                         * (double)timebase_ifo.numer
-                         / (double)timebase_ifo.denom);
+		now =
+		    (uint64_t)((double)(now - start_time) * (double)timebase_ifo.numer /
+		               (double)timebase_ifo.denom);
 
-        t->tv_sec = now / 1000000000;
-        t->tv_nsec = now % 1000000000;
-        return 0;
-    }
-    return -1; /* EINVAL - Clock ID is unknown */
+		t->tv_sec = now / 1000000000;
+		t->tv_nsec = now % 1000000000;
+		return 0;
+	}
+	return -1; /* EINVAL - Clock ID is unknown */
 }
-
-/* if clock_gettime is declared, then __CLOCK_AVAILABILITY will be defined */
-#ifdef __CLOCK_AVAILABILITY
-/* If we compiled with Mac OSX 10.12 or later, then clock_gettime will be declared
- * but it may be NULL at runtime. So we need to check before using it. */
-int _civet_safe_clock_gettime(int clk_id, struct timespec *t);
-
-int
-_civet_safe_clock_gettime(int clk_id, struct timespec *t) {
-    if( clock_gettime ) {
-        return clock_gettime(clk_id, t);
-    }
-    return _civet_clock_gettime(clk_id, t);
-}
-#define clock_gettime _civet_safe_clock_gettime
-#else
-#define clock_gettime _civet_clock_gettime
-#endif
+#define clock_gettime clock_gettime_impl
+#endif  // HAVE_CLOCK_GETTIME
 #endif
 
-// ATOMIC END
+// Urho3D: Prevent inclusion of pthread_time.h on MinGW, instead prefer own implementation of clock_gettime()
+// to prevent dependency on pthread library which is not needed otherwise
+#ifdef __MINGW32__
+#define WIN_PTHREADS_TIME_H
+#endif
 
 #include <time.h>
 #include <stdlib.h>
@@ -2174,7 +2159,7 @@ static int pthread_mutex_unlock(pthread_mutex_t *mutex)
 	return ReleaseMutex(*mutex) == 0 ? -1 : 0;
 }
 
-#ifndef WIN_PTHREADS_TIME_H
+// Urho3D: Prefer own implementation of clock_gettime() to prevent dependency on pthread library which is not needed otherwise
 static int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
 	FILETIME ft;
@@ -2210,7 +2195,6 @@ static int clock_gettime(clockid_t clk_id, struct timespec *tp)
 
 	return ok ? 0 : -1;
 }
-#endif
 
 static int pthread_cond_init(pthread_cond_t *cv, const void *unused)
 {

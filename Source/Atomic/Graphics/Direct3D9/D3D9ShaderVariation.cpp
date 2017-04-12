@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ bool ShaderVariation::Create()
     SplitPath(owner_->GetName(), path, name, extension);
     extension = type_ == VS ? ".vs3" : ".ps3";
 
-    String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
+    String binaryShaderName = graphics_->GetShaderCacheDir() + name + "_" + StringHash(defines_).ToString() + extension;
 
     if (!LoadByteCode(binaryShaderName))
     {
@@ -170,17 +170,6 @@ void ShaderVariation::SetDefines(const String& defines)
 
 bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
 {
-    // ATOMIC BEGIN
-
-    // ATOMIC: Disable shader cache until we can bring in configuration updates for writeable paths:
-    // https://github.com/urho3d/Urho3D/commit/a1e2bc9bd3fe0966bb1aae1e911b96b006d155ce
-
-#ifndef ATOMIC_DEV_BUILD
-    return false;
-#endif
-
-    // ATOMIC END
-
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
         return false;
@@ -380,23 +369,20 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 
 void ShaderVariation::SaveByteCode(const String& binaryShaderName)
 {
-
-// ATOMIC BEGIN
-
-    // ATOMIC: Disable shader cache until we can bring in configuration updates for writeable paths:
-    // https://github.com/urho3d/Urho3D/commit/a1e2bc9bd3fe0966bb1aae1e911b96b006d155ce
-    
-#ifndef ATOMIC_DEV_BUILD
-    return;
-#endif
-
-// ATOMIC END
-
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
 
-    String path = GetPath(cache->GetResourceFileName(owner_->GetName())) + "Cache/";
-    String fullName = path + GetFileNameAndExtension(binaryShaderName);
+    // Filename may or may not be inside the resource system
+    String fullName = binaryShaderName;
+    if (!IsAbsolutePath(fullName))
+    {
+        // If not absolute, use the resource dir of the shader
+        String shaderFileName = cache->GetResourceFileName(owner_->GetName());
+        if (shaderFileName.Empty())
+            return;
+        fullName = shaderFileName.Substring(0, shaderFileName.Find(owner_->GetName())) + binaryShaderName;
+    }
+    String path = GetPath(fullName);
     if (!fileSystem->DirExists(path))
         fileSystem->CreateDir(path);
 

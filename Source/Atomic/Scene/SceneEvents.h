@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -118,7 +118,7 @@ ATOMIC_EVENT(E_NODEADDED, NodeAdded)
     ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-/// A child node is about to be removed from a parent node.
+/// A child node is about to be removed from a parent node. Note that individual component removal events will not be sent.
 ATOMIC_EVENT(E_NODEREMOVED, NodeRemoved)
 {
     ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
