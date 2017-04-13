@@ -314,14 +314,13 @@ ALSA_PlayDevice(_THIS)
     swizzle_alsa_channels(this, this->hidden->mixbuf, frames_left);
 
     while ( frames_left > 0 && SDL_AtomicGet(&this->enabled) ) {
+        int status;
 
         // ATOMIC BEGIN
 #if defined(__LINUX__)
         ALSA_snd_pcm_wait(this->hidden->pcm_handle, -1);  /* was commented out, fixes high cpu usage */
 #endif
         // ATOMIC END
-
-        int status;
 
         /* This wait is a work-around for a hang when USB devices are
            unplugged.  Normally it should not result in any waiting,
