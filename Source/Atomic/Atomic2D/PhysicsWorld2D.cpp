@@ -52,6 +52,15 @@ static const int DEFAULT_POSITION_ITERATIONS = 3;
 const PODVector<unsigned char>& WriteContactInfo(VectorBuffer& buffer, b2Contact* contact)
 {
     buffer.Clear();
+
+    // ATOMIC BEGIN
+    // Handle case when the body has been deleted during the event
+    if (!contact->GetFixtureA()->GetBody() || !contact->GetFixtureB()->GetBody() )
+    {
+        return buffer.GetBuffer();
+    }
+    // ATOMIC END
+
     b2WorldManifold worldManifold;
     contact->GetWorldManifold(&worldManifold);
     for (int i = 0; i < contact->GetManifold()->pointCount; ++i)
