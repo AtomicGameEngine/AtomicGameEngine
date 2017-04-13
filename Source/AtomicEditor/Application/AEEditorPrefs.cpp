@@ -132,7 +132,7 @@ namespace AtomicEditor
             bool highDPI = false;
 
             //Setting the mode to 0 width/height will use engine defaults for window size and layout
-            graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), highDPI, graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample());
+            graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), highDPI, graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample(), 0, 0);
 
             SavePreferences(prefs);
         }

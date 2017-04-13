@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,7 @@ extern const char* GEOMETRY_CATEGORY;
 StaticModel::StaticModel(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     occlusionLodLevel_(M_MAX_UNSIGNED),
-    materialsAttr_(Material::GetTypeStatic()),
-    geometryDisabled_(false)
+    materialsAttr_(Material::GetTypeStatic())
 {
 }
 
@@ -249,15 +248,6 @@ void StaticModel::SetModel(Model* model)
     if (model == model_)
         return;
 
-    // If script erroneously calls StaticModel::SetModel on an AnimatedModel, warn and redirect
-    if (GetType() == AnimatedModel::GetTypeStatic())
-    {
-        ATOMIC_LOGWARNING("StaticModel::SetModel() called on AnimatedModel. Redirecting to AnimatedModel::SetModel()");
-        AnimatedModel* animatedModel = static_cast<AnimatedModel*>(this);
-        animatedModel->SetModel(model);
-        return;
-    }
-
     if (!node_)
     {
         ATOMIC_LOGERROR("Can not set model while model component is not attached to a scene node");
@@ -424,7 +414,7 @@ const ResourceRefList& StaticModel::GetMaterialsAttr() const
 {
     materialsAttr_.names_.Resize(batches_.Size());
     for (unsigned i = 0; i < batches_.Size(); ++i)
-        materialsAttr_.names_[i] = GetResourceName(batches_[i].material_);
+        materialsAttr_.names_[i] = GetResourceName(GetMaterial(i));
 
     return materialsAttr_;
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,7 @@ PackageUpload::PackageUpload() :
 {
 }
 
+// ATOMIC BEGIN
 Connection::Connection(Context* context) : Object(context),
     timeStamp_(0),
     sendMode_(OPSM_NONE),
@@ -71,6 +72,7 @@ Connection::Connection(Context* context) : Object(context),
 {
 
 }
+// ATOMIC END
 
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),

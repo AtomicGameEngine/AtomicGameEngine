@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -121,6 +121,8 @@ protected:
     bool EmitNewParticle();
     /// Return a free particle index.
     unsigned GetFreeParticle() const;
+    /// Return whether has active particles.
+    bool CheckActiveParticles() const;
 
 private:
     /// Handle scene post-update event.

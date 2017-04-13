@@ -2,7 +2,7 @@
 	"name" : "IO",
 	"sources" : ["Source/Atomic/IO"],
 	"classes" : ["Log", "File", "FileSystem", "FileWatcher", "BufferQueue", "PackageFile"],
-	"interfaces" : ["Serializer", "Deserializer"],
+	"interfaces" : ["Serializer", "Deserializer", "AbstractFile"],
 	"overloads" : {
 		"File" : {
 			"File" : ["Context", "String", "FileMode"]

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -185,12 +185,9 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
 
             for (unsigned i = 0; i < jsonArray.Size(); ++i)
             {
-// ATOMIC BEGIN
-                // ATOMIC: Set value before adding to array, see note in JSON_OBJECT case below
                 rapidjson::Value value;
                 ToRapidjsonValue(value, jsonArray[i], allocator);
                 rapidjsonValue.PushBack(value, allocator);                
-// ATOMIC END
             }
         }
         break;
@@ -202,15 +199,10 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             rapidjsonValue.SetObject();
             for (JSONObject::ConstIterator i = jsonObject.Begin(); i != jsonObject.End(); ++i)
             {
-// ATOMIC BEGIN
-                // ATOMIC: Set value before adding member, this fixes a rapidjson crash
-                // when trying to immediately find member (VS2015, release build, difficult to reproduce)
-                // TODO: Submit a PR to upstream
                 const char* name = i->first_.CString();
                 rapidjson::Value value;
                 ToRapidjsonValue(value, i->second_, allocator);
-                rapidjsonValue.AddMember(rapidjson::Value::StringRefType(name), value, allocator);                
-// ATOMIC END
+                rapidjsonValue.AddMember(name, value, allocator);
             }
         }
         break;

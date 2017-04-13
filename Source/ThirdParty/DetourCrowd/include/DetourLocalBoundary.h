@@ -19,9 +19,8 @@
 #ifndef DETOURLOCALBOUNDARY_H
 #define DETOURLOCALBOUNDARY_H
 
-// ATOMIC BEGIN
-#include "../../Detour/include/DetourNavMeshQuery.h"
-// ATOMIC END
+#include "DetourNavMeshQuery.h"
+
 
 class dtLocalBoundary
 {

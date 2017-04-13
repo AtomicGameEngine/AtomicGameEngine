@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -132,12 +132,6 @@ NavigationMesh::NavigationMesh(Context* context) :
 NavigationMesh::~NavigationMesh()
 {
     ReleaseNavigationMesh();
-
-    delete queryFilter_;
-    queryFilter_ = 0;
-
-    delete pathData_;
-    pathData_ = 0;
 }
 
 void NavigationMesh::RegisterObject(Context* context)
@@ -491,7 +485,7 @@ Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& ex
     dtPolyRef pointRef;
     if (!nearestRef)
         nearestRef = &pointRef;
-    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, filter ? filter : queryFilter_, nearestRef, &nearestPoint.x_);
+    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, filter ? filter : queryFilter_.Get(), nearestRef, &nearestPoint.x_);
     return *nearestRef ? transform * nearestPoint : point;
 }
 
@@ -507,7 +501,7 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
@@ -549,7 +543,7 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
     dtPolyRef startRef;
     dtPolyRef endRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
@@ -617,7 +611,7 @@ Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter, dtPolyRef* r
     dtPolyRef polyRef;
     Vector3 point(Vector3::ZERO);
 
-    navMeshQuery_->findRandomPoint(filter ? filter : queryFilter_, Random, randomRef ? randomRef : &polyRef, &point.x_);
+    navMeshQuery_->findRandomPoint(filter ? filter : queryFilter_.Get(), Random, randomRef ? randomRef : &polyRef, &point.x_);
 
     return node_->GetWorldTransform() * point;
 }
@@ -635,7 +629,7 @@ Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radi
     Matrix3x4 inverse = transform.Inverse();
     Vector3 localCenter = inverse * center;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localCenter.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
@@ -666,7 +660,7 @@ float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, cons
     Matrix3x4 inverse = transform.Inverse();
     Vector3 localPoint = inverse * point;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
@@ -699,7 +693,7 @@ Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const 
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
-    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_.Get();
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
@@ -910,8 +904,8 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     // Make sure nodes are not included twice
     if (processedNodes.Contains(node))
         return;
-    // Exclude obstacles from consideration
-    if (node->HasComponent<Obstacle>())
+    // Exclude obstacles and crowd agents from consideration
+    if (node->HasComponent<Obstacle>() || node->HasComponent<CrowdAgent>())
         return;
     processedNodes.Insert(node);
 
@@ -1177,9 +1171,9 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     cfg.cs = cellSize_;
     cfg.ch = cellHeight_;
     cfg.walkableSlopeAngle = agentMaxSlope_;
-    cfg.walkableHeight = (int)ceilf(agentHeight_ / cfg.ch);
-    cfg.walkableClimb = (int)floorf(agentMaxClimb_ / cfg.ch);
-    cfg.walkableRadius = (int)ceilf(agentRadius_ / cfg.cs);
+    cfg.walkableHeight = CeilToInt(agentHeight_ / cfg.ch);
+    cfg.walkableClimb = FloorToInt(agentMaxClimb_ / cfg.ch);
+    cfg.walkableRadius = CeilToInt(agentRadius_ / cfg.cs);
     cfg.maxEdgeLen = (int)(edgeMaxLength_ / cellSize_);
     cfg.maxSimplificationError = edgeMaxError_;
     cfg.minRegionArea = (int)sqrtf(regionMinSize_);

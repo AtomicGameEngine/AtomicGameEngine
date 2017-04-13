@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,12 @@
 
 #include "../Precompiled.h"
 
-#include "../IO/FileSystem.h"
 #include "../IO/File.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
+// ATOMIC BEGIN
+#include "../IO/FileSystem.h"
+// ATOMIC END
 
 namespace Atomic
 {

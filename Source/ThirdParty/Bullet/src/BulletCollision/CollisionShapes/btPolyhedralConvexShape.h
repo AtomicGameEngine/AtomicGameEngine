@@ -16,9 +16,7 @@ subject to the following restrictions:
 #ifndef BT_POLYHEDRAL_CONVEX_SHAPE_H
 #define BT_POLYHEDRAL_CONVEX_SHAPE_H
 
-// ATOMIC_BEGIN
-#include "../../LinearMath/btMatrix3x3.h"
-// ATOMIC_END
+#include "LinearMath/btMatrix3x3.h"
 #include "btConvexInternalShape.h"
 class btConvexPolyhedron;
 

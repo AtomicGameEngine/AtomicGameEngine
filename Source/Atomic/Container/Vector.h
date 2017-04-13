@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -340,7 +340,7 @@ public:
         Iterator i = Find(value);
         if (i != End())
         {
-            EraseSwap(i);
+            EraseSwap(i - Begin());
             return true;
         }
         else
@@ -352,6 +352,16 @@ public:
 
     /// Resize the vector.
     void Resize(unsigned newSize) { Vector<T> tempBuffer; Resize(newSize, 0, tempBuffer); }
+
+    /// Resize the vector and fill new elements with default value.
+    void Resize(unsigned newSize, const T& value)
+    {
+        unsigned oldSize = Size();
+        Vector<T> tempBuffer;
+        Resize(newSize, 0, tempBuffer);
+        for (unsigned i = oldSize; i < newSize; ++i)
+            At(i) = value;
+    }
 
     /// Set new capacity.
     void Reserve(unsigned newCapacity)
@@ -397,6 +407,12 @@ public:
         while (it != End() && *it != value)
             ++it;
         return it;
+    }
+
+    /// Return index of value in vector, or size if not found.
+    unsigned IndexOf(const T& value) const
+    {
+        return Find(value) - Begin();
     }
 
     /// Return whether contains a specific value.
@@ -561,7 +577,7 @@ private:
     }
 };
 
-/// %Vector template class for POD types. Does not call constructors or destructors and uses block move.
+/// %Vector template class for POD types. Does not call constructors or destructors and uses block move. Is intentionally (for performance reasons) unsafe for self-insertion.
 template <class T> class PODVector : public VectorBase
 {
 public:
@@ -591,7 +607,8 @@ public:
     /// Construct with initial data.
     PODVector(const T* data, unsigned size)
     {
-        InsertElements(0, data, data + size);
+        Resize(size);
+        CopyElements(Buffer(), data, size);
     }
 
     /// Construct from another vector.
@@ -621,8 +638,8 @@ public:
         // In case of self-assignment do nothing
         if (&rhs != this)
         {
-            Clear();
-            InsertElements(0, rhs.Begin(), rhs.End());
+            Resize(rhs.size_);
+            CopyElements(Buffer(), rhs.Buffer(), rhs.size_);
         }
         return *this;
     }
@@ -722,13 +739,19 @@ public:
     /// Add an element at the end.
     void Push(const T& value)
     {
-        InsertElements(size_, &value, &value + 1);
+        if (size_ < capacity_)
+            ++size_;
+        else
+            Resize(size_ + 1);
+        Back() = value;
     }
 
     /// Add another vector at the end.
     void Push(const PODVector<T>& vector)
     {
-        InsertElements(size_, vector.Begin(), vector.End());
+        unsigned oldSize = size_;
+        Resize(size_ + vector.size_);
+        CopyElements(Buffer() + oldSize, vector.Buffer(), vector.size_);
     }
 
     /// Remove the last element.
@@ -741,41 +764,78 @@ public:
     /// Insert an element at position.
     void Insert(unsigned pos, const T& value)
     {
-        InsertElements(pos, &value, &value + 1);
+        if (pos > size_)
+            pos = size_;
+
+        unsigned oldSize = size_;
+        Resize(size_ + 1);
+        MoveRange(pos + 1, pos, oldSize - pos);
+        Buffer()[pos] = value;
     }
 
     /// Insert another vector at position.
     void Insert(unsigned pos, const PODVector<T>& vector)
     {
-        InsertElements(pos, vector.Begin(), vector.End());
+        if (pos > size_)
+            pos = size_;
+
+        unsigned oldSize = size_;
+        Resize(size_ + vector.size_);
+        MoveRange(pos + vector.size_, pos, oldSize - pos);
+        CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
     }
 
     /// Insert an element by iterator.
     Iterator Insert(const Iterator& dest, const T& value)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        return InsertElements(pos, &value, &value + 1);
+        if (pos > size_)
+            pos = size_;
+        Insert(pos, value);
+
+        return Begin() + pos;
     }
 
     /// Insert a vector by iterator.
     Iterator Insert(const Iterator& dest, const PODVector<T>& vector)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        return InsertElements(pos, vector.Begin(), vector.End());
+        if (pos > size_)
+            pos = size_;
+        Insert(pos, vector);
+
+        return Begin() + pos;
     }
 
     /// Insert a vector partially by iterators.
     Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        return InsertElements(pos, start, end);
+        if (pos > size_)
+            pos = size_;
+        unsigned length = (unsigned)(end - start);
+        Resize(size_ + length);
+        MoveRange(pos + length, pos, size_ - pos - length);
+        CopyElements(Buffer() + pos, &(*start), length);
+
+        return Begin() + pos;
     }
 
     /// Insert elements.
     Iterator Insert(const Iterator& dest, const T* start, const T* end)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        return InsertElements(pos, start, end);
+        if (pos > size_)
+            pos = size_;
+        unsigned length = (unsigned)(end - start);
+        Resize(size_ + length);
+        MoveRange(pos + length, pos, size_ - pos - length);
+
+        T* destPtr = Buffer() + pos;
+        for (const T* i = start; i != end; ++i)
+            *destPtr++ = *i;
+
+        return Begin() + pos;
     }
 
     /// Erase a range of elements.
@@ -819,7 +879,7 @@ public:
         // Return if the range is illegal
         if (shiftStartIndex > size_ || !length)
             return;
-      
+
         unsigned newSize = size_ - length;
         unsigned trailingCount = size_ - shiftStartIndex;
         if (trailingCount <= length)
@@ -854,7 +914,7 @@ public:
         Iterator i = Find(value);
         if (i != End())
         {
-            EraseSwap(i);
+            EraseSwap(i - Begin());
             return true;
         }
         else
@@ -867,8 +927,27 @@ public:
     /// Resize the vector.
     void Resize(unsigned newSize)
     {
-        PODVector<T> tempBuffer;
-        Resize(newSize, tempBuffer);
+        if (newSize > capacity_)
+        {
+            if (!capacity_)
+                capacity_ = newSize;
+            else
+            {
+                while (capacity_ < newSize)
+                    capacity_ += (capacity_ + 1) >> 1;
+            }
+
+            unsigned char* newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
+            // Move the data into the new buffer and delete the old
+            if (buffer_)
+            {
+                CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
+                delete[] buffer_;
+            }
+            buffer_ = newBuffer;
+        }
+
+        size_ = newSize;
     }
 
     /// Set new capacity.
@@ -914,6 +993,12 @@ public:
         while (it != End() && *it != value)
             ++it;
         return it;
+    }
+
+    /// Return index of value in vector, or size if not found.
+    unsigned IndexOf(const T& value) const
+    {
+        return Find(value) - Begin();
     }
 
     /// Return whether contains a specific value.
@@ -964,54 +1049,6 @@ public:
     T* Buffer() const { return reinterpret_cast<T*>(buffer_); }
 
 private:
-    /// Resize the vector. Current buffer will be stored in tempBuffer in case of reallocation.
-    void Resize(unsigned newSize, PODVector<T>& tempBuffer)
-    {
-        if (newSize > capacity_)
-        {
-            Swap(tempBuffer);
-            size_ = tempBuffer.size_;
-            capacity_ = tempBuffer.capacity_;
-
-            if (!capacity_)
-                capacity_ = newSize;
-            else
-            {
-                while (capacity_ < newSize)
-                    capacity_ += (capacity_ + 1) >> 1;
-            }
-
-            buffer_ = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
-            // Move the data into the new buffer
-            if (tempBuffer.Buffer())
-            {
-                CopyElements(Buffer(), tempBuffer.Buffer(), size_);
-            }
-        }
-
-        size_ = newSize;
-    }
-
-    /// Insert elements.
-    template <typename RandomIteratorT>
-    Iterator InsertElements(unsigned pos, RandomIteratorT start, RandomIteratorT end)
-    {
-        assert(start <= end);
-
-        if (pos > size_)
-            pos = size_;
-        unsigned length = (unsigned)(end - start);
-        PODVector<T> tempBuffer;
-        Resize(size_ + length, tempBuffer);
-        MoveRange(pos + length, pos, size_ - pos - length);
-
-        T* destPtr = Buffer() + pos;
-        for (RandomIteratorT i = start; i != end; ++i)
-            *destPtr++ = *i;
-
-        return Begin() + pos;
-    }
-
     /// Move a range of elements within the vector.
     void MoveRange(unsigned dest, unsigned src, unsigned count)
     {

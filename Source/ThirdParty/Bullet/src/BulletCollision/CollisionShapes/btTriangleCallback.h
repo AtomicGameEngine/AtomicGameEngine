@@ -16,9 +16,7 @@ subject to the following restrictions:
 #ifndef BT_TRIANGLE_CALLBACK_H
 #define BT_TRIANGLE_CALLBACK_H
 
-// ATOMIC BEGIN
-#include "../../LinearMath/btVector3.h"
-// ATOMIC END
+#include "LinearMath/btVector3.h"
 
 
 ///The btTriangleCallback provides a callback for each overlapping triangle when calling processAllTriangles.

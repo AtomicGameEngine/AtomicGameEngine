@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,6 +63,11 @@ public:
     virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
+
+    /// Load resource from file.
+    bool LoadFile(const String& fileName);
+    /// Save resource to file.
+    virtual bool SaveFile(const String& fileName) const;
 
     /// Set name.
     void SetName(const String& name);

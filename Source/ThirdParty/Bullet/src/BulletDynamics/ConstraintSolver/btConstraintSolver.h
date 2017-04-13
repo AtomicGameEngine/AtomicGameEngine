@@ -16,9 +16,7 @@ subject to the following restrictions:
 #ifndef BT_CONSTRAINT_SOLVER_H
 #define BT_CONSTRAINT_SOLVER_H
 
-// ATOMIC BEGIN
-#include "../../LinearMath/btScalar.h"
-// ATOMIC END
+#include "LinearMath/btScalar.h"
 
 class btPersistentManifold;
 class btRigidBody;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     { \
         exitCode = function; \
     } \
-    __except(Atomic::WriteMiniDump("Urho3D", GetExceptionInformation())) \
+    __except(Atomic::WriteMiniDump("Atomic", GetExceptionInformation())) \
     { \
     } \
     return exitCode; \
