@@ -75,27 +75,12 @@ void EventReceiverGroup::EndSendEvent()
 
         dirty_ = false;
     }
-
-    // ATOMIC BEGIN
-    if (inSend_ == 0 && bufferedReceivers_.Size())
-    {
-        receivers_.Push(bufferedReceivers_);
-        bufferedReceivers_.Clear();
-    }
-    // ATOMIC END
 }
 
 void EventReceiverGroup::Add(Object* object)
 {
     if (object)
-    {
-        // ATOMIC BEGIN
-        if (inSend_)
-            bufferedReceivers_.Push(object);
-        else
-        // ATOMIC END
-            receivers_.Push(object);
-    }
+        receivers_.Push(object);
 }
 
 void EventReceiverGroup::Remove(Object* object)

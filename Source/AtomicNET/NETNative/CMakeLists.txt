@@ -46,7 +46,7 @@ if (APPLE)
             # PUBLIC_HEADER dynamicFramework.h
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
         )
-        target_link_libraries( AtomicNETNative "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit -framework CoreMotion -framework GameController")
+        target_link_libraries( AtomicNETNative "-framework AudioToolbox -framework AVFoundation -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit -framework CoreMotion -framework GameController")
     endif()
 endif()
 

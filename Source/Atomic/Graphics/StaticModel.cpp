@@ -248,6 +248,17 @@ void StaticModel::SetModel(Model* model)
     if (model == model_)
         return;
 
+    // ATOMIC BEGIN
+    // If script erroneously calls StaticModel::SetModel on an AnimatedModel, warn and redirect
+    if (GetType() == AnimatedModel::GetTypeStatic())
+    {
+        ATOMIC_LOGWARNING("StaticModel::SetModel() called on AnimatedModel. Redirecting to AnimatedModel::SetModel()");
+        AnimatedModel* animatedModel = static_cast<AnimatedModel*>(this);
+        animatedModel->SetModel(model);
+        return;
+    }
+    // ATOMIC END
+
     if (!node_)
     {
         ATOMIC_LOGERROR("Can not set model while model component is not attached to a scene node");

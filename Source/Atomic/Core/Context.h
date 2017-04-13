@@ -72,10 +72,6 @@ private:
     unsigned inSend_;
     /// Cleanup required flag.
     bool dirty_;
-    // ATOMIC BEGIN
-    /// Buffer of receivers that were added while inSend_ is true. They are appended to receivers_ on EndSendEvent().
-    PODVector<Object*> bufferedReceivers_;
-    // ATOMIC END
 };
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.

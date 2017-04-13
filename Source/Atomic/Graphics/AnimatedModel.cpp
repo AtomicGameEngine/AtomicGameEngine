@@ -1534,4 +1534,14 @@ void AnimatedModel::HandleModelReloadFinished(StringHash eventType, VariantMap& 
     SetModel(currentModel);
 }
 
+// ATOMIC BEGIN
+
+Node* AnimatedModel::GetSkeletonBoneNode(const String & boneName)
+{
+    Bone* bone = skeleton_.GetBone(boneName);
+    return (bone) ? bone->node_ : NULL;
+}
+
+// ATOMIC END
+
 }

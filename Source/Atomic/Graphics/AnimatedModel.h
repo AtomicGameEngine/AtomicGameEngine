@@ -94,10 +94,6 @@ public:
     void SetMorphWeight(const String& name, float weight);
     /// Set vertex morph weight by name hash.
     void SetMorphWeight(StringHash nameHash, float weight);
-    // ATOMIC BEGIN
-    /// Set bone creation override. Useful for previewing animations in the editor scene view.
-    void SetBoneCreationOverride(bool enabled) { boneCreationOverride_ = enabled; }
-    // ATOMIC END
     /// Reset all vertex morphs to zero.
     void ResetMorphWeights();
     /// Apply all animation states to nodes.
@@ -171,6 +167,16 @@ public:
 
     /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
     void UpdateBoneBoundingBox();
+
+    // ATOMIC BEGIN
+
+    /// Return the node of a skeleton bone (for script access)
+    Node* GetSkeletonBoneNode(const String& boneName);
+
+    /// Set bone creation override. Useful for previewing animations in the editor scene view.
+    void SetBoneCreationOverride(bool enabled) { boneCreationOverride_ = enabled; }
+
+    // ATOMIC END
 
 protected:
     /// Handle node being assigned.
