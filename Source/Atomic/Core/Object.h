@@ -285,7 +285,6 @@ public:
         sender_(0),
         userData_(userData)
     {
-        assert(receiver_);
     }
 
     /// Destruct.
