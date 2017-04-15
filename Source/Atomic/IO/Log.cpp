@@ -172,7 +172,7 @@ void Log::Write(int level, const String& message)
 
 #if defined(__ANDROID__)
     int androidLevel = ANDROID_LOG_DEBUG + level;
-    __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
+    __android_log_print(androidLevel, "Atomic", "%s", message.CString());
 #elif defined(IOS)
     SDL_IOS_LogMessage(message.CString());
 #else
