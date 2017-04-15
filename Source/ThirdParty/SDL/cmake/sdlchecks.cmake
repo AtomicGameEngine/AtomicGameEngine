@@ -64,7 +64,9 @@ macro(CheckDLOPEN)
       set (HAVE_DLOPEN TRUE)
     else ()
       # Urho3D - bug fix - use different variables for different checks because of CMake caches the result variable
-      check_function_exists(dlopen DLOPEN_FOUND)
+      # ATOMIC BEGIN
+      # check_function_exists(dlopen DLOPEN_FOUND)
+      # ATOMIC END
       if(NOT DLOPEN_FOUND)
         foreach(_LIBNAME dl tdl)
           check_library_exists("${_LIBNAME}" "dlopen" "" DLOPEN_LIB_${_LIBNAME}_FOUND)
@@ -76,6 +78,13 @@ macro(CheckDLOPEN)
           endif()
         endforeach()
       endif()
+      # ATOMIC BEGIN
+      # call check_function_exists() only after trying to locate dlopen in the libs. This provides lib
+      # in _DLLIB which is required for linking when calling check_c_source_compiles().
+      if(NOT DLOPEN_FOUND)
+        check_function_exists(dlopen DLOPEN_FOUND)
+      endif()
+      # ATOMIC END
       if(DLOPEN_FOUND)
         if(_DLLIB)
           set(CMAKE_REQUIRED_LIBRARIES ${_DLLIB})
