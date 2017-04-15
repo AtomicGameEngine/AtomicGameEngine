@@ -75,7 +75,10 @@ bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
 }
 
 Object::Object(Context* context) :
-    context_(context)
+    context_(context),
+    // ATOMIC BEGIN
+    blockEvents_(false)
+    // ATOMIC END
 {
     assert(context_);
 }
@@ -88,6 +91,11 @@ Object::~Object()
 
 void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData)
 {
+    // ATOMIC BEGIN
+    if (blockEvents_)
+        return;
+    // ATOMIC END
+
     // Make a copy of the context pointer in case the object is destroyed during event handler invocation
     Context* context = context_;
     EventHandler* specific = 0;
@@ -339,6 +347,11 @@ void Object::SendEventNonProfiled(StringHash eventType, VariantMap& eventData)
         ATOMIC_LOGERROR("Sending events is only supported from the main thread");
         return;
     }
+
+    // ATOMIC BEGIN
+    if (blockEvents_)
+        return;
+    // ATOMIC END
 
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
@@ -719,6 +732,12 @@ template <> DebugHud* Object::GetSubsystem<DebugHud>() const
 template <> Metrics* Object::GetSubsystem<Metrics>() const
 {
     return context_->metrics_;
+}
+
+void Object::SendEvent(StringHash eventType, const VariantMap& eventData)
+{
+    VariantMap eventDataCopy = eventData;
+    SendEvent(eventType, eventDataCopy);
 }
 
 // ATOMIC END
