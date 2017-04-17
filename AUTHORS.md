@@ -67,10 +67,10 @@ The Atomic Game Engine began as a fork of the Urho3D project in November 2014
 
 Main website: [http://urho3d.github.io/](http://urho3d.github.io/)
 
-##License
+## License
 Licensed under the MIT license, see [License.txt](https://github.com/urho3d/Urho3D/blob/master/License.txt) for details.
 
-##Credits
+## Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
 - Wei Tjong Yao
