@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using static System.Reflection.IntrospectionExtensions;
 
 namespace AtomicEngine
@@ -6,6 +7,67 @@ namespace AtomicEngine
 
     public partial class Node : Animatable
     {
+
+        /// <summary>
+        /// Whether the node has been explicitly destroyed
+        /// </summary>
+        public bool Destroyed { get; private set; }
+
+        /// <summary>
+        /// Explicitly removes node from hierarchy and disposes of children and components
+        /// </summary>       
+        public virtual void Destroy()
+        {
+            // Destroying node hierarchy is flattened and not recursive
+            // for performance considerations
+
+            if (Destroyed)
+                return;
+
+            Destroyed = true;
+
+            UnsubscribeFromAllEvents();
+
+            // Remove from hierarchy
+            Remove();
+
+            // list of nodes/components to dispose
+            var disposeList = new List<RefCounted>();
+
+            // IMPORTANT: Care must be taken to clear these vectors
+            // otherwise, references will be held until the Vector is GC'd
+            // and the child nodes/components/resources will not be immediately disposed
+
+            var nodes = new Vector<Node>();
+            var components = new Vector<Component>();
+
+            // Get node components and add to dispose list
+            GetComponents(components);
+            disposeList.AddRange(components);
+            components.Clear();
+
+            // get all children of node and add their components to the dispose list
+            GetChildren(nodes, true);
+            foreach (var node in nodes)
+            {
+                node.Destroyed = true;
+                node.GetComponents(components);
+                disposeList.AddRange(components);
+                components.Clear();
+            }
+
+            // add nodes to the back of the list
+            disposeList.AddRange(nodes);
+
+            nodes.Clear();
+
+            // Add ourself to the dispose list
+            disposeList.Add(this);
+
+            // dispose of list
+            RefCountedCache.Dispose(disposeList);
+
+        }
 
         public void RemoveComponent<T>() where T : Component
         {
