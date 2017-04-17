@@ -35,9 +35,11 @@ import android.hardware.*;
 import android.content.pm.ActivityInfo;
 
 /**
-    SDL Activity
-*/
-public class SDLActivity extends Activity {
+ SDL Activity
+ */
+// ATOMIC BEGIN
+public class SDLActivity {
+// ATOMIC END
     private static final String TAG = "SDL";
 
     // Keep track of the paused state
@@ -49,7 +51,9 @@ public class SDLActivity extends Activity {
     public static boolean mSeparateMouseAndTouch;
 
     // Main components
-    protected static SDLActivity mSingleton;
+    // ATOMIC BEGIN
+    protected static Activity mSingleton;
+    // ATOMIC END
     protected static SDLSurface mSurface;
     protected static View mTextEdit;
     protected static ViewGroup mLayout;
@@ -65,6 +69,30 @@ public class SDLActivity extends Activity {
     // Urho3D: flag to load the .so and a new method load them
     private static boolean mIsSharedLibraryLoaded = false;
 
+    // ATOMIC BEGIN
+    public static SDLSurface createSurface(Activity activity) {
+            SDLActivity.initialize();
+            mSingleton = activity;
+
+            if (!mIsSharedLibraryLoaded) {
+                System.loadLibrary("AtomicNETNative");
+                mIsSharedLibraryLoaded = true;
+            }
+            // Set up the surface
+            mSurface = new SDLSurface(activity.getApplication());
+
+            if(Build.VERSION.SDK_INT >= 12) {
+                mJoystickHandler = new SDLJoystickHandler_API12();
+            }
+            else {
+                mJoystickHandler = new SDLJoystickHandler();
+            }
+
+            return mSurface;
+        }
+    // ATOMIC END
+
+
     protected boolean onLoadLibrary(ArrayList<String> libraryNames) {
         for (final String name : libraryNames) {
             System.loadLibrary(name);
@@ -78,7 +106,7 @@ public class SDLActivity extends Activity {
      * The default implementation returns an empty array. It never returns null.
      * @return arguments for the native application.
      */
-    protected String[] getArguments() {
+    static protected String[] getArguments() {
         // Urho3D: always return the "app_process" as the first argument instead of empty array
         return new String[]{"app_process"};
     }
@@ -100,6 +128,8 @@ public class SDLActivity extends Activity {
         mHasFocus = true;
     }
 
+    // ATOMIC BEGIN
+    /*
     // Setup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +205,9 @@ public class SDLActivity extends Activity {
         }
 
         // Set up the surface
-        mSurface = new SDLSurface(getApplication());
+        // ATOMIC BEGIN
+        mSurface = new SDLSurface(activity.getApplication());
+        // ATOMIC END
 
         if(Build.VERSION.SDK_INT >= 12) {
             mJoystickHandler = new SDLJoystickHandler_API12();
@@ -199,13 +231,15 @@ public class SDLActivity extends Activity {
                 SDLActivity.onNativeDropFile(filename);
             }
         }
-    }
+    } */
 
     // Events
-    @Override
-    protected void onPause() {
+
+    // ATOMIC SDLActivity activity methods changes to static, so can be called by C# activity
+
+    public static void onPause() {
+
         Log.v(TAG, "onPause()");
-        super.onPause();
 
         if (!SDLActivity.mIsSharedLibraryLoaded) {  // Urho3D
            return;
@@ -214,10 +248,8 @@ public class SDLActivity extends Activity {
         SDLActivity.handlePause();
     }
 
-    @Override
-    protected void onResume() {
+    public static void onResume() {
         Log.v(TAG, "onResume()");
-        super.onResume();
 
         if (!SDLActivity.mIsSharedLibraryLoaded) {  // Urho3D
            return;
@@ -227,9 +259,8 @@ public class SDLActivity extends Activity {
     }
 
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
+    public static void onWindowFocusChanged(boolean hasFocus) {
+
         Log.v(TAG, "onWindowFocusChanged(): " + hasFocus);
 
         if (!SDLActivity.mIsSharedLibraryLoaded) {  // Urho3D
@@ -242,10 +273,8 @@ public class SDLActivity extends Activity {
         }
     }
 
-    @Override
-    public void onLowMemory() {
+    public static void onLowMemory() {
         Log.v(TAG, "onLowMemory()");
-        super.onLowMemory();
 
         if (!SDLActivity.mIsSharedLibraryLoaded) {  // Urho3D
            return;
@@ -254,12 +283,10 @@ public class SDLActivity extends Activity {
         SDLActivity.nativeLowMemory();
     }
 
-    @Override
-    protected void onDestroy() {
+    public static void onDestroy() {
         Log.v(TAG, "onDestroy()");
 
         if (!SDLActivity.mIsSharedLibraryLoaded) {  // Urho3D
-           super.onDestroy();
            // Reset everything in case the user re opens the app
            SDLActivity.initialize();
            return;
@@ -281,13 +308,11 @@ public class SDLActivity extends Activity {
             //Log.v(TAG, "Finished waiting for SDL thread");
         }
 
-        super.onDestroy();
         // Reset everything in case the user re opens the app
         SDLActivity.initialize();
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
+    public static boolean dispatchKeyEvent(KeyEvent event) {
 
         if (!SDLActivity.mIsSharedLibraryLoaded) {  // Urho3D
            return false;
@@ -305,7 +330,7 @@ public class SDLActivity extends Activity {
             ) {
             return false;
         }
-        return super.dispatchKeyEvent(event);
+        return true;
     }
 
     /** Called by onPause or surfaceDestroyed. Even if surfaceDestroyed
@@ -332,10 +357,19 @@ public class SDLActivity extends Activity {
         }
     }
 
+    // ATOMIC BEGIN
+    public static boolean FinishActivityOnNativeExit = true;
+    // ATOMIC END
+
     /* The native thread has finished */
     public static void handleNativeExit() {
         SDLActivity.mSDLThread = null;
-        mSingleton.finish();
+
+        // ATOMIC BEGIN
+        if (mSingleton != null && FinishActivityOnNativeExit) {
+            mSingleton.finish();
+        }
+        // ATOMIC END
     }
 
 
@@ -404,7 +438,7 @@ public class SDLActivity extends Activity {
                 break;
             }
             default:
-                if ((context instanceof SDLActivity) && !((SDLActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
+                if ((context instanceof AtomicActivity) && !((AtomicActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
                     Log.e(TAG, "error handling message, command is " + msg.arg1);
                 }
             }
@@ -412,10 +446,13 @@ public class SDLActivity extends Activity {
     }
 
     // Handler for the messages
-    Handler commandHandler = new SDLCommandHandler();
+    // ATOMIC BEGIN
+    // Made static
+    static Handler commandHandler = new SDLCommandHandler();
+    // ATOMIC END
 
     // Send a message from the SDLMain thread
-    boolean sendCommand(int command, Object data) {
+    public static boolean sendCommand(int command, Object data) {
         Message msg = commandHandler.obtainMessage();
         msg.arg1 = command;
         msg.obj = data;
@@ -458,14 +495,14 @@ public class SDLActivity extends Activity {
      */
     public static boolean setActivityTitle(String title) {
         // Called from SDLMain() thread and can't directly affect the view
-        return mSingleton.sendCommand(COMMAND_CHANGE_TITLE, title);
+        return SDLActivity.sendCommand(COMMAND_CHANGE_TITLE, title);
     }
 
     /**
      * This method is called by SDL using JNI.
      */
     public static boolean sendMessage(int command, int param) {
-        return mSingleton.sendCommand(command, Integer.valueOf(param));
+        return SDLActivity.sendCommand(command, Integer.valueOf(param));
     }
 
     /**
@@ -483,11 +520,11 @@ public class SDLActivity extends Activity {
         final Object lock = new Object();
         final Object[] results = new Object[2]; // array for writable variables
         synchronized (lock) {
-            runOnUiThread(new Runnable() {
+            mSingleton.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     synchronized (lock) {
-                        results[0] = getSystemService(name);
+                        results[0] = mSingleton.getSystemService(name);
                         results[1] = Boolean.TRUE;
                         lock.notify();
                     }
@@ -548,7 +585,7 @@ public class SDLActivity extends Activity {
      */
     public static boolean showTextInput(int x, int y, int w, int h) {
         // Transfer the task to the main thread as a Runnable
-        return mSingleton.commandHandler.post(new ShowTextInputTask(x, y, w, h));
+        return SDLActivity.commandHandler.post(new ShowTextInputTask(x, y, w, h));
     }
 
     /**
@@ -830,7 +867,7 @@ public class SDLActivity extends Activity {
     // Messagebox
 
     /** Result of current messagebox. Also used for blocking the calling thread. */
-    protected final int[] messageboxSelection = new int[1];
+    static protected final int[] messageboxSelection = new int[1];
 
     /** Id of current dialog. */
     protected int dialogs = 0;
@@ -875,10 +912,10 @@ public class SDLActivity extends Activity {
 
         // trigger Dialog creation on UI thread
 
-        runOnUiThread(new Runnable() {
+        mSingleton.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                showDialog(dialogs++, args);
+                mSingleton.showDialog(dialogs++, args);
             }
         });
 
@@ -898,8 +935,7 @@ public class SDLActivity extends Activity {
         return messageboxSelection[0];
     }
 
-    @Override
-    protected Dialog onCreateDialog(int ignore, Bundle args) {
+    public static Dialog onCreateDialog(int ignore, Bundle args) {
 
         // TODO set values from "flags" to messagebox dialog
 
@@ -928,7 +964,7 @@ public class SDLActivity extends Activity {
 
         // create dialog with title and a listener to wake up calling thread
 
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(mSingleton);
         dialog.setTitle(args.getString("title"));
         dialog.setCancelable(false);
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -942,7 +978,7 @@ public class SDLActivity extends Activity {
 
         // create text
 
-        TextView message = new TextView(this);
+        TextView message = new TextView(mSingleton);
         message.setGravity(Gravity.CENTER);
         message.setText(args.getString("message"));
         if (textColor != Color.TRANSPARENT) {
@@ -957,11 +993,11 @@ public class SDLActivity extends Activity {
 
         final SparseArray<Button> mapping = new SparseArray<Button>();
 
-        LinearLayout buttons = new LinearLayout(this);
+        LinearLayout buttons = new LinearLayout(mSingleton);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
         buttons.setGravity(Gravity.CENTER);
         for (int i = 0; i < buttonTexts.length; ++i) {
-            Button button = new Button(this);
+            Button button = new Button(mSingleton);
             final int id = buttonIds[i];
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1004,7 +1040,7 @@ public class SDLActivity extends Activity {
 
         // create content
 
-        LinearLayout content = new LinearLayout(this);
+        LinearLayout content = new LinearLayout(mSingleton);
         content.setOrientation(LinearLayout.VERTICAL);
         content.addView(message);
         content.addView(buttons);
@@ -1041,7 +1077,7 @@ class SDLMain implements Runnable {
     public void run() {
         // Runs SDL_main()
         // Urho3D: pass filesDir
-        SDLActivity.nativeInit(SDLActivity.mSingleton.getArguments(), ((Activity)SDLActivity.getContext()).getFilesDir().getAbsolutePath());
+        SDLActivity.nativeInit(SDLActivity.getArguments(), ((Activity)SDLActivity.getContext()).getFilesDir().getAbsolutePath());
 
         //Log.v("SDL", "SDL thread terminated");
     }

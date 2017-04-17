@@ -20,6 +20,20 @@ public class AtomicActivity extends Activity {
         setContentView(mLayout);
     }
 
+    // ATOMIC BEGIN
+    /**
+     * This method is called by SDL if SDL did not handle a message itself.
+     * This happens if a received message contains an unsupported command.
+     * Method can be overwritten to handle Messages in a different class.
+     * @param command the command of the message.
+     * @param param the parameter of the message. May be null.
+     * @return if the message was handled in overridden method.
+     */
+    protected boolean onUnhandledMessage(int command, Object param) {
+        return false;
+    }
+    //ATOMIC END
+
     @Override
     protected void onResume() {
         super.onResume();
