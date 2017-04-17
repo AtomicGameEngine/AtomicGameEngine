@@ -21,9 +21,7 @@
 #ifndef DETOURCROWD_H
 #define DETOURCROWD_H
 
-// ATOMIC BEGIN
-#include "../../Detour/include/DetourNavMeshQuery.h"
-// ATOMIC END
+#include "DetourNavMeshQuery.h"
 #include "DetourObstacleAvoidance.h"
 #include "DetourLocalBoundary.h"
 #include "DetourPathCorridor.h"

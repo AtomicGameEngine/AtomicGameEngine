@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -132,6 +132,10 @@ private:
     unsigned boundVBO_;
     /// Currently bound uniform buffer object.
     unsigned boundUBO_;
+    /// Read frame buffer for multisampled texture resolves.
+    unsigned resolveSrcFBO_;
+    /// Write frame buffer for multisampled texture resolves.
+    unsigned resolveDestFBO_;
     /// Current pixel format.
     int pixelFormat_;
     /// Map for FBO's per resolution and format.

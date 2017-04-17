@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
@@ -238,9 +239,7 @@ Graphics::Graphics(Context* context) :
     SetTextureUnitMappings();
     ResetCachedState();
 
-    // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE
-        | SDL_INIT_TIMER | SDL_INIT_HAPTIC ); // ATOMIC BEGIN  HAPTIC  //ATOMIC END
+    context_->RequireSDL(SDL_INIT_VIDEO);
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -297,12 +296,11 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
 
-    // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
-    SDL_Quit();
+    context_->ReleaseSDL();
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
-    int multiSample)
+    int multiSample, int monitor, int refreshRate)
 {
     ATOMIC_PROFILE(SetScreenMode);
 
@@ -310,9 +308,14 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     bool maximize = false;
 
+    // Make sure monitor index is not bigger than the currently detected monitors
+    int monitors = SDL_GetNumVideoDisplays();
+    if (monitor >= monitors || monitor < 0)
+        monitor = 0; // this monitor is not present, use first monitor
+
     // Find out the full screen mode display format (match desktop color depth)
     SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
+    SDL_GetDesktopDisplayMode(monitor, &mode);
     DXGI_FORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? DXGI_FORMAT_B5G6R5_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
 
     // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
@@ -355,7 +358,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // Check fullscreen mode validity. Use a closest match if not found
     if (fullscreen)
     {
-        PODVector<IntVector2> resolutions = GetResolutions();
+        PODVector<IntVector3> resolutions = GetResolutions(monitor);
         if (resolutions.Size())
         {
             unsigned best = 0;
@@ -373,10 +376,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             width = resolutions[best].x_;
             height = resolutions[best].y_;
+            refreshRate = resolutions[best].z_;
         }
     }
 
-    AdjustWindow(width, height, fullscreen, borderless);
+    AdjustWindow(width, height, fullscreen, borderless, monitor);
+    monitor_ = monitor;
 
     if (maximize)
     {
@@ -401,7 +406,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 #ifdef ATOMIC_LOGGING
     String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
@@ -420,6 +425,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_BORDERLESS] = borderless_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_MONITOR] = monitor_;
+    eventData[P_REFRESHRATE] = refreshRate_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
@@ -427,7 +434,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -481,12 +488,18 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image* destImage)
+bool Graphics::TakeScreenShot(Image* destImage_)
 {
     ATOMIC_PROFILE(TakeScreenShot);
 
     if (!impl_->device_)
         return false;
+
+// ATOMIC BEGIN
+    if (!destImage_)
+        return false;
+    Image& destImage = *destImage_;
+// ATOMIC END
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
@@ -542,8 +555,8 @@ bool Graphics::TakeScreenShot(Image* destImage)
         return false;
     }
 
-    destImage->SetSize(width_, height_, 3);
-    unsigned char* destData = destImage->GetData();
+    destImage.SetSize(width_, height_, 3);
+    unsigned char* destData = destImage.GetData();
     for (int y = 0; y < height_; ++y)
     {
         unsigned char* src = (unsigned char*)mappedData.pData + y * mappedData.RowPitch;
@@ -732,6 +745,52 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 
     return true;
 }
+
+bool Graphics::ResolveToTexture(Texture2D* texture)
+{
+    if (!texture)
+        return false;
+    RenderSurface* surface = texture->GetRenderSurface();
+    if (!surface)
+        return false;
+
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    impl_->deviceContext_->ResolveSubresource(dest, 0, source, 0, (DXGI_FORMAT)texture->GetFormat());
+    return true;
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+    if (!texture)
+        return false;
+
+    texture->SetResolveDirty(false);
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        // Resolve only the surface(s) that were actually rendered to
+        RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+        if (!surface->IsResolveDirty())
+            continue;
+
+        surface->SetResolveDirty(false);
+        unsigned subResource = D3D11CalcSubresource(0, i, texture->GetLevels());
+        impl_->deviceContext_->ResolveSubresource(dest, subResource, source, subResource, (DXGI_FORMAT)texture->GetFormat());
+    }
+
+    return true;
+}
+
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
@@ -1085,6 +1144,18 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
 }
 
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+        return;
+
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        impl_->dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(int), &value);
+}
+
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
@@ -1181,60 +1252,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
-    }
-}
-
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
     if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
@@ -1283,6 +1300,20 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
+        else
+        {
+            // Resolve multisampled texture now as necessary
+            if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
+            {
+                if (texture->GetType() == Texture2D::GetTypeStatic())
+                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
+            }
+        }
+
+        if (texture->GetLevelsDirty())
+            texture->RegenerateLevels();
     }
 
     if (texture && texture->GetParametersDirty())
@@ -1390,6 +1421,17 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
+
+            // If multisampled, mark the texture & surface needing resolve
+            if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            {
+                parentTexture->SetResolveDirty(true);
+                renderTarget->SetResolveDirty(true);
+            }
+
+            // If mipmapped, mark the levels needing regeneration
+            if (parentTexture->GetLevels() > 1)
+                parentTexture->SetLevelsDirty();
         }
     }
 }
@@ -1517,6 +1559,15 @@ void Graphics::SetFillMode(FillMode mode)
     if (mode != fillMode_)
     {
         fillMode_ = mode;
+        impl_->rasterizerStateDirty_ = true;
+    }
+}
+
+void Graphics::SetLineAntiAlias(bool enable)
+{
+    if (enable != lineAntiAlias_)
+    {
+        lineAntiAlias_ = enable;
         impl_->rasterizerStateDirty_ = true;
     }
 }
@@ -1660,23 +1711,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
     }
 }
 
-void Graphics::BeginDumpShaders(const String& fileName)
-{
-    shaderPrecache_ = new ShaderPrecache(context_, fileName);
-}
-
-void Graphics::EndDumpShaders()
-{
-    shaderPrecache_.Reset();
-}
-
-void Graphics::PrecacheShaders(Deserializer& source)
-{
-    ATOMIC_PROFILE(PrecacheShaders);
-
-    ShaderPrecache::LoadShaders(this, source);
-}
-
 bool Graphics::IsInitialized() const
 {
     return window_ != 0 && impl_->GetDevice() != 0;
@@ -1691,10 +1725,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     {
         for (unsigned i = 2; i <= 16; ++i)
         {
-            unsigned levels = 0;
-            impl_->device_->CheckMultisampleQualityLevels(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM,
-                i, &levels);
-            if (levels)
+            if (impl_->CheckMultiSampleSupport(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM, i))
                 ret.Push(i);
         }
     }
@@ -2068,7 +2099,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
     return true;
 }
 
-void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless)
+void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor)
 {
     if (!externalWindow_)
     {
@@ -2077,8 +2108,17 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_MaximizeWindow(window_);
             SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
-        else
+        else 
+        {
+            if (newFullscreen || newBorderless) 
+            {
+                // Reposition the window on the specified monitor
+                SDL_Rect display_rect;
+                SDL_GetDisplayBounds(monitor, &display_rect);
+                SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
+            }
             SDL_SetWindowSize(window_, newWidth, newHeight);
+        }
 
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
         SDL_HideWindow(window_);
@@ -2146,7 +2186,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.OutputWindow = GetWindowHandle(window_);
     swapChainDesc.SampleDesc.Count = (UINT)multiSample;
-    swapChainDesc.SampleDesc.Quality = multiSample > 1 ? 0xffffffff : 0;
+    swapChainDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(swapChainDesc.BufferDesc.Format, multiSample);
     swapChainDesc.Windowed = TRUE;
     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -2240,7 +2280,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     depthDesc.ArraySize = 1;
     depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     depthDesc.SampleDesc.Count = (UINT)multiSample_;
-    depthDesc.SampleDesc.Quality = multiSample_ > 1 ? 0xffffffff : 0;
+    depthDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(depthDesc.Format, multiSample_);
     depthDesc.Usage = D3D11_USAGE_DEFAULT;
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depthDesc.CPUAccessFlags = 0;
@@ -2333,6 +2373,7 @@ void Graphics::ResetCachedState()
     depthTestMode_ = CMP_LESSEQUAL;
     depthWrite_ = true;
     fillMode_ = FILL_SOLID;
+    lineAntiAlias_ = false;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
@@ -2540,8 +2581,8 @@ void Graphics::PrepareDraw()
         int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
 
         unsigned newRasterizerStateHash =
-            (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) | ((scaledDepthBias & 0x1fff) << 5) |
-            (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 18);
+            (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) |
+            ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
@@ -2559,8 +2600,8 @@ void Graphics::PrepareDraw()
                 stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
                 stateDesc.DepthClipEnable = TRUE;
                 stateDesc.ScissorEnable = scissorTest_ ? TRUE : FALSE;
-                stateDesc.MultisampleEnable = TRUE;
-                stateDesc.AntialiasedLineEnable = FALSE;
+                stateDesc.MultisampleEnable = lineAntiAlias_ ? FALSE : TRUE;
+                stateDesc.AntialiasedLineEnable = lineAntiAlias_ ? TRUE : FALSE;
 
                 ID3D11RasterizerState* newRasterizerState = 0;
                 HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);

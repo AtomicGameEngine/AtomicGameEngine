@@ -72,27 +72,35 @@ Licensed under the MIT license, see [License.txt](https://github.com/urho3d/Urho
 
 ##Credits
 Urho3D development, contributions and bugfixes by:
-- Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
+- Lasse Öörni
 - Wei Tjong Yao
 - Aster Jian
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
+- Gauthier Billot
 - Loic Blot
 - Danny Boisvert
 - Sergey Bosko
+- Lisandro Bruzzo
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
 - Josh Engebretson
+- Simon Flores
+- Manuel Freiberger
 - Chris Friesen
 - Alex Fuller
 - Henrik Heino
 - Mika Heinonen
+- Victor Holt
+- Johnathan Jenkins
 - Jukka Jylänki
 - Graham King
 - Jason Kinzer
+- Cameron Kline
+- Jan Korous
 - Eugene Kozlov
 - Gunnar Kriik
 - Aliaksandr Kryvashein
@@ -100,11 +108,13 @@ Urho3D development, contributions and bugfixes by:
 - Rokas Kupstys
 - Ali Kämäräinen
 - Pete Leigh
+- Arnis Lielturks
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
 - Xavier Maupeu
 - Jonne Nauha
+- Huy Nguyen
 - Paul Noome
 - David Palacios
 - Alex Parlett
@@ -113,27 +123,35 @@ Urho3D development, contributions and bugfixes by:
 - Vladimir Pobedinsky
 - Franck Poulain
 - Pranjal Raihan
+- Mariusz Richtscheid
 - Nick Royer
+- Jonathan Sandusky
 - Miika Santala
 - Anatoly Sennov
+- Matan Shukry
 - Bengt Soderstrom
 - Hualin Song
 - James Thomas
 - Joshua Tippetts
+- Konstantin Tomashevich
 - Yusuf Umar
+- Mateus Vendramini
 - Daniel Wiberg
 - Steven Zhang
 - AGreatFish
 - BlueMagnificent
 - Enhex
+- Fastran
 - Firegorilla
 - Gordon-F
 - Lumak
 - Magic.Lixin
 - Mike3D
 - MonkeyFirst
+- Ner'zhul
 - Newb I the Newbd
 - OvermindDL1
+- PredatorMF
 - Scellow
 - Skrylar
 - TheComet93
@@ -149,6 +167,7 @@ Urho3D development, contributions and bugfixes by:
 - dragonCASTjosh
 - feltech
 - fredakilla
+- gleblebedev
 - hdunderscore
 - lvshiling
 - marynate
@@ -156,6 +175,7 @@ Urho3D development, contributions and bugfixes by:
 - neat3d
 - nemerle
 - ninjastone
+- orefkov
 - proller
 - raould
 - rasteron

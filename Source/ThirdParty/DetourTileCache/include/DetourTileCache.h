@@ -3,9 +3,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-// ATOMIC BEGIN
-#include "../../Detour/include/DetourStatus.h"
-// ATOMIC END
+#include "DetourStatus.h"
 
 
 

@@ -37,7 +37,7 @@ endif()
 
 if (APPLE)
     if (NOT IOS)
-        target_link_libraries( AtomicNETNative "-stdlib=libc++ -framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
+        target_link_libraries( AtomicNETNative "-stdlib=libc++ -framework AudioToolbox -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
     else()
         set_target_properties(AtomicNETNative PROPERTIES
             FRAMEWORK TRUE
@@ -46,7 +46,7 @@ if (APPLE)
             # PUBLIC_HEADER dynamicFramework.h
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
         )
-        target_link_libraries( AtomicNETNative "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit -framework CoreMotion -framework GameController")
+        target_link_libraries( AtomicNETNative "-framework AudioToolbox -framework AVFoundation -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit -framework CoreMotion -framework GameController")
     endif()
 endif()
 

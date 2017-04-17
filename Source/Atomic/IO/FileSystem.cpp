@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,16 +89,16 @@ namespace Atomic
 
 int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
-#if !defined(NO_POPEN) && !defined(MINI_URHO)
+#if !defined(__EMSCRIPTEN__) && !defined(MINI_URHO)
     if (!redirectToLog)
 #endif
         return system(commandLine.CString());
 
-#if !defined(NO_POPEN) && !defined(MINI_URHO)
+#if !defined(__EMSCRIPTEN__) && !defined(MINI_URHO)
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
-    char* prefPath = SDL_GetPrefPath("urho3d", "temp");
+    char* prefPath = SDL_GetPrefPath("atomic", "temp");
     if (prefPath)
     {
         stderrFilename = String(prefPath) + "command-stderr";
@@ -440,11 +440,13 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         // ATOMIC BEGIN
         // allow opening of http and file urls
         if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://") && !fileName.StartsWith("file://"))
+        {
             if (!FileExists(fileName) && !DirExists(fileName))
             {
                 ATOMIC_LOGERROR("File or directory " + fileName + " not found");
                 return false;
             }
+        }
         // ATOMIC END
 
 #ifdef _WIN32
@@ -694,38 +696,31 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 
 String FileSystem::GetProgramDir() const
 {
-    // Return cached value if possible
-    if (!programDir_.Empty())
-        return programDir_;
-
 #if defined(__ANDROID__)
     // This is an internal directory specifier pointing to the assets in the .apk
     // Files from this directory will be opened using special handling
-    programDir_ = APK;
-    return programDir_;
+    return APK;
 #elif defined(IOS)
-    programDir_ = AddTrailingSlash(SDL_IOS_GetResourceDir());
-    return programDir_;
+    return AddTrailingSlash(SDL_IOS_GetResourceDir());
 #elif defined(_WIN32)
     wchar_t exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileNameW(0, exeName, MAX_PATH);
-    programDir_ = GetPath(String(exeName));
+    return GetPath(String(exeName));
 #elif defined(__APPLE__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
-    programDir_ = GetPath(String(exeName));
+    return GetPath(String(exeName));
 #elif defined(__linux__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     pid_t pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
-    programDir_ = GetPath(String(exeName));
-#endif
-
+    return GetPath(String(exeName));
+#else
 // ATOMIC BEGIN
 
     // Disabling this on Mac as a possible source of resource issues with app bundles
@@ -742,13 +737,9 @@ String FileSystem::GetProgramDir() const
         programDir_ = currentDir;
 
 #endif
-
 // ATOMIC END
-
-    // Sanitate /./ construct away
-    programDir_.Replace("/./", "/");
-
-    return programDir_;
+    return GetCurrentDir();
+#endif
 }
 
 String FileSystem::GetUserDocumentsDir() const

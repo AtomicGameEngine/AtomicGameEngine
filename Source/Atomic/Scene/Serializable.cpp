@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,18 +57,12 @@ static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, con
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    networkState_(0),
-    instanceDefaultValues_(0),
     temporary_(false)
 {
 }
 
 Serializable::~Serializable()
 {
-    delete networkState_;
-    networkState_ = 0;
-    delete instanceDefaultValues_;
-    instanceDefaultValues_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -155,6 +149,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 
     case VAR_INTVECTOR2:
         *(reinterpret_cast<IntVector2*>(dest)) = src.GetIntVector2();
+        break;
+
+    case VAR_INTVECTOR3:
+        *(reinterpret_cast<IntVector3*>(dest)) = src.GetIntVector3();
         break;
 
     case VAR_DOUBLE:
@@ -257,6 +255,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         dest = *(reinterpret_cast<const IntVector2*>(src));
         break;
 
+    case VAR_INTVECTOR3:
+        dest = *(reinterpret_cast<const IntVector3*>(src));
+        break;
+
     case VAR_DOUBLE:
         dest = *(reinterpret_cast<const double*>(src));
         break;
@@ -316,7 +318,7 @@ bool Serializable::Save(Serializer& dest) const
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_FILE))
+        if (!(attr.mode_ & AM_FILE) || (attr.mode_ & AM_FILEREADONLY) == AM_FILEREADONLY)
             continue;
 
         OnGetAttribute(attr, value);
@@ -521,7 +523,7 @@ bool Serializable::SaveXML(XMLElement& dest) const
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_FILE))
+        if (!(attr.mode_ & AM_FILE) || (attr.mode_ & AM_FILEREADONLY) == AM_FILEREADONLY)
             continue;
 
         OnGetAttribute(attr, value);
@@ -558,7 +560,7 @@ bool Serializable::SaveJSON(JSONValue& dest) const
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_FILE))
+        if (!(attr.mode_ & AM_FILE) || (attr.mode_ & AM_FILEREADONLY) == AM_FILEREADONLY)
             continue;
 
         OnGetAttribute(attr, value);
@@ -669,8 +671,7 @@ void Serializable::ResetToDefault()
 
 void Serializable::RemoveInstanceDefault()
 {
-    delete instanceDefaultValues_;
-    instanceDefaultValues_ = 0;
+    instanceDefaultValues_.Reset();
 }
 
 void Serializable::SetTemporary(bool enable)

@@ -1,6 +1,6 @@
 //
 
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,10 +84,10 @@ SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
 }
 
 
-Drawable::Drawable(Context* context, unsigned drawableFlags) :
+Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     Component(context),
     boundingBox_(0.0f, 0.0f),
-    drawableFlags_((unsigned char)drawableFlags),
+    drawableFlags_(drawableFlags),
     worldBoundingBoxDirty_(true),
     castShadows_(false),
     occluder_(false),
@@ -458,7 +458,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
     bool anythingWritten = false;
 
     // Write the common "I came from X" comment
-    outputFile->WriteLine("# OBJ file exported from Urho3D");
+    outputFile->WriteLine("# OBJ file exported from Atomic");
 
     for (unsigned i = 0; i < drawables.Size(); ++i)
     {

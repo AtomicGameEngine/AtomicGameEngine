@@ -18,13 +18,12 @@ subject to the following restrictions:
 
 #include "btCollisionShape.h"
 
-// ATOMIC_BEGIN
-#include "../../LinearMath/btVector3.h"
-#include "../../LinearMath/btTransform.h"
-#include "../../LinearMath/btMatrix3x3.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btTransform.h"
+#include "LinearMath/btMatrix3x3.h"
 #include "btCollisionMargin.h"
-#include "../../LinearMath/btAlignedAllocator.h"
-// ATOMIC_END
+#include "LinearMath/btAlignedAllocator.h"
+
 #define MAX_PREFERRED_PENETRATION_DIRECTIONS 10
 
 /// The btConvexShape is an abstract shape interface, implemented by all convex shapes such as btBoxShape, btConvexHullShape etc.

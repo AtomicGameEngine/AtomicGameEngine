@@ -15,7 +15,7 @@
 	"overloads" : {
 
 		"Node" : {
-			"CreateChild" : ["String", "CreateMode", "unsigned"],
+			"CreateChild" : ["String", "CreateMode", "unsigned", "bool"],
 			"GetChild" : ["String", "bool"],
 			"SetScale" : ["Vector3"],
 			"SetPosition2D" : ["Vector2"],

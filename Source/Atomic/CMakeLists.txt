@@ -21,6 +21,9 @@ file (GLOB PHYSICS_SOURCE Physics/*.cpp Physics/*.h)
 file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
 file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
+if (ATOMIC_IK)
+    file (GLOB IK_SOURCE IK/*.cpp IK/*.h)
+endif ()
 
 if (ATOMIC_DATABASE_SQLITE)
     file (GLOB DATABASE_SOURCE Database/*.cpp Database/*.h Database/SQLite/*.cpp Database/SQLite/*.h)
@@ -32,8 +35,8 @@ if (WIN32)
     if (ATOMIC_D3D11) # DirectX 11
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
     elseif (ATOMIC_OPENGL) # OpenGL
-	    file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
-	else() # DirectX 9
+        file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
+    else() # DirectX 9
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
     endif()
 else()
@@ -52,7 +55,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
                   ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
                   ${WEB_SOURCE} ${SCRIPT_SOURCE} ${METRICS_SOURCE}
-                  ${PLATFORM_SOURCE} ${DATABASE_SOURCE})
+                  ${PLATFORM_SOURCE} ${DATABASE_SOURCE} ${IK_SOURCE})
 
 if (NOT WEB)
   set (SOURCE_FILES ${SOURCE_FILES} ${NETWORK_SOURCE} ${NAVIGATION_SOURCE})
@@ -80,6 +83,7 @@ GroupSources("Web")
 GroupSources("Script")
 GroupSources("Metrics")
 GroupSources("BuildInfo")
+GroupSources("IK")
 
 # Handle Git Revision
 include(GetGitRevisionDescription)
@@ -210,6 +214,12 @@ elseif (ATOMIC_DATABASE_ODBC)
     target_link_libraries(Atomic nanodbc)
     target_compile_definitions(Atomic PUBLIC -DATOMIC_DATABASE=1 -DATOMIC_DATABASE_ODBC=1)
 endif ()
+
+if (ATOMIC_IK)
+    target_link_libraries(Atomic ik)
+    target_compile_definitions(Atomic PUBLIC -DATOMIC_IK=1)
+endif ()
+
 target_include_directories (Atomic PUBLIC
     ${ATOMIC_SOURCE_DIR}/Source
     ${ATOMIC_SOURCE_DIR}/Source/ThirdParty

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -126,11 +126,11 @@ public:
     bool GetInterceptNetworkUpdate(const String& attributeName) const;
 
     /// Return the network attribute state, if allocated.
-    NetworkState* GetNetworkState() const { return networkState_; }
+    NetworkState* GetNetworkState() const { return networkState_.Get(); }
 
 protected:
     /// Network attribute state.
-    NetworkState* networkState_;
+    UniquePtr<NetworkState> networkState_;
 
 private:
     /// Set instance-level default value. Allocate the internal data structure as necessary.
@@ -139,7 +139,7 @@ private:
     Variant GetInstanceDefault(const String& name) const;
 
     /// Attribute default value at each instance level.
-    VariantMap* instanceDefaultValues_;
+    UniquePtr<VariantMap> instanceDefaultValues_;
     /// Temporary flag.
     bool temporary_;
 };
@@ -165,7 +165,7 @@ public:
     {
         assert(ptr);
         const T* classPtr = static_cast<const T*>(ptr);
-        dest = (classPtr->*getFunction_)();
+        dest = (int)(classPtr->*getFunction_)();
     }
 
     /// Invoke setter function.
@@ -348,22 +348,26 @@ public:
 /// Remove attribute by name.
 #define ATOMIC_REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
 /// Define an attribute that points to a memory offset in the object.
-#define ATOMIC_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(GetVariantType<typeName >(), name, offsetof(ClassName, variable), defaultValue, mode))
+#define ATOMIC_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, offsetof(ClassName, variable), defaultValue, mode))
 /// Define an attribute that points to a memory offset in the object, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
 #define ATOMIC_ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(name, offsetof(ClassName, variable), enumNames, defaultValue, mode))
 /// Define an attribute that uses get and set functions.
-#define ATOMIC_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(GetVariantType<typeName >(), name, new Atomic::AttributeAccessorImpl<ClassName, typeName, AttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define ATOMIC_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, new Atomic::AttributeAccessorImpl<ClassName, typeName, Atomic::AttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
 /// Define an attribute that uses get and set free functions.
-#define ATOMIC_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(GetVariantType<typeName >(), name, new Atomic::AttributeAccessorFreeImpl<ClassName, typeName, AttributeTrait<typeName > >(getFunction, setFunction), defaultValue, mode))
+#define ATOMIC_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, new Atomic::AttributeAccessorFreeImpl<ClassName, typeName, Atomic::AttributeTrait<typeName > >(getFunction, setFunction), defaultValue, mode))
 /// Define an attribute that uses get and set functions, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
 #define ATOMIC_ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(name, new Atomic::EnumAttributeAccessorImpl<ClassName, typeName >(&ClassName::getFunction, &ClassName::setFunction), enumNames, defaultValue, mode))
 /// Define an attribute that uses get and set free functions, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
 #define ATOMIC_ENUM_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(name, new Atomic::EnumAttributeAccessorFreeImpl<ClassName, typeName >(getFunction, setFunction), enumNames, defaultValue, mode))
 /// Define an attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
-#define ATOMIC_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(GetVariantType<typeName >(), name, new Atomic::AttributeAccessorImpl<ClassName, typeName, MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
+#define ATOMIC_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, new Atomic::AttributeAccessorImpl<ClassName, typeName, Atomic::MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
 /// Define an attribute that uses get and set free functions, where the get function returns by value, but the set function uses a reference.
-#define ATOMIC_MIXED_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(GetVariantType<typeName >(), name, new Atomic::AttributeAccessorFreeImpl<ClassName, typeName, MixedAttributeTrait<typeName > >(getFunction, setFunction), defaultValue, mode))
+#define ATOMIC_MIXED_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, new Atomic::AttributeAccessorFreeImpl<ClassName, typeName, Atomic::MixedAttributeTrait<typeName > >(getFunction, setFunction), defaultValue, mode))
 /// Update the default value of an already registered attribute.
 #define ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
+/// Define a variant structure attribute that uses get and set functions.
+#define ATOMIC_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, variantStructureElementNames, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, new Atomic::AttributeAccessorImpl<ClassName, typeName, Atomic::AttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, variantStructureElementNames, mode))
+/// Define a variant structure attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
+#define ATOMIC_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, variantStructureElementNames, mode) context->RegisterAttribute<ClassName>(Atomic::AttributeInfo(Atomic::GetVariantType<typeName >(), name, new Atomic::AttributeAccessorImpl<ClassName, typeName, Atomic::MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, variantStructureElementNames, mode))
 
 }

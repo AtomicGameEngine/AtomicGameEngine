@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ namespace Atomic
 class IndexBuffer;
 class VertexBuffer;
 
+// ATOMIC BEGIN
 /// One billboard in the billboard set.
 class ATOMIC_API Billboard : public RefCounted
 {
@@ -69,6 +70,7 @@ public:
 
     float GetSortDistance() const { return sortDistance_; }
     void SetSortDistance(float sortDistance) { sortDistance_ = sortDistance; }
+// ATOMIC END
 
     /// Position.
     Vector3 position_;
@@ -90,8 +92,9 @@ public:
     float screenScaleFactor_;
 };
 
-
+// ATOMIC BEGIN
 static const unsigned MAX_BILLBOARDS = 65536 / 4;
+// ATOMIC END
 
 /// %Billboard component.
 class ATOMIC_API BillboardSet : public Drawable
@@ -142,8 +145,10 @@ public:
     /// Return number of billboards.
     unsigned GetNumBillboards() const { return billboards_.Size(); }
 
+    // ATOMIC BEGIN
     /// Return all billboards.
     Vector<SharedPtr<Billboard>>& GetBillboards() { return billboards_; }
+    // ATOMIC END
 
     /// Return billboard by index.
     Billboard* GetBillboard(unsigned index);

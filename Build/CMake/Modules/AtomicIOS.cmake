@@ -10,7 +10,7 @@ set(CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
 set(CMAKE_OSX_DEPLOYMENT_TARGET "")
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
 
-set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_INCLUDING_64_BIT))
+set(CMAKE_OSX_ARCHITECTURES arm64)
 
 # This is a CMake hack in order to make standard CMake check modules that use try_compile() internally work on iOS platform
 # The injected "flags" are not compiler flags, they are actually CMake variables meant for another CMake subprocess that builds the source file being passed in the try_compile() command
@@ -24,4 +24,4 @@ message(${IOS_SYSROOT})
 
 set(CMAKE_FIND_ROOT_PATH ${IOS_SYSROOT})
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit -framework CoreMotion -framework GameController")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework AudioToolbox -framework AVFoundation -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit -framework CoreMotion -framework GameController")

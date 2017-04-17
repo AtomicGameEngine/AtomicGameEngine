@@ -20,13 +20,13 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- SDLSurface. This is what we draw on, so we need to know when it's created
- in order to do anything useful.
+    SDLSurface. This is what we draw on, so we need to know when it's created
+    in order to do anything useful.
 
- Because of this, that's where we set up the SDL thread
- */
+    Because of this, that's where we set up the SDL thread
+*/
 public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
-        View.OnKeyListener, View.OnTouchListener, SensorEventListener {
+    View.OnKeyListener, View.OnTouchListener, SensorEventListener  {
 
     // Sensors
     protected static SensorManager mSensorManager;
@@ -100,47 +100,47 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         int sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565 by default
         switch (format) {
-            case PixelFormat.A_8:
-                Log.v("SDL", "pixel format A_8");
-                break;
-            case PixelFormat.LA_88:
-                Log.v("SDL", "pixel format LA_88");
-                break;
-            case PixelFormat.L_8:
-                Log.v("SDL", "pixel format L_8");
-                break;
-            case PixelFormat.RGBA_4444:
-                Log.v("SDL", "pixel format RGBA_4444");
-                sdlFormat = 0x15421002; // SDL_PIXELFORMAT_RGBA4444
-                break;
-            case PixelFormat.RGBA_5551:
-                Log.v("SDL", "pixel format RGBA_5551");
-                sdlFormat = 0x15441002; // SDL_PIXELFORMAT_RGBA5551
-                break;
-            case PixelFormat.RGBA_8888:
-                Log.v("SDL", "pixel format RGBA_8888");
-                sdlFormat = 0x16462004; // SDL_PIXELFORMAT_RGBA8888
-                break;
-            case PixelFormat.RGBX_8888:
-                Log.v("SDL", "pixel format RGBX_8888");
-                sdlFormat = 0x16261804; // SDL_PIXELFORMAT_RGBX8888
-                break;
-            case PixelFormat.RGB_332:
-                Log.v("SDL", "pixel format RGB_332");
-                sdlFormat = 0x14110801; // SDL_PIXELFORMAT_RGB332
-                break;
-            case PixelFormat.RGB_565:
-                Log.v("SDL", "pixel format RGB_565");
-                sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565
-                break;
-            case PixelFormat.RGB_888:
-                Log.v("SDL", "pixel format RGB_888");
-                // Not sure this is right, maybe SDL_PIXELFORMAT_RGB24 instead?
-                sdlFormat = 0x16161804; // SDL_PIXELFORMAT_RGB888
-                break;
-            default:
-                Log.v("SDL", "pixel format unknown " + format);
-                break;
+        case PixelFormat.A_8:
+            Log.v("SDL", "pixel format A_8");
+            break;
+        case PixelFormat.LA_88:
+            Log.v("SDL", "pixel format LA_88");
+            break;
+        case PixelFormat.L_8:
+            Log.v("SDL", "pixel format L_8");
+            break;
+        case PixelFormat.RGBA_4444:
+            Log.v("SDL", "pixel format RGBA_4444");
+            sdlFormat = 0x15421002; // SDL_PIXELFORMAT_RGBA4444
+            break;
+        case PixelFormat.RGBA_5551:
+            Log.v("SDL", "pixel format RGBA_5551");
+            sdlFormat = 0x15441002; // SDL_PIXELFORMAT_RGBA5551
+            break;
+        case PixelFormat.RGBA_8888:
+            Log.v("SDL", "pixel format RGBA_8888");
+            sdlFormat = 0x16462004; // SDL_PIXELFORMAT_RGBA8888
+            break;
+        case PixelFormat.RGBX_8888:
+            Log.v("SDL", "pixel format RGBX_8888");
+            sdlFormat = 0x16261804; // SDL_PIXELFORMAT_RGBX8888
+            break;
+        case PixelFormat.RGB_332:
+            Log.v("SDL", "pixel format RGB_332");
+            sdlFormat = 0x14110801; // SDL_PIXELFORMAT_RGB332
+            break;
+        case PixelFormat.RGB_565:
+            Log.v("SDL", "pixel format RGB_565");
+            sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565
+            break;
+        case PixelFormat.RGB_888:
+            Log.v("SDL", "pixel format RGB_888");
+            // Not sure this is right, maybe SDL_PIXELFORMAT_RGB24 instead?
+            sdlFormat = 0x16161804; // SDL_PIXELFORMAT_RGB888
+            break;
+        default:
+            Log.v("SDL", "pixel format unknown " + format);
+            break;
         }
 
         mWidth = width;
@@ -159,28 +159,28 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         {
             if (mWidth > mHeight) {
-                skip = true;
+               skip = true;
             }
         } else if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             if (mWidth < mHeight) {
-                skip = true;
+               skip = true;
             }
         }
 
         // Special Patch for Square Resolution: Black Berry Passport
         if (skip) {
-            double min = Math.min(mWidth, mHeight);
-            double max = Math.max(mWidth, mHeight);
+           double min = Math.min(mWidth, mHeight);
+           double max = Math.max(mWidth, mHeight);
 
-            if (max / min < 1.20) {
-                Log.v("SDL", "Don't skip on such aspect-ratio. Could be a square resolution.");
-                skip = false;
-            }
+           if (max / min < 1.20) {
+              Log.v("SDL", "Don't skip on such aspect-ratio. Could be a square resolution.");
+              skip = false;
+           }
         }
 
         if (skip) {
-            Log.v("SDL", "Skip .. Surface is not ready.");
-            return;
+           Log.v("SDL", "Skip .. Surface is not ready.");
+           return;
         }
 
 
@@ -208,11 +208,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     finally{
                         // Native thread has finished
                         if (! SDLActivity.mExitCalledFromJava) {
-                            try {
-                                SDLActivity.handleNativeExit();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            SDLActivity.handleNativeExit();
                         }
                     }
                 }
@@ -229,11 +225,14 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     @Override
     public boolean onKey(View  v, int keyCode, KeyEvent event) {
         // Dispatch the different events depending on where they come from
-        // Some SOURCE_DPAD or SOURCE_GAMEPAD are also SOURCE_KEYBOARD
-        // So, we try to process them as DPAD or GAMEPAD events first, if that fails we try them as KEYBOARD
-
-        if ( (event.getSource() & InputDevice.SOURCE_GAMEPAD) != 0 ||
-                (event.getSource() & InputDevice.SOURCE_DPAD) != 0 ) {
+        // Some SOURCE_JOYSTICK, SOURCE_DPAD or SOURCE_GAMEPAD are also SOURCE_KEYBOARD
+        // So, we try to process them as JOYSTICK/DPAD/GAMEPAD events first, if that fails we try them as KEYBOARD
+        //
+        // Furthermore, it's possible a game controller has SOURCE_KEYBOARD and
+        // SOURCE_JOYSTICK, while its key events arrive from the keyboard source
+        // So, retrieve the device itself and check all of its sources
+        if (SDLActivity.isDeviceSDLJoystick(event.getDeviceId())) {
+            // Note that we process events with specific key codes here
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 if (SDLActivity.onNativePadDown(event.getDeviceId(), keyCode) == 0) {
                     return true;
@@ -245,7 +244,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             }
         }
 
-        if( (event.getSource() & InputDevice.SOURCE_KEYBOARD) != 0) {
+        if ((event.getSource() & InputDevice.SOURCE_KEYBOARD) != 0) {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 //Log.v("SDL", "key down: " + keyCode);
                 SDLActivity.onNativeKeyDown(keyCode);
@@ -255,6 +254,20 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                 //Log.v("SDL", "key up: " + keyCode);
                 SDLActivity.onNativeKeyUp(keyCode);
                 return true;
+            }
+        }
+
+        if ((event.getSource() & InputDevice.SOURCE_MOUSE) != 0) {
+            // on some devices key events are sent for mouse BUTTON_BACK/FORWARD presses
+            // they are ignored here because sending them as mouse input to SDL is messy
+            if ((keyCode == KeyEvent.KEYCODE_BACK) || (keyCode == KeyEvent.KEYCODE_FORWARD)) {
+                switch (event.getAction()) {
+                case KeyEvent.ACTION_DOWN:
+                case KeyEvent.ACTION_UP:
+                    // mark the event as handled or it will be handled by system
+                    // handling KEYCODE_BACK by system will call onBackPressed()
+                    return true;
+                }
             }
         }
 
@@ -276,7 +289,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         // !!! FIXME: dump this SDK check after 2.0.4 ships and require API14.
         if (event.getSource() == InputDevice.SOURCE_MOUSE && SDLActivity.mSeparateMouseAndTouch) {
             if (Build.VERSION.SDK_INT < 14) {
-                mouseButton = 1;    // For Android==12 all mouse buttons are the left button
+                mouseButton = 1; // all mouse buttons are the left button
             } else {
                 try {
                     mouseButton = (Integer) event.getClass().getMethod("getButtonState").invoke(event);
@@ -346,18 +359,18 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         }
 
         return true;
-    }
+   }
 
     // Sensor events
     public void enableSensor(int sensortype, boolean enabled) {
         // TODO: This uses getDefaultSensor - what if we have >1 accels?
         if (enabled) {
             mSensorManager.registerListener(this,
-                    mSensorManager.getDefaultSensor(sensortype),
-                    SensorManager.SENSOR_DELAY_GAME, null);
+                            mSensorManager.getDefaultSensor(sensortype),
+                            SensorManager.SENSOR_DELAY_GAME, null);
         } else {
             mSensorManager.unregisterListener(this,
-                    mSensorManager.getDefaultSensor(sensortype));
+                            mSensorManager.getDefaultSensor(sensortype));
         }
     }
 
@@ -390,8 +403,8 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     break;
             }
             SDLActivity.onNativeAccel(-x / SensorManager.GRAVITY_EARTH,
-                    y / SensorManager.GRAVITY_EARTH,
-                    event.values[2] / SensorManager.GRAVITY_EARTH - 1);
+                                      y / SensorManager.GRAVITY_EARTH,
+                                      event.values[2] / SensorManager.GRAVITY_EARTH);
         }
     }
 }

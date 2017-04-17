@@ -17,9 +17,7 @@ subject to the following restrictions:
 #define BT_CONVEX_INTERNAL_SHAPE_H
 
 #include "btConvexShape.h"
-// ATOMIC_BEGIN
-#include "../../LinearMath/btAabbUtil2.h"
-// ATOMIC_END
+#include "LinearMath/btAabbUtil2.h"
 
 
 ///The btConvexInternalShape is an internal base class, shared by most convex shape implementations.

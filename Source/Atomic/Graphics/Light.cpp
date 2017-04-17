@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,8 @@ static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
 static const float DEFAULT_SHADOWMAXEXTRUSION = 1000.0f;
 static const float DEFAULT_SHADOWSPLIT = 1000.0f;
 static const float DEFAULT_TEMPERATURE = 6590.0f;
+static const float DEFAULT_RADIUS = 0.0f;
+static const float DEFAULT_LENGTH = 0.0f;
 
 static const char* typeNames[] =
 {
@@ -94,7 +96,9 @@ Light::Light(Context* context) :
     shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
-    temperature_(6590.0f),
+    temperature_(DEFAULT_TEMPERATURE),
+    lightRad_(DEFAULT_RADIUS),
+    lightLength_(DEFAULT_LENGTH),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
@@ -127,6 +131,8 @@ void Light::RegisterObject(Context* context)
     ATOMIC_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, float, DEFAULT_TEMPERATURE, AM_DEFAULT);
     ATOMIC_ATTRIBUTE("Use Physical Values", bool, usePhysicalValues_, false, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_RADIUS, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, float, DEFAULT_LENGTH, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
@@ -301,6 +307,18 @@ void Light::SetColor(const Color& color)
 void Light::SetTemperature(float temperature)
 {
     temperature_ = Clamp(temperature, 1000.0f, 10000.0f);
+    MarkNetworkUpdate();
+}
+
+void Light::SetRadius(float radius)
+{
+    lightRad_ = radius;
+    MarkNetworkUpdate();
+}
+
+void Light::SetLength(float length)
+{
+    lightLength_ = length;
     MarkNetworkUpdate();
 }
 

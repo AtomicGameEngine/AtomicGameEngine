@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -162,7 +162,10 @@ public:
     const HashMap<StringHash, AnimationTrack>& GetTracks() const { return tracks_; }
 
     /// Return number of animation tracks.
-    unsigned GetNumTracks() const { return tracks_.Size(); }
+    unsigned GetNumTracks() const { return tracks_.Size(); } 
+
+    /// Return animation track by index. 
+    AnimationTrack *GetTrack(unsigned index);
 
     /// Return animation track by name.
     AnimationTrack* GetTrack(const String& name);

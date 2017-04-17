@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -201,7 +201,7 @@ public:
     unsigned long long GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
     unsigned long long GetTotalMemoryUse() const;
-    /// Return full absolute file name of resource if possible.
+    /// Return full absolute file name of resource if possible, or empty if not found.
     String GetResourceFileName(const String& name) const;
 
     /// Return whether automatic resource reloading is enabled.

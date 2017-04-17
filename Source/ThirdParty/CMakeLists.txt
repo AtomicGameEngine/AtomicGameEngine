@@ -90,3 +90,7 @@ endif()
 add_subdirectory(ASIO)
 add_subdirectory(rapidjson)
 add_subdirectory(WebSocketPP)
+
+if (ATOMIC_IK)
+    add_subdirectory(ik)
+endif ()

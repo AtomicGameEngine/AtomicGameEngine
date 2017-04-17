@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,7 @@ namespace Atomic
 #ifdef ATOMIC_THREADING
 #ifdef _WIN32
 
-static
-DWORD WINAPI ThreadFunctionStatic(void* data)
+static DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
@@ -48,8 +47,7 @@ DWORD WINAPI ThreadFunctionStatic(void* data)
 
 #else
 
-static
-void* ThreadFunctionStatic(void* data)
+static void* ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
