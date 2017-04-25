@@ -27,8 +27,6 @@
 
 #include "OpenAssetUtils.h"
 
-#include <ThirdParty/thekla/thekla_atlas.h>
-
 namespace ToolCore
 {
 
@@ -444,72 +442,6 @@ String SanitateAssetName(const String& name)
     fixedName.Replace("|", "");
 
     return fixedName;
-}
-
-// LIGHTMAP UV
-
-void GenerateLightmapUV(aiMesh* mesh, const Matrix3x4& vertexTransform, const Matrix3& normalTransform)
-{
-    // Setup thekla input mesh
-    Thekla::Atlas_Input_Mesh* tmesh = new Thekla::Atlas_Input_Mesh();
-
-    tmesh->vertex_count = mesh->mNumVertices;
-    tmesh->vertex_array = new Thekla::Atlas_Input_Vertex[tmesh->vertex_count];
-
-    unsigned numValidFaces = 0;
-
-    for (unsigned index = 0; index < mesh->mNumFaces; index++)
-    {
-        if (mesh->mFaces[index].mNumIndices == 3)
-            numValidFaces++;
-    }
-
-    tmesh->face_count = numValidFaces;
-    tmesh->face_array = new Thekla::Atlas_Input_Face[tmesh->face_count];
-
-    // copy vertex data
-    for (unsigned index = 0; index < mesh->mNumVertices; index++)
-    {
-        Vector3 vertex = vertexTransform * ToVector3(mesh->mVertices[index]);
-        Vector3 normal = normalTransform * ToVector3(mesh->mNormals[index]);
-
-        tmesh->vertex_array[index].position[0] = vertex.x_;
-        tmesh->vertex_array[index].position[1] = vertex.y_;
-        tmesh->vertex_array[index].position[2] = vertex.z_;
-
-        tmesh->vertex_array[index].normal[0] = normal.x_;
-        tmesh->vertex_array[index].normal[1] = normal.y_;
-        tmesh->vertex_array[index].normal[2] = normal.z_;
-    }
-
-    // copy face data
-    unsigned curFace = 0;
-    for (unsigned index = 0; index < mesh->mNumFaces; index++)
-    {
-        if (mesh->mFaces[index].mNumIndices != 3)
-            continue;
-
-        tmesh->face_array[curFace].vertex_index[0] = mesh->mFaces[index].mIndices[0];
-        tmesh->face_array[curFace].vertex_index[1] = mesh->mFaces[index].mIndices[1];
-        tmesh->face_array[curFace].vertex_index[2] = mesh->mFaces[index].mIndices[2];
-
-        curFace++;
-    }
-
-    Thekla::Atlas_Options atlasOptions;
-    atlas_set_default_options(&atlasOptions);
-    atlasOptions.packer_options.witness.texel_area = 32;
-    Thekla::Atlas_Error error = Thekla::Atlas_Error_Success;
-    Thekla::Atlas_Output_Mesh* outputMesh = atlas_generate(tmesh, &atlasOptions, &error);
-
-    if (!outputMesh)
-    {
-
-    }
-
-    delete [] tmesh->vertex_array;
-    delete [] tmesh->face_array;
-    delete tmesh;
 }
 
 }

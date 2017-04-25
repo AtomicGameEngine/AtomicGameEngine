@@ -70,7 +70,6 @@ if (NOT IOS AND NOT ANDROID AND NOT WEB)
     add_subdirectory(Poco)
     add_subdirectory(nativefiledialog)
     add_subdirectory(libsquish)
-    add_subdirectory(thekla)
 endif ()
 
 if (ATOMIC_DATABASE_SQLITE)
