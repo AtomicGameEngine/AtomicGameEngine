@@ -421,6 +421,11 @@ public:
         return materials_.At(index);
     }
 
+    bool GetLightmap() const
+    {
+        return lightmap_;
+    }
+
     int GetLightmapIndex() const
     {
         return lightmapIndex_;
@@ -436,6 +441,7 @@ protected:
     JSONMesh* mesh_;
     bool castShadows_;
     bool receiveShadows_;
+    bool lightmap_;
     int lightmapIndex_;
     Vector4 lightmapTilingOffset_;
     PODVector<JSONMaterial*> materials_;

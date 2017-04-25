@@ -44,6 +44,12 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/Import/ImportConfig.h>
 
+// BEGIN GLOW FIXME
+// This is just here to generate UV2 on mdl's being imported
+#include <AtomicGlow/Atlas/MeshLightmapUVGen.h>
+using namespace AtomicGlow;
+// END GLOW FIXME
+
 #include "OpenAssetImporter.h"
 
 namespace ToolCore
@@ -117,6 +123,7 @@ bool OpenAssetImporter::Load(const String &assetPath)
 
     //PrintLine("Reading file " + assetPath);
 
+    sourceAssetFilename_ = assetPath;
     sourceAssetPath_ = GetPath(assetPath);
 
     scene_ = aiImportFile(GetNativePath(assetPath).CString(), aiCurrentFlags_);
@@ -538,6 +545,18 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
         outModel->SetSkeleton(skeleton);
         if (model.bones_.Size() > maxBones_)
             outModel->SetGeometryBoneMappings(allBoneMappings);
+    }
+
+    String pathName, fileName, extension;
+    SplitPath(sourceAssetFilename_, pathName, fileName, extension);
+
+    MeshLightmapUVGen::Settings uvsettings;
+    MeshLightmapUVGen uvgen(context_, outModel, fileName, uvsettings);
+
+    if (!uvgen.Generate())
+    {
+        errorMessage_ = "Failed to generate lightmap UV " + model.outName_;
+        return false;
     }
 
     File outFile(context_);

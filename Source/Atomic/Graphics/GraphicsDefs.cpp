@@ -90,6 +90,10 @@ extern ATOMIC_API const StringHash PSP_LIGHTLENGTH("LightLength");
 extern ATOMIC_API const StringHash PSP_ZONEMIN("ZoneMin");
 extern ATOMIC_API const StringHash PSP_ZONEMAX("ZoneMax");
 
+// ATOMIC BEGIN
+extern ATOMIC_API const StringHash VSP_LMOFFSET("LMOffset");
+// ATOMIC END
+
 extern ATOMIC_API const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
 extern ATOMIC_API const VertexElement LEGACY_VERTEXELEMENTS[] =

@@ -38,6 +38,10 @@
 #include "AssetEvents.h"
 #include "AssetDatabase.h"
 
+// ATOMIC GLOW HACK BEGIN
+#include <Atomic/Resource/ResourceMapRouter.h>
+// ATOMIC GLOW HACK END
+
 
 namespace ToolCore
 {
@@ -540,6 +544,12 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
     if (cacheEnabled_)
     {
         InitCache();
+
+        // ATOMIC GLOW HACK BEGIN
+        // This is so we get the .mdl files with baked UV2 from from Cache, instead of .mdl in project
+        // need to look into it, don't land this hack
+        SharedPtr<ResourceMapRouter> router(new ResourceMapRouter(context_, "__atomic_ResourceCacheMap.json"));
+        // ATOMIC GLOW HACK END
     }
 
     SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(AssetDatabase, HandleFileChanged));

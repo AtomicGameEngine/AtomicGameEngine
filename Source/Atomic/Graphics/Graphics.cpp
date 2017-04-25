@@ -52,6 +52,9 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 
+// FIXME: Hack
+#include "../Resource/ResourceCache.h"
+
 // ATOMIC BEGIN
 
 #include "Text3D/Text3DFont.h"
@@ -447,6 +450,47 @@ void Graphics::RaiseWindow()
         SDL_RaiseWindow(window_);
 }
 
+// FIXME: Hack
+#include "./Resource/ResourceCache.h"
+static PODVector<Texture2D*> lightmapTextures;
+
+void Graphics::SetLightmapTexture(unsigned id)
+{
+    const unsigned numLightmaps = 25;
+    static bool initialized = false;
+
+    if (!lightmapTextures.Size() && !initialized)
+    {
+        initialized = true;
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+        for (unsigned i = 0; i < numLightmaps; i++)
+        {
+            Texture2D* texture = cache->GetResource<Texture2D>(ToString("Textures/Scene_Lightmap%u.png", i));
+
+            if (!texture)
+                break;
+
+            // FILTER_NEAREST is good for testing lightmap, without bilinear artifacts
+            // texture->SetFilterMode(FILTER_NEAREST);
+            texture->SetNumLevels(1); // No mipmaps
+
+            texture->SetAddressMode(COORD_U, ADDRESS_CLAMP);
+            texture->SetAddressMode(COORD_V, ADDRESS_CLAMP);
+
+            lightmapTextures.Push(texture);
+
+        }
+
+    }
+
+    if (id >= lightmapTextures.Size())
+        return;
+
+    SetTexture(TU_EMISSIVE, lightmapTextures[id]);
+
+}
 
 // ATOMIC END
 

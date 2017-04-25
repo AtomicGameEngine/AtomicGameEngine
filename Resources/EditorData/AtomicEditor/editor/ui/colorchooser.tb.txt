@@ -8,7 +8,7 @@ TBLayout: axis: y, distribution: gravity, position: left
 	TBLayout: axis: x, distribution: gravity
 		TBLayout: axis: x, distribution: gravity
 			TBColorWheel: id: colorwheel, skin: HSVSkin
-					lp: width: 256, height: 256
+				lp: width: 256, height: 256
 			TBSlider: id: lslider, axis: y, min: 0, max: 255, value: 128
 
 		TBLayout: axis: y, distribution: gravity

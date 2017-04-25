@@ -38,6 +38,13 @@
 
 #include "../Components/EditorComponents.h"
 
+#ifdef ATOMIC_GLOW
+
+#include <AtomicGlow/GlowService/GlowService.h>
+using namespace AtomicGlow;
+
+#endif
+
 #include "AEEditorPrefs.h"
 #include "AEEditorApp.h"
 
@@ -145,8 +152,15 @@ namespace AtomicEditor
 
         context_->RegisterSubsystem(new EditorMode(context_));
         context_->RegisterSubsystem(new NETBuildSystem(context_));
-        context_->RegisterSubsystem(new EditorNETService(context_));        
+        context_->RegisterSubsystem(new EditorNETService(context_));
 
+#ifdef ATOMIC_GLOW
+        SharedPtr<GlowService> glowService(new GlowService(context_));
+        if (glowService->Start())
+        {
+            context_->RegisterSubsystem(glowService);
+        }
+#endif
         AppBase::Start();
 
         vm_->SetModuleSearchPaths("AtomicEditor/JavaScript;AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");

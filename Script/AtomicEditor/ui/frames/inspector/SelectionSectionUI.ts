@@ -21,17 +21,20 @@
 //
 
 import SerializableEditType = require("./SerializableEditType");
+import SelectionSection = require("./SelectionSection");
 
 class SelectionSectionUI extends Atomic.UILayout {
 
     editType: SerializableEditType;
+    selectionSection: SelectionSection;
 
     refresh() {
 
     }
 
-    createUI(editType: SerializableEditType) {
+    createUI(editType: SerializableEditType, selectionSection: SelectionSection) {
 
+      this.selectionSection = selectionSection;
       this.editType = editType;
 
     }

@@ -177,7 +177,7 @@ abstract class SelectionSection extends Atomic.UISection {
         if (SelectionSection.customSectionUI[this.editType.typeName]) {
 
             this.customUI = new SelectionSection.customSectionUI[this.editType.typeName]();
-            this.customUI.createUI(this.editType);
+            this.customUI.createUI(this.editType, this);
             attrLayout.addChild(this.customUI);
 
         }

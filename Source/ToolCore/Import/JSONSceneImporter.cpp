@@ -132,11 +132,12 @@ JSONTransform::JSONTransform(JSONSceneImporter* importer, const rapidjson::Value
 
 
 JSONMeshRenderer::JSONMeshRenderer(JSONSceneImporter* importer, const rapidjson::Value& value, const char* type) :
-    JSONComponent(importer, type)
-  , mesh_(0)
-  , castShadows_(false)
-  , receiveShadows_(false)
-  , lightmapIndex_(-1)
+    JSONComponent(importer, type),
+    mesh_(0),
+    castShadows_(false),
+    receiveShadows_(false),
+    lightmap_(false),
+    lightmapIndex_(-1)
 {
     JSONComponent::Parse(value);
 
@@ -154,6 +155,10 @@ JSONMeshRenderer::JSONMeshRenderer(JSONSceneImporter* importer, const rapidjson:
         else if (!strcmp(oitr->name.GetString(), "receiveShadows"))
         {
             receiveShadows_ = oitr->value.IsTrue();
+        }
+        else if (!strcmp(oitr->name.GetString(), "lightmap"))
+        {
+            lightmap_ = oitr->value.GetBool();
         }
         else if (!strcmp(oitr->name.GetString(), "lightmapIndex"))
         {

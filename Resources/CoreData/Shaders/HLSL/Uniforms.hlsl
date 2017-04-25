@@ -27,6 +27,9 @@ uniform float4x3 cViewInv;
 uniform float4x4 cViewProj;
 uniform float4 cUOffset;
 uniform float4 cVOffset;
+// ATOMIC BEGIN
+uniform float4 cLMOffset;
+// ATOMIC END
 uniform float4x3 cZone;
 #ifdef SKINNED
     uniform float4x3 cSkinMatrices[MAXBONES];

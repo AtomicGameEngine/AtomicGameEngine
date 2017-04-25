@@ -582,6 +582,8 @@ public:
     static unsigned GetSinglePassPrimitives() { return numSinglePassPrimitives_; }
     /// Set number of single render pass primitives drawn this frame (D3D9 Only)
     static void SetSinglePassPrimitives(unsigned value) { numSinglePassPrimitives_ = value; }
+
+    void SetLightmapTexture(unsigned id);
   
     // ATOMIC END
 

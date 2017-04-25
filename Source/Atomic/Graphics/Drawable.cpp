@@ -57,7 +57,11 @@ SourceBatch::SourceBatch() :
     worldTransform_(&Matrix3x4::IDENTITY),
     numWorldTransforms_(1),
     instancingData_((void*)0),
-    geometryType_(GEOM_STATIC)
+    geometryType_(GEOM_STATIC),
+    // ATOMIC BEGIN
+    lightmapTilingOffset_(0),
+    lightmapTextureID_(0)
+    // ATOMIC END
 {
 }
 

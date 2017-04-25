@@ -53,6 +53,13 @@ vec2 GetTexCoord(vec2 texCoord)
     return vec2(dot(texCoord, cUOffset.xy) + cUOffset.w, dot(texCoord, cVOffset.xy) + cVOffset.w);
 }
 
+// ATOMIC BEGIN
+vec2 GetLightMapTexCoord(vec2 texCoord)
+{
+    return vec2(texCoord.x * cLMOffset.x + cLMOffset.z, texCoord.y * cLMOffset.y + cLMOffset.w);
+}
+// ATOMIC END
+
 vec4 GetClipPos(vec3 worldPos)
 {
     vec4 ret = vec4(worldPos, 1.0) * cViewProj;

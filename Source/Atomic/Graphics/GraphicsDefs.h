@@ -427,6 +427,10 @@ extern ATOMIC_API const StringHash PSP_LIGHTLENGTH;
 extern ATOMIC_API const StringHash PSP_ZONEMIN;
 extern ATOMIC_API const StringHash PSP_ZONEMAX;
 
+// ATOMIC BEGIN
+extern ATOMIC_API const StringHash VSP_LMOFFSET;
+// ATOMIC END
+
 // Scale calculation from bounding box diagonal.
 extern ATOMIC_API const Vector3 DOT_SCALE;
 

@@ -89,7 +89,7 @@ private:
 
     Vector<SharedPtr<IPCBroker> > brokers_;
 
-    // valid on child
+    // valid on child process
     SharedPtr<IPCWorker> worker_;
 
 #ifdef ATOMIC_PLATFORM_WINDOWS

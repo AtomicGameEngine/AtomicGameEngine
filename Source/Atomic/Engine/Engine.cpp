@@ -236,6 +236,15 @@ bool Engine::Initialize(const VariantMap& parameters)
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
 #ifdef ATOMIC_THREADING
     unsigned numThreads = GetParameter(parameters, EP_WORKER_THREADS, true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
+
+    // ATOMIC BEGIN
+    if (numThreads)
+    {
+        // check for explicitly set worker thread count
+        numThreads = GetParameter(parameters, EP_WORKER_THREADS_COUNT, numThreads).GetUInt();
+    }
+    // ATOMIC END
+
     if (numThreads)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
@@ -998,6 +1007,11 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument == "-autometrics") // --autometrics
             {
                 ret[EP_AUTO_METRICS] = true;
+            }            
+            else if (argument == "workerthreadcount" && !value.Empty())
+            {
+                ret[EP_WORKER_THREADS_COUNT] = ToInt(value);
+                ++i;
             }
             // ATOMIC END
 #ifdef ATOMIC_TESTING

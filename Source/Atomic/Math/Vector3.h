@@ -482,4 +482,20 @@ inline IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs) { retu
 /// Return a random value from [0, 1) from 3-vector seed.
 inline float StableRandom(const Vector3& seed) { return StableRandom(Vector2(StableRandom(Vector2(seed.x_, seed.y_)), seed.z_)); }
 
+// ATOMIC BEGIN
+
+inline float AreaOfTriangle(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+  {
+
+    float a = (v0 - v1).Length();
+    float b = (v1 - v2).Length();
+    float c = (v2 - v0).Length();
+
+    float s = (a + b + c) * 0.5f;
+
+    return (float) Sqrt<float>(s * (s-a) * (s-b) * (s-c));
+  }
+
+// ATOMIC END
+
 }

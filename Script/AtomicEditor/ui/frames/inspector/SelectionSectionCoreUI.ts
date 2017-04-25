@@ -28,12 +28,13 @@ import SerializableEditType = require("./SerializableEditType");
 
 import ProgressModal = require("ui/modal/ProgressModal");
 
+import GlowOutput = require("ui/modal/glow/GlowOutput");
 
 class CollisionShapeSectionUI extends SelectionSectionUI {
 
-    createUI(editType: SerializableEditType) {
+    createUI(editType: SerializableEditType, selectionSection: SelectionSection) {
 
-        this.editType = editType;
+        super.createUI(editType, selectionSection);
 
         var button = new Atomic.UIButton();
         button.fontDescription = InspectorUtils.attrFontDesc;
@@ -64,9 +65,9 @@ class CollisionShapeSectionUI extends SelectionSectionUI {
 
 class CubemapGeneratorSectionUI extends SelectionSectionUI {
 
-    createUI(editType: SerializableEditType) {
+    createUI(editType: SerializableEditType, selectionSection: SelectionSection) {
 
-        this.editType = editType;
+        super.createUI(editType, selectionSection);
 
         var button = new Atomic.UIButton();
         button.fontDescription = InspectorUtils.attrFontDesc;
@@ -132,5 +133,52 @@ class CubemapGeneratorSectionUI extends SelectionSectionUI {
 
 }
 
+class GlowComponentSectionUI extends SelectionSectionUI {
+
+    createUI(editType: SerializableEditType, selectionSection: SelectionSection) {
+
+        super.createUI(editType, selectionSection);
+
+        var button = new Atomic.UIButton();
+        button.fontDescription = InspectorUtils.attrFontDesc;
+        button.gravity = Atomic.UI_GRAVITY.UI_GRAVITY_RIGHT;
+        button.text = "Bake";
+
+        button.onClick = () => {
+
+            var glow = <Editor.GlowComponent>this.editType.objects[0];
+
+            var glowOutput:GlowOutput;
+
+            glow.subscribeToEvent(Editor.AtomicGlowBakeResultEvent((evData) => {
+
+                if (glowOutput) {
+                    glowOutput.hide();
+                    glowOutput.close();
+                    glowOutput = null;
+                }
+
+                glow.unsubscribeFromEvent(Editor.AtomicGlowBakeResultEventType);
+
+            }));
+
+            if (glow.bake()) {
+
+                this.selectionSection.refresh();
+                glowOutput = new GlowOutput();
+                glowOutput.show();
+            }
+
+
+        };
+
+        this.addChild(button);
+
+    }
+
+}
+
+
 SelectionSection.registerCustomSectionUI("CollisionShape", CollisionShapeSectionUI);
 SelectionSection.registerCustomSectionUI("CubemapGenerator", CubemapGeneratorSectionUI);
+SelectionSection.registerCustomSectionUI("GlowComponent", GlowComponentSectionUI);

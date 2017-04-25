@@ -108,6 +108,7 @@ private:
 
     String inputName_;
     String sourceAssetPath_;
+    String sourceAssetFilename_;
     String resourcePath_;
     String outPath_;
     bool useSubdirs_;

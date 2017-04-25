@@ -8,6 +8,8 @@
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/Material.h"
 
+#ifdef __DISABLED
+
 namespace Atomic
 {
 
@@ -44,3 +46,5 @@ private:
 };
 
 }
+
+#endif

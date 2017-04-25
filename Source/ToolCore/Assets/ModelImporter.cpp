@@ -41,6 +41,13 @@
 #include "AssetDatabase.h"
 #include "ModelImporter.h"
 
+// BEGIN GLOW FIXME
+// This is just here to generate UV2 on mdl's being imported
+#include <AtomicGlow/Atlas/MeshLightmapUVGen.h>
+using namespace AtomicGlow;
+// END GLOW FIXME
+
+
 namespace ToolCore
 {
 
@@ -233,21 +240,29 @@ bool ModelImporter::Import()
 
     importNode_ = new Node(context_);
 
+
     if (ext == ".mdl")
     {
+        // BEGIN GLOW FIXME
+
+        // Have a look into mdl copy logic, also this is hacked to generate uv2 for mdl files in project
+        // and needs to be fixed up
+
         FileSystem* fs = GetSubsystem<FileSystem>();
         ResourceCache* cache = GetSubsystem<ResourceCache>();
 
         // mdl files are native file format that doesn't need to be converted
         // doesn't allow scale, animations legacy primarily for ToonTown
 
-        if (!fs->Copy(asset_->GetPath(), asset_->GetCachePath() + ".mdl"))
+        String cacheFilename = asset_->GetCachePath() + ".mdl";
+
+        if (!fs->Copy(asset_->GetPath(), cacheFilename))
         {
             importNode_= 0;
             return false;
-        }
+        }        
 
-        Model* mdl = cache->GetResource<Model>( asset_->GetCachePath() + ".mdl");
+        Model* mdl = cache->GetResource<Model>(cacheFilename);
 
         if (!mdl)
         {
@@ -255,10 +270,34 @@ bool ModelImporter::Import()
             return false;
         }
 
+        String pathName, fileName, extension;
+        SplitPath(asset_->GetCachePath(), pathName, fileName, extension);
+
+        MeshLightmapUVGen::Settings uvsettings;
+        MeshLightmapUVGen uvgen(context_, mdl, fileName, uvsettings);
+
+        if (!uvgen.Generate())
+        {
+            ATOMIC_LOGERRORF("Failed to generate lightmap UV %s", asset_->GetPath().CString());
+            return false;
+        }
+
+        File outFile(context_);
+        if (!outFile.Open(cacheFilename, FILE_WRITE))
+        {
+            ATOMIC_LOGERRORF("Could not open output file %s", asset_->GetPath().CString());
+            return false;
+        }
+
+        mdl->Save(outFile);
+        
+        outFile.Close();
+
         // Force a reload, though file watchers will catch this delayed and load again
         cache->ReloadResource(mdl);
-
         importNode_->CreateComponent<StaticModel>()->SetModel(mdl);
+
+        // END GLOW FIXME
     }
     else
     {
