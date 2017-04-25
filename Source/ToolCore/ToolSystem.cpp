@@ -22,6 +22,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -51,6 +52,12 @@ namespace ToolCore
 ToolSystem::ToolSystem(Context* context) : Object(context),
     updateDelta_(0.0f)
 {
+    if (context_->GetSubsystem<ToolSystem>())
+    {
+        ErrorExit("ToolSystem::ToolSystem - existing ToolSystem already registered");
+        return;
+    }
+
     context_->RegisterSubsystem(new AssetDatabase(context_));
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));
@@ -86,7 +93,7 @@ void ToolSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool ToolSystem::LoadProject(const String& fullpath)
+bool ToolSystem::LoadProject(const String& fullpath, bool readOnly)
 {
 
     String pathName, fileName, ext;
@@ -119,7 +126,7 @@ bool ToolSystem::LoadProject(const String& fullpath)
     project_ = new Project(context_);
     project_->SetResourcePath(resourcePath);
 
-    bool result = project_->Load(fullpath);
+    bool result = project_->Load(fullpath, readOnly);
 
     if (result)
     {

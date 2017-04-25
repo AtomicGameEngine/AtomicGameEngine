@@ -118,7 +118,9 @@ void VS(float4 iPos : POSITION,
             // If using lightmap, disregard zone ambient light
             // If using AO, calculate ambient in the PS
             oVertexLight = float3(0.0, 0.0, 0.0);
-            oTexCoord2 = iTexCoord2;
+            // ATOMIC BEGIN
+            oTexCoord2 = GetLightMapTexCoord(iTexCoord2);
+            // ATOMIC END
         #else
             oVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif
@@ -273,7 +275,9 @@ void PS(
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
-            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+            // ATOMIC BEGIN
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * float3(4, 4, 4) * diffColor.rgb;
+            // ATOMIC END
         #endif
         #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;
@@ -306,7 +310,9 @@ void PS(
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
-            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+            // ATOMIC BEGIN
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * float3(4, 4, 4) * diffColor.rgb;
+            // ATOMIC END
         #endif
         #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;

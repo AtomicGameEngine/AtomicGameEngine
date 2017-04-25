@@ -8,6 +8,10 @@ add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
 target_link_libraries(AtomicTool ToolCore AtomicNETScript Poco Atomic)
 
+if (ATOMIC_GLOW)
+    target_link_libraries(AtomicTool AtomicGlowLib)
+endif()
+
 if (WIN32)
     target_link_libraries(AtomicTool Iphlpapi Wldap32)
 endif()

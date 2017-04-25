@@ -104,6 +104,12 @@ struct ATOMIC_API SourceBatch
     void* instancingData_;
     /// %Geometry type.
     GeometryType geometryType_;
+
+    // ATOMIC BEGIN
+    /// Lightmap Tiling Offset
+    Vector4* lightmapTilingOffset_;
+    unsigned lightmapTextureID_;
+    // ATOMIC END
 };
 
 /// Base class for visible components.

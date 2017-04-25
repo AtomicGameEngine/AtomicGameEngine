@@ -558,7 +558,7 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONTimeOfDay* jtime )
 
 bool JSONSceneProcess::ProcessComponent(Node* node, const JSONLight* jlight )
 {
-    if (!jlight->GetRealtime() || jlight->GetLightType() != "Point")
+    if (jlight->GetLightType() != "Point")
         return true;
 
     Light* light = node->CreateComponent<Light>();
@@ -800,26 +800,10 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONMeshRenderer* jmes
     StaticModel* staticModel = NULL;
     int lightmapIndex = jmeshrenderer->GetLightmapIndex();
 
-    if (lightmapIndex >= 0)
-    {
-        LMStaticModel* lmstatic = node->CreateComponent<LMStaticModel>();
-        staticModel = lmstatic;
+    staticModel = node->CreateComponent<StaticModel>();
 
-        const Vector4& tilingOffset = jmeshrenderer->GetLightmapTilingOffset();
-        lmstatic->lightmapTilingOffset_ = tilingOffset;
-
-        lmstatic->lightmapTilingOffset_.w_ = -lmstatic->lightmapTilingOffset_.w_;
-
-        String lightmapName;
-
-        lightmapName.AppendWithFormat("Textures/%s_Lightmap_%i.png", importer_->GetSceneName().CString(), lightmapIndex);
-
-        Texture2D* texture = cache->GetResource<Texture2D>(lightmapName);
-        assert(texture);
-        lmstatic->SetLightmapTexure(texture);
-    }
-    else
-        staticModel = node->CreateComponent<StaticModel>();
+    if (jmeshrenderer->GetLightmap())
+        staticModel->SetLightmap(true);
 
     const JSONMesh* mesh = jmeshrenderer->GetMesh();
 

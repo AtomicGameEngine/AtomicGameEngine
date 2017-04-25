@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Thread.h"
+#include "../IO/Log.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -155,5 +156,32 @@ bool Thread::IsMainThread()
     return true;
 #endif // ATOMIC_THREADING
 }
+
+// ATOMIC BEGIN
+
+void Thread::Kill()
+{
+#ifdef ATOMIC_THREADING
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    if (handle_)
+    {
+        DWORD exitCode = EXIT_SUCCESS;
+        TerminateThread((HANDLE)handle_, exitCode);
+    }
+#elif defined(ATOMIC_PLATFORM_OSX) 
+
+    ATOMIC_LOGINFO("Thread::Kill() - macOS implementation required");
+
+#elif defined(ATOMIC_PLATFORM_LINUX)
+    pthread_t* thread = (pthread_t*)handle_;
+    if (thread)
+    {
+        pthread_cancel(*thread);
+    }
+#endif
+#endif // ATOMIC_THREADING
+}
+
+// ATOMIC END
 
 }

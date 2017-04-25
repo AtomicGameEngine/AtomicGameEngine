@@ -116,7 +116,9 @@ LICENSE
 #define INCLUDE_STB_IMAGE_WRITE_H
 
 // ATOMIC BEGIN
+#ifndef STBI_IMAGE_NO_ATOMIC
 #include "../../Atomic/Container/Str.h"
+#endif
 // ATOMIC END
 
 #ifdef __cplusplus
@@ -228,7 +230,8 @@ static void stbi__stdio_write(void *context, void *data, int size)
 static int stbi__start_write_file(stbi__write_context *s, const char *filename)
 {
    // Urho3D: proper UTF8 handling for Windows, requires Urho3D WString class
-#ifndef _WIN32
+   // ATOMIC: added STBI_IMAGE_NO_ATOMIC
+#ifndef _WIN32 || defined(STBI_IMAGE_NO_ATOMIC)
    FILE *f = fopen(filename, "wb");
 #else
     Atomic::WString wstr(filename);

@@ -8,6 +8,8 @@
 #include "../Graphics/Technique.h"
 #include "LMStaticModel.h"
 
+#ifdef __DISABLED
+
 namespace Atomic
 {
 
@@ -102,5 +104,7 @@ void LMStaticModel::UpdateBatches(const FrameInfo& frame)
 
 
 }
+
+#endif
 
 

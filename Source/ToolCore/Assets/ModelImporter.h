@@ -82,10 +82,15 @@ public:
     bool GetImportAnimations() { return importAnimations_; }
     void SetImportAnimations(bool importAnimations) { importAnimations_ = importAnimations; }
     bool GetImportMaterials() { return importMaterials_; }
-    void SetImportMaterials(bool importMat) { importMaterials_ = importMat; };
+    void SetImportMaterials(bool importMat) { importMaterials_ = importMat; }
 
     unsigned GetAnimationCount();
     void SetAnimationCount(unsigned count);
+
+    // Lightmap UV
+
+    bool GetGenerateLightmapUV() const { return genLightmapUV_; }
+    void SetGenerateLightmapUV(bool value)  { genLightmapUV_ = value; }
 
     Resource* GetResource(const String& typeName = String::EMPTY);
 
@@ -116,6 +121,8 @@ protected:
     Vector<SharedPtr<AnimationImportInfo>> animationInfo_;
 
     SharedPtr<Node> importNode_;
+
+    bool genLightmapUV_;
 
 };
 

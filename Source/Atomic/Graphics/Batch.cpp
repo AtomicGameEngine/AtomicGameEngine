@@ -186,6 +186,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     Light* light = lightQueue_ ? lightQueue_->light_ : 0;
     Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : 0;
 
+    // ATOMIC BEGIN
+    Scene* scene = view->GetScene();
+    // ATOMIC END
+
     // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
 
@@ -259,6 +263,13 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 graphics->SetShaderParameter(VSP_BILLBOARDROT, cameraNode->GetWorldRotation().RotationMatrix());
         }
     }
+
+    // ATOMIC BEGIN
+    if (lightmapTilingOffset_)
+    {
+        graphics->SetShaderParameter(VSP_LMOFFSET, *lightmapTilingOffset_);
+    }
+    // ATOMIC END
 
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
@@ -603,12 +614,27 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
 
+        // ATOMIC BEGIN
+
         const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material_->GetTextures();
         for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
         {
             if (graphics->HasTextureUnit(i->first_))
+            {
+                if (i->first_ == TU_EMISSIVE && lightmapTilingOffset_)
+                    continue;
+
                 graphics->SetTexture(i->first_, i->second_.Get());
+            }
         }
+
+        if (lightmapTilingOffset_ && scene)
+        {
+            scene->SetLightmapTexture(lightmapTextureID_);
+        }
+
+        // ATOMIC END
+
     }
 
     // Set light-related textures

@@ -123,6 +123,13 @@ public:
     /// Return how many milliseconds maximum to spend on non-threaded low-priority work.
     int GetNonThreadedWorkMs() const { return maxNonThreadedWorkMs_; }
 
+    // ATOMIC_BEGIN
+
+    /// Terminates all worker threads, only use at exit
+    void TerminateThreads();
+
+    // ATOMIC END
+
 private:
     /// Process work items until shut down. Called by the worker threads.
     void ProcessItems(unsigned threadIndex);

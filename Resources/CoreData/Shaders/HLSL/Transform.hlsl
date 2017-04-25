@@ -21,6 +21,13 @@ float2 GetTexCoord(float2 iTexCoord)
     return float2(dot(iTexCoord, cUOffset.xy) + cUOffset.w, dot(iTexCoord, cVOffset.xy) + cVOffset.w);
 };
 
+// ATOMIC BEGIN
+float2 GetLightMapTexCoord(float2 texCoord)
+{
+    return float2(texCoord.x * cLMOffset.x + cLMOffset.z, texCoord.y * cLMOffset.y + cLMOffset.w);
+}
+// ATOMIC END
+
 float4 GetClipPos(float3 worldPos)
 {
     return mul(float4(worldPos, 1.0), cViewProj);

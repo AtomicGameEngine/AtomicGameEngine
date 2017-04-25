@@ -18,6 +18,9 @@ if (WIN32)
     endif ()
 endif ()
 
+option(ATOMIC_GLOW "Build Atomic Glow" ON)
+option(ATOMIC_GLOW_WINDOWS_SUBSYSTEM "Enable WINDOWS subsystem, otherwise CONSOLE is used" ON)
+
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
 
@@ -37,6 +40,10 @@ if (ATOMIC_DOTNET)
 endif ()
 
 if (ATOMIC_DESKTOP)
+
+    if (ATOMIC_GLOW)
+        add_subdirectory(AtomicGlow)
+    endif ()
     if (ATOMIC_DOTNET OR ATOMIC_JAVASCRIPT)
         add_subdirectory(AtomicTool)
     endif ()

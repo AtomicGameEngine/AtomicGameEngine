@@ -470,6 +470,20 @@ class SelectionInspector extends ScriptWidget {
 
     }
 
+    getSection(editType: SerializableEditType) {
+
+        for (var i in this.sections) {
+
+            var section = this.sections[i];
+            if (section.editType == editType)
+                return section;
+        
+        }
+
+        return null;
+
+    }    
+
     removeSection(section: SelectionSection) {
 
         SelectionInspector.sectionStates[section.editType.typeName] = section.value ? true : false;

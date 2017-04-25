@@ -27,18 +27,6 @@
 
 namespace Atomic
 {
-    ATOMIC_EVENT(E_IPCCMD, IPCCmd)
-    {
-        ATOMIC_PARAM(P_COMMAND, Command); // string
-        ATOMIC_PARAM(P_ID, ID); // unsigned
-    }
-
-    ATOMIC_EVENT(E_IPCCMDRESULT, IPCCmdResult)
-    {
-        ATOMIC_PARAM(P_COMMAND, Command); // string
-        ATOMIC_PARAM(P_ID, ID); // unsigned
-    }
-
     class IPCBroker;
 
     /// IPCResultHandler
@@ -72,9 +60,16 @@ namespace Atomic
         virtual bool Start() = 0;
 
         unsigned QueueCommand(IPCResultHandler* handler, const VariantMap& cmdMap);
+
         bool GetBrokerEnabled() const;
 
+        IPCBroker* GetServerBroker() const { return serverBroker_; }
+
     protected:
+
+        virtual void OnIPCWorkerStarted() {}
+        virtual void OnIPCWorkerLog(int level, const String& message) {}
+        virtual void OnIPCWorkerExited() {}
 
         bool StartInternal(const String& exec, const Vector<String>& args);
 

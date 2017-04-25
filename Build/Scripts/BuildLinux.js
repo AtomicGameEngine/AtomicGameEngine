@@ -67,6 +67,10 @@ function copyAtomicEditor() {
 
     copyAtomicNET();
 
+    // copy AtomicGlow
+    fs.copySync(atomicRoot + "Artifacts/Build/AtomicGlow/AtomicGlow",
+    editorAppFolder + "Resources/ToolData/AtomicGlow/AtomicGlow");
+
 }
 
 namespace('build', function() {
@@ -77,7 +81,7 @@ namespace('build', function() {
 
         process.chdir(buildDir);
 
-        var cmds = ["make AtomicEditor AtomicPlayer -j2"];
+        var cmds = ["make AtomicGlow AtomicEditor AtomicPlayer -j2"];
 
         jake.exec(cmds, function() {
 

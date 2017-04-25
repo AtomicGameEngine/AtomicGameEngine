@@ -62,6 +62,19 @@ void AtomicTool::Setup()
     if (arguments.Contains("-toolbootstrap"))
         ToolEnvironment::SetBootstrapping();
 
+    ToolSystem* tsystem = new ToolSystem(context_);
+    context_->RegisterSubsystem(tsystem);
+
+    ToolEnvironment* env = new ToolEnvironment(context_);
+    context_->RegisterSubsystem(env);
+
+    // Initialize the ToolEnvironment
+    if (!env->Initialize(true))
+    {
+        ErrorExit("Unable to initialize tool environment");
+        return;
+    }
+
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
 
@@ -84,8 +97,32 @@ void AtomicTool::Setup()
         }
     }
 
+    SharedPtr<CommandParser> parser(new CommandParser(context_));
+
+    command_ = parser->Parse(arguments);
+    if (command_.Null())
+    {
+        String error = "No command found";
+
+        if (parser->GetErrorMessage().Length())
+            error = parser->GetErrorMessage();
+
+        ErrorExit(error);
+        return;
+    }
+
     // no default resources, AtomicTool may be run outside of source tree
     engineParameters_["ResourcePaths"] = "";
+
+    if (command_->RequiresProjectLoad())
+    {
+
+#ifdef ATOMIC_DEV_BUILD
+        engineParameters_["ResourcePrefixPaths"] = env->GetRootSourceDir() + "/Resources/";
+        engineParameters_["ResourcePaths"] = ToString("CoreData");
+#endif
+    }
+
 }
 
 void AtomicTool::HandleCommandFinished(StringHash eventType, VariantMap& eventData)
@@ -182,19 +219,6 @@ void AtomicTool::Start()
 
     const Vector<String>& arguments = GetArguments();
 
-    ToolSystem* tsystem = new ToolSystem(context_);
-    context_->RegisterSubsystem(tsystem);
-
-    ToolEnvironment* env = new ToolEnvironment(context_);
-    context_->RegisterSubsystem(env);
-
-    // Initialize the ToolEnvironment
-    if (!env->Initialize(true))
-    {
-        ErrorExit("Unable to initialize tool environment");
-        return;
-    }
-
     if (activationKey_.Length())
     {
         DoActivation();
@@ -207,29 +231,19 @@ void AtomicTool::Start()
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
-    SharedPtr<CommandParser> parser(new CommandParser(context_));
-
-    SharedPtr<Command> cmd(parser->Parse(arguments));
-    if (!cmd)
+    if (command_->RequiresProjectLoad())
     {
-        String error = "No command found";
-
-        if (parser->GetErrorMessage().Length())
-            error = parser->GetErrorMessage();
-
-        ErrorExit(error);
-        return;
-    }
-
-    if (cmd->RequiresProjectLoad())
-    {
-        if (!cmd->LoadProject())
+        if (!command_->LoadProject())
         {
-            ErrorExit(ToString("Failed to load project: %s", cmd->GetProjectPath().CString()));
+            ErrorExit(ToString("Failed to load project: %s", command_->GetProjectPath().CString()));
             return;
         }
 
-        String projectPath = cmd->GetProjectPath();
+        String projectPath = command_->GetProjectPath();
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        cache->AddResourceDir(ToString("%sResources", projectPath.CString()));
+        cache->AddResourceDir(ToString("%sCache", projectPath.CString()));
 
         // Set the build path
         String buildFolder = projectPath + "/" + "Build";
@@ -249,10 +263,8 @@ void AtomicTool::Start()
 
     }
 
-    command_ = cmd;
-
     // BEGIN LICENSE MANAGEMENT
-    if (cmd->RequiresLicenseValidation())
+    if (command_->RequiresLicenseValidation())
     {
         GetSubsystem<LicenseSystem>()->Initialize();
     }

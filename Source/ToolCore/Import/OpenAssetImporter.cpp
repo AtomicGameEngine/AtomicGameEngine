@@ -44,6 +44,12 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/Import/ImportConfig.h>
 
+// BEGIN GLOW FIXME
+// This is just here to generate UV2 on mdl's being imported
+#include <AtomicGlow/Atlas/MeshLightmapUVGen.h>
+using namespace AtomicGlow;
+// END GLOW FIXME
+
 #include "OpenAssetImporter.h"
 
 namespace ToolCore
@@ -78,7 +84,8 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     maxBones_(64),
     defaultTicksPerSecond_(4800.0f),
     startTime_(-1),
-    endTime_(-1)
+    endTime_(-1),
+    genLightmapUV_(false)
 {
 
     aiFlagsDefault_ =
@@ -117,6 +124,7 @@ bool OpenAssetImporter::Load(const String &assetPath)
 
     //PrintLine("Reading file " + assetPath);
 
+    sourceAssetFilename_ = assetPath;
     sourceAssetPath_ = GetPath(assetPath);
 
     scene_ = aiImportFile(GetNativePath(assetPath).CString(), aiCurrentFlags_);
@@ -210,6 +218,24 @@ void OpenAssetImporter::ApplyScale()
 
 }
 
+bool OpenAssetImporter::GenerateLightmapUV(Model *model)
+{
+    if (!model)
+    {
+        return false;
+    }
+
+    MeshLightmapUVGen::Settings uvsettings;
+    MeshLightmapUVGen uvgen(model->GetContext(), model, uvsettings);
+
+    if (!uvgen.Generate())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool OpenAssetImporter::ExportModel(const String& outName, const String &animName, bool animationOnly)
 {
     if (outName.Empty())
@@ -273,6 +299,7 @@ bool OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     if (!mdl->GetSkeleton().GetNumBones())
     {
         modelComponent = importNode_->CreateComponent<StaticModel>();
+        modelComponent->SetLightmap(genLightmapUV_);
         modelComponent->SetModel(mdl);
     }
     else
@@ -538,6 +565,12 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
         outModel->SetSkeleton(skeleton);
         if (model.bones_.Size() > maxBones_)
             outModel->SetGeometryBoneMappings(allBoneMappings);
+    }
+
+    if (!GenerateLightmapUV(outModel))
+    {
+        errorMessage_ = "Failed to generate lightmap UV " + model.outName_;
+        return false;
     }
 
     File outFile(context_);

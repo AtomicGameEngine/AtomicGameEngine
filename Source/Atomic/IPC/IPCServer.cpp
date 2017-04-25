@@ -69,6 +69,9 @@ namespace Atomic
         SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(IPCServer, HandleUpdate));
 
         SubscribeToEvent(serverBroker_, E_IPCCMDRESULT, ATOMIC_HANDLER(IPCServer, HandleIPCCmdResult));
+
+        OnIPCWorkerStarted();
+
     }
 
     void IPCServer::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
@@ -77,6 +80,8 @@ namespace Atomic
         {
             serverBroker_ = 0;
             brokerEnabled_ = false;
+
+            OnIPCWorkerExited();
         }
     }
 
@@ -92,6 +97,9 @@ namespace Atomic
         serverLogData["level"] = eventData[P_LEVEL].GetInt();
 
         SendEvent("IPCServerLog", serverLogData);
+
+
+        OnIPCWorkerLog(eventData[P_LEVEL].GetInt(), eventData[P_MESSAGE].GetString());
 
     }
 
@@ -176,7 +184,6 @@ namespace Atomic
         }
 
     }
-
 
     unsigned IPCServer::QueueCommand(IPCResultHandler* handler, const VariantMap& cmdMap)
     {

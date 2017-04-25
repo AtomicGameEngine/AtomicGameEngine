@@ -122,6 +122,21 @@ public:
     void SetGeometryEnabledAttr(const VariantVector& value);
     const VariantVector& GetGeometryEnabledAttr() const;
 
+    bool GetLightmap() const { return lightmap_; }
+    void SetLightmap(bool lightmap) { lightmap_ = lightmap; }
+
+    float GetLightmapScale() const { return lightmapScale_; }
+    void SetLightmapScale(float scale) { lightmapScale_ = scale; }
+
+    unsigned GetLightmapSize() const { return lightmapSize_; }
+    void SetLightmapSize(unsigned size) { lightmapSize_ = size; }
+
+    unsigned GetLightmapIndex() const { return lightmapIndex_; }
+    void SetLightmapIndex(unsigned idx) { lightmapIndex_ = idx; }
+
+    const Vector4& GetLightmapTilingOffset() const { return lightmapTilingOffset_; }
+    void SetLightmapTilingOffset(Vector4 tilingOffset) { lightmapTilingOffset_ = tilingOffset; }
+
     // ATOMIC END
 
 protected:
@@ -155,6 +170,14 @@ protected:
     mutable VariantVector geometryEnabled_;
     /// true if any geometry has been disabled
     mutable bool geometryDisabled_;
+
+    bool lightmap_;
+    float lightmapScale_;
+    unsigned lightmapSize_;
+
+    unsigned lightmapIndex_;
+    Vector4 lightmapTilingOffset_;
+
     // ATOMIC END
 
 private:

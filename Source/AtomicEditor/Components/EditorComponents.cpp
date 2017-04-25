@@ -24,6 +24,7 @@
 
 #include "EditorComponent.h"
 #include "CubemapGenerator.h"
+#include "GlowComponent.h"
 
 namespace AtomicEditor
 {
@@ -32,6 +33,7 @@ void RegisterEditorComponentLibrary(Atomic::Context* context)
 {
     EditorComponent::RegisterObject(context);
     CubemapGenerator::RegisterObject(context);
+    GlowComponent::RegisterObject(context);
 }
 
 }

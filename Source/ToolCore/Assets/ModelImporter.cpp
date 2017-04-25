@@ -67,6 +67,7 @@ void ModelImporter::SetDefaults()
     importMaterials_ = importer->GetImportMaterialsDefault();
     includeNonSkinningBones_ = importer->GetIncludeNonSkinningBones();
     animationInfo_.Clear();
+    genLightmapUV_ = false;
 
 }
 
@@ -84,6 +85,7 @@ bool ModelImporter::ImportModel()
     importer->SetImportNode(importNode_);
     importer->SetImportMaterials(importMaterials_);
     importer->SetIncludeNonSkinningBones(includeNonSkinningBones_);
+    importer->SetGenerateLightmapUV(genLightmapUV_);
 
     if (importer->Load(asset_->GetPath()))
     {
@@ -233,21 +235,24 @@ bool ModelImporter::Import()
 
     importNode_ = new Node(context_);
 
+
     if (ext == ".mdl")
     {
         FileSystem* fs = GetSubsystem<FileSystem>();
         ResourceCache* cache = GetSubsystem<ResourceCache>();
 
         // mdl files are native file format that doesn't need to be converted
-        // doesn't allow scale, animations legacy primarily for ToonTown
+        // doesn't allow scale, animations
 
-        if (!fs->Copy(asset_->GetPath(), asset_->GetCachePath() + ".mdl"))
+        String cacheFilename = asset_->GetCachePath() + ".mdl";
+
+        if (!fs->Copy(asset_->GetPath(), cacheFilename))
         {
             importNode_= 0;
             return false;
         }
 
-        Model* mdl = cache->GetResource<Model>( asset_->GetCachePath() + ".mdl");
+        Model* mdl = cache->GetResource<Model>(cacheFilename);
 
         if (!mdl)
         {
@@ -255,10 +260,35 @@ bool ModelImporter::Import()
             return false;
         }
 
-        // Force a reload, though file watchers will catch this delayed and load again
-        cache->ReloadResource(mdl);
+        if (genLightmapUV_)
+        {
+            if (!OpenAssetImporter::GenerateLightmapUV(mdl))
+            {
+                ATOMIC_LOGERRORF("Failed to generate lightmap UV %s", asset_->GetPath().CString());
+                importNode_= 0;
+                return false;
+            }
 
-        importNode_->CreateComponent<StaticModel>()->SetModel(mdl);
+            File outFile(context_);
+            if (!outFile.Open(cacheFilename, FILE_WRITE))
+            {
+                ATOMIC_LOGERRORF("Could not open output file %s", asset_->GetPath().CString());
+                importNode_= 0;
+                return false;
+            }
+
+            mdl->Save(outFile);
+
+            outFile.Close();
+
+            // Force a reload, though file watchers will catch this delayed and load again
+            cache->ReloadResource(mdl);
+
+        }
+
+        StaticModel* staticModel = importNode_->CreateComponent<StaticModel>();
+        staticModel->SetModel(mdl);
+        staticModel->SetLightmap(genLightmapUV_);
     }
     else
     {
@@ -379,6 +409,9 @@ bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
     if (import.Get("scale").IsNumber())
         scale_ = import.Get("scale").GetDouble();
 
+    if (import.Get("genLightmapUV").IsBool())
+        genLightmapUV_ = import.Get("genLightmapUV").GetBool();
+
     if (import.Get("importAnimations").IsBool())
         importAnimations_ = import.Get("importAnimations").GetBool();
 
@@ -421,6 +454,7 @@ bool ModelImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     save.Set("scale", scale_);
     save.Set("importAnimations", importAnimations_);
     save.Set("importMaterials", importMaterials_);
+    save.Set("genLightmapUV", genLightmapUV_);
 
     JSONArray animInfo;
 

@@ -52,6 +52,9 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 
+// FIXME: Hack
+#include "../Resource/ResourceCache.h"
+
 // ATOMIC BEGIN
 
 #include "Text3D/Text3DFont.h"
@@ -446,8 +449,6 @@ void Graphics::RaiseWindow()
     if (window_)
         SDL_RaiseWindow(window_);
 }
-
-
 // ATOMIC END
 
 }

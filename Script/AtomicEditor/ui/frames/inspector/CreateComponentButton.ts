@@ -95,8 +95,8 @@ subsystemCreateSource.addItem(new Atomic.UIMenuItem("PhysicsWorld", "create comp
 
 var editorCreateSource = new Atomic.UIMenuItemSource();
 
+editorCreateSource.addItem(new Atomic.UIMenuItem("GlowComponent", "GlowComponent"));
 editorCreateSource.addItem(new Atomic.UIMenuItem("CubemapGenerator", "CubemapGenerator"));
-
 
 var componentCreateSource = new Atomic.UIMenuItemSource();
 

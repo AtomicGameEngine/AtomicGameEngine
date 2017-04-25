@@ -44,6 +44,10 @@ namespace Atomic
 
         bool Initialize(const Vector<String>& arguments);
 
+        bool GetBrokerActive() const { return brokerActive_; }
+
+        IPC* GetIPC() const { return ipc_; }
+
     private:
 
         void HandleLogMessage(StringHash eventType, VariantMap& eventData);

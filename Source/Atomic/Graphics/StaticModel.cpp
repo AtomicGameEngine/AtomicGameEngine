@@ -47,7 +47,14 @@ extern const char* GEOMETRY_CATEGORY;
 StaticModel::StaticModel(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     occlusionLodLevel_(M_MAX_UNSIGNED),
-    materialsAttr_(Material::GetTypeStatic())
+    materialsAttr_(Material::GetTypeStatic()),
+    // ATOMIC BEGIN
+    lightmap_(false),
+    lightmapScale_(1.0f),
+    lightmapSize_(0),
+    lightmapIndex_(0),
+    lightmapTilingOffset_(1.0f, 1.0f, 0.0f, 0.0f)
+    // ATOMIC END
 {
 }
 
@@ -76,6 +83,13 @@ void StaticModel::RegisterObject(Context* context)
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Geometry Enabled", GetGeometryEnabledAttr, SetGeometryEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+
+    ATOMIC_ATTRIBUTE("Lightmap", bool, lightmap_, false, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Lightmap Scale", float, lightmapScale_, 1.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Lightmap Size", unsigned, lightmapSize_, 0, AM_DEFAULT);
+
+    ATOMIC_ATTRIBUTE("Lightmap Index", unsigned, lightmapIndex_, 0, AM_FILE | AM_NOEDIT);
+    ATOMIC_ATTRIBUTE("Lightmap Tiling Offset", Vector4, lightmapTilingOffset_ , Vector4(1.0f, 1.0f, 0.0f, 0.0f), AM_FILE | AM_NOEDIT);
 
     // ATOMIC END
 
@@ -164,7 +178,19 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
 
     // ATOMIC BEGIN
     if (geometryDisabled_)
+    {
         UpdateBatchesHideGeometry();
+    }
+
+    if (lightmap_)
+    {
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            batches_[i].lightmapTextureID_ = lightmapIndex_;
+            batches_[i].geometryType_ = GEOM_STATIC_NOINSTANCING;
+            batches_[i].lightmapTilingOffset_ = &lightmapTilingOffset_;
+        }
+    }
     // ATOMIC END
 
 }

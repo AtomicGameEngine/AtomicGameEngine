@@ -183,6 +183,11 @@ bool Asset::Load()
     dirty_ = false;
     if (!CheckCacheFile())
     {
+        if (db->GetReadOnly())
+        {
+            return false;
+        }
+
         dirty_ = true;
     }
 
@@ -270,7 +275,7 @@ bool Asset::CreateImporter()
         textureFormats.Push(".dds");
 
         // todo, externalize recognizers
-        if (ext == ".fbx" || ext == ".blend" || ext == ".dae" || ext == ".mdl")
+        if (ext == ".fbx" || ext == ".blend" || ext == ".dae" || ext == ".mdl" || ext == ".obj")
         {
             importer_ = new ModelImporter(context_, this);
         }

@@ -43,9 +43,11 @@ class ModelInspector extends InspectorWidget {
     onApply() {
 
         this.importer.scale = Number(this.scaleEdit.text);
+        this.importer.generateLightmapUV = this.genLightmapUVBox.value ? true : false;
 
         this.importer.importAnimations = this.importAnimationBox.value ? true : false;
         this.importer.setImportMaterials(this.importMaterials.value ? true : false);
+        
 
         for (var i = 0; i < this.importer.animationCount; i++) {
 
@@ -101,17 +103,20 @@ class ModelInspector extends InspectorWidget {
         }));
 
         this.scaleEdit = InspectorUtils.createAttrEditField("Scale", modelLayout);
-        this.scaleEdit.text = this.importer.scale.toString();
+        this.scaleEdit.text = this.importer.scale.toString();        
 
         this.importMaterials = this.createAttrCheckBox("Import Materials", modelLayout);
         this.importMaterials.value = this.importer.getImportMaterials() ? 1 : 0;
+
+        this.genLightmapUVBox = this.createAttrCheckBox("Generate Lightmap UV", modelLayout);
+        this.genLightmapUVBox.value = this.importer.generateLightmapUV ? 1 : 0;
 
         // Animations Section
         var animationLayout = this.createSection(rootLayout, "Animation", 1);
 
         this.importAnimationBox = this.createAttrCheckBox("Import Animations", animationLayout);
         this.importAnimationBox.value = this.importer.importAnimations ? 1 : 0;
-
+        
         this.importAnimationArray = new ArrayEditWidget("Animation Count");
         animationLayout.addChild(this.importAnimationArray);
 
@@ -193,6 +198,7 @@ class ModelInspector extends InspectorWidget {
 
     // model
     scaleEdit: Atomic.UIEditField;
+    genLightmapUVBox: Atomic.UICheckBox;
 
     // animation
     importAnimationBox: Atomic.UICheckBox;

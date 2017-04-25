@@ -78,5 +78,6 @@ static const String EP_WINDOW_MAXIMIZED = "WindowMaximized";
 static const String EP_AUTO_METRICS = "AutoMetrics";
 static const String EP_PROFILER_LISTEN = "ProfilerListen";
 static const String EP_PROFILER_PORT = "ProfilerPort";
+static const String EP_WORKER_THREADS_COUNT = "WorkerThreadsCount";
 // ATOMIC END
 }

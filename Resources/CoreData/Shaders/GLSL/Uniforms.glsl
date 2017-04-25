@@ -28,6 +28,9 @@ uniform mat4 cViewInv;
 uniform mat4 cViewProj;
 uniform vec4 cUOffset;
 uniform vec4 cVOffset;
+// ATOMIC BEGIN
+uniform vec4 cLMOffset;
+// ATOMIC END
 uniform mat4 cZone;
 #if !defined(GL_ES) || defined(WEBGL)
     uniform mat4 cLightMatrices[4];

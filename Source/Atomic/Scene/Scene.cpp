@@ -46,6 +46,10 @@
 #include "../DebugNew.h"
 
 // ATOMIC BEGIN
+#include "../Graphics/Graphics.h"
+#include "../Graphics/Texture2D.h"
+#include "../Graphics/StaticModel.h"
+#include "../IO/FileSystem.h"
 #include "PrefabComponent.h"
 // ATOMIC END
 
@@ -1281,6 +1285,13 @@ void Scene::FinishLoading(Deserializer* source)
         fileName_ = source->GetName();
         checksum_ = source->GetChecksum();
     }
+
+    // ATOMIC BEGIN
+    if (fileName_.Length())
+    {
+        LoadLightmaps();
+    }
+    // ATOMIC END
 }
 
 void Scene::FinishSaving(Serializer* dest) const
@@ -1546,5 +1557,92 @@ void RegisterSceneLibrary(Context* context)
     PrefabComponent::RegisterObject(context);
     // ATOMIC END
 }
+
+// ATOMIC BEGIN
+void Scene::LoadLightmaps(bool reload)
+{
+    // If we're running headless, don't load lightmap textures
+    if (!GetSubsystem<Graphics>())
+    {
+        return;
+    }
+
+    if (lightmaps_.Size() && !reload)
+    {
+        return;
+    }
+
+    lightmaps_.Clear();
+
+    PODVector<StaticModel*> staticModels;
+    GetComponents<StaticModel>(staticModels, true);
+
+    int maxLightMap = -1;
+
+    for (int i = 0; i < (int) staticModels.Size(); i++)
+    {
+        StaticModel* staticModel = staticModels[i];
+
+        if (!staticModel->GetLightmap())
+            continue;
+
+        int lightmapIndex = (int) staticModel->GetLightmapIndex();
+
+        if (lightmapIndex > maxLightMap)
+        {
+            maxLightMap = lightmapIndex;
+        }
+    }
+
+    if (maxLightMap < 0)
+        return;
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String sceneName = Atomic::GetFileName(GetFileName());
+    String lightmapFolder = ToString("AtomicGlow/Scenes/%s/Lightmaps/", sceneName.CString());
+
+    for (int i = 0; i < maxLightMap + 1; i++)
+    {
+        String textureName = ToString("%sLightmap%i.png", lightmapFolder.CString(), i);
+        Texture2D* texture = cache->GetResource<Texture2D>(textureName);
+
+        if (!texture)
+        {
+            ATOMIC_LOGWARNINGF("Scene::PreloadLightmaps() - Unable to load texture %s", textureName.CString());
+            lightmaps_.Push(SharedPtr<Texture2D>((Texture2D*)0));
+            continue;
+        }
+
+        // FILTER_NEAREST is good for testing lightmap, without bilinear artifacts
+        // texture->SetFilterMode(FILTER_NEAREST);
+        texture->SetNumLevels(1); // No mipmaps
+
+        texture->SetAddressMode(COORD_U, ADDRESS_CLAMP);
+        texture->SetAddressMode(COORD_V, ADDRESS_CLAMP);
+
+        lightmaps_.Push(SharedPtr<Texture2D>(texture));
+    }
+
+}
+
+void Scene::SetLightmapTexture(unsigned id)
+{
+    // Store graphics subsystem into static variable for speed
+    // NOTE: If Atomic needs to support changing graphics subsystem on the fly
+    // this will need to be changed
+    static Graphics* graphics = GetSubsystem<Graphics>();
+
+    if (id >= lightmaps_.Size())
+    {
+        graphics->SetTexture(TU_EMISSIVE, 0);
+        return;
+    }
+
+    graphics->SetTexture(TU_EMISSIVE, lightmaps_[id]);
+
+}
+
+// ATOMIC END
 
 }

@@ -63,6 +63,10 @@ public:
     /// Return whether is executing in the main thread.
     static bool IsMainThread();
 
+    // ATOMIC BEGIN
+    void Kill();
+    // ATOMIC END
+
 protected:
     /// Thread handle.
     void* handle_;
