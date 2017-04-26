@@ -11,6 +11,8 @@ add_definitions(-DTB_FONT_RENDERER_FREETYPE)
 
 if (ATOMIC_OPENGL)
     add_definitions(-DATOMIC_OPENGL=1)
+elseif (ATOMIC_D3D11)
+    add_definitions(-DATOMIC_D3D11=1)
 endif ()
 
 # Define source files
