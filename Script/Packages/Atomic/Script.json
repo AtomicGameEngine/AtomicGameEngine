@@ -1,5 +1,14 @@
 {
 	"name" : "Script",
 	"sources" : ["Source/Atomic/Script"],
-	"classes" : ["ScriptVariant", "ScriptVariantMap", "ScriptVector", "ScriptComponent", "ScriptComponentFile", "PhysicsContact", "PhysicsNodeCollision"]
+	"classes_rename" : {
+		"ScriptRenderPathCommand" : "RenderPathCommand"
+	},
+	"classes" : ["ScriptVariant", "ScriptVariantMap", "ScriptVector", "ScriptComponent", "ScriptComponentFile", "PhysicsContact", "PhysicsNodeCollision", "ScriptRenderPathCommand"],
+	"typescript_decl" : {
+		"ScriptRenderPathCommand" : [
+			"setShaderParameter(name:string, value:Object);"
+		]
+	}
+	
 }

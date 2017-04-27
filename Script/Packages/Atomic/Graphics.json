@@ -53,8 +53,10 @@
 		],
 		"CustomGeometry" : [
 			"setMaterialIndex(index:number, material:Material);"
+		],
+		"RenderPath" : [
+			"setShaderParameter(name:string, value:Object);"
 		]
-
 	},
 
 	"haxe_decl" : {
