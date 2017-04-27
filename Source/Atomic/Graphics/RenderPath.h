@@ -34,6 +34,10 @@ namespace Atomic
 class XMLElement;
 class XMLFile;
 
+// ATOMIC BEGIN
+class ScriptRenderPathCommand;
+// ATOMIC END
+
 /// Rendering path command types.
 enum RenderCommandType
 {
@@ -270,6 +274,13 @@ public:
     Vector<RenderTargetInfo> renderTargets_;
     /// Rendering commands.
     Vector<RenderPathCommand> commands_;
+
+    // ATOMIC BEGIN
+    /// Gets the render command at specified index, note SetCommand must be called to update the RenderPath with any changes
+    bool GetCommand(unsigned index, ScriptRenderPathCommand* dst);
+    /// Sets the render command at specified index
+    bool SetCommand(unsigned index, ScriptRenderPathCommand* src);
+    // ATOMIC END
 };
 
 }

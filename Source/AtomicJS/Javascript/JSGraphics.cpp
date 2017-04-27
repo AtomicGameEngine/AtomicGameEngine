@@ -28,6 +28,7 @@
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Camera.h>
 #include <Atomic/Scene/Node.h>
+#include <Atomic/Script/ScriptRenderPathCommand.h>
 
 namespace Atomic
 {
@@ -337,6 +338,37 @@ static int Octree_Raycast(duk_context* ctx)
     return 1;
 }
 
+static int RenderPath_SetShaderParameter(duk_context* ctx)
+{
+    const char* name = duk_require_string(ctx, 0);
+
+    Variant value;
+    js_to_variant(ctx, 1, value);
+
+    duk_push_this(ctx);
+    RenderPath* renderPath = js_to_class_instance<RenderPath>(ctx, -1, 0);
+
+    renderPath->SetShaderParameter(name, value);
+
+    return 0;
+}
+
+
+static int RenderPathCommand_SetShaderParameter(duk_context* ctx)
+{
+    const char* name = duk_require_string(ctx, 0);
+
+    Variant value;
+    js_to_variant(ctx, 1, value);
+
+    duk_push_this(ctx);
+    ScriptRenderPathCommand* scriptRenderPathCommand = js_to_class_instance<ScriptRenderPathCommand>(ctx, -1, 0);
+
+    scriptRenderPathCommand->renderPathCommand_.SetShaderParameter(name, value);
+
+    return 0;
+}
+
 void jsapi_init_graphics(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -371,6 +403,17 @@ void jsapi_init_graphics(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "Camera");
     duk_push_c_function(ctx, Camera_GetScreenRay, 2);
     duk_put_prop_string(ctx, -2, "getScreenRay");
+    duk_pop(ctx);
+
+
+    js_class_get_prototype(ctx, "Atomic", "RenderPath");
+    duk_push_c_function(ctx, RenderPath_SetShaderParameter, 2);
+    duk_put_prop_string(ctx, -2, "setShaderParameter");
+    duk_pop(ctx);
+
+    js_class_get_prototype(ctx, "Atomic", "RenderPathCommand");
+    duk_push_c_function(ctx, RenderPathCommand_SetShaderParameter, 2);
+    duk_put_prop_string(ctx, -2, "setShaderParameter");
     duk_pop(ctx);
 
     // static methods
