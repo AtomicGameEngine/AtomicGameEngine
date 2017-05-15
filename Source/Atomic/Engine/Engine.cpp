@@ -281,7 +281,10 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
             GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
             GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
-            GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
+// ATOMIC BEGIN
+            // default high dpi to false, until UI fully supports high dpi (including input)
+            GetParameter(parameters, EP_HIGH_DPI, false).GetBool(),
+// ATOMIC END
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
             GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
