@@ -79,7 +79,7 @@ public:
 
     /// Get script attribute
     ResourceRef GetComponentFileAttr() const;
-    ScriptComponentFile* GetComponentFile() { return componentFile_; }
+    ScriptComponentFile* GetComponentFile() const { return componentFile_; }
 
     /// Set script attribute.
     void SetComponentFile(JSComponentFile* cfile) { componentFile_ = cfile; }

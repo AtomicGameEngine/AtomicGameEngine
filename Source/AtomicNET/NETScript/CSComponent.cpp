@@ -120,7 +120,7 @@ void CSComponent::SendLoadEvent()
 
 bool CSComponent::Load(Deserializer& source, bool setInstanceDefault)
 {
-    bool success = Component::Load(source, setInstanceDefault);
+    bool success = ScriptComponent::Load(source, setInstanceDefault);
 
     if (success)
         SendLoadEvent();
@@ -130,7 +130,7 @@ bool CSComponent::Load(Deserializer& source, bool setInstanceDefault)
 
 bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
-    bool success = Component::LoadXML(source, setInstanceDefault);
+    bool success = ScriptComponent::LoadXML(source, setInstanceDefault);
 
     if (success)
         SendLoadEvent();
@@ -138,7 +138,7 @@ bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
-ScriptComponentFile* CSComponent::GetComponentFile()
+ScriptComponentFile* CSComponent::GetComponentFile() const
 {
     if (!componentClassName_.Length())
         return 0;

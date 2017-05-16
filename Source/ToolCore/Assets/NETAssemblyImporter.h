@@ -72,9 +72,13 @@ namespace ToolCore
         virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
         virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
+        void GetAssetCacheMap(HashMap<String, String>& assetMap);
+
     private:
 
         virtual void HandleResult(unsigned cmdID, const VariantMap& cmdResult);
+
+        bool SaveAssemblyCacheFile();
 
         JSONValue assemblyJSON_;
 

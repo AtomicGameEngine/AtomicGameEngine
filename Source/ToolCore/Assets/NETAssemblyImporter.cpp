@@ -41,6 +41,7 @@ namespace ToolCore
 
     NETAssemblyImporter::NETAssemblyImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
     {
+        requiresCacheFile_ = true;
         resultHandler_ = new NETAssemblyImporterResultHandler(context, this);
     }
 
@@ -73,36 +74,51 @@ namespace ToolCore
             }
             else
             {
-                ResourceCache* cache = GetSubsystem<ResourceCache>();
-                CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
-                if (assemblyFile)
+
+                if (!SaveAssemblyCacheFile())
                 {
-                    if (!assemblyFile->ParseAssemblyJSON(assemblyJSON_))
-                    {
-                        ATOMIC_LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly %s", asset_->GetPath().CString());
-                    }
-                    else
-                    {
-                        asset_->Save();
-
-                        using namespace CSComponentAssemblyChanged;
-                        VariantMap assemblyChangedEventData;
-                        assemblyChangedEventData[P_RESOURCE] = asset_->GetResource();
-                        assemblyChangedEventData[P_ASSEMBLYPATH] = asset_->GetPath();        
-                        SendEvent(E_CSCOMPONENTASSEMBLYCHANGED, assemblyChangedEventData);
-                    }
+                    return;
                 }
-                else
+
+                if (!assemblyJSON_.IsObject())
                 {
-
-                    ATOMIC_LOGERRORF("NETAssemblyImporter::HandleResult - Unable to get CSComponentAssembly resource for %s", asset_->GetPath().CString());
-
+                    ATOMIC_LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly json for %s", asset_->GetPath().CString());
                 }
+
+                using namespace CSComponentAssemblyChanged;
+                VariantMap assemblyChangedEventData;
+                assemblyChangedEventData[P_RESOURCE] = asset_->GetResource();
+                assemblyChangedEventData[P_ASSEMBLYPATH] = asset_->GetPath();        
+                SendEvent(E_CSCOMPONENTASSEMBLYCHANGED, assemblyChangedEventData);
                     
             }
             
         }
 
+    }
+
+    bool NETAssemblyImporter::SaveAssemblyCacheFile()
+    {
+        if (!assemblyJSON_.IsObject())
+            return false;
+
+        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+        JSONValue& root = jsonFile->GetRoot();
+        root = assemblyJSON_;
+        jsonFile->SaveFile(asset_->GetCachePath());
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetCachePath());
+
+        if (!assemblyFile)
+        {
+            ATOMIC_LOGERRORF("NETAssemblyImporter::Import - invalid cached assembly json importing %s", asset_->GetPath().CString());
+            return false;
+        }
+
+        asset_->Save();
+
+        return true;
     }
 
     bool NETAssemblyImporter::Import()
@@ -111,8 +127,20 @@ namespace ToolCore
 
         if (!service)
         {
-            ATOMIC_LOGERRORF("NETAssemblyImporter::Import - Unable to get AtomicNETService subsystem importing %s", asset_->GetPath().CString());
-            return false;
+            if (assemblyJSON_.IsObject())
+            {
+                if (!SaveAssemblyCacheFile())
+                    return false;
+
+                ATOMIC_LOGINFOF("NETAssemblyImporter::Import - AtomicNETService process unavailable, using cached assembly JSON for %s", asset_->GetPath().CString());
+
+                return true;
+            }
+            else
+            {
+                ATOMIC_LOGERRORF("NETAssemblyImporter::Import - Unable to get AtomicNETService subsystem and no cached assembly json importing %s", asset_->GetPath().CString());
+                return false;
+            }
         }
 
 
@@ -142,11 +170,8 @@ namespace ToolCore
         if (ajson.IsObject())
         {
             assemblyJSON_ = ajson.GetObject();
-
             ResourceCache* cache = GetSubsystem<ResourceCache>();
-            CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
-            if (assemblyFile)
-                assemblyFile->ParseAssemblyJSON(assemblyJSON_);
+            cache->GetResource<CSComponentAssembly>(asset_->GetCachePath());
         }
 
         return true;
@@ -168,10 +193,21 @@ namespace ToolCore
     Resource* NETAssemblyImporter::GetResource(const String& typeName)
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-        CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
-
+        CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetCachePath());
         return assemblyFile;
+    }
+
+    void NETAssemblyImporter::GetAssetCacheMap(HashMap<String, String>& assetMap)
+    {
+        if (asset_.Null())
+            return;
+
+        String assetPath = asset_->GetRelativePath().ToLower();
+
+        String cachePath = asset_->GetGUID().ToLower();
+
+        // Default is load node xml
+        assetMap["CSComponentAssembly;" + assetPath] = cachePath;
 
     }
 

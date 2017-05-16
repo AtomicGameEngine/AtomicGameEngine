@@ -78,18 +78,18 @@ String StringHash::ToString() const
 // ATOMIC BEGIN
 
 // Lookup for significant strings, not a member of StringHash so don't need to drag hashmap into header
-static HashMap<unsigned, String> gSignificantLookup;
+static HashMap<StringHash, String> gSignificantLookup;
 
 StringHash StringHash::RegisterSignificantString(const char* str)
 {
-    unsigned hash = Calculate(str);
+    StringHash hash(str);
 
     if (gSignificantLookup.Contains(hash))
         return StringHash(hash);
 
     gSignificantLookup[hash] = String(str);
 
-    return StringHash(hash);
+    return hash;
 
 }
 
@@ -98,7 +98,7 @@ StringHash StringHash::RegisterSignificantString(const String& str)
     return RegisterSignificantString(str.CString());
 }
 
-bool StringHash::GetSignificantString(unsigned hash, String& strOut)
+bool StringHash::GetSignificantString(StringHash hash, String& strOut)
 {
     if (!gSignificantLookup.TryGetValue(hash, strOut))
     {
