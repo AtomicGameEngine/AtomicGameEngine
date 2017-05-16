@@ -60,7 +60,7 @@ public:
     void SetComponentClassName(const String& name);
     const String& GetComponentClassName() const { return componentClassName_; }
 
-    virtual ScriptComponentFile* GetComponentFile();
+    virtual ScriptComponentFile* GetComponentFile() const;
 
 protected:
 

@@ -45,9 +45,7 @@ namespace Atomic
         /// Construct.
         CSComponentAssembly(Context* context);
         /// Destruct.
-        virtual ~CSComponentAssembly();
-
-        bool ParseAssemblyJSON(const JSONValue& json);
+        virtual ~CSComponentAssembly();        
 
         CSComponent* CreateCSComponent(const String& classname);
 
@@ -71,6 +69,8 @@ namespace Atomic
         static bool PreloadClassAssemblies();
 
     private:
+
+        bool ParseAssemblyJSON(const JSONValue& json);
 
         static void InitTypeMap();
 

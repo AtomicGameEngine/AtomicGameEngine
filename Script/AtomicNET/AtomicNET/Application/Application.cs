@@ -43,6 +43,8 @@ namespace AtomicEngine
             renderer.ShadowQuality = ShadowQuality.SHADOWQUALITY_SIMPLE_16BIT;
 #endif
 
+            CSComponentAssembly.PreloadClassAssemblies();
+
             appDelegate = (AppDelegate)Activator.CreateInstance(appDelegateType);
 
             try

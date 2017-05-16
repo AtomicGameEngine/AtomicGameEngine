@@ -143,6 +143,7 @@ declare module Atomic {
         mode: number; // AM_*
         defaultValue: string;
         enumNames: string[];
+        enumValues: number[];
         resourceTypeName: string;
         dynamic: boolean;
         tooltip: string;

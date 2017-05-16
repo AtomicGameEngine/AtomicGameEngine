@@ -499,7 +499,7 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
 // ATOMIC BEGIN
         // Check for significant string, to make variant map XML more friendly than using a hash
         String sigString;
-        if (StringHash::GetSignificantString(i->first_.Value(), sigString))
+        if (StringHash::GetSignificantString(i->first_, sigString))
         {
             variantElem.SetString("name", sigString);
         }

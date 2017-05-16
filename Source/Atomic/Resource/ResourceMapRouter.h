@@ -40,6 +40,8 @@ public:
 
     void Route(String& name, StringHash type, ResourceRequest requestType);
 
+    const HashMap<StringHash, String>* GetTypeCacheMap(StringHash hash) const { return resourceMap_[hash]; }
+
 private:
 
     bool Load(const JSONValue& json);

@@ -21,12 +21,14 @@
 //
 
 #include <Atomic/Core/Context.h>
+#include <Atomic/Core/Profiler.h>
 #include <Atomic/IO/Deserializer.h>
+#include <Atomic/IO/Serializer.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
-#include <Atomic/Core/Profiler.h>
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/IO/Serializer.h>
+#include <Atomic/Resource/JSONFile.h>
+#include <Atomic/Resource/ResourceMapRouter.h>
 #include <Atomic/Script/ScriptSystem.h>
 
 #include "NETScriptEvents.h"
@@ -194,7 +196,7 @@ namespace Atomic
                     }
                 }
 
-                AddField(fieldName, varType, resourceTypeName, isArray, fixedArraySize, className, tooltip);
+                AddField(fieldName, varType, resourceTypeName, isArray, isEnum, fixedArraySize, className, tooltip);
 
             }
 
@@ -260,6 +262,21 @@ namespace Atomic
 
         fullAssemblyPath_ = sourceFile->GetFullPath();
 
+        String text = sourceFile->ReadText();
+        JSONValue root;
+
+        if (!JSONFile::ParseJSON(text, root, false))        
+        {
+            ATOMIC_LOGERRORF("Failed to load assembly json for %s ", fullAssemblyPath_.CString());
+            return false;
+        }
+
+        if (!ParseAssemblyJSON(root))
+        {
+            ATOMIC_LOGERRORF("Failed to parse assembly json for %s ", fullAssemblyPath_.CString());
+            return false;
+        }
+
         VariantMap eventData;
 
         using namespace CSComponentAssemblyReference;
@@ -323,45 +340,45 @@ namespace Atomic
 
     bool CSComponentAssembly::PreloadClassAssemblies()
     {
-        // TEMPORARY SOLUTION, Desktop only
-
         ATOMIC_LOGINFO("Preloading Class Assemblies");
 
         Context* context = ScriptSystem::GetContext();
-        assert(context);
+        
+        if (!context)
+            return false;
+
+        ResourceMapRouter* resourceMap = context->GetSubsystem<ResourceMapRouter>();
+
+        if (!resourceMap)
+        {
+            ATOMIC_LOGERROR("CSComponentAssembly::PreloadClassAssemblies - ResourceMapRouter subsystem unavailable");
+            return false;
+        }
 
         ResourceCache* cache = context->GetSubsystem<ResourceCache>();
-        FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
 
-        const StringVector& resourceDirs = cache->GetResourceDirs();
-
-        for (unsigned i = 0; i < resourceDirs.Size(); i++)
+        if (!cache)
         {
-            const String& resourceDir = resourceDirs[i];
+            ATOMIC_LOGERROR("CSComponentAssembly::PreloadClassAssemblies - ResourceCache subsystem unavailable");
+            return false;
+        }
 
-            ATOMIC_LOGINFOF("Scanning: %s", resourceDir.CString());
+        const HashMap<StringHash, String>* assemblies = resourceMap->GetTypeCacheMap("CSComponentAssembly");
 
-            StringVector results;
-            fileSystem->ScanDir(results, resourceDir, "*.dll", SCAN_FILES, true);
+        if (!assemblies)
+            return true;
 
-            for (unsigned j = 0; j < results.Size(); j++)
+        HashMap<StringHash, String>::ConstIterator itr = assemblies->Begin();
+
+        while (itr != assemblies->End())
+        {
+            if (!cache->GetResource<CSComponentAssembly>(itr->second_, false))
             {
-                // FIXME: This filtering is necessary as we're loading setting project root folder as a resource dir
-                // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1037
-
-                String filter = results[j].ToLower();
-
-                if (filter.StartsWith("atomicnet/") || filter.StartsWith("resources/"))
-                {
-                    ATOMIC_LOGINFOF("Skipping Assembly: %s (https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1037)", results[j].CString());
-                    continue;
-                }
-
-                ATOMIC_LOGINFOF("Loading Assembly: %s", results[j].CString());
-
-                cache->GetResource<CSComponentAssembly>(results[j]);
+                ATOMIC_LOGERRORF("CSComponentAssembly::PreloadClassAssemblies - Error getting resource %s", itr->second_.CString());
+                return false;
             }
 
+            itr++;
         }
 
         return true;

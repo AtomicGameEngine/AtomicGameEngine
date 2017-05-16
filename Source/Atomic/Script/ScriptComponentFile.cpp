@@ -43,7 +43,7 @@ ScriptComponentFile::~ScriptComponentFile()
 
 void ScriptComponentFile::RegisterObject(Context* context)
 {
-    //context->RegisterFactory<ScriptComponentFile>();
+    
 }
 
 void ScriptComponentFile::AddEnum(const String& enumName, const EnumInfo& enumInfo, const String& classname)
@@ -53,10 +53,10 @@ void ScriptComponentFile::AddEnum(const String& enumName, const EnumInfo& enumIn
     enumValues.Push(enumInfo);
 }
 
-void ScriptComponentFile::AddField(const String& fieldName, VariantType variantType, const String& resourceTypeName, bool isArray, unsigned fixedArraySize, const String &classname, const String& tooltip)
+void ScriptComponentFile::AddField(const String& fieldName, VariantType variantType, const String& resourceTypeName, bool isArray, bool isEnum, unsigned fixedArraySize, const String &classname, const String& tooltip)
 {
     FieldMap& fields = classFields_[classname];
-    FieldInfo finfo(fieldName, variantType, resourceTypeName, isArray, fixedArraySize);
+    FieldInfo finfo(fieldName, variantType, resourceTypeName, isArray, isEnum, fixedArraySize);
     fields[fieldName] = finfo;
 
     if (tooltip.Length())

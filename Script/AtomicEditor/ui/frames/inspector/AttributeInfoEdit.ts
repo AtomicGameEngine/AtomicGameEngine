@@ -339,13 +339,19 @@ class IntAttributeEdit extends AttributeInfoEdit {
         if (uniform) {
             var object = this.editType.getFirstObject();
             if (object) {
-                var value = object.getAttribute(this.attrInfo.name, this.arrayIndex);
 
+                var value = object.getAttribute(this.attrInfo.name, this.arrayIndex);
                 var widget = this.editWidget;
                 var attrInfo = this.attrInfo;
 
                 if (attrInfo.enumNames.length) {
-                    widget.text = attrInfo.enumNames[value];
+
+                    if (attrInfo.enumValues.indexOf(value) != -1) {
+                        widget.text = attrInfo.enumNames[attrInfo.enumValues.indexOf(value)];
+                    } else {
+                        widget.text = attrInfo.enumNames[value];
+                    }
+                
                 }
                 else {
                     widget.text = value.toString();
@@ -381,10 +387,10 @@ class IntAttributeEdit extends AttributeInfoEdit {
             var id = this.attrInfo.name + " enum popup";
 
             if (ev.target.id == id) {
-
-                this.editType.onAttributeInfoEdited(this.attrInfo, Number(ev.refid) - 1, -1, true, this.arrayIndex);
+                let eindex =  Number(ev.refid) - 1;
+                let value = this.attrInfo.enumValues[eindex];
+                this.editType.onAttributeInfoEdited(this.attrInfo, value, -1, true, this.arrayIndex);
                 this.refresh();
-
             }
 
             else if (this.editWidget == ev.target && this.attrInfo.enumNames.length) {

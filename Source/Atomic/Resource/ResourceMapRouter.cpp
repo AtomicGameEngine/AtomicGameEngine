@@ -29,70 +29,87 @@
 namespace Atomic
 {
 
-ResourceMapRouter::ResourceMapRouter(Context* context, const String& mapFile) : ResourceRouter(context)
-{
-    if (mapFile.Length())
+    ResourceMapRouter::ResourceMapRouter(Context* context, const String& mapFile) : ResourceRouter(context)
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        if (mapFile.Length())
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-        if (!cache)
+            if (!cache)
+            {
+                ATOMIC_LOGERROR("ResourceMapRouter::ResourceMapRouter - ResourceCache subsystem not found");
+                return;
+            }
+
+            SharedPtr<JSONFile> jsonFile = cache->GetTempResource<JSONFile>(mapFile);
+
+            context_->RegisterSubsystem(this);
+
+            if (jsonFile.NotNull())
+            {
+                if (Load(jsonFile->GetRoot()))
+                {
+                    cache->AddResourceRouter(this);
+                }
+                else
+                {
+                    ATOMIC_LOGERROR("ResourceMapRouter::ResourceMapRouter - Unable to load resource map json");
+                }
+            }
+            else
+            {
+                ATOMIC_LOGERROR("ResourceMapRouter::ResourceMapRouter - Unable to parse resource map json");
+            }
+
+        }
+    }
+
+    bool ResourceMapRouter::Load(const JSONValue& json)
+    {
+        const JSONValue& assetMap = json.Get("assetMap");
+
+        if (!assetMap.IsObject())
+            return false;
+
+        ConstJSONObjectIterator itr = assetMap.Begin();
+        while (itr != assetMap.End())
+        {
+            StringVector tags = itr->first_.Split(';');
+
+            if (tags.Size() == 2)
+            {
+                StringHash::RegisterSignificantString(tags[0]);
+                StringHash::RegisterSignificantString(tags[1]);
+                resourceMap_[tags[0]][tags[1]] = itr->second_.GetString();
+            }
+
+            itr++;
+        }
+
+        return true;
+    }
+
+    void ResourceMapRouter::Route(String& name, StringHash type, ResourceRequest requestType)
+    {
+
+        if (type == StringHash::ZERO)
             return;
 
-        SharedPtr<JSONFile> jsonFile = cache->GetTempResource<JSONFile>(mapFile);
-
-        if (jsonFile.NotNull())
+        HashMap<StringHash, HashMap<StringHash, String>>::ConstIterator itr = resourceMap_.Find(type);
+        if (itr == resourceMap_.End())
         {
-            if (Load(jsonFile->GetRoot()))
-                cache->AddResourceRouter(this);
+            return;
         }
 
-    }
-}
-
-bool ResourceMapRouter::Load(const JSONValue& json)
-{
-    const JSONValue& assetMap = json.Get("assetMap");
-
-    if (!assetMap.IsObject())
-        return false;
-
-    ConstJSONObjectIterator itr = assetMap.Begin();
-    while (itr != assetMap.End())
-    {
-        StringVector tags = itr->first_.Split(';');
-
-        if (tags.Size() == 2)
+        HashMap<StringHash, String>::ConstIterator mitr = itr->second_.Find(name);
+        if (mitr == itr->second_.End())
         {
-           resourceMap_[tags[0]][tags[1]] = itr->second_.GetString();
+            return;
         }
 
-        itr++;
+
+        name = mitr->second_;
+
     }
-
-    return true;
-}
-
-void ResourceMapRouter::Route(String& name, StringHash type, ResourceRequest requestType)
-{
-
-    if (type == StringHash::ZERO)
-        return;
-
-    HashMap<StringHash, HashMap<StringHash, String>>::ConstIterator itr = resourceMap_.Find(type);
-    if (itr == resourceMap_.End())
-    {
-        return;
-    }
-
-    HashMap<StringHash, String>::ConstIterator mitr = itr->second_.Find(name);
-    if (mitr == itr->second_.End())
-    {
-        return;
-    }
-
-
-    name = mitr->second_;
-
-}
 
 }

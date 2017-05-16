@@ -44,13 +44,20 @@ public:
     static void RegisterObject(Context* context);
 
     virtual const String& GetComponentClassName() const = 0;
+    virtual ScriptComponentFile* GetComponentFile() const = 0;
 
-    virtual ScriptComponentFile* GetComponentFile() = 0;
-
+    /// Get script field value map
     VariantMap& GetFieldValues() { return fieldValues_; }
 
+    /// Load from binary data. Return true if successful.
     bool Load(Deserializer& source, bool setInstanceDefault);
+    /// Load from XML data. Return true if successful.
     bool LoadXML(const XMLElement& source, bool setInstanceDefault);
+
+    /// Save as binary data. Return true if successful.
+    virtual bool Save(Serializer& dest) const;
+    /// Save as XML data. Return true if successful.
+    virtual bool SaveXML(XMLElement& dest) const;
 
 protected:
 
@@ -58,7 +65,9 @@ protected:
     void SetFieldValuesAttr(const VariantMap& value);
 
     VariantMap fieldValues_;
+    mutable VariantMap fieldValuesAttr_;
 
+    mutable bool saving_;
     bool loading_;
 
 

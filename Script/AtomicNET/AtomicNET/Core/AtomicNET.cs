@@ -126,7 +126,7 @@ namespace AtomicEngine
             context = core.Context;            
 
             NativeCore.Initialize();
-            CSComponentCore.Initialize();
+            CSComponentCore.Initialize();            
 
 #if ATOMIC_DESKTOP
             string[] arguments = Environment.GetCommandLineArgs();

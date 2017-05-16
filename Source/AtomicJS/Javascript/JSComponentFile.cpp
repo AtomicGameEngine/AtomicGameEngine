@@ -377,7 +377,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
                                         {
                                             duk_get_prop_index(ctx, -1, i);
                                             String enumName = duk_require_string(ctx, -1);
-                                            AddEnum(name, EnumInfo(enumName, Variant(float(i))));
+                                            AddEnum(name, EnumInfo(enumName, int(i)));
                                             duk_pop(ctx);
                                         }
 

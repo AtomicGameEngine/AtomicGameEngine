@@ -115,7 +115,7 @@ public:
     static StringHash RegisterSignificantString(const String& str);
 
     /// Get a significant string from a case insensitive hash value
-    static bool GetSignificantString(unsigned hash, String& strOut);
+    static bool GetSignificantString(StringHash hash, String& strOut);
 
     // ATOMIC END
 

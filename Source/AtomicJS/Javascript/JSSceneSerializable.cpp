@@ -512,6 +512,9 @@ namespace Atomic
                     duk_put_prop_string(ctx, -2, "tooltip");
                 }
 
+                // enum names
+                duk_push_array(ctx);
+                // enum values
                 duk_push_array(ctx);
 
                 if (enums.Contains(itr->first_))
@@ -522,13 +525,19 @@ namespace Atomic
 
                     while (eitr != infos->End())
                     {
+                        // enum value
+                        duk_push_number(ctx, eitr->value_);
+                        duk_put_prop_index(ctx, -2, enumCount);
+
+                        // enum name
                         duk_push_string(ctx, eitr->name_.CString());
-                        duk_put_prop_index(ctx, -2, enumCount++);
+                        duk_put_prop_index(ctx, -3, enumCount++);
                         eitr++;
                     }
 
                 }
 
+                duk_put_prop_string(ctx, -3, "enumValues");
                 duk_put_prop_string(ctx, -2, "enumNames");
 
                 // store attr object
@@ -623,6 +632,9 @@ namespace Atomic
                 duk_push_boolean(ctx, 0);
                 duk_put_prop_string(ctx, -2, "dynamic");
 
+                // Enum Names
+                duk_push_array(ctx);
+                // Enum Values
                 duk_push_array(ctx);
 
                 const char** enumPtr = attr->enumNames_;
@@ -632,12 +644,19 @@ namespace Atomic
                 {
                     while (*enumPtr)
                     {
+                        // set value
+                        duk_push_number(ctx, enumCount);
+                        duk_put_prop_index(ctx, -2, enumCount);
+
+                        // set name
                         duk_push_string(ctx, *enumPtr);
-                        duk_put_prop_index(ctx, -2, enumCount++);
+                        duk_put_prop_index(ctx, -3, enumCount++);
+
                         enumPtr++;
                     }
                 }
 
+                duk_put_prop_string(ctx, -3, "enumValues");
                 duk_put_prop_string(ctx, -2, "enumNames");
 
                 // store attr object
