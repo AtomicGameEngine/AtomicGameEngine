@@ -389,6 +389,7 @@ interface WindowData {
     height: number;
     monitor: number;
     maximized: boolean;
+    windowed: boolean;
 }
 
 interface MonacoEditorSettings {
@@ -443,7 +444,8 @@ class PreferencesFormat {
             width: 0,
             height: 0,
             monitor: 0,
-            maximized: true
+            maximized: true,
+            windowed: false
         };
 
         this.playerWindow = {
@@ -452,7 +454,8 @@ class PreferencesFormat {
             width: 0,
             height: 0,
             monitor: 0,
-            maximized: false
+            maximized: false,
+            windowed: false
         };
 
         this.codeEditor = {
