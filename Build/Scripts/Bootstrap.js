@@ -19,6 +19,13 @@ require('./BuildCommon');
 
 var cmd = config._[0];
 
+// Check that we're in a local repo and not a downloaded zip
+if (!fs.existsSync(atomicRoot + ".git")) {
+    console.log("\nBUILD ERROR:\n\nAtomic must be built from a local git clone for submodules and git build information.\n");
+    console.log("Please see: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-Atomic-from-Source");
+    process.exit(1);
+}
+
 function printHelp() {
 
     console.log("\nAtomic Editor Build Script");
