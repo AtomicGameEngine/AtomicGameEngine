@@ -30,11 +30,6 @@ endif ()
 target_link_libraries(AtomicNETNative AtomicApp AtomicNETScriptBindings AtomicNETScript AtomicJS AtomicPlayerLib AtomicPlayerJS Atomic)
 target_include_directories(AtomicNETNative PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (LINUX)
-    #https://github.com/nothings/stb/issues/280
-    target_link_libraries(AtomicNETNative gcc_s gcc)
-endif()
-
 if (APPLE)
     if (NOT IOS)
         target_link_libraries( AtomicNETNative "-stdlib=libc++ -framework AudioToolbox -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
