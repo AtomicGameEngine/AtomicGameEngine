@@ -70,6 +70,11 @@ public:
 
     void SetUIListView(bool value);
 
+    /// Returns the string of item at the requested index
+    const String& GetItemString(int index);
+    /// Returns the string of the selected item
+    const String& GetSelectedItemString();
+
 protected:
 
     void HandleUIUpdate(StringHash eventType, VariantMap& eventData);
