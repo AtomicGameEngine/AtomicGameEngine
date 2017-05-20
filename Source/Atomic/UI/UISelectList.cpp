@@ -35,7 +35,7 @@ using namespace tb;
 namespace Atomic
 {
 
-UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(context, false), transferStr()
+UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(context, false)
 {
     if (createWidget)
     {
@@ -124,7 +124,7 @@ String UISelectList::GetSelectedItemID()
 }
 
 /// Returns the string of the selected item from the list widget
-const String& UISelectList::GetSelectedItemString()
+String UISelectList::GetSelectedItemString()
 {
     int selected = ((TBSelectList*)widget_)->GetValue();
     TBSelectItemSource *tbsource = (TBSelectItemSource*)((TBSelectList*)widget_)->GetSource();
@@ -132,10 +132,7 @@ const String& UISelectList::GetSelectedItemString()
     {
         const char *strx = tbsource->GetItemString(selected);
         if (strx )
-        {
-            transferStr = (String)strx;
-            return (transferStr);
-        }
+            return ( tbsource->GetItemString(selected) );
     }
     return String::EMPTY;
 }
@@ -164,17 +161,14 @@ String UISelectList::GetItemID(int index)
 }
 
 /// Returns the string of item at the requested index from the list widget
-const String& UISelectList::GetItemString(int index)
+String UISelectList::GetItemString(int index)
 {
     TBSelectItemSource *tbsource = (TBSelectItemSource*)((TBSelectList*)widget_)->GetSource();
     if ( tbsource && index >= 0 && index < tbsource->GetNumItems() )
     {
         const char *strx = tbsource->GetItemString(index);
         if (strx != NULL)
-        {
-            transferStr = (String)strx;
-            return (transferStr);
-        }
+            return ( tbsource->GetItemString(index) );
     }
     return String::EMPTY;
 }
