@@ -35,7 +35,7 @@ using namespace tb;
 namespace Atomic
 {
 
-UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(context, false)
+UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(context, false), transferStr()
 {
     if (createWidget)
     {
@@ -133,8 +133,8 @@ const String& UISelectList::GetSelectedItemString()
         const char *strx = tbsource->GetItemString(selected);
         if (strx )
         {
-            static String uiSelectListItemStr = strx;
-            return (uiSelectListItemStr);
+            transferStr = (String)strx;
+            return (transferStr);
         }
     }
     return String::EMPTY;
@@ -172,8 +172,8 @@ const String& UISelectList::GetItemString(int index)
         const char *strx = tbsource->GetItemString(index);
         if (strx != NULL)
         {
-            static String uiSelectListItemStr = strx;
-            return (uiSelectListItemStr);
+            transferStr = (String)strx;
+            return (transferStr);
         }
     }
     return String::EMPTY;

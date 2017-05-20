@@ -83,6 +83,8 @@ protected:
 
 private:
 
+    String transferStr;
+
 };
 
 
