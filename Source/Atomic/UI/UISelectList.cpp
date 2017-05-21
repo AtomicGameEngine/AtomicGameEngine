@@ -123,6 +123,20 @@ String UISelectList::GetSelectedItemID()
     return id_;
 }
 
+/// Returns the string of the selected item from the list widget
+String UISelectList::GetSelectedItemString()
+{
+    int selected = ((TBSelectList*)widget_)->GetValue();
+    TBSelectItemSource *tbsource = (TBSelectItemSource*)((TBSelectList*)widget_)->GetSource();
+    if ( tbsource && selected >= 0 && selected < tbsource->GetNumItems() )
+    {
+        const char *strx = tbsource->GetItemString(selected);
+        if (strx )
+            return ( tbsource->GetItemString(selected) );
+    }
+    return String::EMPTY;
+}
+
 bool UISelectList::GetItemSelected(int index)
 {
     if (!widget_)
@@ -144,6 +158,19 @@ String UISelectList::GetItemID(int index)
 
     return _id;
 
+}
+
+/// Returns the string of item at the requested index from the list widget
+String UISelectList::GetItemString(int index)
+{
+    TBSelectItemSource *tbsource = (TBSelectItemSource*)((TBSelectList*)widget_)->GetSource();
+    if ( tbsource && index >= 0 && index < tbsource->GetNumItems() )
+    {
+        const char *strx = tbsource->GetItemString(index);
+        if (strx != NULL)
+            return ( tbsource->GetItemString(index) );
+    }
+    return String::EMPTY;
 }
 
 String UISelectList::GetHoverItemID()
