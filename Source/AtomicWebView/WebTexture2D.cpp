@@ -390,6 +390,14 @@ void WebTexture2D::SetSize(int width, int height)
 
 #endif
 
+#if defined(ATOMIC_OPENGL) && defined(ATOMIC_PLATFORM_WINDOWS) 
+    //Force width and height to multiples of 2 so that we don't squish pixels
+    //This doesn't seem to make the text completely sharp but it makes it usable for now.
+    width = (width | 2) + 1;
+    height = (height | 2) + 1;
+    texture_->SetFilterMode(TextureFilterMode::FILTER_NEAREST);
+#endif
+
     if (!texture_->SetSize(width, height, format, textureUsage))
     {
         ATOMIC_LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
