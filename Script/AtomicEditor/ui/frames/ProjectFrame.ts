@@ -590,6 +590,21 @@ class ProjectFrame extends ScriptWidget {
         button.skinBg = "TBButton.flat";
         button["asset"] = asset;
         blayout["assetButton"] = button;
+
+        // support for image tooltips
+        var extx = asset.getExtension();
+        if ( extx == ".jpg" || extx == ".png" ) {
+            var tt = "#" + asset.path;
+            button.tooltip = tt;
+        }
+        if ( extx == ".prefab" || extx == ".mdl" || extx == ".fbx" ) {
+            var thumbfolder = ToolCore.toolSystem.project.projectPath + "Support/";
+            var tt = thumbfolder + asset.name + extx + ".png";  // only support png tooltips
+            if ( Atomic.getFileSystem().fileExists (tt) ) {     // if it exists, make the tooltip
+                button.tooltip = "#" + tt;
+            }
+        }
+
         blayout.addChild(button);
 
         return blayout;
