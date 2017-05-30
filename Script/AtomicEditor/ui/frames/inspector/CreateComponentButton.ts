@@ -20,6 +20,12 @@
 // THE SOFTWARE.
 //
 
+// Native components aren't self registering with the editor, so we need to
+// add them to the component menu.
+// TODO: self registration of native components
+var myProjectSource = new Atomic.UIMenuItemSource();
+myProjectSource.addItem(new Atomic.UIMenuItem("MyNativeComponent", "MyNativeComponent"));
+
 var audioCreateSource = new Atomic.UIMenuItemSource();
 
 audioCreateSource.addItem(new Atomic.UIMenuItem("SoundListener", "SoundListener"));
@@ -97,10 +103,11 @@ var editorCreateSource = new Atomic.UIMenuItemSource();
 
 editorCreateSource.addItem(new Atomic.UIMenuItem("CubemapGenerator", "CubemapGenerator"));
 
-
 var componentCreateSource = new Atomic.UIMenuItemSource();
 
+// TODO: self registration of native components/component groups
 var sources = {
+    MyProject: myProjectSource, // add project menu source
     Audio: audioCreateSource,
     "2D": _2DCreateSource,
     Geometry: geometryCreateSource,

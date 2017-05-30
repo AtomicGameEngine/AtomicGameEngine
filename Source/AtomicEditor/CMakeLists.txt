@@ -164,7 +164,9 @@ if (TARGET_PROPERTIES)
     set_target_properties(AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
 
-target_link_libraries(AtomicEditor Atomic)
+# We need to link our project module into the editor, which will make it
+# available both in edit and play modes
+target_link_libraries(AtomicEditor MyProject Atomic)
 
 add_dependencies(${CEF_TARGET} AtomicToolCheckScripts)
 

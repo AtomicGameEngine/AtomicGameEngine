@@ -61,7 +61,7 @@ namespace Atomic
 
             arguments_ = GetArguments();
         }
-        
+
     }
 
     AppBase::~AppBase()
@@ -96,6 +96,10 @@ namespace Atomic
         }
     }
 
+    // Link our project module in, this is an example so doing in AppBase
+    // which is shared by the Atomic Editor and Player, including managed C# player
+    void RegisterMyProjectModule(Context* context);
+
     void AppBase::Setup()
     {
         Application::Setup();
@@ -104,6 +108,9 @@ namespace Atomic
         // Move me!
         RegisterEnvironmentLibrary(context_);
 #endif
+
+        // register project module
+        RegisterMyProjectModule(context_);
 
         ProcessArguments();
 

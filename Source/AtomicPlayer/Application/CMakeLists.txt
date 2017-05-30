@@ -27,7 +27,8 @@ endif()
 endif()
 
 if (NOT IOS)
-    target_link_libraries(AtomicPlayer AtomicJS AtomicPlayerLib AtomicPlayerJS Atomic)
+    # We need to link our project module into the deployed player
+    target_link_libraries(AtomicPlayer MyProject AtomicJS AtomicPlayerLib AtomicPlayerJS Atomic)
 endif()
 
 if (WIN32)

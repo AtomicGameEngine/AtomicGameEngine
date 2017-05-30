@@ -1,0 +1,5 @@
+{
+	"name" : "MyProject",
+	"sources" : ["Source/MyProject"],
+	"classes" : ["MyNativeComponent"]
+}

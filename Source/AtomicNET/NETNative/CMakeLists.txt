@@ -27,7 +27,9 @@ add_library(AtomicNETNative SHARED ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE})
 if (ATOMIC_DESKTOP)
     add_dependencies(AtomicNETNative AtomicToolCheckScripts)
 endif ()
-target_link_libraries(AtomicNETNative AtomicApp AtomicNETScriptBindings AtomicNETScript AtomicJS AtomicPlayerLib AtomicPlayerJS Atomic)
+
+# We need to link our project module into the AtomicNET, unless we optionally disable C# support
+target_link_libraries(AtomicNETNative MyProject AtomicApp AtomicNETScriptBindings AtomicNETScript AtomicJS AtomicPlayerLib AtomicPlayerJS Atomic)
 target_include_directories(AtomicNETNative PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (APPLE)

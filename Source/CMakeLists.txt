@@ -27,6 +27,9 @@ if (ATOMIC_DOTNET)
     add_subdirectory(AtomicNET)
 endif ()
 
+# Add our project native source module
+add_subdirectory(MyProject)
+
 if (ATOMIC_DESKTOP)
     if (ATOMIC_DOTNET OR ATOMIC_JAVASCRIPT)
         add_subdirectory(AtomicTool)
