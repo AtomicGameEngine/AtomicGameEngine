@@ -86,7 +86,9 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     perspectCamPosition_(0, 0, 0),
     perspectiveYaw_(0),
     perspectivePitch_(0),
-    fromOrthographic_(false)
+    fromOrthographic_(false),
+    isOnPlayCamera_(false),
+    lookCamera_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -121,6 +123,11 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     assert(octree_.NotNull());
 
     cameraNode_->SetPosition(Vector3(0, 0, -10));
+
+    //save the default camera Ptr
+    defaultCameraNode_ = cameraNode_;
+
+    activeCameraNode_ = defaultCameraNode_;
 
     SetView(scene_, camera_);
     SetAutoUpdate(false);
@@ -240,7 +247,7 @@ void SceneView3D::MoveCamera(float timeStep)
     Quaternion q(pitch_, yaw_, 0.0f);
 
     if (!zooming || !changingCameraSpeed)
-        cameraNode_->SetRotation(q);
+        activeCameraNode_->SetRotation(q);
 
     if (orbitting)
     {
@@ -250,8 +257,8 @@ void SceneView3D::MoveCamera(float timeStep)
         if (bbox.Defined())
         {
             Vector3 centerPoint = bbox.Center();
-            Vector3 d = cameraNode_->GetWorldPosition() - centerPoint;
-            cameraNode_->SetWorldPosition(centerPoint - q * Vector3(0.0, 0.0, d.Length()));
+            Vector3 d = activeCameraNode_->GetWorldPosition() - centerPoint;
+            activeCameraNode_->SetWorldPosition(centerPoint - q * Vector3(0.0, 0.0, d.Length()));
 
         }
     }
@@ -260,9 +267,9 @@ void SceneView3D::MoveCamera(float timeStep)
     {
         orbitting = false;
         Ray ray = GetCameraRay();
-        Vector3 wpos = cameraNode_->GetWorldPosition();
+        Vector3 wpos = activeCameraNode_->GetWorldPosition();
         wpos += ray.direction_ * (float(input->GetMouseMoveWheel()) * ZOOM_TEMPO);
-        cameraNode_->SetWorldPosition(wpos);
+        activeCameraNode_->SetWorldPosition(wpos);
     }
 
     if (changingCameraSpeed)
@@ -294,32 +301,32 @@ void SceneView3D::MoveCamera(float timeStep)
         if (input->GetKeyDown(KEY_W))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::FORWARD * cameraMoveSpeed_ * timeStep);
+            activeCameraNode_->Translate(Vector3::FORWARD * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_S))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::BACK * cameraMoveSpeed_ * timeStep);
+            activeCameraNode_->Translate(Vector3::BACK * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_A))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::LEFT * cameraMoveSpeed_ * timeStep);
+            activeCameraNode_->Translate(Vector3::LEFT * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_D))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::RIGHT * cameraMoveSpeed_ * timeStep);
+            activeCameraNode_->Translate(Vector3::RIGHT * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_E))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::UP * cameraMoveSpeed_ * timeStep);
+            activeCameraNode_->Translate(Vector3::UP * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_Q))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::DOWN * cameraMoveSpeed_ * timeStep);
+            activeCameraNode_->Translate(Vector3::DOWN * cameraMoveSpeed_ * timeStep);
         }
     }
 
@@ -335,7 +342,7 @@ void SceneView3D::MoveCamera(float timeStep)
         }
 
         Vector3 pos = cameraMoveStart_.Lerp(cameraMoveTarget_, cameraMoveTime_);
-        cameraNode_->SetWorldPosition(pos);
+        activeCameraNode_->SetWorldPosition(pos);
 
     }
 
@@ -395,11 +402,11 @@ void SceneView3D::SnapCameraToView(int snapView)
                 selectedNodePos.z_ += DISTANCE;
                 break;
         }
-        cameraNode_->SetPosition(selectedNodePos);
+        activeCameraNode_->SetPosition(selectedNodePos);
         camera_->SetOrthographic(true);
     }
 
-    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0));
+    activeCameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0));
 
 
 }
@@ -438,8 +445,8 @@ void SceneView3D::SelectView()
 
             pitch_ = perspectivePitch_;
             yaw_ = perspectiveYaw_;
-            cameraNode_->SetPosition(perspectCamPosition_);
-            cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0));
+            activeCameraNode_->SetPosition(perspectCamPosition_);
+            activeCameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0));
         }
 
         if (input->GetKeyPress(KEY_O))
@@ -456,7 +463,7 @@ void SceneView3D::SelectView()
 
 void SceneView3D::SavePerspectiveCameraPosition()
 {
-    perspectCamPosition_ = cameraNode_->GetPosition();
+    perspectCamPosition_ = activeCameraNode_->GetPosition();
     perspectivePitch_ = pitch_;
     perspectiveYaw_ = yaw_;
 }
@@ -499,6 +506,59 @@ bool SceneView3D::MouseInView()
 
     return rect.IsInside(pos);
 
+}
+
+void SceneView3D::TogglePlayCamera() {
+    //invert the logic
+    isOnPlayCamera_ = !isOnPlayCamera_;
+    
+    if (isOnPlayCamera_) {
+        Vector<SharedPtr<Node>> selectionList = sceneEditor_->GetSelection()->GetNodes();
+        if (selectionList.Size() > 0 && selectionList[0]->GetComponent<Camera>() != 0 && selectionList[0]->IsEnabled())
+        {
+            //A camera is selected
+            activeCameraNode_ = selectionList[0];
+            sceneEditor_->GetSelection()->Clear();
+            lookCamera_ = true;
+            ATOMIC_LOGINFO("Switching to the selected camera");
+        }
+        //camera is not selected
+        else
+        {
+            //get all cameras of the scene and select the first one
+            PODVector<Node*> cameraNodes;
+            scene_->GetChildrenWithComponent<Camera>(cameraNodes, true);
+            cameraNodes.Remove(defaultCameraNode_.Get());
+            cameraNodes.Compact();
+            if (cameraNodes.Size() > 0 && cameraNodes[0]->IsEnabled())
+            {
+                activeCameraNode_ = cameraNodes[0];
+                lookCamera_ = true;
+                ATOMIC_LOGINFO("Switching to the first camera on the scene");
+            }
+            else {
+                //There is no active camera on the scene, switch to default camera
+                isOnPlayCamera_ = false;
+                activeCameraNode_ = defaultCameraNode_;
+                lookCamera_ = false;
+                ATOMIC_LOGINFO("Switching to the default camera");
+            }
+        }
+    }
+    else
+    {
+        //set to default
+        activeCameraNode_ = defaultCameraNode_;
+        lookCamera_ = false;
+        ATOMIC_LOGINFO("Switching to the default camera");
+    }
+    //Change the camera Ptr to the new camera, in order to make the Gizmo work
+    camera_ = activeCameraNode_->GetComponent<Camera>();
+    viewport_->SetCamera(camera_);
+
+    //reset yaw and picth
+    pitch_ = activeCameraNode_->GetRotation().PitchAngle();
+    yaw_ = activeCameraNode_->GetRotation().YawAngle();
 }
 
 void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData)
@@ -649,8 +709,16 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
     {
         Input* input = GetSubsystem<Input>();
 
+        //C key is press change to play camera view
+        if (input->GetKeyPress(KEY_C))
+        {
+            TogglePlayCamera();
+            return sceneEditor_->OnEvent(ev);
+        }
         if (input->GetKeyPress(KEY_G))
             gridEnabled_ = !gridEnabled_;
+        if (input->GetKeyPress(KEY_L))
+            lookCamera_ = !lookCamera_;
 
         SelectView();
     }
@@ -673,12 +741,14 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 
-    MoveCamera(timeStep);
+    if (!lookCamera_) {
+        MoveCamera(timeStep);
+    }
 
     QueueUpdate();
 
     if (gridEnabled_)
-        debugRenderer_->CreateGrid(Color::GRAY, true, cameraNode_->GetPosition());
+        debugRenderer_->CreateGrid(Color::GRAY, true, activeCameraNode_->GetPosition());
 
 
     if (preloadResourceScene_.NotNull())
@@ -862,8 +932,8 @@ void SceneView3D::FrameSelection()
         return;
 
     framedBBox_ = bbox;
-    cameraMoveStart_ = cameraNode_->GetWorldPosition();
-    cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
+    cameraMoveStart_ = activeCameraNode_->GetWorldPosition();
+    cameraMoveTarget_ = bbox.Center() - (activeCameraNode_->GetWorldDirection() * sphere.radius_ * 3);
     cameraMoveTime_ = 0.0f;
     cameraMove_ = true;
 
