@@ -387,8 +387,19 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
                 if (!tsxXMLFile)
                     return false;
 
-                tsxXMLFiles_[source] = tsxXMLFile;
+                // ATOMIC BEGIN
 
+                // Look for an image indicating that this is a spritesheet with multiple tiles instead
+                // of a series of individual images which are not supported
+                if (!tsxXMLFile->GetRoot("tileset").GetChild("image"))
+                {
+                    ATOMIC_LOGERROR("Load TSX File failed: " + source + ". tsx files with individual images are not supported.");
+                    return false;
+                }
+                // ATOMIC END
+
+                tsxXMLFiles_[source] = tsxXMLFile;
+                
                 String textureFilePath =
                     GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
                 GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
@@ -418,7 +429,9 @@ bool TmxFile2D::EndLoad()
 
     XMLElement rootElem = loadXMLFile_->GetRoot("map");
     String version = rootElem.GetAttribute("version");
-    if (version != "1.0")
+    // ATOMIC BEGIN
+    if (version != "1.0" && version != "1.0.0")
+    // ATOMIC END
     {
         ATOMIC_LOGERROR("Invalid version");
         return false;
@@ -574,6 +587,16 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             SharedPtr<XMLFile> tsxXMLFile = LoadTSXFile(source);
             if (!tsxXMLFile)
                 return false;
+
+            // ATOMIC BEGIN
+            // Look for an image indicating that this is a spritesheet with multiple tiles instead
+            // of a series of individual images which are not supported
+            if (!tsxXMLFile->GetRoot("tileset").GetChild("image"))
+            {
+                ATOMIC_LOGERROR("Load TSX File failed: " + source + ". tsx files with individual images are not supported.");
+                return false;
+            }
+            // ATOMIC END
 
             // Add to napping to avoid release
             tsxXMLFiles_[source] = tsxXMLFile;

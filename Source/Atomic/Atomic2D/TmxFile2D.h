@@ -171,7 +171,12 @@ class ATOMIC_API TmxFile2D : public Resource
     ATOMIC_OBJECT(TmxFile2D, Resource);
 
 public:
-    /// Construct.
+    /** Construct.
+      * This will load a Tiled .tmx file for use.  Not all
+      * Tile options are supported.  Some important limitions are:
+      * - The Tile Layer Format must be XML
+      * - The tilesets used in the map must be made from sprite sheets. Individual images are not supported
+     */
     TmxFile2D(Context* context);
     /// Destruct.
     virtual ~TmxFile2D();
