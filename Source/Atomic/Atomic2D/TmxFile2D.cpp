@@ -388,7 +388,10 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
                     return false;
 
                 // ATOMIC BEGIN
-                if (tsxXMLFile->GetRoot("tileset").GetChild("tile"))
+
+                // Look for an image indicating that this is a spritesheet with multiple tiles instead
+                // of a series of individual images which are not supported
+                if (!tsxXMLFile->GetRoot("tileset").GetChild("image"))
                 {
                     ATOMIC_LOGERROR("Load TSX File failed: " + source + ". tsx files with individual images are not supported.");
                     return false;
@@ -586,7 +589,9 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                 return false;
 
             // ATOMIC BEGIN
-            if (tsxXMLFile->GetRoot("tileset").GetChild("tile"))
+            // Look for an image indicating that this is a spritesheet with multiple tiles instead
+            // of a series of individual images which are not supported
+            if (!tsxXMLFile->GetRoot("tileset").GetChild("image"))
             {
                 ATOMIC_LOGERROR("Load TSX File failed: " + source + ". tsx files with individual images are not supported.");
                 return false;
