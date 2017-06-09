@@ -334,11 +334,11 @@ bool TBPromptWindow::Show(const char *title, const char *message,
 
     SetText(title);
 
-    TBTextField *editfield = GetWidgetByIDAndType<TBTextField>(1);
+    TBTextField *editfield = GetWidgetByIDAndType<TBTextField>(UIPROMPTMESSAGEID);
     editfield->SetText(message);
     editfield->SetSkinBg("");
 
-    TBEditField *stringfield = GetWidgetByIDAndType<TBEditField>(2);
+    TBEditField *stringfield = GetWidgetByIDAndType<TBEditField>(UIPROMPTEDITID);
     if (preset) 
         stringfield->SetText(preset);
 
@@ -456,6 +456,7 @@ bool TBFinderWindow::Show(const char *title,
 
     TBWidget *root = target->GetParentRoot();
 
+
     const char *source = 
     "TBLayout: axis: y, size: available, position: gravity, distribution: gravity\n"
     "	lp: min-width: 512dp, min-height: 500dp\n"
@@ -549,8 +550,10 @@ bool TBFinderWindow::OnEvent(const TBWidgetEvent &ev)
             target_ev.ref_id = ev.target->GetID();
             InvokeEvent(target_ev);
 
-            // these are internal buttons that do not close the finder window!
-            bool isbuttons = (ev.target->GetID() == 2 || ev.target->GetID() == 3 || ev.target->GetID() == 4 );
+         // these are internal buttons that do not close the finder window!
+            bool isbuttons = (ev.target->GetID() == UIFINDERUPBUTTONID
+                || ev.target->GetID() == UIFINDERBOOKBUTTONID
+                || ev.target->GetID() == UIFINDERFOLDERBUTTONID );
             // If target got deleted, close
             if (this_widget.Get() && !isbuttons )
                 Close();
@@ -587,7 +590,7 @@ bool TBFinderWindow::OnEvent(const TBWidgetEvent &ev)
     {
         rightMenuChild = ev.target; // save for later, this is where we started
         rightMenuParent = FindParentList(ev.target);  // save for later, omg why is this so hard!
-        if ( rightMenuParent && rightMenuParent->GetID() == 5 ) // if we clicked in bookmark list take action!
+        if ( rightMenuParent && rightMenuParent->GetID() == UIFINDERBOOKLISTID ) // if we clicked in bookmark list take action!
         {
             TBPoint pos_in_root(ev.target_x, ev.target_y);
             if (TBMenuWindow *menu = new TBMenuWindow(rightMenuParent, TBIDC("popupmenu")))

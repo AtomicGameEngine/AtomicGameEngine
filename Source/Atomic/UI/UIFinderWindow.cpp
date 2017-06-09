@@ -45,14 +45,14 @@ namespace Atomic
 /// finder window
 UIFinderWindow::UIFinderWindow(Context* context, UIWidget* target, const String& id, bool createWidget) : 
     UIWindow(context, false),
-    finderMode(0),
-    currentPath(),
-    resultPath(),
-    bookmarks(),
-    bookmarkPaths(),
-    newBookmarkPtr(),
-    newFolderPtr(),
-    bookmarksDirty(0)
+    finderMode_(0),
+    currentPath_(),
+    resultPath_(),
+    bookmarks_(),
+    bookmarkPaths_(),
+    newBookmarkPtr_(),
+    newFolderPtr_(),
+    bookmarksDirty_(0)
 {
     if (createWidget)
     {
@@ -66,10 +66,10 @@ UIFinderWindow::~UIFinderWindow()
 {
     SaveBookmarks();
     
-    if ( !newFolderPtr.Expired())
-        newFolderPtr->UnsubscribeFromAllEvents();
-    if ( !newBookmarkPtr.Expired() )
-       newBookmarkPtr->UnsubscribeFromAllEvents();
+    if ( !newFolderPtr_.Expired())
+        newFolderPtr_->UnsubscribeFromAllEvents();
+    if ( !newBookmarkPtr_.Expired() )
+       newBookmarkPtr_->UnsubscribeFromAllEvents();
 
 }
 
@@ -93,7 +93,7 @@ void UIFinderWindow::FindPath(const String& title, const String& preset, int dim
     if (!widget_)
         return;
 
-    finderMode = 1;
+    finderMode_ = 1;
     
     if ( ((TBFinderWindow*)widget_)->Show(title.CString(), preset.CString(), dimmer, width, height) )
     {
@@ -110,7 +110,7 @@ void UIFinderWindow::FindPath(const String& title, const String& preset, int dim
 bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
 {
 
-    if ( ev.type == EVENT_TYPE_CHANGED && ev.target && ((uint32)ev.target->GetID()) == 1 ) 
+    if ( ev.type == EVENT_TYPE_CHANGED && ev.target && ((uint32)ev.target->GetID()) == UIFINDEREDITPATHID ) 
     {
         FileSystem* filesystem = GetSubsystem<FileSystem>();
         UIWidget *pathwidget = GetPathWidget();  // paste or type in currentpath widget
@@ -118,9 +118,9 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
         {
             if ( filesystem->DirExists (pathwidget->GetText())) 
             {
-                if ( pathwidget->GetText() != currentPath ) 
+                if ( pathwidget->GetText() != currentPath_ ) 
                 {
-                    resultPath = "";
+                    resultPath_ = "";
                     SetCurrentPath (pathwidget->GetText());
                     UpdateUiList();
                     UpdateUiResult();
@@ -130,43 +130,43 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
         return true;
     }
 
-   if ( ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == 2 ) // go up
+   if ( ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == UIFINDERUPBUTTONID ) // go up
     {
         GoFolderUp();
         return true;
     }
 
-    if ( ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == 3 ) // add bookmark request
+    if ( ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == UIFINDERBOOKBUTTONID ) // add bookmark request
     {
         // this check is necessary because you can kill the bookmark window with the "X" and
         // this kills the UI but not the newBookmarkPtr to it, and it doesnt get cleaned up properly.
-        if ( newBookmarkPtr.NotNull() )
+        if ( newBookmarkPtr_.NotNull() )
         {
-            newBookmarkPtr->UnsubscribeFromAllEvents();
-            newBookmarkPtr.Reset();
+            newBookmarkPtr_->UnsubscribeFromAllEvents();
+            newBookmarkPtr_.Reset();
         }
-        newBookmarkPtr = new UIPromptWindow(context_, this, "createbookmark",  true);
-        SubscribeToEvent(newBookmarkPtr, E_UIPROMPTCOMPLETE, ATOMIC_HANDLER(UIFinderWindow, HandleCreateBookmark ));
+        newBookmarkPtr_ = new UIPromptWindow(context_, this, "createbookmark",  true);
+        SubscribeToEvent(newBookmarkPtr_, E_UIPROMPTCOMPLETE, ATOMIC_HANDLER(UIFinderWindow, HandleCreateBookmark ));
 
         String prospect = "";
         char delim = '/';
-        Vector <String> tokens = currentPath.Split(delim, false);
+        Vector <String> tokens = currentPath_.Split(delim, false);
         prospect = tokens[ tokens.Size()-1 ]; // get the last folder name as preset
     
-        newBookmarkPtr->Show("Create New Bookmark", "Enter a name for the new bookmark", prospect );
+        newBookmarkPtr_->Show("Create New Bookmark", "Enter a name for the new bookmark", prospect );
         return true;
     }
 
-    if ( ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == 4 ) // add folder request
+    if ( ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == UIFINDERFOLDERBUTTONID ) // add folder request
     {
-        if (newFolderPtr.NotNull())
+        if (newFolderPtr_.NotNull())
         {
-            newFolderPtr->UnsubscribeFromAllEvents();
-            newFolderPtr.Reset();
+            newFolderPtr_->UnsubscribeFromAllEvents();
+            newFolderPtr_.Reset();
         }
-        newFolderPtr = new UIPromptWindow(context_, this, "createfolder",  true);
-        SubscribeToEvent(newFolderPtr, E_UIPROMPTCOMPLETE, ATOMIC_HANDLER(UIFinderWindow, HandleCreateFolder));
-        newFolderPtr->Show("Create new folder", "Enter a name for the new folder", "" );
+        newFolderPtr_ = new UIPromptWindow(context_, this, "createfolder",  true);
+        SubscribeToEvent(newFolderPtr_, E_UIPROMPTCOMPLETE, ATOMIC_HANDLER(UIFinderWindow, HandleCreateFolder));
+        newFolderPtr_->Show("Create new folder", "Enter a name for the new folder", "" );
         return true;
     }
 
@@ -176,8 +176,8 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
         int selected = bklist->GetValue();
         if ( selected >= 0 )
         {
-            resultPath = "";  // were going back, give up file.
-            SetCurrentPath ( bookmarkPaths[selected]);
+            resultPath_ = "";  // were going back, give up file.
+            SetCurrentPath ( bookmarkPaths_[selected]);
             UpdateUiPath();
             UpdateUiList();
             UpdateUiResult();
@@ -186,7 +186,7 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
         return true;
     }
     
-    if ( ev.type == EVENT_TYPE_CUSTOM && ev.target && ((uint32)ev.target->GetID()) == 5 ) // bookmarks TB context menu result
+    if ( ev.type == EVENT_TYPE_CUSTOM && ev.target && ((uint32)ev.target->GetID()) == UIFINDERBOOKLISTID ) // bookmarks TB context menu result
     {
         UI* ui = GetSubsystem<UI>();
         if ( ev.special_key == tb::TB_KEY_DELETE ) // we wanna delete something
@@ -206,14 +206,14 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
         return true;
     }
 
-    if ( ev.type == EVENT_TYPE_CLICK && ev.target && ((uint32)ev.target->GetID()) == 6 ) // clicked dirfiles list
+    if ( ev.type == EVENT_TYPE_CLICK && ev.target && ((uint32)ev.target->GetID()) == UIFINDERFILELISTID ) // clicked dirfiles list
     {
         UISelectList *filelist = static_cast<UISelectList *>(GetFilesWidget());
         ComposePath( filelist->GetSelectedItemString() );
         return true;
     }
 
-    if ( ev.type == EVENT_TYPE_CLICK && (ev.ref_id == 8 || ev.ref_id == 9) ) // clicked 8 = ok button, 9 = cancel button
+    if ( ev.type == EVENT_TYPE_CLICK && (ev.ref_id ==  UIFINDEROKBUTTONID|| ev.ref_id == UIFINDERCANCELBUTTONID ) ) // clicked ok or cancel button
     {
         UI* ui = GetSubsystem<UI>();
         VariantMap eventData;
@@ -227,10 +227,10 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
         eventData[UIFinderComplete::P_SELECTED] = "";
         eventData[UIFinderComplete::P_REASON] = "CANCEL";
 
-        if (ev.ref_id == 8) // ok button was pressed, otherwise it was cancel button
+        if (ev.ref_id == UIFINDEROKBUTTONID) // ok button was pressed, otherwise it was cancel button
         {
             eventData[UIFinderComplete::P_REASON] = "OK";
-            if ( finderMode == 0 ) // finding a file
+            if ( finderMode_ == 0 ) // finding a file
             {   // get from widget, in case the user had been typing.
                 UIWidget *ewidget = GetResultWidget(); 
                 if( ewidget) eventData[UIFinderComplete::P_SELECTED] = ewidget->GetText();
@@ -258,11 +258,11 @@ void UIFinderWindow::HandleCreateBookmark(StringHash eventType, VariantMap& even
     String Reason = eventData["Reason"].GetString();
     String Selected = eventData["Selected"].GetString();
     if( Reason == "OK" )
-        CreateBookmark( Selected, currentPath );
-    if (newBookmarkPtr)
+        CreateBookmark( Selected, currentPath_ );
+    if (newBookmarkPtr_)
     {
-        newBookmarkPtr->UnsubscribeFromAllEvents();
-        newBookmarkPtr.Reset();
+        newBookmarkPtr_->UnsubscribeFromAllEvents();
+        newBookmarkPtr_.Reset();
     }
 }
 
@@ -272,11 +272,11 @@ void UIFinderWindow::HandleCreateFolder(StringHash eventType, VariantMap& eventD
     String Reason = eventData["Reason"].GetString();
     String Selected = eventData["Selected"].GetString();
     if( Reason == "OK" )
-        CreateFolder( Selected); 
-    if (newFolderPtr)
+        CreateFolder(Selected); 
+    if (newFolderPtr_)
     {
-         newFolderPtr->UnsubscribeFromAllEvents();
-         newFolderPtr.Reset();
+         newFolderPtr_->UnsubscribeFromAllEvents();
+         newFolderPtr_.Reset();
     }
 }
 
@@ -292,7 +292,7 @@ UIWidget* UIFinderWindow::GetPathWidget()
 {
     if (!widget_)
         return 0;
-    TBWidget* child = (TBWidget*) widget_->GetWidgetByIDAndType<TBEditField>(1);
+    TBWidget* child = (TBWidget*) widget_->GetWidgetByIDAndType<TBEditField>(UIFINDEREDITPATHID);
     if (!child)
         return 0;
     UI* ui = GetSubsystem<UI>();
@@ -303,7 +303,7 @@ UIWidget* UIFinderWindow::GetResultWidget()
 {
     if (!widget_)
         return 0;
-    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBEditField>(7);
+    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBEditField>(UIFINDEREDITFILEID);
     if (!child)
         return 0;
     UI* ui = GetSubsystem<UI>();
@@ -314,7 +314,7 @@ UIWidget* UIFinderWindow::GetBookmarksWidget()
 {
     if (!widget_)
         return 0;
-    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBSelectList>(5);
+    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBSelectList>(UIFINDERBOOKLISTID);
     if (!child)
         return 0;
     UI* ui = GetSubsystem<UI>();
@@ -325,7 +325,7 @@ UIWidget* UIFinderWindow::GetFilesWidget()
 {
     if (!widget_)
         return 0;
-    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBSelectList>(6);
+    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBSelectList>(UIFINDERFILELISTID);
     if (!child)
         return 0;
     UI* ui = GetSubsystem<UI>();
@@ -345,13 +345,13 @@ void UIFinderWindow::PresetCurrentPath( const String& preset )
 // set the current path value
 void UIFinderWindow::SetCurrentPath( const String& string ) 
 { 
-    currentPath = string;
+    currentPath_ = string;
 }
 
 //using the list, jam things together, we'll either get another path or a file.
 void UIFinderWindow::ComposePath (const String& string )
 {
-    String prospect = currentPath + string;
+    String prospect = currentPath_ + string;
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
  
@@ -364,7 +364,7 @@ void UIFinderWindow::ComposePath (const String& string )
     }
     else  // its a file
     {
-        resultPath = prospect;
+        resultPath_ = prospect;
         UpdateUiResult();
     }
 }
@@ -410,7 +410,7 @@ void UIFinderWindow::GoFolderUp()
 {
     String prospect = "";
     char delim = '/';
-    Vector <String> tokens = currentPath.Split(delim, false);
+    Vector <String> tokens = currentPath_.Split(delim, false);
  
     if ( tokens.Size() == 0 ) // were at the top
         prospect = "/";
@@ -425,9 +425,9 @@ void UIFinderWindow::GoFolderUp()
         prospect += delim;
     }
 
-    if ( prospect != currentPath ) 
+    if ( prospect != currentPath_ ) 
     {
-        resultPath = "";
+        resultPath_ = "";
         SetCurrentPath (prospect);
         UpdateUiPath();
         UpdateUiList();
@@ -441,8 +441,8 @@ void UIFinderWindow::UpdateUiPath ()
     UIWidget *pathwidget = GetPathWidget();
     if(pathwidget)
     {
-        if ( pathwidget->GetText() != currentPath )
-            pathwidget->SetText(currentPath);
+        if ( pathwidget->GetText() != currentPath_ )
+            pathwidget->SetText(currentPath_);
     }
 }
 
@@ -452,8 +452,8 @@ void UIFinderWindow::UpdateUiResult ()
     UIWidget *resultwidget = GetResultWidget();
     if( resultwidget)
     {
-        if ( resultwidget->GetText() != resultPath )
-            resultwidget->SetText(resultPath);
+        if ( resultwidget->GetText() != resultPath_ )
+            resultwidget->SetText(resultPath_);
     }
 }
 
@@ -472,11 +472,11 @@ void UIFinderWindow::UpdateUiList()
     UISelectList *filelist = static_cast<UISelectList *>(GetFilesWidget());
     UISelectItemSource *fileSource = new UISelectItemSource(context_);
     
-    if ( filesystem->DirExists (currentPath ) )
+    if ( filesystem->DirExists (currentPath_ ) )
     { 
         Vector <String> mydirs;
         int nn = 0;
-        filesystem->ScanDir (mydirs,currentPath, "*", SCAN_DIRS, false );
+        filesystem->ScanDir (mydirs,currentPath_, "*", SCAN_DIRS, false );
         Sort(mydirs.Begin(), mydirs.End(), CompareStrs); // sort them
         for ( nn=0; nn<mydirs.Size(); nn++ ) 
         {
@@ -486,7 +486,7 @@ void UIFinderWindow::UpdateUiList()
             fileSource->AddItem( new UISelectItem(context_, mydirs[nn], idz, "FolderIcon" ));
         }
         Vector <String> myfiles;
-        filesystem->ScanDir (myfiles, currentPath, "*", SCAN_FILES, false );
+        filesystem->ScanDir (myfiles, currentPath_, "*", SCAN_FILES, false );
         Sort(myfiles.Begin(), myfiles.End(), CompareStrs);
         for ( nn=0; nn<myfiles.Size(); nn++ ) 
         {
@@ -502,7 +502,7 @@ void UIFinderWindow::UpdateUiList()
 void UIFinderWindow::CreateFolder( const String& string )
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
-    if ( filesystem->CreateDir( currentPath + string ) )
+    if ( filesystem->CreateDir( currentPath_ + string ) )
     {
         UpdateUiList();
     }
@@ -519,9 +519,9 @@ void UIFinderWindow::CreateBookmark ( const String& bkname, const String&  bkpat
         String idz = "BKM" + String(inspos);
         if ( bklist->AddItem ( inspos, bkname, idz ) )
         {
-            bookmarks.Push(bkname);
-            bookmarkPaths.Push (bkpath);
-            bookmarksDirty = 1;
+            bookmarks_.Push(bkname);
+            bookmarkPaths_.Push (bkpath);
+            bookmarksDirty_ = 1;
         }
     }
 }
@@ -533,15 +533,15 @@ void UIFinderWindow::DeleteBookmark ( int bkindex )
     if (bklist && bkindex >= 0) 
     {
         bklist->DeleteItem(bkindex);
-        bookmarks.Erase(bkindex,1);
-        bookmarkPaths.Erase(bkindex,1);
-        resultPath = "";
-        SetCurrentPath (bookmarkPaths[0]);
+        bookmarks_.Erase(bkindex,1);
+        bookmarkPaths_.Erase(bkindex,1);
+        resultPath_ = "";
+        SetCurrentPath (bookmarkPaths_[0]);
         UpdateUiPath();
         UpdateUiList();
         UpdateUiResult();
         bklist->SetValue(-1);
-        bookmarksDirty = 1;
+        bookmarksDirty_ = 1;
     }
 }
 
@@ -551,7 +551,7 @@ void UIFinderWindow::LoadBookmarks()
     String bkdata = "";
     String bkpath = "";
     
-#if defined(ANDROID) || defined( __ANDROID__) || defined(IOS)
+#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
     bkpath = filesystem->GetUserDocumentsDir(); // somewhere writable on mobile
 #else
     bkpath = filesystem->GetAppPreferencesDir("AtomicGameEngine", "Bookmarks"); // desktop systems
@@ -574,18 +574,18 @@ void UIFinderWindow::LoadBookmarks()
     {
         CreateBookmark ( tokens[nn], tokens[nn+1] );
     }
-    bookmarksDirty = 0;
+    bookmarksDirty_ = 0;
 
 }
 
 void UIFinderWindow::SaveBookmarks()
 {
-    if ( bookmarksDirty > 0 )
+    if ( bookmarksDirty_ > 0 )
     {
         FileSystem* filesystem = GetSubsystem<FileSystem>();
         String bkpath = "";
 
-#if defined(ANDROID) || defined( __ANDROID__) || defined(IOS)
+#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
         bkpath = filesystem->GetUserDocumentsDir();
 #else
         bkpath = filesystem->GetAppPreferencesDir("AtomicGameEngine", "Bookmarks");
@@ -594,16 +594,16 @@ void UIFinderWindow::SaveBookmarks()
         bkpath += "/Bookmarks.txt";
         String bkdata = "";
         int nn=0, sep=-1;
-        for ( nn = 0; nn<bookmarks.Size(); nn++)
+        for ( nn = 0; nn<bookmarks_.Size(); nn++)
         {
             if ( sep > 0 )
             {
-                bkdata += bookmarks[nn];
+                bkdata += bookmarks_[nn];
                 bkdata += "\n";
-                bkdata += bookmarkPaths[nn];
+                bkdata += bookmarkPaths_[nn];
                 bkdata += "\n";
             }
-            if ( bookmarks[nn] == "-" ) 
+            if ( bookmarks_[nn] == "-" ) 
                 sep = nn;
         }
         File *fp = new File (context_, bkpath, FILE_WRITE);

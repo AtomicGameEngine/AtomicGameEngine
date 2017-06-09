@@ -100,7 +100,7 @@ UIWidget* UIPromptWindow::GetEditWidget()
 {
     if (!widget_)
         return 0;
-    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBEditField>(2);
+    TBWidget* child = (TBWidget*)widget_->GetWidgetByIDAndType<TBEditField>(UIPROMPTEDITID);
     if (!child)
         return 0;
     UI* ui = GetSubsystem<UI>();

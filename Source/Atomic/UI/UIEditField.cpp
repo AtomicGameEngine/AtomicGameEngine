@@ -216,7 +216,7 @@ void UIEditField::OnFocusChanged(bool focused)
                 styleEdit->selection.SelectAll();
             firstFocusFlag_ = true;
 
-#if defined(ANDROID) || defined( __ANDROID__) || defined(IOS)
+#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
 
             // click on field to gain focus and bring up the onscreen keyboard to edit
             if ( !(w->GetReadOnly() || w->GetState(WIDGET_STATE_DISABLED)) )
@@ -261,7 +261,7 @@ bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
             }
         }
 
-#if defined(ANDROID) || defined( __ANDROID__) || defined(IOS)
+#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
 
         // triple click to get the onscreen keyboard, in case it is auto-focused
         else if ( ev.count == 3 ) 

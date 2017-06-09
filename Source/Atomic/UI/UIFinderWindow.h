@@ -70,14 +70,14 @@ private:
     void LoadBookmarks();  /// load user created bookmarks from file
     void SaveBookmarks();  /// save user created bookmarks to file
 
-    int finderMode;  /// finder mode, 0 = find file, 1 = find folder
-    String currentPath; /// current path for the finder
-    String resultPath;  /// result file for finder
-    Vector <String> bookmarks;  /// array of names of bookmarks
-    Vector <String> bookmarkPaths; /// array of bookmark paths
-    WeakPtr<UIPromptWindow> newBookmarkPtr;  /// pointer for bookmark prompt window
-    WeakPtr<UIPromptWindow> newFolderPtr; /// pointer for new folder prompt window
-    int bookmarksDirty;  /// flag to track if the bookmark array has changed
+    int finderMode_;  /// finder mode, 0 = find file, 1 = find folder
+    String currentPath_; /// current path for the finder
+    String resultPath_;  /// result file for finder
+    Vector <String> bookmarks_;  /// array of names of bookmarks
+    Vector <String> bookmarkPaths_; /// array of bookmark paths
+    WeakPtr<UIPromptWindow> newBookmarkPtr_;  /// pointer for bookmark prompt window
+    WeakPtr<UIPromptWindow> newFolderPtr_; /// pointer for new folder prompt window
+    int bookmarksDirty_;  /// flag to track if the bookmark array has changed
 
 };
 
