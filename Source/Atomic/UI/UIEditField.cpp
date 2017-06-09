@@ -28,6 +28,8 @@
 #include "UIEvents.h"
 #include "UIEditField.h"
 
+#include "../Atomic/Input/Input.h"
+
 using namespace tb;
 
 namespace Atomic
@@ -213,6 +215,17 @@ void UIEditField::OnFocusChanged(bool focused)
             if (!w->GetMultiline())
                 styleEdit->selection.SelectAll();
             firstFocusFlag_ = true;
+
+#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
+
+            // click on field to gain focus and bring up the onscreen keyboard to edit
+            if ( !(w->GetReadOnly() || w->GetState(WIDGET_STATE_DISABLED)) )
+            { 
+                Input* input = GetSubsystem<Input>();
+                input->SetScreenKeyboardVisible(true); 
+            }
+#endif  
+
         }
         else
         {
@@ -247,6 +260,22 @@ bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
                 styleEdit->selection.SelectAll();
             }
         }
+
+#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
+
+        // triple click to get the onscreen keyboard, in case it is auto-focused
+        else if ( ev.count == 3 ) 
+        {
+            TBEditField* w = (TBEditField*) widget_;
+            if ( !(w->GetReadOnly() || w->GetState(WIDGET_STATE_DISABLED)) )
+            { 
+                Input* input = GetSubsystem<Input>();
+                input->SetScreenKeyboardVisible(true); 
+            }
+        }
+
+#endif
+
     }
 
     return UIWidget::OnEvent(ev);

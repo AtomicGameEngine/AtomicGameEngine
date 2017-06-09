@@ -144,4 +144,20 @@ ATOMIC_EVENT(E_UILISTVIEWSELECTIONCHANGED, UIListViewSelectionChanged)
     ATOMIC_PARAM(P_SELECTED, Selected);        // bool
 }
 
+/// event for PromptWindow
+ATOMIC_EVENT(E_UIPROMPTCOMPLETE, UIPromptComplete)
+{
+    ATOMIC_PARAM(P_TITLE, Title);  // string
+    ATOMIC_PARAM(P_REASON, Reason);  // string
+    ATOMIC_PARAM(P_SELECTED, Selected);  // string
+}
+
+/// event for FinderWindow
+ATOMIC_EVENT(E_UIFINDERCOMPLETE, UIFinderComplete)
+{
+    ATOMIC_PARAM(P_TITLE, Title);  // string
+    ATOMIC_PARAM(P_REASON, Reason);  // string
+    ATOMIC_PARAM(P_SELECTED, Selected);  // string
+}
+
 }

@@ -485,3 +485,13 @@ elements
 		content-ofs-x 1
 		content-ofs-y 1
 
+	# == FileFinder support 
+	FolderIcon
+		bitmap folder.png
+	FolderAdd
+		bitmap folder_create.png
+	BookmarkIcon
+		bitmap star.png
+	FolderUp
+		bitmap arrow_up.png
+

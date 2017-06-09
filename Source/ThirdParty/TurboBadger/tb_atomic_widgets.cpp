@@ -29,6 +29,8 @@
 #include "tb_node_tree.h"
 #include "tb_system.h"
 #include "tb_atomic_widgets.h"
+#include "tb_editfield.h"
+#include "tb_menu_window.h"
 #include <math.h>
 
 namespace tb {
@@ -282,5 +284,359 @@ void TBBarGraph::SetAxis(AXIS axis)
 }
 
 TB_WIDGET_FACTORY(TBBarGraph, TBValue::TYPE_FLOAT, WIDGET_Z_TOP) {}
+
+
+// == TBPromptWindow =======================================
+
+
+TBPromptWindow::TBPromptWindow(TBWidget *target, TBID id)
+    : m_target(target)
+{
+    TBWidgetListener::AddGlobalListener(this);
+    SetID(id);
+}
+
+TBPromptWindow::~TBPromptWindow()
+{
+    TBWidgetListener::RemoveGlobalListener(this);
+    if (TBWidget *dimmer = m_dimmer.Get())
+    {
+        dimmer->GetParent()->RemoveChild(dimmer);
+        delete dimmer;
+    }
+}
+
+bool TBPromptWindow::Show(const char *title, const char *message,
+    const char *preset, int dimmer,
+    int width, int height)
+{
+    TBWidget *target = m_target.Get();
+    if (!target)
+        return false;
+
+    TBWidget *root = target->GetParentRoot();
+
+    const char *source = "TBLayout: axis: y, distribution: gravity, position: left\n"
+    "	TBLayout: axis: y, distribution: gravity, distribution-position: left\n"
+    "		TBTextField: id: 1, gravity: left right\n"
+    "			font: size: 14dp\n"
+    "		TBEditField: id: 2, multiline: 0, styling: 0, adapt-to-content: 0, gravity: left right\n"
+     "			font: size: 14dp\n"
+   "	TBSeparator: gravity: left right\n"
+    "	TBLayout: distribution: gravity\n"
+    "		TBButton: text: \"  OK  \", id: \"TBPromptWindow.ok\"\n"
+    "			font: size: 14dp\n"
+    "		TBButton: text: \"Cancel\", id: \"TBPromptWindow.cancel\"\n"
+    "			font: size: 14dp\n";
+
+    if (!g_widgets_reader->LoadData(GetContentRoot(), source))
+        return false;
+
+    SetText(title);
+
+    TBTextField *editfield = GetWidgetByIDAndType<TBTextField>(UIPROMPTMESSAGEID);
+    editfield->SetText(message);
+    editfield->SetSkinBg("");
+
+    TBEditField *stringfield = GetWidgetByIDAndType<TBEditField>(UIPROMPTEDITID);
+    if (preset) 
+        stringfield->SetText(preset);
+
+    TBRect rect;
+
+    // Size to fit content. This will use the default size of the textfield.
+    if (width == 0 || height == 0)
+    {
+        ResizeToFitContent();
+        rect = GetRect();
+    }
+    else
+    {
+        SetSize(width, height);
+        rect = GetRect();
+    }
+
+    // Create background dimmer
+    if (dimmer != 0)
+    {
+        if (TBDimmer *dimmer = new TBDimmer)
+        {
+            root->AddChild(dimmer);
+            m_dimmer.Set(dimmer);
+        }
+    }
+
+    // Center and size to the new height
+    TBRect bounds(0, 0, root->GetRect().w,  root->GetRect().h);
+    SetRect(rect.CenterIn(bounds).MoveIn(bounds).Clip(bounds));
+    root->AddChild(this);
+    return true;
+}
+
+bool TBPromptWindow::OnEvent(const TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_CLICK && ev.target->IsOfType<TBButton>())
+    {
+        TBWidgetSafePointer this_widget(this);
+
+        // Invoke the click on the target
+        TBWidgetEvent target_ev(EVENT_TYPE_CLICK);
+        target_ev.ref_id = ev.target->GetID();
+        InvokeEvent(target_ev);
+
+        // If target got deleted, close
+        if (this_widget.Get())
+            Close();
+
+        return true;
+    }
+    else if (ev.type == EVENT_TYPE_KEY_DOWN && ev.special_key == TB_KEY_ESC)
+    {
+        TBWidgetEvent click_ev(EVENT_TYPE_CLICK);
+        m_close_button.InvokeEvent(click_ev);
+        return true;
+    }
+    return TBWindow::OnEvent(ev);
+}
+
+void TBPromptWindow::OnDie()
+{
+    if (TBWidget *dimmer = m_dimmer.Get())
+        dimmer->Die();
+}
+
+void TBPromptWindow::OnWidgetDelete(TBWidget *widget)
+{
+    // If the target widget is deleted, close!
+    if (!m_target.Get())
+        Close();
+}
+
+bool TBPromptWindow::OnWidgetDying(TBWidget *widget)
+{
+    // If the target widget or an ancestor of it is dying, close!
+    if (widget == m_target.Get() || widget->IsAncestorOf(m_target.Get()))
+        Close();
+    return false;
+}
+
+
+// == TBFinderWindow =======================================
+
+
+TBFinderWindow::TBFinderWindow(TBWidget *target, TBID id)
+    : m_target(target),
+    rightMenuParent(NULL),
+    rightMenuChild(NULL)
+{
+    TBWidgetListener::AddGlobalListener(this);
+    SetID(id);
+}
+
+TBFinderWindow::~TBFinderWindow()
+{
+    TBWidgetListener::RemoveGlobalListener(this);
+    if (TBWidget *dimmer = m_dimmer.Get())
+    {
+        dimmer->GetParent()->RemoveChild(dimmer);
+        delete dimmer;
+    }
+    rightMenuParent=NULL;
+    rightMenuChild=NULL;
+}
+
+
+bool TBFinderWindow::Show(const char *title,
+    const char *preset, int dimmer,
+    int width, int height)
+{
+    TBWidget *target = m_target.Get();
+    if (!target)
+        return false;
+
+    TBWidget *root = target->GetParentRoot();
+
+
+    const char *source = 
+    "TBLayout: axis: y, size: available, position: gravity, distribution: gravity\n"
+    "	lp: min-width: 512dp, min-height: 500dp\n"
+    "	TBLayout: distribution: gravity, distribution-position: left\n"
+    "		TBEditField: id: 1, multiline: 0, styling: 0, adapt-to-content: 0, gravity: left right\n"
+    "			tooltip current folder location\n"
+    "			font: size: 14dp\n"
+    "		TBButton\n"
+    "			lp: height: 28dp, width: 28dp\n"
+    "			skin TBButton.uniformflat\n"
+    "			TBSkinImage: skin: FolderUp, id: up_image\n"
+    "			id 2\n"
+    "			tooltip Go up one folder\n"
+    "		TBWidget\n"
+    "			lp: height: 28dp, width: 28dp\n"
+    "		TBButton\n"
+    "			lp: height: 28dp, width: 28dp\n"
+    "			skin TBButton.uniformflat\n"
+    "			TBSkinImage: skin: BookmarkIcon, id: book_image\n"
+    "			id 3\n"
+    "			tooltip Bookmark current folder\n"
+    "		TBButton\n"
+    "			lp: height: 28dp, width: 28dp\n"
+    "			skin TBButton.uniformflat\n"
+    "			TBSkinImage: skin: FolderAdd, id: create_image\n"
+    "			id 4\n"
+    "			tooltip Create a new folder \n"
+    "	TBLayout: distribution: gravity, distribution-position: left\n"
+    "		TBLayout: axis: x, distribution: gravity\n"
+    "			TBSelectList: id: 5, gravity: all\n"
+    "				lp: max-width: 160dp, min-width: 160dp\n"
+    "				font: size: 14dp\n"
+    "			TBSelectList: id: 6, gravity: all\n"
+    "				font: size: 14dp\n"
+    "	TBLayout: distribution: gravity\n"
+    "		TBEditField: id: 7, multiline: 0, styling: 0, adapt-to-content: 0, gravity: left right\n"
+    "			tooltip name of the wanted file\n"
+    "			font: size: 14dp\n"
+    "	TBLayout: distribution: gravity\n"
+    "		TBButton: text: \"  OK  \", id: 8\n"
+    "			font: size: 14dp\n"
+    "		TBButton: text: \"Cancel\", id: 9\n"
+    "			font: size: 14dp\n";
+
+    if (!g_widgets_reader->LoadData(GetContentRoot(), source))
+        return false;
+
+    SetText(title);
+    TBRect rect;
+
+    // Size to fit content. This will use the default size of the textfield.
+    if (width == 0 || height == 0)
+    {
+        ResizeToFitContent();
+        rect = GetRect();
+    }
+    else
+    {
+        SetSize(width, height);
+        rect = GetRect();
+    }
+
+    // Create background dimmer
+    if (dimmer != 0)
+    {
+        if (TBDimmer *dimmer = new TBDimmer)
+        {
+            root->AddChild(dimmer);
+            m_dimmer.Set(dimmer);
+        }
+    }
+
+    // Center and size to the new height
+    TBRect bounds(0, 0, root->GetRect().w,  root->GetRect().h);
+    SetRect(rect.CenterIn(bounds).MoveIn(bounds).Clip(bounds));
+    root->AddChild(this);
+    return true;
+}
+
+bool TBFinderWindow::OnEvent(const TBWidgetEvent &ev)
+{
+
+    if (ev.type == EVENT_TYPE_CLICK )
+    {
+        if (  ev.target->IsOfType<TBButton>())
+        {
+            TBWidgetSafePointer this_widget(this);
+
+            // Invoke the click on the target
+            TBWidgetEvent target_ev(EVENT_TYPE_CLICK);
+            target_ev.ref_id = ev.target->GetID();
+            InvokeEvent(target_ev);
+
+         // these are internal buttons that do not close the finder window!
+            bool isbuttons = (ev.target->GetID() == UIFINDERUPBUTTONID
+                || ev.target->GetID() == UIFINDERBOOKBUTTONID
+                || ev.target->GetID() == UIFINDERFOLDERBUTTONID );
+            // If target got deleted, close
+            if (this_widget.Get() && !isbuttons )
+                Close();
+            return true;
+        }
+        else if ( ev.target->GetID() == TBIDC("popupmenu"))
+        {
+            if (ev.ref_id == TBIDC("delete"))
+            {
+                // send EVENT_TYPE_CUSTOM, were gonna used cached information to send info how we got here
+                if(rightMenuParent)
+                {
+                    TBWidgetEvent custom_ev(EVENT_TYPE_CUSTOM);
+                    custom_ev.target = rightMenuParent;  // were want to operate on this list
+                    custom_ev.ref_id = rightMenuChild?rightMenuChild->GetID():ev.ref_id; // on this entry 
+                    custom_ev.special_key = TB_KEY_DELETE;  // and what we wanna do to it
+                    rightMenuParent->InvokeEvent(custom_ev); // forward to delegate
+                    rightMenuChild = NULL; // clear the cached values
+                    rightMenuParent = NULL;
+                }
+            }
+            else
+                return false;
+            return true;
+        }
+    }
+    else if (ev.type == EVENT_TYPE_KEY_DOWN && ev.special_key == TB_KEY_ESC)
+    {
+        TBWidgetEvent click_ev(EVENT_TYPE_CLICK);
+        m_close_button.InvokeEvent(click_ev);
+        return true;
+    }
+    else if (ev.type == EVENT_TYPE_CONTEXT_MENU || ev.type == EVENT_TYPE_RIGHT_POINTER_UP ) // want to embed popup menu on TBSelectList id: 5
+    {
+        rightMenuChild = ev.target; // save for later, this is where we started
+        rightMenuParent = FindParentList(ev.target);  // save for later, omg why is this so hard!
+        if ( rightMenuParent && rightMenuParent->GetID() == UIFINDERBOOKLISTID ) // if we clicked in bookmark list take action!
+        {
+            TBPoint pos_in_root(ev.target_x, ev.target_y);
+            if (TBMenuWindow *menu = new TBMenuWindow(rightMenuParent, TBIDC("popupmenu")))
+            {
+                TBGenericStringItemSource *source = menu->GetList()->GetDefaultSource();
+                source->AddItem(new TBGenericStringItem("delete", TBIDC("delete")));
+                menu->Show(source, TBPopupAlignment(pos_in_root), -1);
+            }
+            return true;
+        }
+    }
+
+    return TBWindow::OnEvent(ev);
+}
+
+void TBFinderWindow::OnDie()
+{
+    if (TBWidget *dimmer = m_dimmer.Get())
+        dimmer->Die();
+}
+
+void TBFinderWindow::OnWidgetDelete(TBWidget *widget)
+{
+    // If the target widget is deleted, close!
+    if (!m_target.Get())
+        Close();
+}
+
+bool TBFinderWindow::OnWidgetDying(TBWidget *widget)
+{
+    // If the target widget or an ancestor of it is dying, close!
+    if (widget == m_target.Get() || widget->IsAncestorOf(m_target.Get()))
+        Close();
+    return false;
+}
+
+TBWidget *TBFinderWindow::FindParentList( TBWidget *widget) // utility for dealing with menus.
+{
+    TBWidget *tmp = widget;
+    while (tmp)
+    {
+        if ( tmp->IsOfType<TBSelectList>() ) return tmp;
+        tmp = tmp->GetParent();
+    }
+    return NULL;
+}
+
 
 }; // namespace tb
