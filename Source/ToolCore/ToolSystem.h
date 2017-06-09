@@ -43,7 +43,7 @@ public:
     ToolSystem(Context* context);
     virtual ~ToolSystem();
 
-    bool LoadProject(const String& fullpath);
+    bool LoadProject(const String& fullpath, bool readOnly = false);
     Project* GetProject() { return project_; }
     void CloseProject();
 

@@ -186,6 +186,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     Light* light = lightQueue_ ? lightQueue_->light_ : 0;
     Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : 0;
 
+    // ATOMIC BEGIN
+    Scene* scene = view->GetScene();
+    // ATOMIC END
+
     // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
 
@@ -624,9 +628,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             }
         }
 
-        if (lightmapTilingOffset_)
+        if (lightmapTilingOffset_ && scene)
         {
-            graphics->SetLightmapTexture(lightmapTextureID_);
+            scene->SetLightmapTexture(lightmapTextureID_);
         }
 
         // ATOMIC END

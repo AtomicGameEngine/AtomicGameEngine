@@ -40,7 +40,7 @@ class SceneBaker : public Object
 
     public:
 
-    SceneBaker(Context* context);
+    SceneBaker(Context* context, const String& projectPath);
     virtual ~SceneBaker();    
 
     bool Light(const GlowLightMode lightMode);
@@ -64,8 +64,6 @@ class SceneBaker : public Object
 
     int GetCurrentGIBounce() const {return currentGIPass_; }
 
-    bool SaveLitScene();
-
     bool WriteBakeData(VectorBuffer& buffer);
 
     bool GetStandaloneMode() const { return standaloneMode_; }
@@ -88,6 +86,8 @@ private:
     bool LightGI();
     void LightGIFinish();
 
+    bool SaveLitScene();
+
     SharedPtr<Scene> scene_;
     SharedPtr<EmbreeScene> embreeScene_;
 
@@ -101,6 +101,7 @@ private:
 
     int currentGIPass_;
 
+    String projectPath_;
     bool standaloneMode_;
 
 };

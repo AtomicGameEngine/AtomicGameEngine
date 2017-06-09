@@ -54,7 +54,7 @@ class LightMapPacker : public Object
 
     void Pack();
 
-    void SaveLightmaps();
+    bool SaveLightmaps(const String& projectPath, const String& scenePath);
 
 private:
 

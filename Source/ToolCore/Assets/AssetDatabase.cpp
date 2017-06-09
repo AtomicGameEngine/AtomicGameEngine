@@ -191,6 +191,11 @@ Asset* AssetDatabase::GetAssetByPath(const String& path)
 void AssetDatabase::PruneOrphanedDotAssetFiles()
 {
 
+    if (GetReadOnly())
+    {
+        return;
+    }
+
     if (project_.Null())
     {
         ATOMIC_LOGDEBUG("AssetDatabase::PruneOrphanedDotAssetFiles - called without project loaded");
@@ -335,6 +340,11 @@ void AssetDatabase::UpdateAssetCacheMap()
     if (project_.Null())
         return;
 
+    if (GetReadOnly())
+    {
+        return;
+    }
+
     bool gen = assetScanImport_;
     assetScanImport_ = false;
 
@@ -431,12 +441,15 @@ void AssetDatabase::Scan()
 
         if (!fs->FileExists(dotAssetFilename))
         {
-            // new asset
-            SharedPtr<Asset> asset(new Asset(context_));
-
-            if (asset->SetPath(path))
+            if (!GetReadOnly())
             {
-                AddAsset(asset, true);
+                // new asset
+                SharedPtr<Asset> asset(new Asset(context_));
+
+                if (asset->SetPath(path))
+                {
+                    AddAsset(asset, true);
+                }
             }
         }
         else
@@ -604,6 +617,14 @@ void AssetDatabase::HandleResourceLoadFailed(StringHash eventType, VariantMap& e
 
 void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventData)
 {
+    // for now, when in read only mode, early exit
+    // in the future, it is possible we'll want to
+    // handle this for read only project loads differently
+    if (GetReadOnly())
+    {
+        return;
+    }
+
     using namespace FileChanged;
     const String& fullPath = eventData[P_FILENAME].GetString();
 
@@ -679,6 +700,11 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
 
 void AssetDatabase::ReimportAllAssets()
 {
+    if (GetReadOnly())
+    {
+        return;
+    }
+
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
 
     while (itr != assets_.End())
@@ -693,6 +719,11 @@ void AssetDatabase::ReimportAllAssets()
 
 void AssetDatabase::ReimportAllAssetsInDirectory(const String& directoryPath)
 {
+    if (GetReadOnly())
+    {
+        return;
+    }
+
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
 
     while (itr != assets_.End())
@@ -776,6 +807,11 @@ bool AssetDatabase::GenerateCache(bool clean)
 void AssetDatabase::SetCacheEnabled(bool cacheEnabled)
 {
     cacheEnabled_ = cacheEnabled;
+}
+
+bool AssetDatabase::GetReadOnly() const
+{
+    return project_.Null() ? false : project_->GetReadOnly();
 }
 
 }

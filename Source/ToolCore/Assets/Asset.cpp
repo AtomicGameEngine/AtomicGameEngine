@@ -183,6 +183,11 @@ bool Asset::Load()
     dirty_ = false;
     if (!CheckCacheFile())
     {
+        if (db->GetReadOnly())
+        {
+            return false;
+        }
+
         dirty_ = true;
     }
 

@@ -86,17 +86,18 @@ namespace AtomicGlow
 
         if (cmd == "bake")
         {
-
             timer_.Reset();
+
+            String sceneName = eventData["scenename"].GetString();
 
             // settings
             VectorBuffer settingsBuffer = eventData["settings"].GetVectorBuffer();
             GlobalGlowSettings.Unpack(settingsBuffer);
 
-            ATOMIC_LOGINFO("AtomicGlow bake received, baking");
+            ATOMIC_LOGINFOF("AtomicGlow baking scene: %s", sceneName.CString());
 
             sceneBaker_->SetStandaloneMode(false);
-            sceneBaker_->LoadScene("Scenes/Scene.scene");
+            sceneBaker_->LoadScene(sceneName);
 
             using namespace IPCCmdResult;
             result["result"] = "success";
@@ -209,11 +210,13 @@ namespace AtomicGlow
 
     void AtomicGlowApp::Start()
     {
+        // IMPORTANT!!!
+        // This needs to be refactored, see // ATOMIC GLOW HACK in AssetDatabase.cpp
+        // SharedPtr<ResourceMapRouter> router(new ResourceMapRouter(context_, "__atomic_ResourceCacheMap.json"));
+        // IMPORTANT!!!
+
         if (exitCode_)
             return;
-
-        // Initialize resource mapper
-        SharedPtr<ResourceMapRouter> router(new ResourceMapRouter(context_, "__atomic_ResourceCacheMap.json"));
 
         if (!engine_->Initialize(engineParameters_))
         {
@@ -231,12 +234,26 @@ namespace AtomicGlow
 
         bool ipc = IPCClientApp::Initialize(arguments_);
 
-        sceneBaker_ = new SceneBaker(context_);
+        ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
+        // Load project, in read only mode
+        if (!tsystem->LoadProject(projectPath_, true))
+        {
+            ErrorExit(ToString("Unable to load project %s", projectPath_.CString()));
+            return;
+        }
+
+        sceneBaker_ = new SceneBaker(context_, projectPath_);
 
         if (!ipc)
         {
-            // TODO: proper standalone scene arg
-            sceneBaker_->LoadScene("Scenes/Scene.scene");
+            if (!sceneBaker_->LoadScene(scenePath_))
+            {
+                String message = scenePath_.Length() ? "AtomicGlowApp::Start() - standalone mode unable to load scene: " + scenePath_:
+                                                       "AtomicGlowApp::Start() - standalone mode scene not specified";
+
+                ErrorExit(message);
+            }
         }
 
     }
@@ -261,8 +278,6 @@ namespace AtomicGlow
             return;
         }
 
-        String projectPath;
-
         for (unsigned i = 0; i < arguments_.Size(); ++i)
         {
             if (arguments_[i].Length() > 1)
@@ -277,26 +292,35 @@ namespace AtomicGlow
                         value = GetPath(value);
                     }
 
-                    if (fileSystem->DirExists(value))
-                    {
-
-                    }
-                    else
+                    if (!fileSystem->DirExists(value))
                     {
                         ErrorExit(ToString("%s project path does not exist", value.CString()));
+                        return;
                     }
 
-                    projectPath = AddTrailingSlash(value);
+                    projectPath_ = AddTrailingSlash(value);
 
                 }
+                else if (argument == "--scene" && value.Length())
+                {
+                    scenePath_ = value;
+
+                }
+
             }
+        }
+
+        if (!projectPath_.Length())
+        {
+            ErrorExit(ToString("%s project path not specified"));
+            return;
         }
 
         engineParameters_.InsertNew("LogName", fileSystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "AtomicGlow.log");
 
     #ifdef ATOMIC_DEV_BUILD
         engineParameters_["ResourcePrefixPaths"] = env->GetRootSourceDir() + "/Resources/";
-        engineParameters_["ResourcePaths"] = ToString("CoreData;EditorData;%sResources;%sCache", projectPath.CString(), projectPath.CString());
+        engineParameters_["ResourcePaths"] = ToString("CoreData;EditorData;%sResources;%sCache", projectPath_.CString(), projectPath_.CString());
     #endif
 
         // TODO: change to using new workerthreadcount command line arg

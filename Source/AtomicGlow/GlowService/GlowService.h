@@ -48,7 +48,7 @@ public:
 
     bool Start();
 
-    bool Bake(Scene* scene, const GlowSettings& settings);
+    bool Bake(const String& projectPath, Scene* scene, const GlowSettings& settings);
 
     void CancelBake();
 
@@ -69,6 +69,7 @@ private:
 
     String result_;
     bool bakeCanceled_;
+    String projectPath_;
 
 };
 

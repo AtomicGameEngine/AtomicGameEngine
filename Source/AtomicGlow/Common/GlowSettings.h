@@ -67,9 +67,6 @@ namespace AtomicGlow
         float aoMin_;
         float aoMultiply_;
 
-
-        String projectPath_;
-
         GlowSettings()
         {
             SetDefaults();
@@ -136,9 +133,6 @@ namespace AtomicGlow
 
         void SetDefaults(GlowPreset preset = GLOW_PRESET_FAST_LOW_QUALITY)
         {
-            // fix me
-            projectPath_ = "/Users/jenge/Dev/atomic/AtomicExamplesPrivate/AtomicGlowTests/TestScene1/";
-
             // common settings
 
             // lightmap size

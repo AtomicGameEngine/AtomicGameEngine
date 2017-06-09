@@ -96,8 +96,6 @@ private:
     float aoMin_;
     float aoMultiply_;
 
-    WeakPtr<SceneEditor3D> sceneEditor_;
-
 };
 
 

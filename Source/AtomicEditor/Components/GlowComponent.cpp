@@ -23,9 +23,13 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/Context.h>
 
+#include <ToolCore/ToolSystem.h>
+#include <ToolCore/Project/Project.h>
+
 #include <AtomicGlow/GlowService/GlowService.h>
 #include "GlowComponent.h"
 
+using namespace ToolCore;
 using namespace AtomicGlow;
 
 namespace AtomicEditor
@@ -95,7 +99,16 @@ bool GlowComponent::Bake()
     CopyToGlowSettings(settings);
     settings.Validate();
     SetFromGlowSettings(settings);
-    return glowService->Bake(GetScene(), settings);
+
+    ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
+    if (!toolSystem)
+        return false;
+
+    Project* project = toolSystem->GetProject();
+    if (!project)
+        return false;
+
+    return glowService->Bake(project->GetProjectPath(), GetScene(), settings);
 }
 
 void GlowComponent::HandleAtomicGlowBakeCancel(StringHash eventType, VariantMap& eventData)

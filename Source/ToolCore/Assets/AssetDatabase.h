@@ -80,6 +80,8 @@ public:
 
     String GetDotAssetFilename(const String& path);
 
+    bool GetReadOnly() const;
+
 private:
 
     void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
@@ -118,7 +120,6 @@ private:
     bool assetScanImport_;
 
     bool cacheEnabled_;
-
 };
 
 }

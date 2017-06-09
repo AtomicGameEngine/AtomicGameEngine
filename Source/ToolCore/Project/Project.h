@@ -46,7 +46,7 @@ public:
     /// Destruct.
     virtual ~Project();
 
-    bool Load(const String& fullpath);
+    bool Load(const String& fullpath, bool readOnly = false);
     void Save(const String& fullpath = "");
 
     /// Paths
@@ -69,8 +69,10 @@ public:
 
     bool GetSupportsPlatform(const String& platform) const;
 
-    bool IsDirty() { return dirty_; }
-    void SetDirty() { if (!loading_) dirty_ = true; }
+    bool GetReadOnly() const { return readOnly_; }
+
+    bool IsDirty() { if (readOnly_) { return false; } return dirty_; }
+    void SetDirty() { if (readOnly_) { return; } if (!loading_) dirty_ = true; }
 
     ProjectBuildSettings* GetBuildSettings() { return buildSettings_; }
     ProjectUserPrefs* GetUserPrefs() { return userPrefs_; }
@@ -106,6 +108,7 @@ private:
 
     bool loading_;
     bool dirty_;
+    bool readOnly_;
 
     SharedPtr<ProjectUserPrefs> userPrefs_;
     SharedPtr<ProjectBuildSettings> buildSettings_;

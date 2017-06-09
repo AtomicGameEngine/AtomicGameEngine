@@ -58,6 +58,12 @@ void GlowService::OnGlowProcessExited()
         }
     }
 
+    if (scene_)
+    {
+        scene_->LoadLightmaps(true);
+    }
+
+    projectPath_ = String::EMPTY;
     glowProcess_ = 0;
     scene_ = 0;
 
@@ -85,7 +91,7 @@ void GlowService::OnBakeSuccess()
 
     VariantMap eventData;
     eventData[P_RESULT] = "success";
-    eventData[P_SUCCESS] = true;
+    eventData[P_SUCCESS] = true;    
 
     SendEvent(E_ATOMICGLOWSERVICEBAKERESULT, eventData);
 
@@ -148,13 +154,28 @@ void GlowService::ProcessBakeData(VectorBuffer& bakeData)
 
 }
 
-bool GlowService::Bake(Scene* scene, const GlowSettings& settings)
+bool GlowService::Bake(const String& projectPath, Scene* scene, const GlowSettings& settings)
 {
     if (!scene)
     {
         ATOMIC_LOGERROR("GlowService::Bake() - Called with null scene");
         return false;
     }
+
+    String sceneName = scene->GetFileName();
+
+    if (!sceneName.Length())
+    {
+        ATOMIC_LOGERROR("GlowService::Bake() - Called with unnamed scene");
+        return false;
+    }
+
+    if (!projectPath.Length())
+    {
+        ATOMIC_LOGERROR("GlowService::Bake() - zero length projectPath");
+        return false;
+    }
+
 
     if (glowProcess_.NotNull())
     {
@@ -167,17 +188,26 @@ bool GlowService::Bake(Scene* scene, const GlowSettings& settings)
 
     glowProcess_ = new GlowProcess(context_);
 
-    if (!glowProcess_->Start(glowBinaryPath_, glowBaseArgs_))
+    projectPath_ = projectPath;
+
+    StringVector args;
+    args.Push("--project");
+    args.Push(projectPath_);
+    args += glowBaseArgs_;
+
+    if (!glowProcess_->Start(glowBinaryPath_, args))
     {
         ATOMIC_LOGERROR("GlowService::Bake() - Glow process failed to start");
         return false;
     }
 
     scene_ = scene;
+    projectPath_ = projectPath;
 
     using namespace IPCCmd;
     VariantMap cmdMap;
     cmdMap[P_COMMAND] = "bake";
+    cmdMap["scenename"] = sceneName;
 
     // settings
     VectorBuffer settingsBuffer;
@@ -223,9 +253,6 @@ bool GlowService::Start()
 #else
     glowBinaryPath_ = "/Users/jenge/Dev/atomic/build-AtomicGameEngine-Desktop-Release/Source/AtomicGlow/AtomicGlow";
 #endif
-
-    glowBaseArgs_.Push("--project");
-    glowBaseArgs_.Push("/Users/jenge/Dev/atomic/AtomicExamplesPrivate/AtomicGlowTests/TestScene1");
 
     return true;
 

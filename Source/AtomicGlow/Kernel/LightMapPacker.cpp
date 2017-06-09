@@ -22,6 +22,7 @@
 #include <ThirdParty/STB/stb_rect_pack.h>
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/Image.h>
 
 #include "BakeMesh.h"
@@ -246,24 +247,43 @@ void LightMapPacker::EmitLightmap(unsigned lightMapID)
 
 }
 
-void LightMapPacker::SaveLightmaps()
-{
+bool LightMapPacker::SaveLightmaps(const String &projectPath, const String &scenePath)
+{    
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
     for (unsigned i = 0; i < lightMaps_.Size(); i++)
     {
         LightMap* lightmap = lightMaps_[i];
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-        String filename = ToString("C:/Dev/atomic/AtomicExamplesPrivate/AtomicGlowTests/TestScene1/Resources/Textures/Scene_Lightmap%u.png", lightmap->GetID());
-#else
         const char* format = GlobalGlowSettings.outputFormat_ == GLOW_OUTPUT_PNG ? "png" : "dds";
-        String filename = ToString("%s/Resources/Textures/Scene_Lightmap%u.%s", GlobalGlowSettings.projectPath_.CString(), lightmap->GetID(), format);
-#endif
 
-        //ATOMIC_LOGINFOF("Saving Lightmap: %s", filename.CString());
+        // Note: 2 scenes with the same name in project will collide for lightmap storage
+        // this shouldn't be a general issue, and will be addressed once lightmaps are processed
+        // to Cache with GUID
+        String sceneName = GetFileName(scenePath);
+
+        String folder = ToString("%sResources/AtomicGlow/Scenes/%s/Lightmaps/",  projectPath.CString(), sceneName.CString());
+
+        if (!fileSystem->DirExists(folder))
+        {
+            fileSystem->CreateDirsRecursive(folder);
+        }
+
+        if (!fileSystem->DirExists(folder))
+        {
+            ATOMIC_LOGERRORF("LightMapPacker::SaveLightmaps - Unable to create folder: %s", folder.CString());
+            return false;
+        }
+
+        String filename = ToString("%sLightmap%u.%s", folder.CString(), lightmap->GetID(), format);
+
+        ATOMIC_LOGINFOF("Saving Lightmap: %s", filename.CString());
 
         GlobalGlowSettings.outputFormat_ == GLOW_OUTPUT_PNG ? lightmap->GetImage()->SavePNG(filename) : lightmap->GetImage()->SaveDDS(filename);
 
     }
+
+    return true;
 
 }
 

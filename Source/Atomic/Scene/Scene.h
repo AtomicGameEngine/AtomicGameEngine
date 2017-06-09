@@ -35,6 +35,10 @@ namespace Atomic
 class File;
 class PackageFile;
 
+// ATOMIC BEGIN
+class Texture2D;
+// ATOMIC END
+
 static const unsigned FIRST_REPLICATED_ID = 0x1;
 static const unsigned LAST_REPLICATED_ID = 0xffffff;
 static const unsigned FIRST_LOCAL_ID = 0x01000000;
@@ -256,6 +260,11 @@ public:
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
 
+    // ATOMIC BEGIN
+    void LoadLightmaps(bool reload = false);
+    void SetLightmapTexture(unsigned id);
+    // ATOMIC END
+
 private:
     /// Handle the logic update event to update the scene, if active.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -275,6 +284,10 @@ private:
     void PreloadResourcesXML(const XMLElement& element);
     /// Preload resources from a JSON scene or object prefab file.
     void PreloadResourcesJSON(const JSONValue& value);
+
+    // ATOMIC BEGIN
+    Vector<SharedPtr<Texture2D>> lightmaps_;
+    // ATOMIC END
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;

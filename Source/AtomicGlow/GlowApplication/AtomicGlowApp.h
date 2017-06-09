@@ -56,6 +56,9 @@ namespace AtomicGlow
 
         Timer timer_;
 
+        String projectPath_;
+        String scenePath_;
+
         SharedPtr<SceneBaker> sceneBaker_;
 
     };

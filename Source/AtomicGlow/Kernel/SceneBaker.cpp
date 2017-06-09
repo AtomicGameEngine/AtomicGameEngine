@@ -28,6 +28,7 @@
 
 #include <Atomic/Core/WorkQueue.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Graphics/Zone.h>
 #include <Atomic/Graphics/Light.h>
@@ -43,9 +44,10 @@
 namespace AtomicGlow
 {
 
-SceneBaker::SceneBaker(Context* context) : Object(context),
+SceneBaker::SceneBaker(Context* context, const String &projectPath) : Object(context),
     currentLightMode_(GLOW_LIGHTMODE_UNDEFINED),
     currentGIPass_(0),
+    projectPath_(AddTrailingSlash(projectPath)),
     standaloneMode_(true)
 {
     embreeScene_ = new EmbreeScene(context_);
@@ -64,13 +66,9 @@ bool SceneBaker::SaveLitScene()
         return false;
     }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    String scenefilename = ToString("C:/Dev/atomic/AtomicExamplesPrivate/AtomicGlowTests/TestScene1/Resources/Scenes/LitScene.scene");
-#else
-    String scenefilename = ToString("%s/Resources/Scenes/LitScene.scene", GlobalGlowSettings.projectPath_.CString());
-#endif
+    String sceneFilename = AddTrailingSlash(projectPath_) + "Resources/" + scene_->GetFileName();
 
-    File saveFile(context_, scenefilename, FILE_WRITE);
+    File saveFile(context_, sceneFilename, FILE_WRITE);
     return scene_->SaveXML(saveFile);
 }
 
@@ -125,7 +123,16 @@ bool SceneBaker::GenerateLightmaps()
 
     packer->Pack();
 
-    packer->SaveLightmaps();
+    if (!packer->SaveLightmaps(projectPath_, scene_->GetFileName()))
+    {
+        return false;
+    }
+
+    if (standaloneMode_)
+    {
+        if (!SaveLitScene())
+            return false;
+    }
 
     return WriteBakeData(bakeData_);
 
@@ -391,6 +398,51 @@ bool SceneBaker::LoadScene(const String& filename)
 
         if (staticModel->GetModel() && (staticModel->GetLightmap() ||staticModel->GetCastShadows()))
         {
+            Model* model = staticModel->GetModel();
+
+            for (unsigned i = 0; i < model->GetNumGeometries(); i++)
+            {
+                Geometry* geo = model->GetGeometry(i, 0);
+
+                if (!geo)
+                {
+                    ATOMIC_LOGERRORF("SceneBaker::LoadScene - model without geometry: %s", model->GetName().CString());
+                    return false;
+                }
+
+                const unsigned char* indexData = 0;
+                unsigned indexSize = 0;
+                unsigned vertexSize = 0;
+                const unsigned char* vertexData = 0;
+                const PODVector<VertexElement>* elements = 0;
+
+                geo->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
+
+                if (!indexData || !indexSize || !vertexData || !vertexSize || !elements)
+                {
+                    ATOMIC_LOGERRORF("SceneBaker::LoadScene - Unable to inspect geometry elements: %s",  model->GetName().CString());
+                    return false;
+                }
+
+                int texcoords = 0;
+                for (unsigned i = 0; i < elements->Size(); i++)
+                {
+                    const VertexElement& element = elements->At(i);
+
+                    if (element.type_ == TYPE_VECTOR2 && element.semantic_ == SEM_TEXCOORD)
+                    {
+                        texcoords++;
+                    }
+                }
+
+                if (texcoords < 2)
+                {
+                    ATOMIC_LOGERRORF("SceneBaker::LoadScene - Model without lightmap UV set, skipping: %s",  model->GetName().CString());
+                    continue;
+                }
+
+            }
+
             SharedPtr<BakeMesh> meshMap (new BakeMesh(context_, this));
             meshMap->SetStaticModel(staticModel);
             bakeMeshes_.Push(meshMap);

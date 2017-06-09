@@ -44,7 +44,8 @@ namespace ToolCore
 Project::Project(Context* context) :
     Object(context),
     loading_(false),
-    dirty_(false)
+    dirty_(false),
+    readOnly_(false)
 {
     version_ = "1.0.0";
 
@@ -107,9 +108,10 @@ bool Project::GetSupportsPlatform(const String& platform) const
     return projectSettings_->GetSupportsPlatform(platform);
 }
 
-bool Project::Load(const String& fullpath)
+bool Project::Load(const String& fullpath, bool readOnly)
 {
     loading_ = true;
+    readOnly_ = readOnly;
 
     if (fullpath.Contains(".atomic")) {
 
