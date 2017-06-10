@@ -22,3 +22,6 @@ set (SOURCE_FILES ${C_FILES} ${H_FILES})
 
 add_library(TurboBadger ${SOURCE_FILES})
 target_include_directories(TurboBadger SYSTEM BEFORE PUBLIC .)
+if (NOT MSVC)
+    target_compile_options(TurboBadger PRIVATE -std=gnu++11)
+endif ()

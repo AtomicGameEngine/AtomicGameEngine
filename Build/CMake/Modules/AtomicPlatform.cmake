@@ -1,4 +1,6 @@
 
+set(ATOMIC_DYNAMIC_RUNTIME OFF CACHE BOOL "Build engine as shared library and link dynamically to system runtime.")
+
 if (WIN32)
     include(AtomicWindows)
 elseif (APPLE)
