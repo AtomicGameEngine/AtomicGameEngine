@@ -6,7 +6,8 @@ var inspectorFields = {
 
 exports.component = function(self) {
     
-    //update function calls each frame
+    //update function is called each frame.
+	//timeStep: time since last call to update in seconds
     self.update = function(timeStep) {
         //roll a node
         self.node.roll(timeStep * 100);
