@@ -379,7 +379,6 @@ bool CSTypeHelper::OmitFunction(JSBFunction* function)
     if (!function)
         return false;
 
-
     if (function->GetSkipLanguage(BINDINGLANGUAGE_CSHARP))
         return true;
 

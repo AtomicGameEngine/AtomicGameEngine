@@ -28,7 +28,7 @@ namespace ToolCore
 unsigned JSBFunction::idCounter_ = 1;
 
 JSBFunction::JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
-                                  isInterface_(false),
+                                  isInheritedInterface_(false),
                                   isConstructor_(false), isDestructor_(false),
                                   isGetter_(false), isSetter_(false),
                                   isOverload_(false), skip_(false),
@@ -166,7 +166,7 @@ JSBFunction* JSBFunction::Clone(JSBClass* dstClass)
 
     dst->docString_ = docString_;
 
-    dst->isInterface_ = isInterface_;
+    dst->isInheritedInterface_ = isInheritedInterface_;
     dst->isConstructor_ = isConstructor_;
     dst->isDestructor_ = isDestructor_;
     dst->isGetter_ = isGetter_;

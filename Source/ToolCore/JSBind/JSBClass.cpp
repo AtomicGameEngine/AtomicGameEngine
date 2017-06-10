@@ -304,7 +304,7 @@ void JSBClass::MergeInterface(JSBClass* interface)
         if (!MatchFunction(src))
         {
             JSBFunction* function = src->Clone(this);
-            function->SetInterface(true);
+            function->SetInheritedInterface(true);
             AddFunction(function);
         }
     }
