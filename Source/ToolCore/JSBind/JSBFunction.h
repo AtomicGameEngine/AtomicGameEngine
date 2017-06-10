@@ -153,7 +153,9 @@ public:
     bool IsOverload() { return isOverload_; }
     bool IsVirtual() const { return isVirtual_; }
     bool IsStatic() const { return isStatic_; }
-    bool IsInterface() const { return isInterface_; }
+
+    // get whether this method is inherited from a parent interface
+    bool IsInheritedInterface() const { return isInheritedInterface_; }
 
     // true if return value has been mutated to be passed in at end of parameters (optimization)
     bool HasMutatedReturn() const { return hasMutatedReturn_; }
@@ -190,7 +192,7 @@ public:
     void SetStatic(bool value = true) { isStatic_ = value; }
     void SetSkip(bool value) { skip_ = value; }
     void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
-    void SetInterface(bool interface) { isInterface_ = interface; }
+    void SetInheritedInterface(bool interface) { isInheritedInterface_ = interface; }
     void SetDocString(const String& docString) { docString_ = docString; }
 
     void SetSkipLanguage(BindingLanguage language, bool skip = true)
@@ -295,7 +297,7 @@ private:
 
     String docString_;
 
-    bool isInterface_;
+    bool isInheritedInterface_;
 
     bool isConstructor_;
     bool isDestructor_;
