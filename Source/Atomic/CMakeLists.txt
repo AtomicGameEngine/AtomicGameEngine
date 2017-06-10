@@ -92,7 +92,17 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo/AtomicGitSHA.cpp.in" "${CM
 
 set (SOURCE_FILES ${SOURCE_FILES} BuildInfo/AtomicBuildInfo.cpp BuildInfo/AtomicBuildInfo.h BuildInfo/AtomicGitSHA.cpp BuildInfo/AtomicGitSHA.h)
 
-add_library(Atomic ${SOURCE_FILES})
+if (ATOMIC_DYNAMIC_RUNTIME)
+    set(ATOMIC_LIBRARY_TYPE SHARED)
+else ()
+    set(ATOMIC_LIBRARY_TYPE STATIC)
+endif ()
+add_library(Atomic ${ATOMIC_LIBRARY_TYPE} ${SOURCE_FILES})
+if (NOT ATOMIC_DYNAMIC_RUNTIME)
+    target_compile_definitions (Atomic PUBLIC -DATOMIC_STATIC_DEFINE=1 -DATOMIC_API=)
+else ()
+    target_compile_definitions (Atomic PRIVATE -DATOMIC_EXPORTS=1)
+endif ()
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(Atomic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
@@ -202,7 +212,6 @@ else ()
 endif ()
 
 # TODO: enable shared library builds.
-target_compile_definitions (Atomic PUBLIC -DATOMIC_STATIC_DEFINE=1 -DATOMIC_API=)
 if (NOT APPLE OR IOS OR WEB)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_TBUI=1)
 endif ()
@@ -226,3 +235,18 @@ target_include_directories (Atomic PUBLIC
 )
 
 include(AtomicDoc)
+
+if ($ENV{ATOMIC_BUILD_DIST})
+    target_compile_definitions(Atomic PUBLIC -DATOMIC_BUILD_DIST=1)
+endif ()
+
+if (MSVC)
+    target_compile_options(Atomic PUBLIC "$<$<CONFIG:Debug>:${ATOMIC_MSVC_RUNTIME}d>")
+    target_compile_options(Atomic PUBLIC "$<$<CONFIG:Release>:${ATOMIC_MSVC_RUNTIME}>")
+    target_compile_options(Atomic PUBLIC "$<$<CONFIG:RelWithDebInfo>:${ATOMIC_MSVC_RUNTIME}>")
+    target_compile_options(Atomic PUBLIC "$<$<CONFIG:MinSizeRel>:${ATOMIC_MSVC_RUNTIME}>")
+endif ()
+
+if (UNIX OR MINGW)
+    target_compile_options(Atomic PUBLIC -std=gnu++11)
+endif ()

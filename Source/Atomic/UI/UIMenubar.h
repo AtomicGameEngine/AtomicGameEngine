@@ -29,7 +29,7 @@ namespace Atomic
 
 class UIMenuItemSource;
 
-class UIMenuItem : public UISelectItem
+class ATOMIC_API UIMenuItem : public UISelectItem
 {
     ATOMIC_OBJECT(UIMenuItem, UISelectItem)
 

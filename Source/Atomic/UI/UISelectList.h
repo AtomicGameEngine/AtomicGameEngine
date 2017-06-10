@@ -33,7 +33,7 @@ namespace tb
 namespace Atomic
 {
 
-class UISelectList : public UIWidget
+class ATOMIC_API UISelectList : public UIWidget
 {
     ATOMIC_OBJECT(UISelectList, UIWidget)
 

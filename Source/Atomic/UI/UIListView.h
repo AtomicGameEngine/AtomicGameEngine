@@ -31,7 +31,7 @@ namespace Atomic
 class ListViewItemSource;
 class ListViewItem;
 
-class UIListView : public UIWidget
+class ATOMIC_API UIListView : public UIWidget
 {
     ATOMIC_OBJECT(UIListView, UIWidget);
 

@@ -34,7 +34,7 @@ namespace Atomic
 class JSComponent;
 
 /// Script document resource.
-class ATOMIC_API JSComponentFile : public ScriptComponentFile
+class JSComponentFile : public ScriptComponentFile
 {
     ATOMIC_OBJECT(JSComponentFile, ScriptComponentFile);
 

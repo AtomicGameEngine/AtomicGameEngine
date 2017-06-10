@@ -34,7 +34,7 @@ class WebTexture2DPrivate;
 
 
 /// A render handler which uses a Texture2D and can be used for UI, 2D, and 3D rendering
-class ATOMIC_API WebTexture2D : public WebRenderHandler
+class  WebTexture2D : public WebRenderHandler
 {
     friend class WebTexture2DPrivate;
 

@@ -41,7 +41,7 @@ namespace SystemUI
     class MessageBox;
 }
 
-class UI : public Object, private tb::TBWidgetListener
+class ATOMIC_API UI : public Object, private tb::TBWidgetListener
 {
     ATOMIC_OBJECT(UI, Object)
 

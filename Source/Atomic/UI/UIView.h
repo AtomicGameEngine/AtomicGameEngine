@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 /// a view off the root widget
-class UIView : public UIWidget
+class ATOMIC_API UIView : public UIWidget
 {
     ATOMIC_OBJECT(UIView, UIWidget)
 

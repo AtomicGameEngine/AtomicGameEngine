@@ -32,7 +32,7 @@ namespace Atomic
 {
     class Node;
 
-    class PhysicsContact : public RefCounted
+    class ATOMIC_API PhysicsContact : public RefCounted
     {
         friend class PhysicsNodeCollision;
 
@@ -64,7 +64,7 @@ namespace Atomic
         float impulse_;
     };
 
-    class PhysicsNodeCollision : public RefCounted
+    class ATOMIC_API PhysicsNodeCollision : public RefCounted
     {
         ATOMIC_REFCOUNTED(PhysicsNodeCollision)
 

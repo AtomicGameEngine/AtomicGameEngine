@@ -31,7 +31,7 @@ namespace Atomic
 
 class UISelectItemSource;
 
-class UIMenuWindow : public UIWidget
+class ATOMIC_API UIMenuWindow : public UIWidget
 {
     ATOMIC_OBJECT(UIMenuWindow, UIWidget)
 

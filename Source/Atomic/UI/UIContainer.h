@@ -27,7 +27,7 @@
 namespace Atomic
 {
 
-class UIContainer : public UIWidget
+class ATOMIC_API UIContainer : public UIWidget
 {
     ATOMIC_OBJECT(UIContainer, UIWidget)
 

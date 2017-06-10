@@ -41,7 +41,7 @@ struct NETCoreDelegates
     NETCoreThrowManagedExceptionFunction throwManagedException;
 };
 
-class ATOMIC_API NETCore : public Object
+class NETCore : public Object
 {
 
     ATOMIC_OBJECT(NETCore, Object)

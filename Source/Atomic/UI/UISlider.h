@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 
-class UISlider : public UIWidget
+class ATOMIC_API UISlider : public UIWidget
 {
     ATOMIC_OBJECT(UISlider, UIWidget)
 

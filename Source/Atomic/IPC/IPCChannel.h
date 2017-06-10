@@ -41,7 +41,7 @@
 namespace Atomic
 {
 
-class IPCChannel : public Object, public Thread
+class ATOMIC_API IPCChannel : public Object, public Thread
 {
     ATOMIC_OBJECT(IPCChannel, Object)
 

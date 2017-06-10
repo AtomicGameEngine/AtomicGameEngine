@@ -112,7 +112,7 @@ private:
     PODVector<char> buf_;
 };
 
-class IPCProcess : public Object
+class ATOMIC_API IPCProcess : public Object
 {
     ATOMIC_OBJECT(IPCProcess, Object)
 

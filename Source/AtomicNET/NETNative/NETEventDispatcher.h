@@ -28,7 +28,7 @@
 namespace Atomic
 {
 
-class ATOMIC_API NETEventDispatcher : public Object, public GlobalEventListener
+class NETEventDispatcher : public Object, public GlobalEventListener
 {
     ATOMIC_OBJECT(NETEventDispatcher, Object);
 

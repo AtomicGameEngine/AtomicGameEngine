@@ -45,7 +45,7 @@ enum UI_SIZE_DEP {
     UI_SIZE_DEP_BOTH                    = 3 //  tb::SIZE_DEP_BOTH
 };
 
-class UIPreferredSize : public RefCounted
+class ATOMIC_API UIPreferredSize : public RefCounted
 {
     friend class UIWidget;
 

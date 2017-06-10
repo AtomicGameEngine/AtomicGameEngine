@@ -27,6 +27,6 @@
 namespace Atomic
 {
 
-void RegisterEnvironmentLibrary(Context* context);
+void ATOMIC_API RegisterEnvironmentLibrary(Context* context);
 
 }

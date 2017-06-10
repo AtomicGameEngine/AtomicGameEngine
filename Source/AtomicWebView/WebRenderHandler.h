@@ -34,7 +34,7 @@ class WebClient;
 
 
 /// Base class for various WebRenderHandlers
-class ATOMIC_API WebRenderHandler : public Object
+class WebRenderHandler : public Object
 {
     ATOMIC_OBJECT(WebRenderHandler, Object);
 

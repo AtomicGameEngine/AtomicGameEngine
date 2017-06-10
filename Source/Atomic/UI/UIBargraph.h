@@ -29,7 +29,7 @@
 namespace Atomic
 {
 
-class UIBargraph : public UIWidget
+class ATOMIC_API UIBargraph : public UIWidget
 {
     ATOMIC_OBJECT(UIBargraph, UIWidget)
 

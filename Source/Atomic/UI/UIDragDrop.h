@@ -34,7 +34,7 @@ class UITextField;
 class UIDragObject;
 
 /// UIDragDrop subsystem
-class UIDragDrop : public Object
+class ATOMIC_API UIDragDrop : public Object
 {
 
     ATOMIC_OBJECT(UIDragDrop, Object);

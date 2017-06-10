@@ -31,8 +31,7 @@ namespace Atomic
 
 class Context;
 
-class ImportConfig :
-    Configuration
+class ImportConfig : Configuration
 {
 
 public:

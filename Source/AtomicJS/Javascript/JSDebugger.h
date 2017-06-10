@@ -29,7 +29,7 @@ namespace Atomic
 
 
 /// JavaScript/TypeScript Debugger Subsystem
-class ATOMIC_API JSDebugger : public Object
+class JSDebugger : public Object
 {
 
     ATOMIC_OBJECT(JSDebugger, Object)

@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 
-class UIClickLabel : public UIWidget
+class ATOMIC_API UIClickLabel : public UIWidget
 {
     ATOMIC_OBJECT(UIClickLabel, UIWidget)
 

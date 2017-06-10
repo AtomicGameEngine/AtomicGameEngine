@@ -33,7 +33,7 @@ namespace Atomic
 
 class UISelectItemSource;
 
-class UISelectItem : public Object
+class ATOMIC_API UISelectItem : public Object
 {
     ATOMIC_OBJECT(UISelectItem, Object)
 
@@ -64,7 +64,7 @@ protected:
 
 };
 
-class UISelectItemSource : public Object
+class ATOMIC_API UISelectItemSource : public Object
 {
     ATOMIC_OBJECT(UISelectItemSource, Object)
 
