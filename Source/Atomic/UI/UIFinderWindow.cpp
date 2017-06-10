@@ -46,12 +46,6 @@ namespace Atomic
 UIFinderWindow::UIFinderWindow(Context* context, UIWidget* target, const String& id, bool createWidget) : 
     UIWindow(context, false),
     finderMode_(0),
-    currentPath_(),
-    resultPath_(),
-    bookmarks_(),
-    bookmarkPaths_(),
-    newBookmarkPtr_(),
-    newFolderPtr_(),
     bookmarksDirty_(0)
 {
     if (createWidget)
@@ -254,9 +248,10 @@ bool UIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
 
 void UIFinderWindow::HandleCreateBookmark(StringHash eventType, VariantMap& eventData)
 {
-    String Title = eventData["Title"].GetString();
-    String Reason = eventData["Reason"].GetString();
-    String Selected = eventData["Selected"].GetString();
+    const String& Title = eventData["Title"].GetString();
+    const String& Reason = eventData["Reason"].GetString();
+    const String& Selected = eventData["Selected"].GetString();
+
     if( Reason == "OK" )
         CreateBookmark( Selected, currentPath_ );
     if (newBookmarkPtr_)
@@ -268,9 +263,10 @@ void UIFinderWindow::HandleCreateBookmark(StringHash eventType, VariantMap& even
 
 void UIFinderWindow::HandleCreateFolder(StringHash eventType, VariantMap& eventData)
 {
-    String Title = eventData["Title"].GetString();
-    String Reason = eventData["Reason"].GetString();
-    String Selected = eventData["Selected"].GetString();
+    const String& Title = eventData["Title"].GetString();
+    const String& Reason = eventData["Reason"].GetString();
+    const String& Selected = eventData["Selected"].GetString();
+
     if( Reason == "OK" )
         CreateFolder(Selected); 
     if (newFolderPtr_)
