@@ -53,9 +53,6 @@
 			<attribute name="Sprite" value="Sprite2D;Sprites/star.png" />
 		</component>
 		<component type="CSComponent" id="1988">
-			<attribute name="FieldValues">
-				<variant hash="273365031" type="Float" value="3" />
-			</attribute>
 			<attribute name="Assembly" value="CSComponentAssembly;AtomicProject.dll" />
 			<attribute name="Class" value="Spinner" />
 		</component>
