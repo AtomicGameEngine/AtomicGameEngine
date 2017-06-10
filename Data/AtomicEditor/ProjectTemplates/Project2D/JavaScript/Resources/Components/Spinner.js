@@ -10,7 +10,7 @@ exports.component = function(self) {
 	//timeStep: time since last call to update in seconds
     self.update = function(timeStep) {
         //roll a node
-        self.node.roll(timeStep * 100);
+        self.node.roll(self.speed * timeStep * 75);
 
     }
 
