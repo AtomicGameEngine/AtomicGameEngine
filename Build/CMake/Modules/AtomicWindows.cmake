@@ -7,21 +7,16 @@ include(AtomicDesktop)
 
 set(ATOMIC_NODE_JAKE Build/Windows/node/node.exe Build/node_modules/jake/bin/cli.js -f Build\\Scripts\\Bootstrap.js)
 
-if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(D3DCOMPILER_47_DLL ${ATOMIC_SOURCE_DIR}/Build/Windows/Binaries/x64/D3DCompiler_47.dll)
-else ()
-    set(D3DCOMPILER_47_DLL ${ATOMIC_SOURCE_DIR}/Build/Windows/Binaries/x86/D3DCompiler_47.dll)
-endif ()
+set(D3DCOMPILER_47_DLL ${ATOMIC_SOURCE_DIR}/Build/Windows/Binaries/${ATOMIC_PROJECT_ARCH_SHORT}/D3DCompiler_47.dll)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-
 # compile with static runtime
-set(CompilerFlags
-    CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO
-    CMAKE_C_FLAGS_MINSIZEREL)
-
-foreach (CompilerFlag ${CompilerFlags})
-    string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-endforeach ()
+if (MSVC)
+    if (ATOMIC_DYNAMIC_RUNTIME)
+        set(ATOMIC_MSVC_RUNTIME /MD)
+    else ()
+        set(ATOMIC_MSVC_RUNTIME /MT)
+    endif ()
+    msvc_set_runtime(${ATOMIC_MSVC_RUNTIME})
+endif ()

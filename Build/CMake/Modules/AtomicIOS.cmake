@@ -2,7 +2,7 @@ include(BundleUtilities)
 
 set(JAVASCRIPT_BINDINGS_PLATFORM "IOS")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -std=gnu++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
 
 set(CMAKE_CROSSCOMPILING TRUE)
 set(CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
