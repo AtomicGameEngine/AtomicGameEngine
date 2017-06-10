@@ -36,7 +36,7 @@ namespace Atomic
     class NETVariantMap;
 
     /// NET Assembly resource.
-    class ATOMIC_API CSComponentAssembly : public ScriptComponentFile
+    class CSComponentAssembly : public ScriptComponentFile
     {
         ATOMIC_OBJECT(CSComponentAssembly, ScriptComponentFile)
 

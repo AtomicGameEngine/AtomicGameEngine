@@ -49,7 +49,7 @@ typedef void(*JSVMPackageRegistrationFunction)(JSVM* vm);
 /// Registration signature for JSVM package registration with settings
 typedef void(*JSVMPackageRegistrationSettingsFunction)(JSVM* vm, const VariantMap& setting);
 
-class ATOMIC_API JSVM : public Object
+class JSVM : public Object
 {
 
     friend class JSMetrics;

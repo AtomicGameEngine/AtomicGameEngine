@@ -35,7 +35,7 @@ class WebClientPrivate;
 class WebMessageHandler;
 
 /// WebClient is the main interface for communicating with a browser instance
-class ATOMIC_API WebClient : public Object
+class WebClient : public Object
 {
     friend class WebBrowserHost;
     friend class WebClientPrivate;

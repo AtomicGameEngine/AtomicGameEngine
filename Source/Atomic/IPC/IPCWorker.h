@@ -29,7 +29,7 @@
 namespace Atomic
 {
 
-class IPCWorker : public IPCChannel
+class ATOMIC_API IPCWorker : public IPCChannel
 {
     ATOMIC_OBJECT(IPCWorker, IPCChannel);
 

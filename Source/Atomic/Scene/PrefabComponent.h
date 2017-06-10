@@ -7,7 +7,7 @@
 namespace Atomic
 {
 
-class PrefabComponent : public Component
+class ATOMIC_API PrefabComponent : public Component
 {
     ATOMIC_OBJECT(PrefabComponent, Component);
 

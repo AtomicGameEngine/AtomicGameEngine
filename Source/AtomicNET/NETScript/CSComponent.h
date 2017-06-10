@@ -30,7 +30,7 @@
 namespace Atomic
 {
 
-class ATOMIC_API CSComponent : public ScriptComponent
+class CSComponent : public ScriptComponent
 {
     friend class CSComponentFactory;
 

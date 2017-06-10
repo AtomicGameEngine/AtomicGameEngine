@@ -37,7 +37,7 @@ enum UI_MESSAGEWINDOW_SETTINGS
 };
 
 
-class UIMessageWindow : public UIWindow
+class ATOMIC_API UIMessageWindow : public UIWindow
 {
     ATOMIC_OBJECT(UIMessageWindow, UIWindow)
 

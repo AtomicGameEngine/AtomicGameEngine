@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 
-class UIDragObject : public Object
+class ATOMIC_API UIDragObject : public Object
 {
 
     ATOMIC_OBJECT(UIDragObject, Object);

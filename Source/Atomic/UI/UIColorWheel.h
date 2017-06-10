@@ -30,7 +30,7 @@ namespace Atomic
 {
 
 
-class UIColorWheel : public UIWidget
+class ATOMIC_API UIColorWheel : public UIWidget
 {
     ATOMIC_OBJECT(UIColorWheel, UIWidget)
 

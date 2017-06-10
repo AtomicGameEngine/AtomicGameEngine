@@ -40,7 +40,7 @@ namespace Atomic
 {
 
 
-class ProcSky : public Drawable
+class ATOMIC_API ProcSky : public Drawable
 {
     ATOMIC_OBJECT(ProcSky, Drawable);
 

@@ -343,7 +343,7 @@ void ATOMIC_API RegisterResourceLibrary(Context* context);
 
 // ATOMIC BEGIN
 /// Extension used for package files
-extern const char* PAK_EXTENSION;
+extern ATOMIC_API const char* PAK_EXTENSION;
 // ATOMIC END
 
 

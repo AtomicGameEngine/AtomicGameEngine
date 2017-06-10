@@ -29,7 +29,7 @@ namespace Atomic
 
 class UILayout;
 
-class UITabContainer : public UIWidget
+class ATOMIC_API UITabContainer : public UIWidget
 {
     ATOMIC_OBJECT(UITabContainer, UIWidget)
 

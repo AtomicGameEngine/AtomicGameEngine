@@ -39,7 +39,7 @@ enum UI_EDIT_TYPE {
     UI_EDIT_TYPE_NUMBER = 6 // tb::EDIT_TYPE_NUMBER
 };
 
-class UIEditField : public UIWidget
+class ATOMIC_API UIEditField : public UIWidget
 {
     ATOMIC_OBJECT(UIEditField, UIWidget)
 

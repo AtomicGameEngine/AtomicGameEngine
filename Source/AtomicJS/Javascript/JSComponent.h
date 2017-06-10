@@ -33,7 +33,7 @@ namespace Atomic
 class JSVM;
 
 /// JavaScript component
-class ATOMIC_API JSComponent : public ScriptComponent
+class JSComponent : public ScriptComponent
 {
     friend class JSComponentFactory;
     friend class JSComponentFile;

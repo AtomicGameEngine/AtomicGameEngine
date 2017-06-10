@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 
-class UISection : public UIWidget
+class ATOMIC_API UISection : public UIWidget
 {
     ATOMIC_OBJECT(UISection, UIWidget)
 

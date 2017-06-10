@@ -28,7 +28,7 @@
 namespace Atomic
 {
 
-class UISelectDropdown : public UIButton
+class ATOMIC_API UISelectDropdown : public UIButton
 {
     ATOMIC_OBJECT(UISelectDropdown, UIButton)
 

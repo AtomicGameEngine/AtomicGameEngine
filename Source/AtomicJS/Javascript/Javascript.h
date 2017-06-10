@@ -32,7 +32,7 @@ namespace Atomic
 class JSVM;
 
 /// Javascript subsystem.
-class ATOMIC_API Javascript : public Object
+class Javascript : public Object
 {
     ATOMIC_OBJECT(Javascript, Object);
 
@@ -61,6 +61,6 @@ private:
 };
 
 /// Register Javascript library objects.
-void ATOMIC_API RegisterJavascriptLibrary(Context* context);
+void RegisterJavascriptLibrary(Context* context);
 
 }

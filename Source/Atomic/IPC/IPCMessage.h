@@ -44,7 +44,7 @@ struct IPCMessageHeader
     unsigned messageSize_;
 };
 
-class IPCMessageEvent
+class ATOMIC_API IPCMessageEvent
 {
 
 public:

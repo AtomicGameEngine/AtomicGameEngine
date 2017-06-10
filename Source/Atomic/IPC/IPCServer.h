@@ -42,7 +42,7 @@ namespace Atomic
     class IPCBroker;
 
     /// IPCResultHandler
-    class IPCResultHandler : public Object
+    class ATOMIC_API IPCResultHandler : public Object
     {
         ATOMIC_OBJECT(IPCResultHandler, Object)
 
@@ -59,7 +59,7 @@ namespace Atomic
     };
 
     /// IPCServer
-    class IPCServer : public Object
+    class ATOMIC_API IPCServer : public Object
     {
         ATOMIC_OBJECT(IPCServer, Object)
 

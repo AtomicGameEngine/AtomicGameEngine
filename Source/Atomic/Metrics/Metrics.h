@@ -28,7 +28,7 @@
 namespace Atomic
 {
 
-class MetricsSnapshot : public RefCounted
+class ATOMIC_API MetricsSnapshot : public RefCounted
 {
     friend class Metrics;
 

@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 
-class UICheckBox : public UIWidget
+class ATOMIC_API UICheckBox : public UIWidget
 {
     ATOMIC_OBJECT(UICheckBox, UIWidget)
 

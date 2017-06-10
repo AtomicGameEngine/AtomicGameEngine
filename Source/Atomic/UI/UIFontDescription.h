@@ -27,7 +27,7 @@
 namespace Atomic
 {
 
-class UIFontDescription : public Object
+class ATOMIC_API UIFontDescription : public Object
 {
     ATOMIC_OBJECT(UIFontDescription, Object)
 

@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 
-class UIInlineSelect : public UIWidget
+class ATOMIC_API UIInlineSelect : public UIWidget
 {
     ATOMIC_OBJECT(UIInlineSelect, UIWidget)
 

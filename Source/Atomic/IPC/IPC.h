@@ -41,7 +41,7 @@ struct QueuedEvent
     VariantMap eventData_;
 };
 
-class IPC : public Object
+class ATOMIC_API IPC : public Object
 {
     ATOMIC_OBJECT(IPC, Object);
 

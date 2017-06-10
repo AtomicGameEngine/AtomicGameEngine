@@ -29,7 +29,7 @@
 namespace Atomic
 {
 
-class AtomicBuildInfo : public RefCounted
+class ATOMIC_API AtomicBuildInfo : public RefCounted
 {
     ATOMIC_REFCOUNTED(AtomicBuildInfo)
 

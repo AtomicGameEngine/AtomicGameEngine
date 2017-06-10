@@ -31,7 +31,7 @@ class IPCProcess;
 
 
 /// Server application held broker
-class IPCBroker : public IPCChannel
+class ATOMIC_API IPCBroker : public IPCChannel
 {
     friend class IPC;
 

@@ -47,7 +47,7 @@ enum UI_WINDOW_SETTINGS {
 };
 
 
-class UIWindow : public UIWidget
+class ATOMIC_API UIWindow : public UIWidget
 {
     ATOMIC_OBJECT(UIWindow, UIWidget)
 

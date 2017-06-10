@@ -168,7 +168,7 @@ class UILayoutParams;
 class UIFontDescription;
 
 /// Wraps a TurboBadger widget in our Object model
-class UIWidget : public Object, public tb::TBWidgetDelegate
+class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
 {
     friend class UI;
 

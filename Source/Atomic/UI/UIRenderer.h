@@ -38,7 +38,7 @@ namespace Atomic
 
 class UI;
 
-class UIRenderer : public tb::TBRendererBatcher
+class ATOMIC_API UIRenderer : public tb::TBRendererBatcher
 {
     friend class UI;
 public:

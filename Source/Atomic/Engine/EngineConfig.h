@@ -32,8 +32,7 @@ namespace Atomic
 class Context;
 
 /// Atomic engine configuration
-class EngineConfig :
-    Configuration
+class ATOMIC_API EngineConfig : Configuration
 {
 
 public:
