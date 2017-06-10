@@ -31,6 +31,19 @@
 #include "tb_msg.h"
 #include "tb_widgets_listener.h"
 #include "tb_widgets_common.h"
+#include "tb_window.h"
+
+#define UIPROMPTMESSAGEID 1
+#define UIPROMPTEDITID 2
+#define UIFINDEREDITPATHID 1
+#define UIFINDERUPBUTTONID 2
+#define UIFINDERBOOKBUTTONID 3
+#define UIFINDERFOLDERBUTTONID 4
+#define UIFINDERBOOKLISTID 5
+#define UIFINDERFILELISTID 6
+#define UIFINDEREDITFILEID 7
+#define UIFINDEROKBUTTONID 8
+#define UIFINDERCANCELBUTTONID 9
 
 namespace tb {
 
@@ -136,6 +149,61 @@ private:
     AXIS m_axis;
     unsigned m_margin;
 };
+
+
+/** TBPromptWindow is a window for requesting a string. */
+class TBPromptWindow : public TBWindow, private TBWidgetListener
+{
+public:
+    // For safe typecasting
+    TBOBJECT_SUBCLASS(TBPromptWindow, TBWindow);
+    TBPromptWindow(TBWidget *target, TBID id);
+    virtual ~TBPromptWindow();
+    bool Show(const char *title, const char *message,
+          const char *preset = nullptr, int dimmer = 0,
+          int width = 0, int height = 0);
+    virtual TBWidget *GetEventDestination() { return m_target.Get(); }
+    virtual bool OnEvent(const TBWidgetEvent &ev);
+    virtual void OnDie();
+
+private:
+    // TBWidgetListener
+    virtual void OnWidgetDelete(TBWidget *widget);
+    virtual bool OnWidgetDying(TBWidget *widget);
+    TBWidgetSafePointer m_dimmer;
+    TBWidgetSafePointer m_target;
+};
+
+// file, path finder
+class TBFinderWindow : public TBWindow, private TBWidgetListener
+{
+public:
+    // For safe typecasting
+    TBOBJECT_SUBCLASS(TBFinderWindow, TBWindow);
+    TBFinderWindow(TBWidget *target, TBID id);
+    virtual ~TBFinderWindow();
+    bool Show(const char *title,
+          const char *preset = nullptr, int dimmer = 0,
+          int width = 0, int height = 0);
+    virtual TBWidget *GetEventDestination() { return m_target.Get(); }
+    virtual bool OnEvent(const TBWidgetEvent &ev);
+    virtual void OnDie();
+
+private:
+    // TBWidgetListener
+    virtual void OnWidgetDelete(TBWidget *widget);
+    virtual bool OnWidgetDying(TBWidget *widget);
+    TBWidget *FindParentList( TBWidget *widget); // utility for dealing with menus.
+    TBWidgetSafePointer m_dimmer;
+    TBWidgetSafePointer m_target;
+    TBWidget *rightMenuParent;  // information for context menus
+    TBWidget *rightMenuChild;
+
+};
+
+
+
+
 
 
 }; // namespace tb

@@ -88,6 +88,8 @@ using namespace tb;
 #include "UIColorWidget.h"
 #include "UIColorWheel.h"
 #include "UIBargraph.h"
+#include "UIPromptWindow.h"
+#include "UIFinderWindow.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -817,6 +819,22 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBMessageWindow>())
     {
         UIMessageWindow* nwidget = new UIMessageWindow(context_, NULL, "", false);
+        nwidget->SetWidget(widget);
+        WrapWidget(nwidget, widget);
+        return nwidget;
+    }
+    
+    if (widget->IsOfType<TBPromptWindow>())
+    {
+        UIPromptWindow* nwidget = new UIPromptWindow(context_, NULL, "", false);
+        nwidget->SetWidget(widget);
+        WrapWidget(nwidget, widget);
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBFinderWindow>())
+    {
+        UIFinderWindow* nwidget = new UIFinderWindow(context_, NULL, "", false);
         nwidget->SetWidget(widget);
         WrapWidget(nwidget, widget);
         return nwidget;
