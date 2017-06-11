@@ -1,0 +1,7 @@
+# GitHub metrics tuning
+
+*.c linguist-language=C++
+*.h linguist-language=C++
+
+# ignore massive amounts of vendored JS
+Build/node_modules/* linguist-vendored=true
