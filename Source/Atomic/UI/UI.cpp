@@ -298,7 +298,7 @@ void UI::SetDefaultFont(const String& name, int size)
 {
     tb::TBFontDescription fd;
     fd.SetID(tb::TBIDC(name.CString()));
-    fd.SetSize(tb::g_tb_skin->GetDimensionConverter()->DpToPx(12));
+    fd.SetSize(tb::g_tb_skin->GetDimensionConverter()->DpToPx(size));
     tb::g_font_manager->SetDefaultFontDescription(fd);
 
     // Create the font now.
