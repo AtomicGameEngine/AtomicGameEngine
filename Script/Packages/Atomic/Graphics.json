@@ -1,6 +1,6 @@
 {
 	"name" : "Graphics",
-	"sources" : ["Source/Atomic/Graphics"],
+	"sources" : ["Source/Atomic/Graphics", "Source/Atomic/Graphics/Text3D"],
 	"includes" : ["<Atomic/Scene/Scene.h>", "<Atomic/Graphics/OcclusionBuffer.h>", "<Atomic/Scene/ValueAnimation.h>",
 							  "<Atomic/Container/ArrayPtr.h>", "<Atomic/Graphics/Animation.h>",
 							 "<Atomic/Graphics/Material.h>", "<Atomic/Resource/Image.h>", "<Atomic/Graphics/VertexBuffer.h>"],
@@ -14,7 +14,8 @@
  				 "StaticModel",
  				 "Animation", "AnimatedModel", "AnimationController", "AnimationState", "Billboard", "BillboardSet", "CustomGeometry",
  				 "DecalSet", "ParticleEffect", "ParticleEmitter", "RibbonTrail",
- 				 "Skybox", "StaticModelGroup", "Terrain", "TerrainPatch"],
+ 				 "Skybox", "StaticModelGroup", "Terrain", "TerrainPatch",
+			 	 "Text3D", "Text3DFont"],
 	"overloads" : {
 		"Viewport" : {
 			"Viewport" : ["Context", "Scene", "Camera", "RenderPath"],
