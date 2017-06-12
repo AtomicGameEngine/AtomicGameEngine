@@ -423,4 +423,18 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     PurgePool();
 }
 
+// ATOMIC BEGIN
+
+
+void WorkQueue::TerminateThreads()
+{
+    for (unsigned i = 0; i < threads_.Size(); ++i)
+        threads_[i]->Kill();
+
+    threads_.Clear();
+
+}
+
+// ATOMIC END
+
 }

@@ -109,6 +109,7 @@ namespace AtomicGlow
         if (cmd == "quit")
         {
             ATOMIC_LOGINFO("AtomicGlow quit received, exiting");
+            GetSubsystem<WorkQueue>()->TerminateThreads();
             exitCode_ = EXIT_SUCCESS;
             engine_->Exit();
         }
