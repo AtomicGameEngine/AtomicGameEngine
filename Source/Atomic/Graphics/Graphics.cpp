@@ -53,6 +53,11 @@
 #include "../IO/Log.h"
 
 // ATOMIC BEGIN
+
+#include "Text3D/Text3DFont.h"
+#include "Text3D/Text3DText.h"
+#include "Text3D/Text3D.h"
+
 #include <SDL/include/SDL.h>
 #include <SDL/include/SDL_syswm.h>
 // ATOMIC END
@@ -404,6 +409,12 @@ void RegisterGraphicsLibrary(Context* context)
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);
+
+    // ATOMIC BEGIN
+    Text3DFont::RegisterObject(context);
+    Text3DText::RegisterObject(context);
+    Text3D::RegisterObject(context);
+    // ATOMIC END
 }
 
 // ATOMIC BEGIN
