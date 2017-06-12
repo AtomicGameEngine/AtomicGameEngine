@@ -17,8 +17,11 @@ target_compile_definitions(AtomicGlowLib PUBLIC -DATOMIC_GLOW=1)
 add_dependencies(AtomicApp AtomicToolCheckScripts)
 
 if (WIN32)
+if (NOT ATOMIC_GLOW_WINDOWS_SUBSYSTEM)
     add_definitions(-DATOMIC_WIN32_CONSOLE)
-endif(WIN32)
+endif()
+endif()
+
 
 file (GLOB GLOW_APPLICATION_SOURCE GlowApplication/*.cpp GlowApplication/*.h)
 
@@ -28,6 +31,9 @@ target_link_libraries(AtomicGlow AtomicApp AtomicJS AtomicNETScript AtomicGlowLi
 
 if (WIN32)
     target_link_libraries(AtomicGlow Iphlpapi Wldap32)
+    if (ATOMIC_GLOW_WINDOWS_SUBSYSTEM)
+        set_target_properties(AtomicGlow PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+    endif()
 endif()
 
 
@@ -38,4 +44,3 @@ add_custom_command( TARGET AtomicGlow POST_BUILD
                     COMMAND "${CMAKE_COMMAND}"
                     ARGS -E copy_if_different \"$<TARGET_FILE:AtomicGlow>\" \"${ATOMIC_SOURCE_DIR}/Artifacts/Build/AtomicGlow/\"
                     COMMENT "Copying AtomicGlow to Build Artifacts" )
-

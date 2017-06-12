@@ -9,6 +9,7 @@ option(ATOMIC_DATABASE_SQLITE "Enable SQLite database subsystem" OFF)
 option(ATOMIC_DATABASE_ODBC "Enable ODBC database subsystem" OFF)
 option(ATOMIC_IK "Enable inverse kinematics subsystem" OFF)
 option(ATOMIC_GLOW "Build Atomic Glow" ON)
+option(ATOMIC_GLOW_WINDOWS_SUBSYSTEM "Enable WINDOWS subsystem, otherwise CONSOLE is used" ON)
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
@@ -30,7 +31,7 @@ endif ()
 
 if (ATOMIC_DESKTOP)
 
-    if (ATOMIC_GLOW)        
+    if (ATOMIC_GLOW)
         add_subdirectory(AtomicGlow)
     endif ()
     if (ATOMIC_DOTNET OR ATOMIC_JAVASCRIPT)
