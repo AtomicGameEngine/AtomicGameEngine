@@ -52,7 +52,11 @@ public:
 
     void CancelBake();
 
+    bool GetServiceExecutable(String& execPath, Vector<String>& baseArgs) const;
+
 private:
+
+    bool LocateServiceExecutable();
 
     void OnBakeError(const String& result);
     void OnBakeSuccess();

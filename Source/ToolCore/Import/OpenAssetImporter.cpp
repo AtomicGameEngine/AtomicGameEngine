@@ -84,7 +84,8 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     maxBones_(64),
     defaultTicksPerSecond_(4800.0f),
     startTime_(-1),
-    endTime_(-1)
+    endTime_(-1),
+    genLightmapUV_(false)
 {
 
     aiFlagsDefault_ =
@@ -215,6 +216,24 @@ void OpenAssetImporter::ApplyScale()
 
     }
 
+}
+
+bool OpenAssetImporter::GenerateLightmapUV(Model *model)
+{
+    if (!model)
+    {
+        return false;
+    }
+
+    MeshLightmapUVGen::Settings uvsettings;
+    MeshLightmapUVGen uvgen(model->GetContext(), model, uvsettings);
+
+    if (!uvgen.Generate())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool OpenAssetImporter::ExportModel(const String& outName, const String &animName, bool animationOnly)
@@ -547,13 +566,7 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
 
-    String pathName, fileName, extension;
-    SplitPath(sourceAssetFilename_, pathName, fileName, extension);
-
-    MeshLightmapUVGen::Settings uvsettings;
-    MeshLightmapUVGen uvgen(context_, outModel, fileName, uvsettings);
-
-    if (!uvgen.Generate())
+    if (!GenerateLightmapUV(outModel))
     {
         errorMessage_ = "Failed to generate lightmap UV " + model.outName_;
         return false;

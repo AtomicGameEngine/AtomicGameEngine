@@ -21,9 +21,9 @@
 //
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/Graphics/StaticModel.h>
-
 
 #include "GlowProcess.h"
 #include "GlowServiceEvents.h"
@@ -183,6 +183,13 @@ bool GlowService::Bake(const String& projectPath, Scene* scene, const GlowSettin
         return false;
     }
 
+    if (!glowBinaryPath_.Length())
+    {
+        ATOMIC_LOGERROR("GlowService::Bake() - Called with empty glowBinaryPath_");
+        return false;
+    }
+
+
     bakeCanceled_ = false;
     result_.Clear();
 
@@ -197,7 +204,7 @@ bool GlowService::Bake(const String& projectPath, Scene* scene, const GlowSettin
 
     if (!glowProcess_->Start(glowBinaryPath_, args))
     {
-        ATOMIC_LOGERROR("GlowService::Bake() - Glow process failed to start");
+        ATOMIC_LOGERRORF("GlowService::Bake() - Glow process failed to start: %s", glowBinaryPath_.CString());
         return false;
     }
 
@@ -234,25 +241,75 @@ void GlowService::CancelBake()
 
 }
 
-
-bool GlowService::Start()
+bool GlowService::LocateServiceExecutable()
 {
-    bool failed = false;
-
-    if (failed)
-    {
-        ATOMIC_LOGERROR("GlowService::Start() - Unable to start AtomicGlow service");
-        return false;
-    }
 
     glowBinaryPath_ = String::EMPTY;
     glowBaseArgs_.Clear();
 
-#ifdef ATOMIC_DEBUG
-    glowBinaryPath_ = "/Users/jenge/Dev/atomic/build-AtomicGameEngine-Desktop-Debug/Source/AtomicGlow/AtomicGlow";
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+#ifdef ATOMIC_DEV_BUILD
+
+    String rootSourceDir = ATOMIC_ROOT_SOURCE_DIR;
+    rootSourceDir = AddTrailingSlash(rootSourceDir);
+
+    glowBinaryPath_ = rootSourceDir + "Artifacts/Build/AtomicGlow/AtomicGlow";
+
 #else
-    glowBinaryPath_ = "/Users/jenge/Dev/atomic/build-AtomicGameEngine-Desktop-Release/Source/AtomicGlow/AtomicGlow";
+
+#ifdef ATOMIC_PLATFORM_OSX
+    String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
+#else
+    String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
 #endif
+
+    glowBinaryPath_ = resourcesDir + "ToolData/AtomicGlow/AtomicGlow";
+
+#endif
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+    glowBinaryPath_ += ".exe";
+
+#endif
+
+    if (!fileSystem->FileExists(glowBinaryPath_))
+    {
+        ATOMIC_LOGERRORF("AtomicGlow binary not found: %s", glowBinaryPath_.CString());
+
+        glowBinaryPath_.Clear();
+        glowBaseArgs_.Clear();
+
+        return false;
+    }
+
+    return true;
+}
+
+bool GlowService::GetServiceExecutable(String& execPath, Vector<String>& baseArgs) const
+{
+    execPath.Clear();
+    baseArgs.Clear();
+
+    if (!glowBinaryPath_.Length())
+    {
+        return false;
+    }
+
+    execPath = glowBinaryPath_;
+    baseArgs = glowBaseArgs_;
+
+    return true;
+}
+
+bool GlowService::Start()
+{
+    if (!LocateServiceExecutable())
+    {
+        ATOMIC_LOGERROR("GlowService::Start() - Unable to start AtomicGlow service");
+        return false;
+    }
 
     return true;
 

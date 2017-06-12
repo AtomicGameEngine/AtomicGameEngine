@@ -35,7 +35,7 @@ public:
 
     };
 
-    MeshLightmapUVGen(Context* context, Model* model, const String& modelName, const Settings& settings);
+    MeshLightmapUVGen(Context* context, Model* model, const Settings& settings);
     virtual ~MeshLightmapUVGen();
 
     bool Generate();
@@ -54,7 +54,6 @@ private:
     };
 
     SharedPtr<Model> model_;
-    String modelName_;
     SharedPtr<ModelPacker> modelPacker_;
 
     SharedPtr<MPLODLevel> curLOD_;

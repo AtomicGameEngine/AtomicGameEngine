@@ -46,6 +46,10 @@ function copyAtomicEditor() {
 
     fs.copySync(playerBinary, resourceDest + "ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
 
+    // copy AtomicGlow
+    fs.copySync(atomicRoot + "Artifacts/Build/AtomicGlow/AtomicGlow",
+    resourceDest + "ToolData/AtomicGlow/AtomicGlow");
+
     copyAtomicNET();
 
 }
@@ -59,7 +63,7 @@ namespace('build', function() {
         process.chdir(buildDir);
 
         var cmds = [];
-        cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -configuration " + config["config"] + " -parallelizeTargets -jobs 4")
+        cmds.push("xcodebuild -target AtomicGlow -target AtomicEditor -target AtomicPlayer -configuration " + config["config"] + " -parallelizeTargets -jobs 4")
 
         jake.exec(cmds, function() {
 

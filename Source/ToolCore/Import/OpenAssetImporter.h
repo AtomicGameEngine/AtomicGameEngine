@@ -31,12 +31,17 @@
 
 using namespace Atomic;
 
+namespace Atomic
+{
+class Model;
+}
+
 namespace ToolCore
 {
 
 class OpenAssetImporter : public Object
 {
-    ATOMIC_OBJECT(OpenAssetImporter, Object);
+    ATOMIC_OBJECT(OpenAssetImporter, Object)
 
 public:
 
@@ -70,10 +75,15 @@ public:
 
     const Vector<AnimationInfo>& GetAnimationInfos() { return animationInfos_; }
 
+    bool GetGenerateLightmapUV() const { return genLightmapUV_; }
+    void SetGenerateLightmapUV(bool value) { genLightmapUV_ = value; }
+
+    static bool GenerateLightmapUV(Model* model);
+
 private:
 
     void ApplyScale();
-    void ApplyScale(aiNode* node);
+    void ApplyScale(aiNode* node);    
 
     bool BuildAndSaveModel(OutModel& model);
     bool BuildAndSaveAnimations(OutModel* model = 0, const String& animNameOverride = String::EMPTY);
@@ -153,6 +163,8 @@ private:
 
     float startTime_;
     float endTime_;
+
+    bool genLightmapUV_;
 
 };
 

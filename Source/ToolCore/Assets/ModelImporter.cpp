@@ -41,13 +41,6 @@
 #include "AssetDatabase.h"
 #include "ModelImporter.h"
 
-// BEGIN GLOW FIXME
-// This is just here to generate UV2 on mdl's being imported
-#include <AtomicGlow/Atlas/MeshLightmapUVGen.h>
-using namespace AtomicGlow;
-// END GLOW FIXME
-
-
 namespace ToolCore
 {
 
@@ -74,6 +67,7 @@ void ModelImporter::SetDefaults()
     importMaterials_ = importer->GetImportMaterialsDefault();
     includeNonSkinningBones_ = importer->GetIncludeNonSkinningBones();
     animationInfo_.Clear();
+    genLightmapUV_ = false;
 
 }
 
@@ -243,16 +237,11 @@ bool ModelImporter::Import()
 
     if (ext == ".mdl")
     {
-        // BEGIN GLOW FIXME
-
-        // Have a look into mdl copy logic, also this is hacked to generate uv2 for mdl files in project
-        // and needs to be fixed up
-
         FileSystem* fs = GetSubsystem<FileSystem>();
         ResourceCache* cache = GetSubsystem<ResourceCache>();
 
         // mdl files are native file format that doesn't need to be converted
-        // doesn't allow scale, animations legacy primarily for ToonTown
+        // doesn't allow scale, animations
 
         String cacheFilename = asset_->GetCachePath() + ".mdl";
 
@@ -260,7 +249,7 @@ bool ModelImporter::Import()
         {
             importNode_= 0;
             return false;
-        }        
+        }
 
         Model* mdl = cache->GetResource<Model>(cacheFilename);
 
@@ -270,34 +259,33 @@ bool ModelImporter::Import()
             return false;
         }
 
-        String pathName, fileName, extension;
-        SplitPath(asset_->GetCachePath(), pathName, fileName, extension);
-
-        MeshLightmapUVGen::Settings uvsettings;
-        MeshLightmapUVGen uvgen(context_, mdl, fileName, uvsettings);
-
-        if (!uvgen.Generate())
+        if (genLightmapUV_)
         {
-            ATOMIC_LOGERRORF("Failed to generate lightmap UV %s", asset_->GetPath().CString());
-            return false;
+            if (!OpenAssetImporter::GenerateLightmapUV(mdl))
+            {
+                ATOMIC_LOGERRORF("Failed to generate lightmap UV %s", asset_->GetPath().CString());
+                importNode_= 0;
+                return false;
+            }
+
+            File outFile(context_);
+            if (!outFile.Open(cacheFilename, FILE_WRITE))
+            {
+                ATOMIC_LOGERRORF("Could not open output file %s", asset_->GetPath().CString());
+                importNode_= 0;
+                return false;
+            }
+
+            mdl->Save(outFile);
+
+            outFile.Close();
+
+            // Force a reload, though file watchers will catch this delayed and load again
+            cache->ReloadResource(mdl);
+
         }
 
-        File outFile(context_);
-        if (!outFile.Open(cacheFilename, FILE_WRITE))
-        {
-            ATOMIC_LOGERRORF("Could not open output file %s", asset_->GetPath().CString());
-            return false;
-        }
-
-        mdl->Save(outFile);
-        
-        outFile.Close();
-
-        // Force a reload, though file watchers will catch this delayed and load again
-        cache->ReloadResource(mdl);
         importNode_->CreateComponent<StaticModel>()->SetModel(mdl);
-
-        // END GLOW FIXME
     }
     else
     {
@@ -418,6 +406,9 @@ bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
     if (import.Get("scale").IsNumber())
         scale_ = import.Get("scale").GetDouble();
 
+    if (import.Get("genLightmapUV").IsBool())
+        genLightmapUV_ = import.Get("genLightmapUV").GetBool();
+
     if (import.Get("importAnimations").IsBool())
         importAnimations_ = import.Get("importAnimations").GetBool();
 
@@ -460,6 +451,7 @@ bool ModelImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     save.Set("scale", scale_);
     save.Set("importAnimations", importAnimations_);
     save.Set("importMaterials", importMaterials_);
+    save.Set("genLightmapUV", genLightmapUV_);
 
     JSONArray animInfo;
 

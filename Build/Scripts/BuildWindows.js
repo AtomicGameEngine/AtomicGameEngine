@@ -53,6 +53,11 @@ function copyAtomicEditor() {
     fs.copySync(buildDir +  "Source/AtomicPlayer/Application/" + config["config"] + "/D3DCompiler_47.dll",
     editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
 
+    // copy AtomicGlow
+    // TODO: make sure Glow isn't dependent on D3DCompiler_47.dll
+    fs.copySync(atomicRoot + "Artifacts/Build/AtomicGlow/AtomicGlow.exe",
+    editorAppFolder + "Resources/ToolData/AtomicGlow/AtomicGlow.exe");
+
     copyAtomicNET();
 
 }

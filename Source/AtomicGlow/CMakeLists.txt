@@ -30,3 +30,12 @@ if (WIN32)
     target_link_libraries(AtomicGlow Iphlpapi Wldap32)
 endif()
 
+
+# Copy AtomicGlow to Artifacts
+add_custom_command( TARGET AtomicGlow POST_BUILD
+                    COMMAND "${CMAKE_COMMAND}"
+                    ARGS -E make_directory \"${ATOMIC_SOURCE_DIR}/Artifacts/Build/AtomicGlow\"
+                    COMMAND "${CMAKE_COMMAND}"
+                    ARGS -E copy_if_different \"$<TARGET_FILE:AtomicGlow>\" \"${ATOMIC_SOURCE_DIR}/Artifacts/Build/AtomicGlow/\"
+                    COMMENT "Copying AtomicGlow to Build Artifacts" )
+

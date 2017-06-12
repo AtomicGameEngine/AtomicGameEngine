@@ -11,9 +11,8 @@ namespace AtomicGlow
 {
 
 
-MeshLightmapUVGen::MeshLightmapUVGen(Context* context, Model* model, const String& modelName, const Settings& settings) : Object(context),
+MeshLightmapUVGen::MeshLightmapUVGen(Context* context, Model* model, const Settings& settings) : Object(context),
     model_(model),
-    modelName_(modelName),
     modelPacker_(new ModelPacker(context)),
     settings_(settings),
     tOutputMesh_(0),
@@ -47,11 +46,6 @@ inline void MeshLightmapUVGen::EmitVertex(PODVector<MPVertex>& vertices, unsigne
 
 void MeshLightmapUVGen::WriteLightmapUVCoords()
 {
-    String modelName = modelName_;
-
-    if (!modelName.Length())
-        modelName = "AnonymousModel";
-
     
     //Thekla::atlas_write_debug_textures(tOutputMesh_, tInputMesh_, ToString("/Users/jenge/Desktop/%s_lmWorldSpaceTexture.png", modelName.CString()).CString() ,
     //                                                              ToString("/Users/jenge/Desktop/%s_lmNormalTexture.png", modelName.CString()).CString() );
