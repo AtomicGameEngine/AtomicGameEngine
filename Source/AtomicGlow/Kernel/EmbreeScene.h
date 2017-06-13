@@ -46,10 +46,21 @@ class EmbreeScene : public Object
 
     RTCScene GetRTCScene() const { return rtcScene_; }
 
+    void RegisterBakeMesh(unsigned geomID, BakeMesh* mesh)
+    {
+        meshMapLookup_[geomID] = mesh;
+    }
+
+    BakeMesh* GetBakeMesh(unsigned geomID) const
+    {
+        return meshMapLookup_[geomID] ? meshMapLookup_[geomID]->Get() : 0;
+    }
+
+
 private:
 
     // embree geomID -> MeshMap
-    HashMap<unsigned, BakeMesh*> meshMapLookup_;
+    HashMap<unsigned, WeakPtr<BakeMesh>> meshMapLookup_;
 
     RTCDevice rtcDevice_;
     RTCScene rtcScene_;

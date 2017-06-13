@@ -56,7 +56,7 @@ class SceneBaker : public Object
 
     void QueryLights(const BoundingBox& bbox, PODVector<BakeLight*>& lights);
 
-    void TraceRay(LightRay* lightRay, const PODVector<AtomicGlow::BakeLight *>& bakeLights_);
+    void TraceRay(LightRay* lightRay, const PODVector<AtomicGlow::BakeLight *>& bakeLights);
 
     Scene* GetScene() const { return scene_; }
 
@@ -68,7 +68,7 @@ class SceneBaker : public Object
 
     bool GetStandaloneMode() const { return standaloneMode_; }
 
-    void SetStandaloneMode(bool standaloneMode) { standaloneMode_ = standaloneMode; }
+    void SetStandaloneMode(bool standaloneMode) { standaloneMode_ = standaloneMode; }    
 
 private:
 
@@ -87,6 +87,18 @@ private:
     void LightGIFinish();
 
     bool SaveLitScene();
+
+    // Direct lighting
+
+    void DirectLight( LightRay* lightRay, const PODVector<BakeLight*>& bakeLights);
+    Color DirectLightFromPoint( LightRay* lightRay, const BakeLight* light ) const;
+    Color DirectLightFromPointSet( LightRay* lightRay, const BakeLight* light ) const;
+    float DirectLightInfluenceFromPoint(LightRay* lightRay, const Vector3 &point, const BakeLight *light ) const;
+
+    // New GI
+
+    bool EmitPhotons();
+    void IndirectLight(LightRay* lightRay);
 
     SharedPtr<Scene> scene_;
     SharedPtr<EmbreeScene> embreeScene_;

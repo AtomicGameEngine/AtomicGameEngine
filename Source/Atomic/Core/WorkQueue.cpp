@@ -428,11 +428,15 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 
 void WorkQueue::TerminateThreads()
 {
+    // this currently works on Windows, may work on Linux, hangs macOS on applicaiton exit
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
     for (unsigned i = 0; i < threads_.Size(); ++i)
         threads_[i]->Kill();
 
     threads_.Clear();
 
+#endif
 }
 
 // ATOMIC END

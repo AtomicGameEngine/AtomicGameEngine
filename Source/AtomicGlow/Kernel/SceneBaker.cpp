@@ -34,12 +34,14 @@
 #include <Atomic/Graphics/Light.h>
 #include <Atomic/Graphics/StaticModel.h>
 
+#include "LightRay.h"
 #include "BakeModel.h"
 #include "BakeMesh.h"
 #include "BakeLight.h"
 #include "EmbreeScene.h"
 #include "LightMapPacker.h"
 #include "SceneBaker.h"
+#include "Photons.h"
 
 namespace AtomicGlow
 {
@@ -138,12 +140,17 @@ bool SceneBaker::GenerateLightmaps()
 
 }
 
-void SceneBaker::TraceRay(LightRay* lightRay, const PODVector<BakeLight*>& bakeLights_)
+void SceneBaker::TraceRay(LightRay* lightRay, const PODVector<BakeLight*>& bakeLights)
 {
-    for (unsigned i = 0; i < bakeLights_.Size(); i++)
+    if (currentLightMode_ == GLOW_LIGHTMODE_DIRECT)
     {
-        bakeLights_[i]->Light(lightRay);
+        DirectLight(lightRay, bakeLights);
     }
+    else
+    {
+        IndirectLight(lightRay);
+    }
+
 }
 
 bool SceneBaker::LightDirect()
@@ -170,7 +177,33 @@ bool SceneBaker::LightDirect()
 
 void SceneBaker::LightDirectFinish()
 {
-    bakeLights_.Clear();
+
+}
+
+bool SceneBaker::EmitPhotons()
+{
+    Photons photons(this, GlobalGlowSettings.photonPassCount_, GlobalGlowSettings.photonBounceCount_,
+                          GlobalGlowSettings.photonEnergyThreshold_, GlobalGlowSettings.photonMaxDistance_);
+
+    int numPhotons = photons.Emit(bakeLights_);
+
+    ATOMIC_LOGINFOF("SceneBaker::EmitPhotons() - %i photons emitted", numPhotons);
+
+    if (!numPhotons)
+    {
+        return false;
+    }
+
+
+    for( unsigned i = 0; i < bakeMeshes_.Size(); i++ )
+    {
+        if( PhotonMap* photons = bakeMeshes_[i]->GetPhotonMap() )
+        {
+            photons->Gather( GlobalGlowSettings.finalGatherRadius_ );
+        }
+    }
+
+    return true;
 }
 
 bool SceneBaker::LightGI()
@@ -178,31 +211,18 @@ bool SceneBaker::LightGI()
     // Indirect Lighting
     currentLightMode_ = GLOW_LIGHTMODE_INDIRECT;
 
-    if (!GlobalGlowSettings.giEnabled_ || currentGIPass_ >= GlobalGlowSettings.giMaxBounces_)
+    // We currently only need one GI pass
+    if (!GlobalGlowSettings.giEnabled_ || currentGIPass_ >= 1)
     {
         return false;
     }
 
-    ATOMIC_LOGINFOF("GI Pass #%i of %i", currentGIPass_ + 1, GlobalGlowSettings.giMaxBounces_);
+    ATOMIC_LOGINFOF("GI Pass #%i of %i", currentGIPass_ + 1, 1);
 
-    BounceBakeLight* blight;
-    unsigned totalBounceSamples = 0;
+    bool photons = EmitPhotons();
 
-    for (unsigned i = 0; i < bakeMeshes_.Size(); i++)
-    {
-        BakeMesh* mesh = bakeMeshes_[i];
-        blight = mesh->GenerateBounceBakeLight();
-        if (blight)
-        {
-            bakeLights_.Push(SharedPtr<BakeLight>(blight));
-            totalBounceSamples += blight->GetNumBounceSamples();
-        }
-    }
-
-    if (!bakeLights_.Size())
+    if (!photons)
         return false;
-
-    ATOMIC_LOGINFOF("IMPORTANT: Optimize allocation of samples! Indirect lighting with %u bounce lights and %u samples", bakeLights_.Size(), totalBounceSamples);
 
     for (unsigned i = 0; i < bakeMeshes_.Size(); i++)
     {
@@ -216,13 +236,7 @@ bool SceneBaker::LightGI()
 
 void SceneBaker::LightGIFinish()
 {
-    bakeLights_.Clear();
-
     currentGIPass_++;
-
-    if (currentGIPass_ >= GlobalGlowSettings.giMaxBounces_)
-    {
-    }
 }
 
 
@@ -247,7 +261,13 @@ bool SceneBaker::Light(const GlowLightMode lightMode)
         if (!LightGI())
         {
             currentLightMode_ = GLOW_LIGHTMODE_COMPLETE;
-            ATOMIC_LOGINFO("Cycle: GI - no work to be done");
+
+            // We currently only need one GI pass
+            if (GlobalGlowSettings.giEnabled_ && currentGIPass_ == 0)
+            {
+                ATOMIC_LOGINFO("Cycle: GI - no work to be done");
+            }
+
             return false;
         }
 
@@ -337,9 +357,9 @@ bool SceneBaker::LoadScene(const String& filename)
             continue;
 
         zones.Push(zone);;
-        SharedPtr<ZoneBakeLight> zlight(new ZoneBakeLight(context_, this));
-        zlight->SetZone(zone);
-        bakeLights_.Push(zlight);
+
+        BakeLight* bakeLight = BakeLight::CreateZoneLight(this, zone->GetAmbientColor());
+        bakeLights_.Push(SharedPtr<BakeLight>(bakeLight));
     }
 
     // Lights
@@ -348,22 +368,24 @@ bool SceneBaker::LoadScene(const String& filename)
 
     for (unsigned i = 0; i < lightNodes.Size(); i++)
     {
-        Atomic::Light* light = lightNodes[i]->GetComponent<Atomic::Light>();
+        Node* lightNode = lightNodes[i];
+        Atomic::Light* light = lightNode->GetComponent<Atomic::Light>();
 
-        if (!light->GetNode()->IsEnabled()|| !light->IsEnabled())
+        if (!lightNode->IsEnabled() || !light->IsEnabled())
             continue;
 
         if (light->GetLightType() == LIGHT_DIRECTIONAL)
         {
+            /*
             SharedPtr<DirectionalBakeLight> dlight(new DirectionalBakeLight(context_, this));
             dlight->SetLight(light);
             bakeLights_.Push(dlight);
+            */
         }
         else if (light->GetLightType() == LIGHT_POINT)
         {
-            SharedPtr<PointBakeLight> dlight(new PointBakeLight(context_, this));
-            dlight->SetLight(light);
-            bakeLights_.Push(dlight);
+            BakeLight* bakeLight = BakeLight::CreatePointLight(this, lightNode->GetWorldPosition(), light->GetRange(), light->GetColor(), 1.0f, light->GetCastShadows());
+            bakeLights_.Push(SharedPtr<BakeLight>(bakeLight));
         }
 
     }
@@ -451,6 +473,189 @@ bool SceneBaker::LoadScene(const String& filename)
     }
 
     return Preprocess();
+}
+
+// DIRECT LIGHT
+
+void SceneBaker::DirectLight( LightRay* lightRay, const PODVector<BakeLight*>& bakeLights )
+{
+    for (unsigned i = 0; i < bakeLights.Size(); i++)
+    {
+        BakeLight* bakeLight = bakeLights[i];
+
+        Color influence;
+
+        // if (light->GetVertexGenerator())
+        //{
+        // influence = DirectLightFromPointSet( lightRay, bakeLight );
+        //}
+        //else
+        {
+            influence = DirectLightFromPoint( lightRay, bakeLight );
+        }
+
+        if (influence.r_ || influence.g_ || influence.b_ )
+        {
+            lightRay->samplePoint_.bakeMesh->ContributeRadiance(lightRay, influence.ToVector3());
+        }
+
+    }
+}
+
+Color SceneBaker::DirectLightFromPoint( LightRay* lightRay, const BakeLight* light ) const
+{
+    float influence = DirectLightInfluenceFromPoint( lightRay, light->GetPosition(), light );
+
+    if( influence > 0.0f )
+    {
+        return light->GetColor() * light->GetIntensity() * influence;
+    }
+
+    return Color::BLACK;
+}
+
+Color SceneBaker::DirectLightFromPointSet( LightRay* lightRay, const BakeLight* light ) const
+{
+    /*
+    LightVertexGenerator* vertexGenerator = light->vertexGenerator();
+
+    // ** No light vertices generated - just exit
+    if( vertexGenerator->vertexCount() == 0 ) {
+        return Rgb( 0, 0, 0 );
+    }
+
+    const LightVertexBuffer& vertices = vertexGenerator->vertices();
+    Rgb                      color    = Rgb( 0, 0, 0 );
+
+    for( int i = 0, n = vertexGenerator->vertexCount(); i < n; i++ ) {
+        const LightVertex&  vertex    = vertices[i];
+        float               influence = influenceFromPoint( lumel, vertex.m_position + light->position(), light );
+
+        // ** We have a non-zero light influence - add a light color to final result
+        if( influence > 0.0f ) {
+            color += light->color() * light->intensity() * influence;
+        }
+    }
+
+    return color / static_cast<float>( vertexGenerator->vertexCount() );
+    */
+
+    return Color::BLACK;
+}
+
+// ** DirectLight::influenceFromPoint
+float SceneBaker::DirectLightInfluenceFromPoint(LightRay* lightRay, const Vector3 &point, const BakeLight* light ) const
+{
+    float inf       = 1.0f;
+    float att       = 1.0f;
+    float cut       = 1.0f;
+    float distance  = 0.0f;
+
+    // Calculate light influence.
+    if( const LightInfluence* influence = light->GetInfluenceModel() )
+    {
+        inf = influence->Calculate( lightRay, point, distance );
+    }
+
+    // Calculate light cutoff.
+    if( const LightCutoff* cutoff = light->GetCutoffModel() )
+    {
+        cut = cutoff->Calculate( lightRay->samplePoint_.position);
+    }
+
+    // Calculate light attenuation
+    if( const LightAttenuation* attenuation = light->GetAttenuationModel() )
+    {
+        att = attenuation->Calculate( distance );
+    }
+
+    // Return final influence
+    return inf * att * cut;
+}
+
+// INDIRECT LIGHT
+
+void SceneBaker::IndirectLight( LightRay* lightRay)
+{
+    BakeMesh* bakeMesh = 0;
+    LightRay::SamplePoint& source = lightRay->samplePoint_;
+
+    Vector3 gathered;
+
+    int nsamples = GlobalGlowSettings.finalGatherSamples_;
+    float maxDistance = GlobalGlowSettings.finalGatherDistance_; // , settings.m_finalGatherRadius, settings.m_skyColor, settings.m_ambientColor
+
+    for( int k = 0; k <nsamples; k++ )
+    {
+        Vector3 dir;
+        Vector3::GetRandomHemisphereDirection(dir, source.normal);
+
+        float influence = Max<float>( source.normal.DotProduct(dir), 0.0f );
+
+        if (influence > 1.0f)
+        {
+            // ATOMIC_LOGINFO("This shouldn't happen");
+        }
+
+        RTCRay& ray = lightRay->rtcRay_;
+        lightRay->SetupRay(source.position, dir, .001f, maxDistance);
+
+        rtcIntersect(GetEmbreeScene()->GetRTCScene(), ray);
+
+        if (ray.geomID == RTC_INVALID_GEOMETRY_ID)
+        {
+            // gathered += skyColor * influence + ambientColor;
+            continue;
+        }               
+
+        bakeMesh = GetEmbreeScene()->GetBakeMesh(ray.geomID);
+
+        if (!bakeMesh)
+        {
+            continue;
+        }
+
+        if (bakeMesh == source.bakeMesh && ray.primID == source.triangle)
+        {
+            // do not self light
+            continue;
+        }
+
+        const BakeMesh::MMTriangle* tri = bakeMesh->GetTriangle(ray.primID);
+
+        // TODO: interpolate normal, if artifacting
+        if( dir.DotProduct(tri->normal_) >= 0.0f )
+        {
+            continue;
+        }
+
+        PhotonMap* photonMap = bakeMesh->GetPhotonMap();
+
+        if (!photonMap)
+        {
+            continue;
+        }
+
+        Vector3 bary(ray.u, ray.v, 1.0f-ray.u-ray.v);
+        Vector2 st;
+        bakeMesh->GetST(ray.primID, 1, bary, st);
+
+        PhotonMap::Photon* photon = photonMap->GetPhoton(Vector2(ray.u, ray.v));
+
+        if (!photon || !photon->photons_)
+            continue;
+
+        gathered += photon->gathered_.ToVector3() * influence;// + ambientColor;
+
+    }
+
+    gathered /= static_cast<float>( nsamples );
+
+    if (gathered.x_ >= 0.01f || gathered.y_ >= 0.01f || gathered.z_ >= 0.01f )
+    {
+        source.bakeMesh->ContributeRadiance(lightRay, gathered, GLOW_LIGHTMODE_INDIRECT);
+    }
+
 }
 
 }

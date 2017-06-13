@@ -67,6 +67,24 @@ namespace AtomicGlow
         float aoMin_;
         float aoMultiply_;
 
+        // NEW GI
+
+        // Number of photon passes.
+        int photonPassCount_;
+        // Maximum photon tracing depth (number of light bounces).
+        int photonBounceCount_;
+        // The minimum energy that photon should have to continue tracing.
+        float photonEnergyThreshold_;
+        // The reflected light maximum distance. All intersections above this value will be ignored.
+        float photonMaxDistance_;
+
+        // Number of final gather samples.
+        int finalGatherSamples_;
+        // Maximum distance to gather photons at.
+        float finalGatherDistance_;
+        // A radius of circle in which samples are gathered from photon map.
+        int finalGatherRadius_;
+
         GlowSettings()
         {
             SetDefaults();
@@ -156,25 +174,63 @@ namespace AtomicGlow
                 case GLOW_PRESET_FAST_LOW_QUALITY:
                     lexelDensity_ = 0.16f;
                     nsamples_ = 16;
-                    giEnabled_ = false;
+                    photonPassCount_          = 8;
+                    photonBounceCount_        = 1;
+                    photonEnergyThreshold_    = 0.05f;
+                    // fix me should be 10, bigger for massive cornell
+                    photonMaxDistance_        = 10;
+
+                    finalGatherSamples_       = 32;
+                    finalGatherDistance_      = 50;
+                    finalGatherRadius_        = 7;
                     break;
+
                 case GLOW_PRESET_MEDIUM_QUALITY:
                     lexelDensity_ = 0.32f;
                     nsamples_ = 64;
                     giEnabled_ = true;
                     giGranularity_ = 8;
+
+                    photonPassCount_          = 16;
+                    photonBounceCount_        = 3;
+                    photonEnergyThreshold_    = 0.05f;
+                    photonMaxDistance_        = 10;
+
+                    finalGatherSamples_       = 64;
+                    finalGatherDistance_      = 50;
+                    finalGatherRadius_        = 7;
                     break;
+
                 case GLOW_PRESET_HIGH_QUALITY:
                     lexelDensity_ = 0.5f;                    
                     giEnabled_ = true;
                     nsamples_ = 256;
                     giGranularity_ = 8;
+
+                    photonPassCount_          = 32;
+                    photonBounceCount_        = 3;
+                    photonEnergyThreshold_    = 0.05f;
+                    photonMaxDistance_        = 10;
+
+                    finalGatherSamples_       = 128;
+                    finalGatherDistance_      = 50;
+                    finalGatherRadius_        = 7;
                     break;
+
                 case GLOW_PRESET_SLOW_EXTREME_QUALITY:
                     lexelDensity_ = 0.65f;
                     nsamples_ = 256;
                     giEnabled_ = true;
                     giGranularity_ = 8;
+
+                    photonPassCount_          = 64;
+                    photonBounceCount_        = 4;
+                    photonEnergyThreshold_    = 0.05f;
+                    photonMaxDistance_        = 10;
+
+                    finalGatherSamples_       = 1024;
+                    finalGatherDistance_      = 50;
+                    finalGatherRadius_        = 7;
                     break;
             }
         }

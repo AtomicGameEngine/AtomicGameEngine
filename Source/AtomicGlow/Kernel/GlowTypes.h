@@ -28,8 +28,6 @@ using namespace Atomic;
 namespace AtomicGlow
 {
 
-const unsigned GLOW_MAX_BOUNCE_SAMPLE_TRIANGLES = 8;
-
 enum GlowLightMode
 {
     GLOW_LIGHTMODE_UNDEFINED,
@@ -39,31 +37,6 @@ enum GlowLightMode
     GLOW_LIGHTMODE_COMPLETE
 };
 
-struct BounceSample
-{
-    int triIndex_[GLOW_MAX_BOUNCE_SAMPLE_TRIANGLES];
-    Vector3 position_;
-    Vector3 radiance_;
-    Vector3 srcColor_;
-    int hits_;
-
-    BounceSample()
-    {
-        Reset();
-    }
-
-    void Reset()
-    {
-        for (int i = 0; i < GLOW_MAX_BOUNCE_SAMPLE_TRIANGLES; i++)
-        {
-            triIndex_[i] = -1;
-        }
-
-        Vector3 v(-1, -1, -1);
-        position_ = radiance_ = v;
-        srcColor_ = Vector3::ZERO;
-        hits_ = 0;
-    }
-};
+const float LIGHT_ANGLE_EPSILON = 0.001f;
 
 }

@@ -58,4 +58,14 @@ float RandStandardNormal()
     return val;
 }
 
+// ATOMIC BEGIN
+
+float RandZeroOne()
+{
+    static float invRAND_MAX = 1.0f / RAND_MAX;
+    return float(rand()) * invRAND_MAX;
+}
+
+// ATOMIC END
+
 }

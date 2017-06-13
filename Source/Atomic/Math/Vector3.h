@@ -407,6 +407,39 @@ public:
 
         return *this * (1.0f - t) + rhs * t;
     }
+
+    static void GetRandomInSphere( Vector3& result, const Vector3& center, float radius )
+    {
+        Vector3 dir;
+        GetRandomDirection(dir);
+        result = center + dir * radius;
+    }
+
+    static void GetRandomDirection( Vector3& result )
+    {
+        float  len;
+
+        do
+        {
+           result.x_ = (RandZeroOne() * 2.0f - 1.0f);
+           result.y_ = (RandZeroOne() * 2.0f - 1.0f);
+           result.z_ = (RandZeroOne() * 2.0f - 1.0f);
+           len   = result.Length();
+
+        } while( len > 1.0f );
+
+        result /= len;
+    }
+
+    static void GetRandomHemisphereDirection( Vector3& result, const Vector3& normal )
+    {
+        GetRandomDirection(result);
+
+        if( result.DotProduct(normal) < 0 ) {
+            result = -result;
+        }
+    }
+
     // ATOMIC END
     
     /// Return float data.

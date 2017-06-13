@@ -1,4 +1,5 @@
 // Copyright (c) 2014-2017, THUNDERBEAST GAMES LLC All rights reserved
+// Portions Copyright (c) 2015 Dmitry Sovetov
 // Copyright 2009-2017 Intel Corporation
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,59 +36,304 @@
 namespace AtomicGlow
 {
 
-const float LIGHT_ANGLE_EPSILON = 0.001f;
-
-// http://www.altdevblogaday.com/2012/05/03/generating-uniformly-distributed-points-on-sphere/
-static inline void GetRandomDirection(Vector3& result)
-{
-    float z = 2.0f * rand() / RAND_MAX - 1.0f;
-    float t = 2.0f * rand() / RAND_MAX * 3.14f;
-    float r = sqrt(1.0f - z * z);
-    result.x_ = r * (float) cos(t);
-    result.y_ = r * (float) sin(t);
-    result.z_ = z;
-}
-
 BakeLight::BakeLight(Context* context, SceneBaker* sceneBaker) : BakeNode(context, sceneBaker),
-    range_(0.0f)
+    color_(Color::WHITE),
+    intensity_( 0.0f ),
+    castsShadow_( false )
 {
 }
 
 BakeLight::~BakeLight()
 {
-
 }
 
-// Zone Lights
-
-ZoneBakeLight::ZoneBakeLight(Context* context, SceneBaker* sceneBaker) : BakeLight(context, sceneBaker)
+LightCutoff* BakeLight::GetCutoffModel( void ) const
 {
+    return cutoffModel_;
 }
 
-ZoneBakeLight::~ZoneBakeLight()
+void BakeLight::SetCutoffModel( LightCutoff* value )
+{
+    cutoffModel_ = value;
+}
+
+LightInfluence* BakeLight::GetInfluenceModel( void ) const
+{
+    return influenceModel_;
+}
+
+void BakeLight::SetInfluenceModel( LightInfluence* value )
+{
+    influenceModel_ = value;
+}
+
+/*
+LightVertexGenerator* BakeLight::vertexGenerator( void ) const
+{
+    return vertexGenerator_;
+}
+
+// ** BakeLight::setVertexGenerator
+void BakeLight::setVertexGenerator( LightVertexGenerator* value )
+{
+    delete m_vertexGenerator;
+    m_vertexGenerator = value;
+}
+*/
+
+LightAttenuation* BakeLight::GetAttenuationModel( void ) const
+{
+    return attenuationModel_;
+}
+
+void BakeLight::SetAttenuationModel( LightAttenuation* value )
+{
+    attenuationModel_ = value;
+}
+
+PhotonEmitter* BakeLight::GetPhotonEmitter( void ) const
+{
+    return photonEmitter_;
+}
+
+void BakeLight::SetPhotonEmitter( PhotonEmitter* value )
+{
+    photonEmitter_ = value;
+}
+
+const Vector3& BakeLight::GetPosition( void ) const
+{
+    return position_;
+}
+
+void BakeLight::SetPosition( const Vector3& value )
+{
+    position_ = value;
+}
+
+const Color& BakeLight::GetColor( void ) const
+{
+    return color_;
+}
+
+void BakeLight::SetColor( const Color& value )
+{
+    color_ = value;
+}
+
+float BakeLight::GetIntensity( void ) const
+{
+    return intensity_;
+}
+
+void BakeLight::SetIntensity( float value )
+{
+    intensity_ = value;
+}
+
+bool BakeLight::GetCastsShadow( void ) const
+{
+    return castsShadow_;
+}
+
+void BakeLight::SetCastsShadow( bool value )
+{
+    castsShadow_ = value;
+}
+
+BakeLight* BakeLight::CreateZoneLight( SceneBaker* baker, const Color& color)
+{
+    BakeLight* light = new BakeLight(baker->GetContext(), baker);
+    light->SetCastsShadow( false );
+    light->SetColor( color );
+    light->SetIntensity(1.0f);
+
+    if (GlobalGlowSettings.aoEnabled_)
+    {
+        light->SetInfluenceModel( new AmbientOcclusionInfluence( light ) );
+    }
+
+    return light;
+}
+
+BakeLight* BakeLight::CreatePointLight( SceneBaker* baker, const Vector3& position, float radius, const Color& color, float intensity, bool castsShadow )
+{
+    BakeLight* light = new BakeLight(baker->GetContext(), baker);
+
+    light->SetInfluenceModel( new LightInfluence( light ) );
+    light->SetAttenuationModel( new LinearLightAttenuation( light, radius ) );
+    light->SetCutoffModel( new LightCutoff( light ) );
+    light->SetPhotonEmitter( new PhotonEmitter( light ) );
+
+    light->SetCastsShadow( castsShadow );
+    light->SetPosition( position );
+    light->SetColor( color );
+    light->SetIntensity( intensity );
+
+    return light;
+}
+
+BakeLight* BakeLight::CreateSpotLight( SceneBaker* baker, const Vector3& position, const Vector3& direction, float cutoff, float radius, const Color& color, float intensity, bool castsShadow )
+{
+    BakeLight* light = new BakeLight(baker->GetContext(), baker);
+
+    light->SetInfluenceModel( new LightInfluence( light ) );
+    light->SetAttenuationModel( new LinearLightAttenuation( light, radius ) );
+    light->SetCutoffModel( new LightSpotCutoff( light, direction, cutoff, 1.0f ) );
+    light->SetPhotonEmitter( new PhotonEmitter( light ) );
+
+    light->SetCastsShadow( castsShadow );
+    light->SetPosition( position );
+    light->SetColor( color );
+    light->SetIntensity( intensity );
+
+    return light;
+}
+
+BakeLight* BakeLight::CreateDirectionalLight( SceneBaker* baker, const Vector3& direction, const Color& color, float intensity, bool castsShadow )
+{
+    BakeLight* light = new BakeLight(baker->GetContext(), baker);
+
+    light->SetInfluenceModel( new DirectionalLightInfluence( light, direction ) );
+    light->SetPhotonEmitter( new DirectionalPhotonEmitter( light, direction ) );
+    light->SetCastsShadow( castsShadow );
+    light->SetColor( color );
+    light->SetIntensity( intensity );
+
+    return light;
+}
+
+/*
+BakeLight* BakeLight::CreateAreaLight( SceneBaker* baker, const Mesh* mesh, const Vector3& position, const Rgb& color, float intensity, bool castsShadow )
+{
+    Light* light = new Light;
+
+    light->SetInfluence( new LightInfluence( light ) );
+    light->SetAttenuation( new LinearLightAttenuation( light, mesh->bounds().volume() ) );
+    light->SetPhotonEmitter( new PhotonEmitter( light ) );
+    light->SetCutoff( new LightCutoff( light ) );
+    //light->SetVertexGenerator( new FaceLightVertexGenerator( mesh, true, 3 ) );
+    //light->SetVertexGenerator( new FaceLightVertexGenerator( mesh, false, 0 ) );
+    light->SetVertexGenerator( new FaceLightVertexGenerator( mesh, true, 0 ) );
+    //  light->SetVertexGenerator( new LightVertexGenerator( mesh ) );
+    light->SetCastsShadow( castsShadow );
+    light->SetPosition( position );
+    light->SetColor( color );
+    light->SetIntensity( intensity );
+
+    light->GetVertexGenerator()->Generate();
+
+    return light;
+}
+*/
+
+// ------------------------------------------------------- LightInfluence --------------------------------------------------------- //
+
+LightInfluence::LightInfluence( const BakeLight* light ) :
+    light_( light )
 {
 
 }
 
-void ZoneBakeLight::Light(LightRay* lightRay)
+float LightInfluence::Calculate(LightRay* lightRay, const Vector3& light, float& distance ) const
 {
     LightRay::SamplePoint& source = lightRay->samplePoint_;
 
+    Vector3 direction = light - source.position;
+    distance = direction.Length();
+    direction.Normalize();
+
+    // ** Calculate Lambert's cosine law intensity
+    float intensity = GetLambert( direction, source.normal );
+
+    if( intensity <= 0.001f ) {
+        return 0.0f;
+    }
+
+    // ** Cast shadow to point
+    if( light_->GetCastsShadow() )
+    {
+        LightRay::SamplePoint& source = lightRay->samplePoint_;
+
+        // clean this mess up
+        RTCScene scene = source.bakeMesh->GetSceneBaker()->GetEmbreeScene()->GetRTCScene();
+
+        lightRay->SetupRay(source.position, direction, .001f, distance);
+
+        rtcOccluded(scene, lightRay->rtcRay_);
+
+        // obstructed?  TODO: glass, etc
+        if (lightRay->rtcRay_.geomID != RTC_INVALID_GEOMETRY_ID)
+        {
+            return 0.0f;
+        }
+    }
+
+    return intensity;
+}
+
+float LightInfluence::GetLambert( const Vector3& direction, const Vector3& normal )
+{
+    float dp = direction.DotProduct(normal);
+    return dp < 0.0f ? 0.0f : dp;
+}
+
+// --------------------------------------------------- DirectionalLightInfluence -------------------------------------------------- //
+
+DirectionalLightInfluence::DirectionalLightInfluence( const BakeLight* light, const Vector3& direction )
+    : LightInfluence( light ), direction_( direction )
+{
+
+}
+
+float DirectionalLightInfluence::Calculate(LightRay* lightRay, const Vector3& light, float& distance ) const
+{
+    LightRay::SamplePoint& source = lightRay->samplePoint_;
+
+    float intensity = GetLambert( -direction_, source.normal );
+
+    if( intensity <= 0.001f )
+    {
+        return 0.0f;
+    }
+
+    // ** Cast shadow to point
+    if( light_->GetCastsShadow() )
+    {
+        // FIXME: tracer
+        // intensity *= tracer->traceSegment( point, point - m_direction * 1000, rt::HitUseAlpha ) ? 0.0f : 1.0f;
+    }
+
+    return intensity;
+}
+
+// --------------------------------------------------- AmbientOcclusionInfluence -------------------------------------------------- //
+
+AmbientOcclusionInfluence::AmbientOcclusionInfluence( const BakeLight* light )
+    : LightInfluence( light )
+{
+
+}
+
+float AmbientOcclusionInfluence::Calculate(LightRay* lightRay, const Vector3& light, float& distance ) const
+{
+
+    LightRay::SamplePoint& source = lightRay->samplePoint_;
+
     if (source.normal == Vector3::ZERO)
-        return;
+        return 1.0f;
 
-    RTCScene scene = sceneBaker_->GetEmbreeScene()->GetRTCScene();
+    // clean this mess up
+    RTCScene scene = source.bakeMesh->GetSceneBaker()->GetEmbreeScene()->GetRTCScene();
 
-    const Color& color = zone_->GetAmbientColor();
+    const Color& color = light_->GetColor();
 
     Vector3 rad(color.r_, color.g_, color.b_);
 
     if (!GlobalGlowSettings.aoEnabled_)
     {
-        source.bakeMesh->ContributeRadiance(lightRay, rad, GLOW_LIGHTMODE_AMBIENT);
-        return;
+        return 1.0f;
     }
-
 
     // TODO: AO using ray packets/streams
 
@@ -110,11 +356,11 @@ void ZoneBakeLight::Light(LightRay* lightRay)
     for (unsigned nsamp = 0; nsamp < nsamples; nsamp++)
     {
         Vector3 rayDir;
-        GetRandomDirection(rayDir);
+        Vector3::GetRandomHemisphereDirection(rayDir, source.normal);
 
         float dotp = source.normal.x_ * rayDir.x_ +
-                     source.normal.y_ * rayDir.y_ +
-                     source.normal.z_ * rayDir.z_;
+                source.normal.y_ * rayDir.y_ +
+                source.normal.z_ * rayDir.z_;
 
         if (dotp < 0.1f)
         {
@@ -149,329 +395,124 @@ void ZoneBakeLight::Light(LightRay* lightRay)
         ao *= multiply;
         ao = Clamp<float>(ao, aoMin, 1.0f);
 
-        rad *= ao;
+        return ao;
     }
 
-    source.bakeMesh->ContributeRadiance(lightRay, rad, GLOW_LIGHTMODE_AMBIENT);
+    return 1.0f;
 }
 
-void ZoneBakeLight::SetZone(Zone* zone)
-{
-    node_ = zone->GetNode();
-    zone_ = zone;
-}
+// --------------------------------------------------------- LightCutoff ---------------------------------------------------------- //
 
-
-// Directional Lights
-
-DirectionalBakeLight::DirectionalBakeLight(Context* context, SceneBaker* sceneBaker) : BakeLight(context, sceneBaker)
-{
-}
-
-DirectionalBakeLight::~DirectionalBakeLight()
+LightCutoff::LightCutoff( const BakeLight* light ) : light_( light )
 {
 
 }
 
-void DirectionalBakeLight::Light(LightRay* lightRay)
+float LightCutoff::Calculate( const Vector3& point ) const
 {
-    RTCScene scene = sceneBaker_->GetEmbreeScene()->GetRTCScene();
-
-    LightRay::SamplePoint& source = lightRay->samplePoint_;
-    RTCRay& ray = lightRay->rtcRay_;
-
-    float angle = direction_.DotProduct(source.normal);
-
-    if (angle < 0.0f)
-        return;
-
-    lightRay->SetupRay(source.position, direction_);
-
-    rtcOccluded(scene, ray);
-
-    // obstructed?  TODO: glass, etc
-    if (ray.geomID != RTC_INVALID_GEOMETRY_ID)
-        return;
-
-    Vector3 rad(color_.r_, color_.g_, color_.b_);
-
-    rad*=angle;
-
-    source.bakeMesh->ContributeRadiance(lightRay, rad);
-
+    return 1.0f;
 }
 
-void DirectionalBakeLight::SetLight(Atomic::Light* light)
+float LightCutoff::GetCutoffForDirection( const Vector3& direction ) const
 {
-    node_ = light->GetNode();
-
-    color_ = light->GetColor();
-
-    direction_ = -node_->GetWorldDirection();
-    direction_.Normalize();
-
+    return 1.0f;
 }
 
-// Point Lights
+// ------------------------------------------------------- LightSpotCutoff -------------------------------------------------------- //
 
-PointBakeLight::PointBakeLight(Context* context, SceneBaker* sceneBaker) : BakeLight(context, sceneBaker)
-{
-}
-
-PointBakeLight::~PointBakeLight()
+LightSpotCutoff::LightSpotCutoff( const BakeLight* light, const Vector3& direction, float cutoff, float exponent ) :
+    LightCutoff( light ), direction_( direction ), cutoff_( cutoff ), exponent_( exponent )
 {
 
 }
 
-void PointBakeLight::Light(LightRay* lightRay)
+float LightSpotCutoff::Calculate( const Vector3& point ) const
 {
-    RTCScene scene = sceneBaker_->GetEmbreeScene()->GetRTCScene();
-
-    LightRay::SamplePoint& source = lightRay->samplePoint_;
-    RTCRay& ray = lightRay->rtcRay_;
-
-    Vector3 dir = position_ - source.position;
-
-    float dist = dir.Length();
-
-    if (range_ <= 0.0f || dist >= range_)
-        return;
-
+    Vector3 dir = point - light_->GetPosition();
     dir.Normalize();
+    return GetCutoffForDirection( dir );
+}
 
-    float dot = dir.DotProduct(source.normal);
+float LightSpotCutoff::GetCutoffForDirection( const Vector3& direction ) const
+{
+    float value = direction.DotProduct(direction_);
 
-    if (dot < 0.0f)
-        return;
-
-    lightRay->SetupRay(source.position, dir, .001f, dist);
-
-    rtcOccluded(scene, ray);
-
-    // obstructed?  TODO: glass, etc
-    if (ray.geomID != RTC_INVALID_GEOMETRY_ID)
-        return;
-
-    Vector3 rad(color_.r_, color_.g_, color_.b_);
-
-    // lightOverBright 1.2 for example will pop light,
-    // needs to be configurable per light, maybe with brightness modifer
-    float lightOverBright = 1.0f;
-
-    rad *= Max<float> (1.0f - ( dist * lightOverBright / range_), 0.0f);
-    rad *= dot;
-
-    // EXPERIMENTAL: if GI is enabled, dim point light a bit
-
-    if (GlobalGlowSettings.giEnabled_)
-    {
-        rad *= 0.75f;
+    if( value <= cutoff_ ) {
+        return 0.0f;
     }
 
+    value = (1.0f - (1.0f - value) * 1.0f / (1.0f - cutoff_));
 
-
-    if (rad.Length() > M_EPSILON)
-        source.bakeMesh->ContributeRadiance(lightRay, rad);
-
-}
-
-void PointBakeLight::SetLight(Atomic::Light* light)
-{
-    node_ = light->GetNode();
-
-    color_ = light->GetColor();
-    position_ = node_->GetWorldPosition();
-
-    range_ = light->GetRange();
-
-}
-
-// Bounce Lights
-
-Mutex BounceBakeLight::sortMutex_;
-
-BounceBakeLight::BounceBakeLight(Context* context, SceneBaker* sceneBaker) : BakeLight(context, sceneBaker)
-{
-}
-
-BounceBakeLight::~BounceBakeLight()
-{
-
-}
-
-static Vector3 compareBouncePoint;
-static inline bool CompareBounceSamples(const BounceSample* lhs, const BounceSample* rhs)
-{
-    Vector3 v1 =  lhs->position_ - compareBouncePoint;
-    Vector3 v2 =  rhs->position_ - compareBouncePoint;
-    return v1.LengthSquared() < v2.LengthSquared();
-}
-
-void BounceBakeLight::Light(LightRay* lightRay)
-{
-    RTCScene scene = sceneBaker_->GetEmbreeScene()->GetRTCScene();
-    LightRay::SamplePoint& source = lightRay->samplePoint_;
-    RTCRay& ray = lightRay->rtcRay_;
-
-    const float maxDist = 5.0f;
-    const float maxDistSq = maxDist * maxDist;
-
-    const BounceSample* b;
-    PODVector<const BounceSample*> samples;
-
-    for (int i = 0; i < bounceSamples_.Size(); i++)
-    {
-        b = &bounceSamples_[i];
-
-        // don't light self
-        if (source.bakeMesh == bakeMesh_)
-        {
-            for (int j = 0; j < GLOW_MAX_BOUNCE_SAMPLE_TRIANGLES; j++)
-            {
-                if (b->triIndex_[j] == -1)
-                    break;
-
-                if (b->triIndex_[j] == source.triangle)
-                    return;
-
-            }
-        }
-
-        Vector3 dir =  b->position_ - source.position;
-
-        if (dir.LengthSquared() > maxDistSq)
-        {
-            continue;
-        }
-
-        dir.Normalize();
-
-        if (dir.DotProduct(source.normal) < M_EPSILON)
-        {
-            continue;
-        }
-
-        samples.Push(b);
-
+    if( fabs( 1.0f - exponent_ ) > 0.01f ) {
+        value = powf( value, exponent_ );
     }
 
-    if (!samples.Size())
-        return;
-
-    sortMutex_.Acquire();
-
-    compareBouncePoint = source.position;
-
-    Sort(samples.Begin(), samples.End(), CompareBounceSamples);
-
-    sortMutex_.Release();
-
-
-    int bestIndex = -1;
-    float bestDist = M_INFINITY;
-    for (unsigned i = 0; i < samples.Size(); i++)
-    {
-        b = samples[i];
-
-        Vector3 dir = b->position_ - source.position;
-        float dist = dir.Length();
-
-        if (dist < bestDist)
-        {
-            dir.Normalize();
-
-            lightRay->SetupRay(source.position, dir, 0.01f, dist * 1.01f);
-
-            rtcIntersect(scene, ray);
-
-            if (ray.geomID != bakeMesh_->GetGeomID())
-            {
-                continue;
-            }
-
-            // backface
-            if ( (ray.Ng[0] * ray.dir[0]) +
-                 (ray.Ng[1] * ray.dir[1]) +
-                 (ray.Ng[2] * ray.dir[2]) < 0.0f)
-            {
-                continue;
-            }
-
-            bool found = false;
-            for (int j = 0; j < GLOW_MAX_BOUNCE_SAMPLE_TRIANGLES; j++)
-            {
-                if (b->triIndex_[j] == -1)
-                    break;
-
-                if (b->triIndex_[j] == ray.primID)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                continue;
-
-            bestIndex = i;
-            bestDist = dist;
-
-            break;
-        }
-
-    }
-
-    if (bestIndex == -1)
-        return;
-
-    b = samples[bestIndex];
-
-    // weighted average of src color and radiance for bounce sample
-    Vector3 rad = b->srcColor_ + (b->radiance_/b->hits_);
-    rad /= 2.0f;
-
-    float d = 1.0f - Clamp<float>(bestDist / maxDist, 0.01f, 1.0f);
-
-    rad *= d;
-
-    rad *= 0.15f;
-
-    if (rad.x_ < 0.0f || rad.y_ < 0.0f || rad.z_ < 0.0f)
-    {
-        ATOMIC_LOGWARNING("BounceBakeLight::Light - negative rad factor");
-        return;
-    }
-
-    source.bakeMesh->ContributeRadiance(lightRay, rad, GLOW_LIGHTMODE_INDIRECT);
-
+    return value;
 }
 
-void BounceBakeLight::SetBounceSamples(const PODVector<BounceSample>& bounceSamples)
+// ------------------------------------------------------- LightAttenuation ------------------------------------------------------- //
+
+LightAttenuation::LightAttenuation( const BakeLight* light ) : light_( light )
 {
-    bounceSamples_ = bounceSamples;
+
 }
 
-void BounceBakeLight::SetBakeMesh(BakeMesh* bakeMesh)
+// ---------------------------------------------------- LinearLightAttenuation ---------------------------------------------------- //
+
+
+LinearLightAttenuation::LinearLightAttenuation( const BakeLight* light, float radius, float constant, float linear, float quadratic )
+    : LightAttenuation( light ), radius_( radius ), constant_( constant ), linear_( linear ), quadratic_( quadratic )
 {
-    bakeMesh_ = bakeMesh;
-    node_ = bakeMesh->GetNode();
 
-    color_ = Color::MAGENTA;
-    range_ = -1.0f;
-    position_ = Vector3::ZERO;
 }
 
-void BounceBakeLight::SetLight(Atomic::Light* light)
+
+float LinearLightAttenuation::Calculate( float distance ) const
 {
-    node_ = light->GetNode();
+    if (fabs(radius_) < 0.01f)
+        return 0.0f;
 
-    color_ = light->GetColor();
-    position_ = node_->GetWorldPosition();
+    float r = distance / radius_;
+    return Max<float>( 1.0f / (1.0f + constant_ + linear_ * r + quadratic_ * r * r), 0.0f );
+}
 
-    range_ = light->GetRange();
+// -------------------------------------------------------- PhotonEmitter --------------------------------------------------------- //
+
+PhotonEmitter::PhotonEmitter( const BakeLight* light ) :
+    light_( light )
+{
 
 }
 
+int PhotonEmitter::GetPhotonCount( void ) const
+{
+    return static_cast<int>( light_->GetIntensity() * 25000 );
+}
+
+void PhotonEmitter::Emit( SceneBaker* sceneBaker, Vector3& position, Vector3& direction ) const
+{
+    position  = light_->GetPosition();
+    Vector3::GetRandomDirection(direction);
+
+}
+
+// --------------------------------------------------- DirectinalPhotonEmitter ---------------------------------------------------- //
+
+DirectionalPhotonEmitter::DirectionalPhotonEmitter( const BakeLight* light, const Vector3& direction ) :
+    PhotonEmitter( light ), direction_( direction )
+{
+    plane_.Define(direction.Normalized(), light->GetPosition()); //  = Plane::calculate( direction, light->position() );
+}
+
+/*
+void DirectionalPhotonEmitter::Emit( const Scene* scene, Vector3& position, Vector3& direction ) const
+{
+    const Bounds& bounds = scene->bounds();
+
+    position  = m_plane * bounds.randomPointInside() - m_direction * 5;
+    direction = m_direction;
+}
+*/
 
 
 }

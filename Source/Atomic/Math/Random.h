@@ -36,4 +36,9 @@ ATOMIC_API int Rand();
 /// Return a standard normal distributed number.
 ATOMIC_API float RandStandardNormal();
 
+// ATOMIC BEGIN
+/// Returns a random number between 0 and 1
+ATOMIC_API float RandZeroOne();
+// ATOMIC END
+
 }

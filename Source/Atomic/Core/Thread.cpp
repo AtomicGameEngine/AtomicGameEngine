@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Thread.h"
+#include "../IO/Log.h"
 
 #ifdef _WIN32
 #include <windows.h>

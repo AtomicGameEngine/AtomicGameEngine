@@ -31,6 +31,7 @@
 #include "BakeModel.h"
 #include "BakeNode.h"
 #include "RadianceMap.h"
+#include "Photons.h"
 
 namespace AtomicGlow
 {
@@ -149,7 +150,13 @@ class BakeMesh : public BakeNode
 
     bool GetUV0Color(int triIndex, const Vector3 &barycentric, Color& colorOut) const;
 
+    void GetST(int triIndex, int channel, const Vector3& barycentric, Vector2& st) const;
+
     const Color& GetAmbientColor() const { return ambientColor_; }
+
+    PhotonMap* GetPhotonMap() const { return photonMap_; }
+
+    void SetPhotonMap(PhotonMap* photonMap) { photonMap_ = photonMap; }
 
 private:
 
@@ -168,8 +175,6 @@ private:
     static void IntersectFilter(void* ptr, RTCRay& ray);
 
     bool LightPixel(ShaderData* shaderData, int x, int y, const Vector3& barycentric,const Vector3& dx, const Vector3& dy, float coverage);
-
-    void ResetBounce();
 
     // mesh geometry, in world space
 
@@ -196,14 +201,11 @@ private:
     SharedArrayPtr<bool> radiancePassAccept_;
     // radiance -> triangle contributor
     SharedArrayPtr<int> radianceTriIndices_;
-    SharedArrayPtr<BounceSample> bounceSamples_;
+
+    SharedPtr<PhotonMap> photonMap_;
 
     unsigned radianceHeight_;
     unsigned radianceWidth_;
-
-    unsigned bounceWidth_;
-    unsigned bounceHeight_;
-    unsigned bounceGranularity_;
 
     unsigned embreeGeomID_;
 
