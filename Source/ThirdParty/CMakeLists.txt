@@ -94,3 +94,5 @@ add_subdirectory(WebSocketPP)
 if (ATOMIC_IK)
     add_subdirectory(ik)
 endif ()
+
+add_subdirectory(imgui)

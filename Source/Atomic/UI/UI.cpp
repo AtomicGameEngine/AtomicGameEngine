@@ -232,7 +232,7 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_TEXTINPUT, ATOMIC_HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(UI, HandleUpdate));
     SubscribeToEvent(E_SCREENMODE, ATOMIC_HANDLER(UI, HandleScreenMode));
-    SubscribeToEvent(SystemUI::E_CONSOLECLOSED, ATOMIC_HANDLER(UI, HandleConsoleClosed));
+    SubscribeToEvent(E_CONSOLECLOSED, ATOMIC_HANDLER(UI, HandleConsoleClosed));
 
     SubscribeToEvent(E_TOUCHBEGIN, ATOMIC_HANDLER(UI, HandleTouchBegin));
     SubscribeToEvent(E_TOUCHEND, ATOMIC_HANDLER(UI, HandleTouchEnd));
@@ -247,7 +247,7 @@ void UI::Initialize(const String& languageFile)
 
     initialized_ = true;
 
-    SystemUI::SystemUI* systemUI = new SystemUI::SystemUI(context_);
+    SystemUI* systemUI = new SystemUI(context_);
     context_->RegisterSubsystem(systemUI);
     systemUI->CreateConsoleAndDebugHud();
 
@@ -417,10 +417,6 @@ void UI::Render(bool resetRenderTargets)
 {
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
-
-    SystemUI::SystemUI* systemUI = GetSubsystem<SystemUI::SystemUI>();
-    if (systemUI)
-        systemUI->Render();
 }
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -912,20 +908,20 @@ void UI::OnWidgetFocusChanged(TBWidget *widget, bool focused)
 
 void UI::ShowDebugHud(bool value)
 {
-    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* hud = GetSubsystem<DebugHud>();
 
     if (!hud)
         return;
 
     if (value)
-        hud->SetMode(SystemUI::DEBUGHUD_SHOW_ALL);
+        hud->SetMode(DEBUGHUD_SHOW_ALL);
     else
-        hud->SetMode(SystemUI::DEBUGHUD_SHOW_NONE);
+        hud->SetMode(DEBUGHUD_SHOW_NONE);
 }
 
 void UI::ToggleDebugHud()
 {
-    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* hud = GetSubsystem<DebugHud>();
 
     if (!hud)
         return;
@@ -935,7 +931,7 @@ void UI::ToggleDebugHud()
 
 void UI::SetDebugHudExtents(bool useRootExtent, const IntVector2& position, const IntVector2& size)
 {
-    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* hud = GetSubsystem<DebugHud>();
 
     if (!hud)
         return;
@@ -946,7 +942,7 @@ void UI::SetDebugHudExtents(bool useRootExtent, const IntVector2& position, cons
 
 void UI::CycleDebugHudMode()
 {
-    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* hud = GetSubsystem<DebugHud>();
 
     if (!hud)
         return;
@@ -956,7 +952,7 @@ void UI::CycleDebugHudMode()
 
 void UI::SetDebugHudProfileMode(DebugHudProfileMode mode)
 {
-    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* hud = GetSubsystem<DebugHud>();
 
     if (!hud)
         return;
@@ -966,7 +962,7 @@ void UI::SetDebugHudProfileMode(DebugHudProfileMode mode)
 
 void UI::SetDebugHudRefreshInterval(float seconds)
 {
-    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* hud = GetSubsystem<DebugHud>();
 
     if (!hud)
         return;
@@ -976,7 +972,7 @@ void UI::SetDebugHudRefreshInterval(float seconds)
 
 void UI::ShowConsole(bool value)
 {
-    SystemUI::Console* console = GetSubsystem<SystemUI::Console>();
+    Console* console = GetSubsystem<Console>();
 
     if (!console)
         return;
@@ -987,7 +983,7 @@ void UI::ShowConsole(bool value)
 
 void UI::ToggleConsole()
 {
-    SystemUI::Console* console = GetSubsystem<SystemUI::Console>();
+    Console* console = GetSubsystem<Console>();
 
     if (!console)
         return;
@@ -1001,17 +997,10 @@ void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
     consoleVisible_ = false;
 }
 
-SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String& message)
+MessageBox* UI::ShowSystemMessageBox(const String& title, const String& message)
 {
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
-
-    SystemUI::MessageBox* messageBox = new SystemUI::MessageBox(context_, message, title, 0, xmlFile);
-
+    MessageBox* messageBox = new MessageBox(context_, message, title);
     return messageBox;
-
-
 }
 
 UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
