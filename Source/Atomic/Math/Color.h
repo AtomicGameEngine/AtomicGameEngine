@@ -200,6 +200,13 @@ public:
     /// Return as string.
     String ToString() const;
 
+    // ATOMIC BEGIN
+
+    /// Return color packed to a 32-bit integer, with B component in the lowest 8 bits. Components are clamped to [0, 1] range.
+    unsigned ToUIntArgb() const;
+
+    // ATOMIC END
+
     /// Red value.
     float r_;
     /// Green value.
