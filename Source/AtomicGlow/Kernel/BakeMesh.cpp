@@ -396,7 +396,11 @@ void BakeMesh::Preprocess()
     // If GI is enabled, setup bounce metrics
     if (GlobalGlowSettings.giEnabled_)
     {
-        photonMap_ = new PhotonMap(radianceWidth_, radianceHeight_);
+        // granularity setting?
+        int pwidth = Min<int>(32, radianceWidth_ / 4);
+        int pheight = Min<int>(32, radianceHeight_ / 4);
+
+        photonMap_ = new PhotonMap(this, pwidth, pheight);
     }
 }
 

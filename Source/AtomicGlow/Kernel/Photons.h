@@ -36,6 +36,9 @@ namespace AtomicGlow
 
 class SceneBaker;
 
+const int PHOTON_TRI_MAX = 8;
+const int PHOTON_TRI_INVALID = -1;
+
 class PhotonMap : public RefCounted
 {
     ATOMIC_REFCOUNTED(PhotonMap)
@@ -44,44 +47,153 @@ public:
 
     struct Photon
     {
-      Color gathered_;
-      Color color_;
-      int photons_;
+      int tris_[PHOTON_TRI_MAX];
+      Color gathered_[PHOTON_TRI_MAX];
+      Color color_[PHOTON_TRI_MAX];
+      int photons_[PHOTON_TRI_MAX];
+
+      int MapTriIndex(int triIndex) const
+      {
+          for (int i = 0; i < PHOTON_TRI_MAX; i++)
+          {
+              if (tris_[i] == PHOTON_TRI_INVALID)
+                  break;
+
+              if (tris_[i] == triIndex)
+                  return i;
+          }
+
+          return PHOTON_TRI_INVALID;
+
+      }
 
       void Reset()
       {
-        color_ = gathered_ = Color::BLACK;
-        photons_ = 0;
+          for (int i = 0; i < PHOTON_TRI_MAX; i++)
+          {
+              tris_[i] = PHOTON_TRI_INVALID;
+              color_[i] = gathered_[i] = Color::BLACK;
+              photons_[i] = 0;
+          }
       }
+
     };
 
-    PhotonMap(int width, int height);
+    PhotonMap(BakeMesh* bakeMesh, int width, int height);
     virtual ~PhotonMap();
 
-    Photon* GetPhoton(const Vector2& uv)
+    // Allocates a triangle, always check return, in readOnly mode won't allocate new tri
+    bool GetPhoton(int triIndex, const Vector2& uv, Color& color, int& photons, Color& gathered, bool readOnly = false)
     {
+        color = Color::BLACK;
+        gathered = Color::BLACK;
+        photons = 0;
+
         int x = static_cast<int>( uv.x_ * (width_  - 1) );
         int y = static_cast<int>( uv.y_ * (height_ - 1) );
 
         if (x < 0 || x >= width_)
-            return 0;
+            return false;
 
         if (y < 0 || y >= height_)
-            return 0;
+            return false;
 
-        return &photons_[y * width_ + x];
+        Photon* photon = &photons_[y * width_ + x];
+
+        int idx = photon->MapTriIndex(triIndex);
+
+        if (idx == PHOTON_TRI_INVALID)
+        {
+            if (readOnly)
+            {
+                return false;
+            }
+
+            for ( int i = 0; i < PHOTON_TRI_MAX; i++ )
+            {
+                if (photon->tris_[i] == PHOTON_TRI_INVALID)
+                {
+                    idx = photon->tris_[i] = triIndex;
+                    break;
+                }
+            }
+
+        }
+
+        if (idx == PHOTON_TRI_INVALID)
+        {
+            // out of tri storage
+            return false;
+        }
+
+        color = photon->color_[idx];
+        gathered = photon->gathered_[idx];
+        photons = photon->photons_[idx];
+
+        return true;
 
     }
 
+    // Adds a photon
+    bool AddPhoton(int triIndex, const Vector2& uv, const Color& color)
+    {
+
+        if (color.r_ < 0.01f && color.g_ < 0.01f && color.b_ < 0.01f)
+        {
+            // filter out tiny adds
+            return false;
+        }
+
+        int x = static_cast<int>( uv.x_ * (width_  - 1) );
+        int y = static_cast<int>( uv.y_ * (height_ - 1) );
+
+        if (x < 0 || x >= width_)
+            return false;
+
+        if (y < 0 || y >= height_)
+            return false;
+
+        Photon* photon = &photons_[y * width_ + x];
+
+        int idx = photon->MapTriIndex(triIndex);
+
+        if (idx == PHOTON_TRI_INVALID)
+        {
+            for ( int i = 0; i < PHOTON_TRI_MAX; i++ )
+            {
+                if (photon->tris_[i] == PHOTON_TRI_INVALID)
+                {
+                    idx = photon->tris_[i] = triIndex;
+                    break;
+                }
+            }
+        }
+
+        if (idx == PHOTON_TRI_INVALID)
+        {
+            // out of tri storage
+            return false;
+        }
+
+        photon->color_[idx] += color;
+        photon->photons_[idx]++;
+
+        return true;
+
+    }
+
+    void SavePng(const String& filename) const;
+
     void Gather( int radius );
 
-    Color Gather( int x, int y, int radius ) const;
+    Color Gather( int triIndex, int x, int y, int radius ) const;
 
 private:
 
     int width_;
     int height_;
 
+    WeakPtr<BakeMesh> bakeMesh_;
     SharedArrayPtr<Photon> photons_;
 
 };
@@ -124,7 +236,7 @@ private:
     void Trace(const LightAttenuation* attenuation, const Vector3& position, const Vector3& direction, const Color& color, int depth, unsigned lastGeomID = RTC_INVALID_GEOMETRY_ID, unsigned lastPrimID = RTC_INVALID_GEOMETRY_ID );
 
     //Stores a photon bounce.
-    void Store( PhotonMap* photonmap, const Color& color, const Vector2& uv );
+    void Store( PhotonMap* photonmap, int triIdx, const Color& color, const Vector2& uv );
 
 private:
 

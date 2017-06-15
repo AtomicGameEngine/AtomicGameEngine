@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 //
 
+#include <Atomic/Core/StringUtils.h>
+
 #include "EmbreeScene.h"
 #include "SceneBaker.h"
 #include "Photons.h"
@@ -30,7 +32,8 @@ namespace AtomicGlow
 {
 
 
-PhotonMap::PhotonMap(int width, int height) :
+PhotonMap::PhotonMap(BakeMesh* bakeMesh, int width, int height) :
+    bakeMesh_(bakeMesh),
     width_(width),
     height_(height)
 {
@@ -52,20 +55,79 @@ PhotonMap::~PhotonMap()
 
 }
 
-void PhotonMap::Gather( int radius )
+void PhotonMap::SavePng(const String& filename) const
+{
+    Image image(bakeMesh_->GetContext());
+
+    image.SetSize(width_, height_, 3);
+    image.Clear(Color::BLACK);
+
+    for( int y = 0; y < height_; y++ )
+    {
+        for( int x = 0; x < width_; x++ )
+        {
+            const Photon& photon = photons_[y * width_ + x];
+
+            int count;
+            Color gathered = Color::BLACK;
+
+            for (count = 0; count < PHOTON_TRI_MAX; count++)
+            {
+                if (photon.tris_[count] == PHOTON_TRI_INVALID)
+                    break;
+
+                gathered += photon.gathered_[count];
+
+            }
+
+            if (!count)
+                continue;
+
+            gathered.r_ *= (1.0f / float(count));
+            gathered.g_ *= (1.0f / float(count));
+            gathered.b_ *= (1.0f / float(count));
+            gathered.a_ *= (1.0f / float(count));
+
+            image.SetPixel(x, y, gathered);
+        }
+
+    }
+
+    image.SavePNG(filename);
+
+}
+
+void PhotonMap::Gather(int radius )
 {
     for( int y = 0; y < height_; y++ )
     {
         for( int x = 0; x < width_; x++ )
         {
-            photons_[y * width_ + x].gathered_ = Gather(x, y, radius);
+            Photon& photon = photons_[y * width_ + x];
+
+            for (int i = 0; i < PHOTON_TRI_MAX; i++)
+            {
+                if (photon.tris_[i] == PHOTON_TRI_INVALID)
+                    break;
+
+                photon.gathered_[i] = Gather(photon.tris_[i], x, y, radius);
+            }
         }
     }
+
+    /*
+    if (true)
+    {
+        String filename = ToString("/Users/jenge/Temp/PhotonMap%i.png", bakeMesh_->GetGeomID());
+        SavePng(filename);
+    }
+    */
+
 }
 
-Color PhotonMap::Gather( int x, int y, int radius ) const
+Color PhotonMap::Gather( int triIndex, int x, int y, int radius ) const
 {
-    Color color;
+    Color color = Color::BLACK;
     int photons = 0;
 
     for( int j = y - radius; j <= y + radius; j++ )
@@ -79,16 +141,23 @@ Color PhotonMap::Gather( int x, int y, int radius ) const
 
             const Photon& photon = photons_[j * width_ + i];
 
+            int idx = photon.MapTriIndex(triIndex);
+
+            if (idx == PHOTON_TRI_INVALID)
+            {
+                continue;
+            }
+
             float distance = sqrtf( static_cast<float>( (x - i) * (x - i) + (y - j) * (y - j) ) );
 
             if( distance > radius ) {
                 continue;
             }
 
-            if (photon.photons_)
+            if (photon.photons_[idx])
             {
-                color += photon.color_;
-                photons += photon.photons_;
+                color += photon.color_[idx];
+                photons += photon.photons_[idx];
             }
         }
     }
@@ -155,10 +224,10 @@ void Photons::EmitPhotons( const BakeLight* light )
 
     for( int i = 0, n = emitter->GetPhotonCount(); i < n; i++ )
     {
-        // ** Emit photon
+        // Emit photon
         emitter->Emit( sceneBaker_, position, direction );
 
-        // ** Calculate light cutoff
+        // Calculate light cutoff
         float cut = 1.0f;
 
         if( const LightCutoff* cutoff = light->GetCutoffModel() )
@@ -178,7 +247,7 @@ void Photons::EmitPhotons( const BakeLight* light )
 
 void Photons::Trace(const LightAttenuation* attenuation, const Vector3& position, const Vector3& direction, const Color& color, int depth , unsigned lastGeomID, unsigned lastPrimID)
 {
-    // ** Maximum depth or energy threshold exceeded
+    // Maximum depth or energy threshold exceeded
     if( depth > maxDepth_ || color.Luma() < energyThreshold_ )
     {
         return;
@@ -210,13 +279,14 @@ void Photons::Trace(const LightAttenuation* attenuation, const Vector3& position
     Vector3 hitNormal(ray.Ng[0], ray.Ng[1], ray.Ng[2]);
     hitNormal.Normalize();
 
-    // ** Energy attenuation after a photon has passed the traced segment
+    // energy attenuation after a photon has passed the traced segment
     float att = 1.0f;
-    if( attenuation ) {
-        /*att =*/ attenuation->Calculate( (position - hitPosition).Length() );
+    if( attenuation )
+    {
+        att = attenuation->Calculate( (position - hitPosition).Length() );
     }
 
-    // ** Energy after reflection
+    // energy after reflection
     float influence = LightInfluence::GetLambert( direction, hitNormal ) * att;
 
     if (influence <= 0.0f)
@@ -235,7 +305,7 @@ void Photons::Trace(const LightAttenuation* attenuation, const Vector3& position
         return;
     }
 
-    // ** Final photon color
+    // final photon color
     hitColor.r_ *= (color.r_ * influence);
     hitColor.g_ *= (color.g_ * influence);
     hitColor.b_ *= (color.b_ * influence);
@@ -243,35 +313,25 @@ void Photons::Trace(const LightAttenuation* attenuation, const Vector3& position
     Vector2 st;
     bakeMesh->GetST(ray.primID, 1, bary, st);
 
-    // ** Store photon energy
-    Store( bakeMesh->GetPhotonMap(), hitColor, st );
+    // store photon energy
+    Store( bakeMesh->GetPhotonMap(), (int) ray.primID, hitColor, st );
 
-    // ** Keep tracing
+    // keep tracing
     Vector3 dir;
     Vector3::GetRandomHemisphereDirection(dir, hitNormal);
-    Trace( attenuation,hitPosition, dir, hitColor, depth + 1, ray.geomID, ray.primID );
+    Trace( attenuation, hitPosition, dir, hitColor, depth + 1, ray.geomID, ray.primID );
 }
 
-void Photons::Store( PhotonMap* photonmap, const Color& color, const Vector2& uv )
+void Photons::Store(PhotonMap* photonmap, int triIdx, const Color& color, const Vector2& uv )
 {
     if( !photonmap ) {
         return;
     }
 
-    if (color.r_ < 0.01f && color.g_ < 0.01f && color.b_ < 0.01f)
+    if (!photonmap->AddPhoton(triIdx, uv, color))
     {
-        // filter out tiny adds
         return;
     }
-
-    PhotonMap::Photon* photon = photonmap->GetPhoton( uv );
-
-    if( !photon ) {
-        return;
-    }
-
-    photon->color_ += color;
-    photon->photons_++;
 
     photonCount_++;
 }

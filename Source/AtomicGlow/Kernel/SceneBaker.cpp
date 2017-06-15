@@ -640,12 +640,16 @@ void SceneBaker::IndirectLight( LightRay* lightRay)
         Vector2 st;
         bakeMesh->GetST(ray.primID, 1, bary, st);
 
-        PhotonMap::Photon* photon = photonMap->GetPhoton(Vector2(ray.u, ray.v));
+        int photons;
+        Color pcolor;
+        Color gcolor;
 
-        if (!photon || !photon->photons_)
+        if (!photonMap->GetPhoton( (int) ray.primID, st, pcolor, photons, gcolor, true))
+        {
             continue;
+        }
 
-        gathered += photon->gathered_.ToVector3() * influence;// + ambientColor;
+        gathered += gcolor.ToVector3() * influence;// + ambientColor;
 
     }
 
