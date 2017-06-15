@@ -199,9 +199,9 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     void SetFontDescription(UIFontDescription* fd);
 
     void Remove();
-    void RemoveChild(UIWidget* child, bool cleanup = true);
+    virtual void RemoveChild(UIWidget* child, bool cleanup = true);
 
-    void DeleteAllChildren();
+    virtual void DeleteAllChildren();
 
     // String ID
     virtual void SetId(const String& id);
@@ -236,7 +236,7 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     void SetDragObject(UIDragObject* object) { dragObject_ = object; }
     UIDragObject* GetDragObject() { return dragObject_; }
 
-    UIWidget* GetFirstChild();
+    virtual UIWidget* GetFirstChild();
     UIWidget* GetNext();
 
     bool IsAncestorOf(UIWidget* widget);
@@ -244,18 +244,18 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     void SetIsFocusable(bool value);
 
     // get this or child widget with id
-    UIWidget* GetWidget(const String& id);
+    virtual UIWidget* GetWidget(const String& id);
 
     UIView* GetView();
 
     virtual void AddChild(UIWidget* child);
 
-    void AddChildAfter(UIWidget* child, UIWidget* otherChild);
-    void AddChildBefore(UIWidget* child, UIWidget* otherChild);
+    virtual void AddChildAfter(UIWidget* child, UIWidget* otherChild);
+    virtual void AddChildBefore(UIWidget* child, UIWidget* otherChild);
 
     /// Add the child to this widget. See AddChild for adding a child to the top or bottom.
     /// This takes a relative Z and insert the child before or after the given reference widget.
-    void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
+    virtual void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
 
     void InvalidateLayout();
 
