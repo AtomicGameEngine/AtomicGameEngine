@@ -163,7 +163,8 @@ public:
             {
                 if (photon->tris_[i] == PHOTON_TRI_INVALID)
                 {
-                    idx = photon->tris_[i] = triIndex;
+                    idx = i;
+                    photon->tris_[i] = triIndex;
                     break;
                 }
             }

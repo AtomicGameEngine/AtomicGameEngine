@@ -256,7 +256,9 @@ void Photons::Trace(const LightAttenuation* attenuation, const Vector3& position
     // clean this mess up
     RTCScene scene = sceneBaker_->GetEmbreeScene()->GetRTCScene();
 
-    lightRay_.SetupRay(position, direction, .001f, maxDistance_);
+    float maxDist = attenuation ? maxDistance_ : LIGHT_LARGE_DISTANCE;
+
+    lightRay_.SetupRay(position, direction, .001f, maxDist);
 
     RTCRay& ray = lightRay_.rtcRay_;
 

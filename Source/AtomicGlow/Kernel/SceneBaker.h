@@ -68,7 +68,9 @@ class SceneBaker : public Object
 
     bool GetStandaloneMode() const { return standaloneMode_; }
 
-    void SetStandaloneMode(bool standaloneMode) { standaloneMode_ = standaloneMode; }    
+    void SetStandaloneMode(bool standaloneMode) { standaloneMode_ = standaloneMode; }
+
+    const BoundingBox& GetSceneBounds() const { return sceneBounds_; }
 
 private:
 
@@ -115,6 +117,8 @@ private:
 
     String projectPath_;
     bool standaloneMode_;
+
+    BoundingBox sceneBounds_;
 
 };
 

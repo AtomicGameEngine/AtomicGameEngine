@@ -368,6 +368,7 @@ bool SceneBaker::LoadScene(const String& filename)
 
     for (unsigned i = 0; i < lightNodes.Size(); i++)
     {
+        BakeLight* bakeLight = 0;
         Node* lightNode = lightNodes[i];
         Atomic::Light* light = lightNode->GetComponent<Atomic::Light>();
 
@@ -376,15 +377,15 @@ bool SceneBaker::LoadScene(const String& filename)
 
         if (light->GetLightType() == LIGHT_DIRECTIONAL)
         {
-            /*
-            SharedPtr<DirectionalBakeLight> dlight(new DirectionalBakeLight(context_, this));
-            dlight->SetLight(light);
-            bakeLights_.Push(dlight);
-            */
+            bakeLight = BakeLight::CreateDirectionalLight(this, lightNode->GetDirection(), light->GetColor(), 1.0f, light->GetCastShadows());
         }
         else if (light->GetLightType() == LIGHT_POINT)
         {
-            BakeLight* bakeLight = BakeLight::CreatePointLight(this, lightNode->GetWorldPosition(), light->GetRange(), light->GetColor(), 1.0f, light->GetCastShadows());
+            bakeLight = BakeLight::CreatePointLight(this, lightNode->GetWorldPosition(), light->GetRange(), light->GetColor(), 1.0f, light->GetCastShadows());
+        }
+
+        if (bakeLight)
+        {
             bakeLights_.Push(SharedPtr<BakeLight>(bakeLight));
         }
 
@@ -401,7 +402,11 @@ bool SceneBaker::LoadScene(const String& filename)
         if (!staticModel->GetNode()->IsEnabled() || !staticModel->IsEnabled())
             continue;
 
-        Vector3 center = staticModel->GetWorldBoundingBox().Center();
+        const BoundingBox& modelWBox = staticModel->GetWorldBoundingBox();
+
+        sceneBounds_.Merge(modelWBox);
+
+        Vector3 center = modelWBox.Center();
         int bestPriority = M_MIN_INT;
         Zone* newZone = 0;
 
@@ -585,6 +590,7 @@ void SceneBaker::IndirectLight( LightRay* lightRay)
     int nsamples = GlobalGlowSettings.finalGatherSamples_;
     float maxDistance = GlobalGlowSettings.finalGatherDistance_; // , settings.m_finalGatherRadius, settings.m_skyColor, settings.m_ambientColor
 
+    int hits = 0;
     for( int k = 0; k <nsamples; k++ )
     {
         Vector3 dir;
@@ -604,7 +610,12 @@ void SceneBaker::IndirectLight( LightRay* lightRay)
 
         if (ray.geomID == RTC_INVALID_GEOMETRY_ID)
         {
-            // gathered += skyColor * influence + ambientColor;
+            Color skyColor(130.0f/255.0f, 209.0f/255.0f, 207.0f/255.0f);
+
+            skyColor = skyColor * 0.30f;
+
+            gathered += (skyColor * influence).ToVector3();// + ambientColor;
+            hits++;
             continue;
         }               
 
@@ -649,9 +660,13 @@ void SceneBaker::IndirectLight( LightRay* lightRay)
             continue;
         }
 
+        hits++;
         gathered += gcolor.ToVector3() * influence;// + ambientColor;
 
     }
+
+    if (!hits)
+        return;
 
     gathered /= static_cast<float>( nsamples );
 

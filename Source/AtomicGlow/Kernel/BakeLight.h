@@ -244,7 +244,7 @@ public:
     DirectionalPhotonEmitter( const BakeLight* light, const Vector3& direction );
 
     /// Emits a new photon.
-    // virtual void Emit( const Scene* scene, Vector3& position, Vector3& direction ) const;
+    virtual void Emit( SceneBaker* scene, Vector3& position, Vector3& direction ) const;
 
 private:
 

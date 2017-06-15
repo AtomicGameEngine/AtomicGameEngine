@@ -37,6 +37,7 @@ enum GlowLightMode
     GLOW_LIGHTMODE_COMPLETE
 };
 
+const float LIGHT_LARGE_DISTANCE = 65535.0f;
 const float LIGHT_ANGLE_EPSILON = 0.001f;
 
 }

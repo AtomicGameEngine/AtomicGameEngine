@@ -297,11 +297,17 @@ float DirectionalLightInfluence::Calculate(LightRay* lightRay, const Vector3& li
         return 0.0f;
     }
 
-    // ** Cast shadow to point
-    if( light_->GetCastsShadow() )
+    // clean this mess up
+    RTCScene scene = source.bakeMesh->GetSceneBaker()->GetEmbreeScene()->GetRTCScene();
+
+    lightRay->SetupRay(source.position, -direction_, .001f, LIGHT_LARGE_DISTANCE);
+
+    rtcOccluded(scene, lightRay->rtcRay_);
+
+    // obstructed?  TODO: glass, etc
+    if (lightRay->rtcRay_.geomID != RTC_INVALID_GEOMETRY_ID)
     {
-        // FIXME: tracer
-        // intensity *= tracer->traceSegment( point, point - m_direction * 1000, rt::HitUseAlpha ) ? 0.0f : 1.0f;
+        return 0.0f;
     }
 
     return intensity;
@@ -504,15 +510,18 @@ DirectionalPhotonEmitter::DirectionalPhotonEmitter( const BakeLight* light, cons
     plane_.Define(direction.Normalized(), light->GetPosition()); //  = Plane::calculate( direction, light->position() );
 }
 
-/*
-void DirectionalPhotonEmitter::Emit( const Scene* scene, Vector3& position, Vector3& direction ) const
+void DirectionalPhotonEmitter::Emit( SceneBaker* sceneBaker, Vector3& position, Vector3& direction ) const
 {
-    const Bounds& bounds = scene->bounds();
+    const BoundingBox& bounds = sceneBaker->GetSceneBounds();
 
-    position  = m_plane * bounds.randomPointInside() - m_direction * 5;
-    direction = m_direction;
+    Vector3 randomPoint(Lerp<float>(bounds.min_.x_, bounds.max_.x_, RandZeroOne()),
+                        Lerp<float>(bounds.min_.y_, bounds.max_.y_, RandZeroOne()),
+                        Lerp<float>(bounds.min_.z_, bounds.max_.z_, RandZeroOne()));
+
+
+    position  = plane_.Project(randomPoint) - direction_ * ( LIGHT_LARGE_DISTANCE * 0.5f);
+    direction = direction_;
 }
-*/
 
 
 }
