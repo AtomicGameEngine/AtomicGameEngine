@@ -33,20 +33,21 @@
 
 #include <imgui.h>
 
+
 namespace Atomic
 {
 
-class SystemUI : public Atomic::Object
+class SystemUI
+        : public Atomic::Object
 {
-    ATOMIC_OBJECT(SystemUI, Atomic::Object);
+ATOMIC_OBJECT(SystemUI, Atomic::Object);
 public:
     SystemUI(Atomic::Context* context);
     ~SystemUI();
 
     //! Get ui scale.
     //! \return scale of ui.
-    float GetScale() const
-    { return uiScale_; };
+    float GetScale() const { return uiScale_; };
     //! Set ui scale.
     //! \param scale of ui.
     void SetScale(float scale);
@@ -58,8 +59,8 @@ public:
       \param merge set to true if new font should be merged to last active font.
       \return ImFont instance that may be used for setting current font when drawing GUI.
     */
-    ImFont*
-    AddFont(const Atomic::String& font_path, float size = 0, const unsigned short* ranges = 0, bool merge = false);
+    ImFont* AddFont(const Atomic::String& font_path, float size = 0, const unsigned short* ranges = 0,
+                    bool merge = false);
     //! Add font to imgui subsystem.
     /*!
       \param font_path a string pointing to TTF font resource.
@@ -68,8 +69,9 @@ public:
       \param merge set to true if new font should be merged to last active font.
       \return ImFont instance that may be used for setting current font when drawing GUI.
     */
-    ImFont* AddFont(const Atomic::String& font_path, float size = 0,
-                    const std::initializer_list<unsigned short>& ranges = {}, bool merge = false);
+    ImFont* AddFont(
+            const Atomic::String& font_path, float size = 0,
+            const std::initializer_list<unsigned short>& ranges = {}, bool merge = false);
 
     void CreateConsoleAndDebugHud();
 

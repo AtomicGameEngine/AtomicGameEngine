@@ -19,6 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#define STB_TEXTEDIT_IMPLEMENTATION 1
 #include "../../Input/InputEvents.h"
 #include "../../Input/Input.h"
 #include "../../Core/CoreEvents.h"
@@ -32,7 +33,6 @@
 #include "../../UI/SystemUI/Console.h"
 #include "../../UI/SystemUI/DebugHud.h"
 #include <SDL.h>
-#include <imgui_internal.h>
 
 
 using namespace std::placeholders;
@@ -171,7 +171,7 @@ void SystemUI::OnRawEvent(VariantMap& args)
     case SDL_KEYUP:
     case SDL_KEYDOWN:
     case SDL_TEXTINPUT:
-        args[SDLRawInput::P_CONSUMED] = ImGui::GetCurrentContext()->FocusedWindow != 0;
+        args[SDLRawInput::P_CONSUMED] = ImGui::IsAnyWindowFocused();
         break;
     case SDL_MOUSEWHEEL:
     case SDL_MOUSEBUTTONUP:

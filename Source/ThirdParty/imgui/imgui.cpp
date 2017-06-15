@@ -3138,6 +3138,14 @@ bool ImGui::IsMouseHoveringAnyWindow()
     return g.HoveredWindow != NULL;
 }
 
+// ATOMIC BEGIN
+bool ImGui::IsAnyWindowFocused()
+{
+    ImGuiContext& g = *GImGui;
+    return g.FocusedWindow != 0;
+}
+// ATOMIC END
+
 bool ImGui::IsPosHoveringAnyWindow(const ImVec2& pos)
 {
     return FindHoveredWindow(pos, false) != NULL;

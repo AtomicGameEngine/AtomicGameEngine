@@ -63,7 +63,7 @@ private:
 // BEGIN LICENSE MANAGEMENT
     void HandleMessageAck(StringHash eventType, VariantMap& eventData);
     bool licenseModule3D_;
-    SharedPtr<SystemUI::MessageBox> messageBox_;
+    SharedPtr<MessageBox> messageBox_;
 // END LICENSE MANAGEMENT
 
     IPCHandle fd_[2];

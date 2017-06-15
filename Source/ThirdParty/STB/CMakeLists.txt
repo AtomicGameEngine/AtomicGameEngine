@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2017 the Atomic project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,6 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME STB)
-
-# Define source files
-define_source_files (GLOB_CPP_PATTERNS *.c *.cpp *.h)
-
-# ATOMIC BEGIN
-set (INCLUDE_DIRS . ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-# ATOMIC END
-
-# Setup target
-setup_library ()
+add_library(STB STATIC stb_impl.cpp)
+target_compile_definitions(STB PUBLIC -DSTB_VORBIS_HEADER_ONLY=1)
+target_include_directories(STB PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ../..)
