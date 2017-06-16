@@ -106,7 +106,7 @@ endif ()
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(Atomic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../)
-target_link_libraries (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL ASIO rapidjson WebSocketPP)
+target_link_libraries (Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB SDL ASIO rapidjson WebSocketPP imgui)
 target_compile_definitions (Atomic PUBLIC -DATOMIC_CXX11=1)
 if (ATOMIC_64BIT)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_64BIT=1)

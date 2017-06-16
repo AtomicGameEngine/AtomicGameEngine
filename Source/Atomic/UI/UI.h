@@ -35,11 +35,7 @@ class VertexBuffer;
 class UIRenderer;
 class UIWidget;
 class UIPopupWindow;
-
-namespace SystemUI
-{
-    class MessageBox;
-}
+class MessageBox;
 
 class ATOMIC_API UI : public Object, private tb::TBWidgetListener
 {
@@ -93,7 +89,7 @@ public:
 
     void GetTBIDString(unsigned id, String& value);
 
-    SystemUI::MessageBox *ShowSystemMessageBox(const String& title, const String& message);
+    MessageBox *ShowSystemMessageBox(const String& title, const String& message);
 
     // Debug HUD
 

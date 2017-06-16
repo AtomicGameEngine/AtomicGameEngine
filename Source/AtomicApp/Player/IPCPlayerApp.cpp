@@ -225,7 +225,7 @@ namespace Atomic
         brokerActive_ = true;
 
         // If the parent application has a profile mode up, sync 
-        SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+        DebugHud* debugHud = GetSubsystem<DebugHud>();
         if (debugHud)
         {
             unsigned mode = eventData["debugHudMode"].GetUInt();

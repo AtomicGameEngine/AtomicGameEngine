@@ -94,7 +94,7 @@ void PlayerMode::HandleIPCInitialize(StringHash eventType, VariantMap& eventData
 
     // END LICENSE MANAGEMENT
 
-    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* debugHud = GetSubsystem<DebugHud>();
     if (debugHud)
     {
         debugHud->SetMode(eventData["debugHudMode"].GetUInt());
@@ -243,7 +243,7 @@ void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
         done = true;
 
         messageBox_ = GetSubsystem<UI>()->ShowSystemMessageBox("3D Module License Required", "A 3D Module License is required to display 3D content.\n\nUpgrade to Atomic Pro for all features and platforms.");
-        SubscribeToEvent(messageBox_, SystemUI::E_MESSAGEACK, ATOMIC_HANDLER(PlayerMode, HandleMessageAck));
+        SubscribeToEvent(messageBox_, E_MESSAGEACK, ATOMIC_HANDLER(PlayerMode, HandleMessageAck));
 
         if (brokerActive_)
         {

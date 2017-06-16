@@ -1,4 +1,5 @@
 //
+// Copyright (c) 2017 the Atomic project.
 // Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,18 +24,10 @@
 #pragma once
 
 #include "../../Core/Object.h"
+#include "../../UI/SystemUI/SystemUI.h"
 
 namespace Atomic
 {
-
-class XMLFile;
-
-namespace SystemUI
-{
-
-class Button;
-class Text;
-class UIElement;
 
 /// Message box dialog.
 class ATOMIC_API MessageBox : public Object
@@ -43,8 +36,7 @@ class ATOMIC_API MessageBox : public Object
 
 public:
     /// Construct. If layout file is not given, use the default message box layout. If style file is not given, use the default style file from root UI element.
-    MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY,
-        XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY);
     /// Destruct.
     virtual ~MessageBox();
     /// Register object factory.
@@ -59,24 +51,23 @@ public:
     const String& GetTitle() const;
     /// Return message text. Return empty string if there is no message text element.
     const String& GetMessage() const;
-
-    /// Return dialog window.
-    UIElement* GetWindow() const { return window_; }
+    /// Returns true if message box is open.
+    bool IsOpen() const { return isOpen_; }
 
 private:
-    /// Handle events that dismiss the message box.
-    void HandleMessageAcknowledged(StringHash eventType, VariantMap& eventData);
+    /// Render message box ui.
+    void RenderFrame(StringHash eventType, VariantMap& eventData);
 
-    /// UI element containing the whole UI layout. Typically it is a Window element type.
-    SharedPtr<UIElement> window_;
     /// Title text element.
-    Text* titleText_;
+    String titleText_;
     /// Message text element.
-    Text* messageText_;
-    /// OK button element.
-    Button* okButton_;
+    String messageText_;
+    /// Is message box window open.
+    bool isOpen_;
+    /// Initial message box window position.
+    ImVec2 windowPosition_;
+    /// Initial message box window size.
+    ImVec2 windowSize_;
 };
-
-}
 
 }

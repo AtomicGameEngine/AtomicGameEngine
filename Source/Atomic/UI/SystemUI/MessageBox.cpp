@@ -1,4 +1,5 @@
 //
+// Copyright (c) 2017 the Atomic project.
 // Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,88 +24,29 @@
 #include "../../Core/Context.h"
 #include "../../Graphics/Graphics.h"
 #include "../../IO/Log.h"
-#include "../../Resource/ResourceCache.h"
-#include "../../Resource/XMLFile.h"
-#include "Button.h"
-#include "MessageBox.h"
-#include "Text.h"
-#include "SystemUI.h"
-#include "SystemUIEvents.h"
-#include "Window.h"
+#include "../../UI/SystemUI/SystemUIEvents.h"
+#include "../../UI/SystemUI/SystemUI.h"
+#include "../../UI/SystemUI/MessageBox.h"
 
 namespace Atomic
 {
 
-namespace SystemUI
-{
-
-
-MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile,
-    XMLFile* styleFile) :
+MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString) :
     Object(context),
     titleText_(0),
-    messageText_(0),
-    okButton_(0)
+    messageText_(messageString),
+    isOpen_(true)
 {
-    // If layout file is not given, use the default message box layout
-    if (!layoutFile)
-    {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        layoutFile = cache->GetResource<XMLFile>("UI/MessageBox.xml");
-        if (!layoutFile)    // Error is already logged
-            return;         // Note: windowless MessageBox should not be used!
-    }
-
-    SystemUI* ui = GetSubsystem<SystemUI>();
-    window_ = ui->LoadLayout(layoutFile, styleFile);
-    if (!window_)   // Error is already logged
-        return;
-    ui->GetRoot()->AddChild(window_);
-
-    // Set the title and message strings if they are given
-    titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
-    if (titleText_ && !titleString.Empty())
-        titleText_->SetText(titleString);
-    messageText_ = dynamic_cast<Text*>(window_->GetChild("MessageText", true));
-    if (messageText_ && !messageString.Empty())
-        messageText_->SetText(messageString);
-
-    // Center window after the message is set
-    Window* window = dynamic_cast<Window*>(window_.Get());
-    if (window)
-    {
-        Graphics* graphics = GetSubsystem<Graphics>();  // May be null if headless
-        if (graphics)
-        {
-            const IntVector2& size = window->GetSize();
-            window->SetPosition((graphics->GetWidth() - size.x_) / 2, (graphics->GetHeight() - size.y_) / 2);
-        }
-        else
-            ATOMIC_LOGWARNING("Instantiating a modal window in headless mode!");
-
-        window->SetModal(true);
-        SubscribeToEvent(window, E_MODALCHANGED, ATOMIC_HANDLER(MessageBox, HandleMessageAcknowledged));
-    }
-
-    // Bind the buttons (if any in the loaded UI layout) to event handlers
-    okButton_ = dynamic_cast<Button*>(window_->GetChild("OkButton", true));
-    if (okButton_)
-    {
-        ui->SetFocusElement(okButton_);
-        SubscribeToEvent(okButton_, E_RELEASED, ATOMIC_HANDLER(MessageBox, HandleMessageAcknowledged));
-    }
-    Button* cancelButton = dynamic_cast<Button*>(window_->GetChild("CancelButton", true));
-    if (cancelButton)
-        SubscribeToEvent(cancelButton, E_RELEASED, ATOMIC_HANDLER(MessageBox, HandleMessageAcknowledged));
-    Button* closeButton = dynamic_cast<Button*>(window_->GetChild("CloseButton", true));
-    if (closeButton)
-        SubscribeToEvent(closeButton, E_RELEASED, ATOMIC_HANDLER(MessageBox, HandleMessageAcknowledged));
+    SetTitle(titleString);
+    Graphics* graphics = GetSubsystem<Graphics>();
+    windowSize_ = ImVec2(300, 150);
+    windowPosition_ = ImVec2(graphics->GetWidth() / 2 - windowSize_.x / 2, graphics->GetHeight() / 2 - windowSize_.y / 2);
+    SubscribeToEvent(E_SYSTEMUIFRAME, ATOMIC_HANDLER(MessageBox, RenderFrame));
 }
 
 MessageBox::~MessageBox()
 {
-    if (window_)
-        window_->Remove();
+    UnsubscribeFromAllEvents();
 }
 
 void MessageBox::RegisterObject(Context* context)
@@ -114,39 +56,57 @@ void MessageBox::RegisterObject(Context* context)
 
 void MessageBox::SetTitle(const String& text)
 {
-    if (titleText_)
-        titleText_->SetText(text);
+    titleText_ = ToString("%s##%p", text.CString(), this);
 }
 
 void MessageBox::SetMessage(const String& text)
 {
-    if (messageText_)
-        messageText_->SetText(text);
+    messageText_ = text;
 }
 
 const String& MessageBox::GetTitle() const
 {
-    return titleText_ ? titleText_->GetText() : String::EMPTY;
+    return titleText_;
 }
 
 const String& MessageBox::GetMessage() const
 {
-    return messageText_ ? messageText_->GetText() : String::EMPTY;
+    return messageText_;
 }
 
-void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eventData)
+void MessageBox::RenderFrame(StringHash eventType, VariantMap& eventData)
 {
     using namespace MessageACK;
+    ImGui::SetNextWindowPos(windowPosition_, ImGuiSetCond_FirstUseEver);
+    if (ImGui::Begin(titleText_.CString(), &isOpen_, windowSize_, -1, ImGuiWindowFlags_NoCollapse|
+                     ImGuiWindowFlags_NoSavedSettings))
+    {
+        ImGui::Text(messageText_.CString());
+        auto region = ImGui::GetContentRegionAvail();
+        ImGui::SetCursorPos(ImVec2(region.x - 100 + 20, region.y + 20));
 
-    VariantMap& newEventData = GetEventDataMap();
-    newEventData[P_OK] = eventData[Released::P_ELEMENT] == okButton_;
-    SendEvent(E_MESSAGEACK, newEventData);
+        bool closeWindow = false;
+        bool status = false;
+        if (ImGui::Button("Ok"))
+        {
+            closeWindow = true;
+            status = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel") || !isOpen_)
+        {
+            closeWindow = true;
+            status = false;
+        }
 
-    // ATOMIC BEGIN
-    // this->ReleaseRef();
-    // ATOMIC END
-}
-
+        if (closeWindow)
+        {
+            SendEvent(E_MESSAGEACK, P_OK, status);
+            UnsubscribeFromAllEvents();
+            isOpen_ = false;
+        }
+    }
+    ImGui::End();
 }
 
 }
