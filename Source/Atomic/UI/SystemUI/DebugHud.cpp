@@ -21,13 +21,13 @@
 // THE SOFTWARE.
 //
 
-#include <UI/UI.h>
 #include "../../Core/CoreEvents.h"
 #include "../../Core/Profiler.h"
 #include "../../Engine/Engine.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/Renderer.h"
 #include "../../IO/Log.h"
+#include "../../UI/UI.h"
 #include "../../UI/SystemUI/SystemUI.h"
 #include "../../UI/SystemUI/DebugHud.h"
 
