@@ -325,10 +325,10 @@ void DebugHud::RenderUi(StringHash eventType, VariantMap& eventData)
                         profilerOutput_ = "Metrics subsystem not found";
                 }
                 auto size = ImGui::CalcTextSize(profilerOutput_.CString());
-                sizeProfiler_ = IntVector2(size.x + 20, size.y + 20);
-                posProfiler_ = WithinExtents({-(size.x + 20), 0});
+                sizeProfiler_ = IntVector2((int)size.x + 20, (int)size.y + 20);
+                posProfiler_ = WithinExtents({-((int)size.x + 20), 0});
             }
-            ImGui::Text(profilerOutput_.CString());
+            ImGui::TextUnformatted(profilerOutput_.CString());
         }
         ImGui::End();
     }
