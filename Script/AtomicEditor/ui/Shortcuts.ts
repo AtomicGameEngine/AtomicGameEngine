@@ -206,6 +206,13 @@ class Shortcuts extends Atomic.ScriptObject {
 
             if (!Atomic.ui.focusedWidget && !this.cmdKeyDown()) {
 
+                if (ev.key == Atomic.KEY_ESCAPE) {
+
+                    if (Atomic.ui.consoleIsVisible) {
+                        Atomic.ui.showConsole(false);
+                    }
+                }
+
                 if (ev.key == Atomic.KEY_W) {
                     this.invokeGizmoEditModeChanged(Editor.EditMode.EDIT_MOVE);
                 } else if (ev.key == Atomic.KEY_E) {

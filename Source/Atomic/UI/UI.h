@@ -109,6 +109,9 @@ public:
     void ShowConsole(bool value);
     void ToggleConsole();
 
+    /// Get whether the console is currently visible
+    bool GetConsoleIsVisible() const { return consoleVisible_; }
+
     bool GetFocusedWidget();
 
     /// request exit on next frame

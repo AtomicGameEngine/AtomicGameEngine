@@ -38,10 +38,11 @@
 #include <libsquish/squish.h>
 #endif
 
-// ATOMIC END
-
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
+
+// ATOMIC END
+
 
 #include "../DebugNew.h"
 
