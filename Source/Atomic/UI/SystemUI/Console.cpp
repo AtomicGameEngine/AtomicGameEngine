@@ -73,7 +73,10 @@ void Console::SetVisible(bool enable)
         SubscribeToEvent(E_SYSTEMUIFRAME, ATOMIC_HANDLER(Console, RenderUi));
     }
     else
+    {
         UnsubscribeFromEvent(E_SYSTEMUIFRAME);
+        ImGui::SetWindowFocus(0);
+    }
 }
 
 void Console::Toggle()
@@ -229,12 +232,6 @@ void Console::RenderUi(StringHash eventType, VariantMap& eventData)
     }
 
     windowSize_.y_ = ImGui::GetWindowHeight();
-
-    if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(SCANCODE_ESCAPE))
-    {
-        SetVisible(false);
-        ImGui::SetWindowFocus(0);
-    }
 
     ImGui::End();
 }

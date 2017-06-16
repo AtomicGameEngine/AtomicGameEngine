@@ -171,7 +171,7 @@ void SystemUI::OnRawEvent(VariantMap& args)
     case SDL_KEYUP:
     case SDL_KEYDOWN:
     case SDL_TEXTINPUT:
-        args[SDLRawInput::P_CONSUMED] = ImGui::IsAnyWindowFocused();
+        args[SDLRawInput::P_CONSUMED] = ImGui::IsAnyItemActive();
         break;
     case SDL_MOUSEWHEEL:
     case SDL_MOUSEBUTTONUP:
