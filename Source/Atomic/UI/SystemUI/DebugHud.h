@@ -97,6 +97,7 @@ private:
     /// Render system ui.
     void RenderUi(StringHash eventType, VariantMap& eventData);
     void RecalculateWindowPositions();
+    IntVector2 WithinExtents(IntVector2 pos);
 
     /// Hashmap containing application specific stats.
     HashMap<String, String> appStats_;
@@ -127,6 +128,7 @@ private:
     IntVector2 posMode_;
     IntVector2 posStats_;
     IntVector2 posProfiler_;
+    IntVector2 sizeProfiler_;
 };
 
 }

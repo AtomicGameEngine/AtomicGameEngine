@@ -100,28 +100,9 @@ void DebugHud::ResetExtents()
 
 void DebugHud::RecalculateWindowPositions()
 {
-    auto withinExtents = [&](IntVector2 pos) -> IntVector2
-    {
-        if (pos.x_ < 0)
-            pos.x_ += extents_.right_;
-        else if (pos.x_ > 0)
-            pos.x_ += extents_.left_;
-        else
-            pos.x_ = extents_.left_;
-
-        if (pos.y_ < 0)
-            pos.y_ += extents_.bottom_;
-        else if (pos.y_ > 0)
-            pos.y_ += extents_.top_;
-        else
-            pos.y_ = extents_.top_;
-
-        return pos;
-    };
-
-    posMode_ = withinExtents({0, -30});
-    posStats_ = withinExtents({0, 0});
-    posProfiler_ = withinExtents({-530, 0});
+    posMode_ = WithinExtents({0, -30});
+    posStats_ = WithinExtents({0, 0});
+    posProfiler_ = WithinExtents({-530, 0});
 }
 
 void DebugHud::SetProfilerMode(DebugHudProfileMode mode)
@@ -210,6 +191,25 @@ void DebugHud::ClearAppStats()
     appStats_.Clear();
 }
 
+IntVector2 DebugHud::WithinExtents(IntVector2 pos)
+{
+    if (pos.x_ < 0)
+        pos.x_ += extents_.right_;
+    else if (pos.x_ > 0)
+        pos.x_ += extents_.left_;
+    else
+        pos.x_ = extents_.left_;
+
+    if (pos.y_ < 0)
+        pos.y_ += extents_.bottom_;
+    else if (pos.y_ > 0)
+        pos.y_ += extents_.top_;
+    else
+        pos.y_ = extents_.top_;
+
+    return pos;
+};
+
 void DebugHud::RenderUi(StringHash eventType, VariantMap& eventData)
 {
     Renderer* renderer = GetSubsystem<Renderer>();
@@ -292,11 +292,12 @@ void DebugHud::RenderUi(StringHash eventType, VariantMap& eventData)
     if (mode_ & DEBUGHUD_SHOW_PROFILER)
     {
         ImGui::SetNextWindowPos(ImVec2(posProfiler_.x_, posProfiler_.y_));
-        if (ImGui::Begin("DebugHud Metrics", 0, ImVec2(530, 1080), 0, backgroundTextWindowFlags))
+        ImGui::SetNextWindowSize(ImVec2(sizeProfiler_.x_, sizeProfiler_.y_));
+        if (ImGui::Begin("DebugHud Metrics", 0, ImVec2(0, 0), 0, backgroundTextWindowFlags))
         {
-            if (profilerMode_ == DEBUG_HUD_PROFILE_PERFORMANCE)
+            if (profilerTimer_.GetMSec(false) >= profilerInterval_)
             {
-                if (profilerTimer_.GetMSec(false) >= profilerInterval_)
+                if (profilerMode_ == DEBUG_HUD_PROFILE_PERFORMANCE)
                 {
                     profilerTimer_.Reset();
                     Profiler* profiler = GetSubsystem<Profiler>();
@@ -306,25 +307,28 @@ void DebugHud::RenderUi(StringHash eventType, VariantMap& eventData)
                         profiler->BeginInterval();
                     }
                 }
-                ImGui::Text(profilerOutput_.CString());
-            }
-            else
-            {
-                Metrics* metrics = GetSubsystem<Metrics>();
-                if (metrics)
+                else
                 {
-                    if (metrics->GetEnabled())
+                    Metrics* metrics = GetSubsystem<Metrics>();
+                    if (metrics)
                     {
-                        metricsSnapshot_.Clear();
-                        metrics->Capture(&metricsSnapshot_);
-                        ImGui::Text(metricsSnapshot_.PrintData(2).CString());
+                        if (metrics->GetEnabled())
+                        {
+                            metricsSnapshot_.Clear();
+                            metrics->Capture(&metricsSnapshot_);
+                            profilerOutput_ = metricsSnapshot_.PrintData(2);
+                        }
+                        else
+                            profilerOutput_ = "Metrics system not enabled";
                     }
                     else
-                        ImGui::Text("Metrics system not enabled");
+                        profilerOutput_ = "Metrics subsystem not found";
                 }
-                else
-                    ImGui::Text("Metrics subsystem not found");
+                auto size = ImGui::CalcTextSize(profilerOutput_.CString());
+                sizeProfiler_ = IntVector2(size.x + 20, size.y + 20);
+                posProfiler_ = WithinExtents({-(size.x + 20), 0});
             }
+            ImGui::Text(profilerOutput_.CString());
         }
         ImGui::End();
     }
