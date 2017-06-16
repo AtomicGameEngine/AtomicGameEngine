@@ -1,4 +1,5 @@
 //
+// Copyright (c) 2017 the Atomic project.
 // Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,21 +25,12 @@
 
 #include "../../Core/Object.h"
 #include "../../Core/Timer.h"
+#include "../../Metrics/Metrics.h"
 
 #include "../UIEnums.h"
 
 namespace Atomic
 {
-
-class Engine;
-class XMLFile;
-
-namespace SystemUI
-{
-
-class Font;
-class Text;
-class UIElement;
 
 static const unsigned DEBUGHUD_SHOW_NONE = 0x0;
 static const unsigned DEBUGHUD_SHOW_STATS = 0x1;
@@ -57,10 +49,6 @@ public:
     /// Destruct.
     ~DebugHud();
 
-    /// Updates the hud. Called by HandlePostUpdate().
-    void Update(float timeStep);
-    /// Set UI elements' style from an XML file.
-    void SetDefaultStyle(XMLFile* style);
     /// Set elements to show.
     void SetMode(unsigned mode);
     /// Cycle through elements
@@ -77,18 +65,6 @@ public:
     void Toggle(unsigned mode);
     /// Toggle all elements.
     void ToggleAll();
-
-    /// Return the UI style file.
-    XMLFile* GetDefaultStyle() const;
-
-    /// Return rendering stats text.
-    Text* GetStatsText() const { return statsText_; }
-
-    /// Return rendering mode text.
-    Text* GetModeText() const { return modeText_; }
-
-    /// Return profiler text.
-    Text* GetProfilerText() const { return profilerText_; }
 
     /// Return currently shown elements.
     unsigned GetMode() const { return mode_; }
@@ -115,20 +91,14 @@ public:
     void ClearAppStats();
 
     void SetExtents(bool useRootExtents = true, const IntVector2& position = IntVector2::ZERO, const IntVector2& size = IntVector2::ZERO);
+    void ResetExtents();
 
 private:
-    /// Handle logic post-update event. The HUD texts are updated here.
-    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Render system ui.
+    void RenderUi(StringHash eventType, VariantMap& eventData);
+    void RecalculateWindowPositions();
+    IntVector2 WithinExtents(IntVector2 pos);
 
-    /// Rendering stats text.
-    SharedPtr<UIElement> layout_;
-
-    /// Rendering stats text.
-    SharedPtr<Text> statsText_;
-    /// Rendering mode text.
-    SharedPtr<Text> modeText_;
-    /// Profiling information text.
-    SharedPtr<Text> profilerText_;
     /// Hashmap containing application specific stats.
     HashMap<String, String> appStats_;
     /// Profiler timer.
@@ -149,8 +119,16 @@ private:
     float fpsFramesSinceUpdate_;
     /// Calculated fps
     unsigned fps_;
+    /// Cached profiler output.
+    String profilerOutput_;
+    /// Metrics data snapshot.
+    MetricsSnapshot metricsSnapshot_;
+    /// DebugHud extents that data will be rendered in.
+    IntRect extents_;
+    IntVector2 posMode_;
+    IntVector2 posStats_;
+    IntVector2 posProfiler_;
+    IntVector2 sizeProfiler_;
 };
-
-}
 
 }

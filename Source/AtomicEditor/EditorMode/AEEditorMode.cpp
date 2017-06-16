@@ -67,7 +67,7 @@ EditorMode::~EditorMode()
 void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
     VariantMap startupData;
-    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+    DebugHud* debugHud = GetSubsystem<DebugHud>();
 
     startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
     startupData["debugHudProfilerMode"] = (unsigned) (debugHud ? debugHud->GetProfilerMode() : DEBUG_HUD_PROFILE_PERFORMANCE);
@@ -272,9 +272,9 @@ bool EditorMode::PlayProjectInternal(const String &addArgs, bool debug)
     {
         // enabled metrics at app start
 
-        SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+        DebugHud* debugHud = GetSubsystem<DebugHud>();
 
-        if ( debugHud && ( debugHud->GetMode() & Atomic::SystemUI::DEBUGHUD_SHOW_PROFILER) && (debugHud->GetProfilerMode() == DEBUG_HUD_PROFILE_METRICS))
+        if ( debugHud && ( debugHud->GetMode() & Atomic::DEBUGHUD_SHOW_PROFILER) && (debugHud->GetProfilerMode() == DEBUG_HUD_PROFILE_METRICS))
         {
             vargs.Insert(0, "--playermetrics");
         }

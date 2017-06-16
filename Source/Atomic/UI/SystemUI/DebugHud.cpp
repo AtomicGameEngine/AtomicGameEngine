@@ -1,4 +1,5 @@
 //
+// Copyright (c) 2017 the Atomic project.
 // Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,20 +27,14 @@
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/Renderer.h"
 #include "../../IO/Log.h"
-#include "Font.h"
-#include "Text.h"
-#include "SystemUI.h"
-#include "UIElement.h"
-#include "DebugHud.h"
+#include "../../UI/UI.h"
+#include "../../UI/SystemUI/SystemUI.h"
+#include "../../UI/SystemUI/DebugHud.h"
 
 #include "../../DebugNew.h"
 
-#include "../../Metrics/Metrics.h"
 
 namespace Atomic
-{
-
-namespace SystemUI
 {
 
 static const char* qualityTexts[] =
@@ -70,251 +65,53 @@ DebugHud::DebugHud(Context* context) :
     fpsFramesSinceUpdate_(0),
     fps_(0)
 {
-    SystemUI* ui = GetSubsystem<SystemUI>();
-    UIElement* uiRoot = ui->GetRoot();
-
-    layout_ = new UIElement(context_);
-    uiRoot->AddChild(layout_);
-
-    layout_->SetSize(uiRoot->GetSize());
-
-    statsText_ = new Text(context_);
-    statsText_->SetAlignment(HA_LEFT, VA_TOP);
-    statsText_->SetPriority(100);
-    statsText_->SetVisible(false);
-    layout_->AddChild(statsText_);
-
-    modeText_ = new Text(context_);
-    modeText_->SetAlignment(HA_LEFT, VA_BOTTOM);
-    modeText_->SetPriority(100);
-    modeText_->SetVisible(false);
-    layout_->AddChild(modeText_);
-
-    profilerText_ = new Text(context_);
-    profilerText_->SetAlignment(HA_RIGHT, VA_TOP);
-    profilerText_->SetPriority(100);
-    profilerText_->SetVisible(false);
-    layout_->AddChild(profilerText_);
-
-    SubscribeToEvent(E_POSTUPDATE, ATOMIC_HANDLER(DebugHud, HandlePostUpdate));
-
-    statsText_->SetTextEffect(TE_SHADOW);
-    modeText_->SetTextEffect(TE_SHADOW);
-    profilerText_->SetTextEffect(TE_SHADOW);
+    ResetExtents();
+    RecalculateWindowPositions();
+    SubscribeToEvent(E_SYSTEMUIFRAME, ATOMIC_HANDLER(DebugHud, RenderUi));
 }
 
 DebugHud::~DebugHud()
 {
-    statsText_->Remove();
-    modeText_->Remove();
-    profilerText_->Remove();
+    UnsubscribeFromAllEvents();
 }
 
+// TODO: get rid of `useRootExtents` and replace calls to SetExtents(true, ...) with ResetExtents().
 void DebugHud::SetExtents(bool useRootExtents, const IntVector2& position, const IntVector2& size)
 {
     if (useRootExtents)
-    {
-        SystemUI* ui = GetSubsystem<SystemUI>();
-        UIElement* uiRoot = ui->GetRoot();
-
-        layout_->SetPosition(IntVector2::ZERO);
-        layout_->SetSize(uiRoot->GetSize());
-    }
+        ResetExtents();
     else
     {
-        layout_->SetPosition(position);
-        layout_->SetSize(size);
+        auto bottomRight = position + size;
+        extents_ = IntRect(position.x_, position.y_, bottomRight.x_, bottomRight.y_);
     }
+    RecalculateWindowPositions();
 }
 
-void DebugHud::Update(float timeStep)
+void DebugHud::ResetExtents()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    Renderer* renderer = GetSubsystem<Renderer>();
-    if (!renderer || !graphics)
-        return;
+//    auto uiRoot = GetSubsystem<UI>()->GetRootWidget();
+//    auto topLeft = uiRoot->GetPosition();
+//    auto bottomRight = uiRoot->GetPosition() + uiRoot->GetSize();
+//    extents_ = IntRect(topLeft.x_, topLeft.y_, bottomRight.x_, bottomRight.y_);
+    auto graphics = GetSubsystem<Graphics>();
+    extents_ = IntRect(0, 0, graphics->GetWidth(), graphics->GetHeight());
+}
 
-    // Ensure UI-elements are not detached
-    if (!layout_->GetParent())
-    {
-        SystemUI* ui = GetSubsystem<SystemUI>();
-        UIElement* uiRoot = ui->GetRoot();
-        uiRoot->AddChild(layout_);
-    }
-
-    if (statsText_->IsVisible())
-    {
-        fpsTimeSinceUpdate_ += timeStep;
-        ++fpsFramesSinceUpdate_;
-        if (fpsTimeSinceUpdate_ > FPS_UPDATE_INTERVAL)
-        {
-            fps_ = (int)(fpsFramesSinceUpdate_ / fpsTimeSinceUpdate_);
-            fpsFramesSinceUpdate_ = 0;
-            fpsTimeSinceUpdate_ = 0;
-        }
-
-        unsigned primitives, batches;
-        if (!useRendererStats_)
-        {
-            primitives = graphics->GetNumPrimitives();
-            batches = graphics->GetNumBatches();
-        }
-        else
-        {
-            primitives = renderer->GetNumPrimitives();
-            batches = renderer->GetNumBatches();
-        }
-
-        String stats;
-
-        unsigned singlePassPrimitives = graphics->GetSinglePassPrimitives();
-        unsigned editorPrimitives = graphics->GetNumPrimitives() - renderer->GetNumPrimitives();
-
-        if (singlePassPrimitives)
-            stats.AppendWithFormat("FPS %d\nTriangles (All passes) %u\nTriangles (Single pass) %u\nTriangles (Editor) %u\n", 
-                fps_, 
-                primitives, 
-                singlePassPrimitives, 
-                editorPrimitives);
-        else
-            stats.AppendWithFormat("FPS %d\nTriangles %u\n", fps_, primitives);
-                    
-        stats.AppendWithFormat("Batches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
-            batches,
-            renderer->GetNumViews(),
-            renderer->GetNumLights(true),
-            renderer->GetNumShadowMaps(true),
-            renderer->GetNumOccluders(true));
-
-        if (!appStats_.Empty())
-        {
-            stats.Append("\n");
-            for (HashMap<String, String>::ConstIterator i = appStats_.Begin(); i != appStats_.End(); ++i)
-                stats.AppendWithFormat("\n%s %s", i->first_.CString(), i->second_.CString());
-        }
-
-        statsText_->SetText(stats);
-    }
-
-    if (modeText_->IsVisible())
-    {
-        String mode;
-        mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
-            qualityTexts[renderer->GetTextureQuality()],
-            qualityTexts[renderer->GetMaterialQuality()],
-            renderer->GetSpecularLighting() ? "On" : "Off",
-            renderer->GetDrawShadows() ? "On" : "Off",
-            renderer->GetShadowMapSize(),
-            shadowQualityTexts[renderer->GetShadowQuality()],
-            renderer->GetMaxOccluderTriangles() > 0 ? "On" : "Off",
-            renderer->GetDynamicInstancing() ? "On" : "Off",
-            graphics->GetApiName().CString());
-
-        modeText_->SetText(mode);
-    }
-
-    Profiler* profiler = GetSubsystem<Profiler>();
-    
-    if (profiler)
-    {
-        if (profilerTimer_.GetMSec(false) >= profilerInterval_)
-        {
-            profilerTimer_.Reset();
-
-            if (profilerText_->IsVisible())
-            {
-                String profilerOutput;
-
-                if (profilerMode_ == DEBUG_HUD_PROFILE_PERFORMANCE)
-                {
-                    profilerOutput = profiler->PrintData(false, false, profilerMaxDepth_);
-                }
-                else
-                {
-                    Metrics* metrics = GetSubsystem<Metrics>();
-
-                    int size = profilerText_->GetFontSize();
-
-                    if (metrics)
-                    {                        
-
-                        if (metrics->GetEnabled())
-                        {
-                            if (size != 8)
-                                profilerText_->SetFont(profilerText_->GetFont(), 8);
-
-                            SharedPtr<MetricsSnapshot> snapshot(new MetricsSnapshot());
-                            metrics->Capture(snapshot);
-                            profilerOutput = snapshot->PrintData(2);
-                        }
-                        else
-                        {
-                            if (size != 32)
-                                profilerText_->SetFont(profilerText_->GetFont(), 32);
-
-                            profilerOutput = "Metrics system not enabled";
-                        }
-
-                    }
-                    else
-                    {
-                        if (size != 32)
-                            profilerText_->SetFont(profilerText_->GetFont(), 32);
-
-                        profilerOutput = "Metrics subsystem not found";
-                    }
-
-                }
-
-                profilerText_->SetText(profilerOutput);
-            }
-
-            profiler->BeginInterval();
-        }
-    }
+void DebugHud::RecalculateWindowPositions()
+{
+    posMode_ = WithinExtents({0, -30});
+    posStats_ = WithinExtents({0, 0});
+    posProfiler_ = WithinExtents({-530, 0});
 }
 
 void DebugHud::SetProfilerMode(DebugHudProfileMode mode)
 { 
-    profilerMode_ = mode; 
-
-    if (profilerMode_ == DEBUG_HUD_PROFILE_PERFORMANCE)
-    {
-        if (profilerText_.NotNull())
-        {
-            profilerText_->SetText("");
-            profilerText_->SetFont(profilerText_->GetFont(), 11);
-        }
-    }
-    else
-    {
-        if (profilerText_.NotNull())
-        {
-            profilerText_->SetText("");            
-        }
-    }
-
-}
-
-void DebugHud::SetDefaultStyle(XMLFile* style)
-{
-    if (!style)
-        return;
-
-    statsText_->SetDefaultStyle(style);
-    statsText_->SetStyle("DebugHudText");
-    modeText_->SetDefaultStyle(style);
-    modeText_->SetStyle("DebugHudText");
-    profilerText_->SetDefaultStyle(style);
-    profilerText_->SetStyle("DebugHudText");
+    profilerMode_ = mode;
 }
 
 void DebugHud::SetMode(unsigned mode)
 {
-    statsText_->SetVisible((mode & DEBUGHUD_SHOW_STATS) != 0);
-    modeText_->SetVisible((mode & DEBUGHUD_SHOW_MODE) != 0);
-    profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
-
     mode_ = mode;
 }
 
@@ -366,11 +163,6 @@ void DebugHud::ToggleAll()
     Toggle(DEBUGHUD_SHOW_ALL);
 }
 
-XMLFile* DebugHud::GetDefaultStyle() const
-{
-    return statsText_->GetDefaultStyle(false);
-}
-
 float DebugHud::GetProfilerInterval() const
 {
     return (float)profilerInterval_ / 1000.0f;
@@ -399,13 +191,147 @@ void DebugHud::ClearAppStats()
     appStats_.Clear();
 }
 
-void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+IntVector2 DebugHud::WithinExtents(IntVector2 pos)
 {
-    using namespace PostUpdate;
+    if (pos.x_ < 0)
+        pos.x_ += extents_.right_;
+    else if (pos.x_ > 0)
+        pos.x_ += extents_.left_;
+    else
+        pos.x_ = extents_.left_;
 
-    Update(eventData[P_TIMESTEP].GetFloat());
-}
+    if (pos.y_ < 0)
+        pos.y_ += extents_.bottom_;
+    else if (pos.y_ > 0)
+        pos.y_ += extents_.top_;
+    else
+        pos.y_ = extents_.top_;
 
+    return pos;
+};
+
+void DebugHud::RenderUi(StringHash eventType, VariantMap& eventData)
+{
+    Renderer* renderer = GetSubsystem<Renderer>();
+    Graphics* graphics = GetSubsystem<Graphics>();
+    const auto backgroundTextWindowFlags = ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoTitleBar|
+            ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoInputs;
+
+    if (mode_ & DEBUGHUD_SHOW_MODE)
+    {
+        ImGui::SetNextWindowPos(ImVec2(posMode_.x_, posMode_.y_));
+        if (ImGui::Begin("DebugHud mode", 0, ImVec2(1024, 30), 0, backgroundTextWindowFlags))
+        {
+            ImGui::Text("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
+                        qualityTexts[renderer->GetTextureQuality()],
+                        qualityTexts[renderer->GetMaterialQuality()],
+                        renderer->GetSpecularLighting() ? "On" : "Off",
+                        renderer->GetDrawShadows() ? "On" : "Off",
+                        renderer->GetShadowMapSize(),
+                        shadowQualityTexts[renderer->GetShadowQuality()],
+                        renderer->GetMaxOccluderTriangles() > 0 ? "On" : "Off",
+                        renderer->GetDynamicInstancing() ? "On" : "Off",
+                        graphics->GetApiName().CString());
+        }
+        ImGui::End();
+    }
+
+    if (mode_ & DEBUGHUD_SHOW_STATS)
+    {
+        fpsTimeSinceUpdate_ += GetSubsystem<Time>()->GetTimeStep();
+        ++fpsFramesSinceUpdate_;
+        if (fpsTimeSinceUpdate_ > FPS_UPDATE_INTERVAL)
+        {
+            fps_ = (int)(fpsFramesSinceUpdate_ / fpsTimeSinceUpdate_);
+            fpsFramesSinceUpdate_ = 0;
+            fpsTimeSinceUpdate_ = 0;
+        }
+
+        unsigned primitives, batches;
+        if (!useRendererStats_)
+        {
+            primitives = graphics->GetNumPrimitives();
+            batches = graphics->GetNumBatches();
+        }
+        else
+        {
+            primitives = renderer->GetNumPrimitives();
+            batches = renderer->GetNumBatches();
+        }
+
+        String stats;
+
+        unsigned singlePassPrimitives = graphics->GetSinglePassPrimitives();
+        unsigned editorPrimitives = graphics->GetNumPrimitives() - renderer->GetNumPrimitives();
+
+        ImGui::SetNextWindowPos(ImVec2(posStats_.x_, posStats_.y_));
+        if (ImGui::Begin("DebugHud Stats", 0, ImVec2(0, 0), 0,
+                         backgroundTextWindowFlags))
+        {
+            ImGui::Text("FPS %d", fps_);
+            if (singlePassPrimitives)
+            {
+                ImGui::Text("Triangles (All passes) %u", primitives);
+                ImGui::Text("Triangles (Single pass) %u", singlePassPrimitives);
+                ImGui::Text("Triangles (Editor) %u", editorPrimitives);
+            }
+            else
+                ImGui::Text("Triangles %u", primitives);
+            ImGui::Text("Batches %u", batches);
+            ImGui::Text("Views %u", renderer->GetNumViews());
+            ImGui::Text("Lights %u", renderer->GetNumLights(true));
+            ImGui::Text("Shadowmaps %u", renderer->GetNumShadowMaps(true));
+            ImGui::Text("Occluders %u", renderer->GetNumOccluders(true));
+
+            for (HashMap<String, String>::ConstIterator i = appStats_.Begin(); i != appStats_.End(); ++i)
+                ImGui::Text("%s %s", i->first_.CString(), i->second_.CString());
+        }
+        ImGui::End();
+    }
+
+    if (mode_ & DEBUGHUD_SHOW_PROFILER)
+    {
+        ImGui::SetNextWindowPos(ImVec2(posProfiler_.x_, posProfiler_.y_));
+        ImGui::SetNextWindowSize(ImVec2(sizeProfiler_.x_, sizeProfiler_.y_));
+        if (ImGui::Begin("DebugHud Metrics", 0, ImVec2(0, 0), 0, backgroundTextWindowFlags))
+        {
+            if (profilerTimer_.GetMSec(false) >= profilerInterval_)
+            {
+                if (profilerMode_ == DEBUG_HUD_PROFILE_PERFORMANCE)
+                {
+                    profilerTimer_.Reset();
+                    Profiler* profiler = GetSubsystem<Profiler>();
+                    if (profiler)
+                    {
+                        profilerOutput_ = profiler->PrintData(false, false, profilerMaxDepth_);
+                        profiler->BeginInterval();
+                    }
+                }
+                else
+                {
+                    Metrics* metrics = GetSubsystem<Metrics>();
+                    if (metrics)
+                    {
+                        if (metrics->GetEnabled())
+                        {
+                            metricsSnapshot_.Clear();
+                            metrics->Capture(&metricsSnapshot_);
+                            profilerOutput_ = metricsSnapshot_.PrintData(2);
+                        }
+                        else
+                            profilerOutput_ = "Metrics system not enabled";
+                    }
+                    else
+                        profilerOutput_ = "Metrics subsystem not found";
+                }
+                auto size = ImGui::CalcTextSize(profilerOutput_.CString());
+                sizeProfiler_ = IntVector2((int)size.x + 20, (int)size.y + 20);
+                posProfiler_ = WithinExtents({-((int)size.x + 20), 0});
+            }
+            ImGui::TextUnformatted(profilerOutput_.CString());
+        }
+        ImGui::End();
+    }
 }
 
 }
