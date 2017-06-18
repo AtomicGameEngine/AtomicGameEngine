@@ -90,6 +90,7 @@ using namespace tb;
 #include "UIBargraph.h"
 #include "UIPromptWindow.h"
 #include "UIFinderWindow.h"
+#include "UIPulldownMenu.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -736,6 +737,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBSelectDropdown>())
     {
         UISelectDropdown* select = new UISelectDropdown(context_, false);
+        select->SetWidget(widget);
+        WrapWidget(select, widget);
+        return select;
+    }
+
+    if (widget->IsOfType<TBPulldownMenu>())
+    {
+        UIPulldownMenu* select = new UIPulldownMenu(context_, false);
         select->SetWidget(widget);
         WrapWidget(select, widget);
         return select;

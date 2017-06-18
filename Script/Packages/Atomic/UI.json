@@ -10,7 +10,7 @@
 								"UISkinImage", "UITabContainer", "UISceneView", "UIPreferredSize", "UIDragObject",
 								"UIContainer", "UISection", "UIInlineSelect", "UITextureWidget", "UIColorWidget", "UIColorWheel",
 								"UIScrollContainer", "UISeparator", "UIDimmer", "UISelectDropdown", "UISlider", "UIBargraph",
-								"UIPromptWindow", "UIFinderWindow"],
+								"UIPromptWindow", "UIFinderWindow", "UIPulldownMenu"],
 	"overloads" : {
 	},
 	"typescript_decl" : {
@@ -22,7 +22,9 @@
 		    "getWidgetAt<T extends UIWidget>(x: number, y: number, include_children: boolean): T;"
 		],
 		"UIWidget": [
-		    "getWidget<T extends UIWidget>(id: string): T;"
+		    "getWidget<T extends UIWidget>(id: string): T;",
+		    "onEvent: () => void;",
+		    "onChanged: () => void;"
 		]
 	}
 
