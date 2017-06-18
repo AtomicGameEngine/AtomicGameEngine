@@ -27,9 +27,9 @@
 
 #include <Atomic/Input/Controls.h>
 
+#include <Atomic/Atomic2D/PhysicsWorld2D.h>
 
 #include "NETCore.h"
-#include "Atomic/Atomic2D/PhysicsWorld2D.h"
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #define ATOMIC_EXPORT_API __declspec(dllexport)
