@@ -29,6 +29,7 @@
 
 
 #include "NETCore.h"
+#include "Atomic/Atomic2D/PhysicsWorld2D.h"
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #define ATOMIC_EXPORT_API __declspec(dllexport)
@@ -534,6 +535,15 @@ namespace Atomic
 
             world->RaycastSingle(*result, *ray, maxDistance, collisionMask);
 
+        }
+
+        // PhysicsWorld2D
+
+        ATOMIC_EXPORT_API void csi_Atomic_PhysicsWorld2D_RaycastSingle(PhysicsWorld2D* world2D, Vector2* startPoint, Vector2* endPoint, unsigned collisionMask, PhysicsRaycastResult2D* result)
+        {
+            if (!world2D || !result)
+                return;
+            world2D->RaycastSingle(*result, *startPoint, *endPoint, collisionMask);
         }
 
         // Controls
