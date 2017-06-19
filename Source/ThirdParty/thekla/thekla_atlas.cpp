@@ -19,8 +19,8 @@
 
 #include "nvcore/Array.inl"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#define STBI_IMAGE_NO_ATOMIC
+#include "../../STB/stb_image_write.h"
 
 using namespace Thekla;
 using namespace nv;
