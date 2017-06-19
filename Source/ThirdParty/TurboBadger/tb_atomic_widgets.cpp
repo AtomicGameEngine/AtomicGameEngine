@@ -3,7 +3,7 @@
 // ==                     See tb_core.h for more information.                    ==
 // ================================================================================
 //
-// Copyright (c) 2016, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2016-2017, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@
 #include "tb_atomic_widgets.h"
 #include "tb_editfield.h"
 #include "tb_menu_window.h"
+#include "tb_select.h"
+
 #include <math.h>
 
 namespace tb {
@@ -636,6 +638,125 @@ TBWidget *TBFinderWindow::FindParentList( TBWidget *widget) // utility for deali
         tmp = tmp->GetParent();
     }
     return NULL;
+}
+
+// == TBPulldownMenu ==========================================
+
+TBPulldownMenu::TBPulldownMenu()
+    : m_value(-1)
+{
+    SetSource(&m_default_source);
+    SetSkinBg(TBIDC("TBSelectDropdown"), WIDGET_INVOKE_INFO_NO_CALLBACKS);
+}
+
+TBPulldownMenu::~TBPulldownMenu()
+{
+    SetSource(nullptr);
+    CloseWindow();
+}
+
+void TBPulldownMenu::OnSourceChanged()
+{
+    m_value = -1;
+    m_valueid = TBID();
+    if (m_source && m_source->GetNumItems())
+        SetValue(0);
+}
+
+void TBPulldownMenu::SetValue(int value)
+{
+    if (!m_source)
+        return;
+    m_value = value;
+    m_valueid = GetSelectedItemID();
+    InvokeModifiedEvent( m_valueid );
+}
+
+TBID TBPulldownMenu::GetSelectedItemID()
+{
+    if (m_source && m_value >= 0 && m_value < m_source->GetNumItems())
+        return m_source->GetItemID(m_value);
+    return TBID();
+}
+
+void TBPulldownMenu::InvokeModifiedEvent( TBID entryid )
+{
+    TBWidgetEvent ev( EVENT_TYPE_CHANGED);
+    // TBIDC does not register the TBID with the UI system, so do it this way
+    ev.target = this;      // who am I
+    ev.ref_id = entryid;   // id of whom we clicked
+    TBWidget::OnEvent(ev); // forward to delegate
+}
+
+void TBPulldownMenu::OpenWindow()
+{
+    if (!m_source || !m_source->GetNumItems() || m_window_pointer.Get())
+        return;
+
+    if (TBMenuWindow *window = new TBMenuWindow(this, TBIDC("TBPulldownMenu.menu")))
+    {
+        m_window_pointer.Set(window);
+        window->SetSkinBg(TBIDC("TBSelectDropdown.window"));
+        window->Show(m_source, TBPopupAlignment());
+    }
+}
+
+void TBPulldownMenu::CloseWindow()
+{
+    if (TBMenuWindow *window = GetMenuIfOpen())
+        window->Close();
+}
+
+TBMenuWindow *TBPulldownMenu::GetMenuIfOpen() const
+{
+    return TBSafeCast<TBMenuWindow>(m_window_pointer.Get());
+}
+
+bool TBPulldownMenu::OnEvent(const TBWidgetEvent &ev)
+{
+    if ( ev.target->IsOfType<TBButton>() && ev.type == EVENT_TYPE_CLICK)
+    {
+        // Open the menu, or set the value and close it if already open (this will
+        // happen when clicking by keyboard since that will call click on this button)
+        if (TBMenuWindow *menu_window = GetMenuIfOpen())
+        {
+            TBWidgetSafePointer tmp(this);
+            int value = menu_window->GetList()->GetValue();
+            menu_window->Die();
+            if (tmp.Get())
+                SetValue(value);
+        }
+        else
+            OpenWindow();
+        return true;
+    }
+    else if (ev.target->GetID() == TBIDC("TBPulldownMenu.menu") && ev.type == EVENT_TYPE_CLICK )
+    {
+        if (TBMenuWindow *menu_window = GetMenuIfOpen())
+            SetValue(menu_window->GetList()->GetValue());
+        return true;
+    }
+    else if (ev.target == this && m_source && ev.IsKeyEvent())
+    {
+        if (TBMenuWindow *menu_window = GetMenuIfOpen())
+        {
+            // Redirect the key strokes to the list
+            TBWidgetEvent redirected_ev(ev);
+            return menu_window->GetList()->InvokeEvent(redirected_ev);
+        }
+    }
+    return false;
+}
+
+TB_WIDGET_FACTORY( TBPulldownMenu, TBValue::TYPE_INT, WIDGET_Z_TOP) {}
+
+extern void ReadItems(TBNode *node, TBGenericStringItemSource *target_source);  // blind function that lives in tb_widgets_reader.cpp
+
+void TBPulldownMenu::OnInflate(const INFLATE_INFO &info)
+{
+    // Read items (if there is any) into the default source
+    ReadItems(info.node, GetDefaultSource());
+    TBWidget::OnInflate(info);
 }
 
 
