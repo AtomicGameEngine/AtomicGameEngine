@@ -85,6 +85,7 @@ bool ModelImporter::ImportModel()
     importer->SetImportNode(importNode_);
     importer->SetImportMaterials(importMaterials_);
     importer->SetIncludeNonSkinningBones(includeNonSkinningBones_);
+    importer->SetGenerateLightmapUV(genLightmapUV_);
 
     if (importer->Load(asset_->GetPath()))
     {
@@ -285,7 +286,9 @@ bool ModelImporter::Import()
 
         }
 
-        importNode_->CreateComponent<StaticModel>()->SetModel(mdl);
+        StaticModel* staticModel = importNode_->CreateComponent<StaticModel>();
+        staticModel->SetModel(mdl);
+        staticModel->SetLightmap(genLightmapUV_);
     }
     else
     {

@@ -299,6 +299,7 @@ bool OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     if (!mdl->GetSkeleton().GetNumBones())
     {
         modelComponent = importNode_->CreateComponent<StaticModel>();
+        modelComponent->SetLightmap(genLightmapUV_);
         modelComponent->SetModel(mdl);
     }
     else
