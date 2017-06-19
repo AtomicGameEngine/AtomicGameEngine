@@ -23,7 +23,7 @@
 		],
 		"UIWidget": [
 		    "getWidget<T extends UIWidget>(id: string): T;",
-		    "onEvent: (data:any) => void;",
+		    "onEvent: (eventData:UIWidgetEvent) => void;",
 		    "onChanged: () => void;"
 		]
 	}
