@@ -101,6 +101,8 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
             JSBFunctionType* fType = NULL;
             JSBFunctionType* getType = NULL;
             JSBFunctionType* setType = NULL;
+            bool getStatic = false;
+            bool setStatic = false;
 
             if (CSTypeHelper::OmitFunction(prop->getter_) || CSTypeHelper::OmitFunction(prop->setter_))
                 continue;
@@ -118,22 +120,39 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
 
             if (prop->getter_ && !prop->getter_->Skip())
             {
-                fType = getType = prop->getter_->GetReturnType();
+                getStatic = prop->getter_->IsStatic();
+                fType = getType = prop->getter_->GetReturnType();                
             }
+
             if (prop->setter_ && !prop->setter_->Skip())
             {
+                setStatic = prop->setter_->IsStatic();
                 setType = prop->setter_->GetParameters()[0];
 
                 if (!fType)
+                {
                     fType = setType;
+                }
                 else if (fType->type_->ToString() != setType->type_->ToString())
+                {
                     continue;
+                }
+                else if (getStatic != setStatic)
+                {
+                    ATOMIC_LOGWARNINGF("CSClassWriter::WriteManagedProperties : mismatched static qualifier on property %s:%s",
+                                       klass_->GetName().CString(), prop->name_.CString());
+
+                    continue;
+                }
             }
 
             if (!fType)
                 continue;
 
-            String line = klass_->IsInterface() ? "" : "public ";
+            String line = (klass_->IsInterface() ? "" : "public ");
+
+            if (getStatic)
+                line += "static ";
 
             JSBClass* baseClass = klass_->GetBaseClass();
             if (baseClass)

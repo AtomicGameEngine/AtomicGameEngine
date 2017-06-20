@@ -123,7 +123,7 @@ namespace AtomicEngine
             if (core != null)
                 AtomicNET.RegisterSubsystem(core);
 
-            context = core.Context;            
+            context = NETCore.Context;
 
             NativeCore.Initialize();
             CSComponentCore.Initialize();            
