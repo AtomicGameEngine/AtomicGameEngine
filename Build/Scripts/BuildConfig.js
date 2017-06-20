@@ -45,7 +45,10 @@ function processOptions(config) {
             if ( spawnSync)
                 config["with-atomicnet"] = spawnSync("which", ["xbuild"]).status == 1 ? false : true;
         } else if (os.platform() == "linux") {  // see if xbuild is available on linux
-            config["with-atomicnet"] = programFileExists('/usr/bin/xbuild') && programDirectoryExists('/usr/bin/mono/');
+            var hasXbuild = programFileExists('/usr/bin/xbuild');
+            var hasMonoFile = programFileExists('/usr/bin/mono');
+            var hasMonoDir = programDirectoryExists('/usr/bin/mono/');
+            config["with-atomicnet"] = hasXbuild && ( hasMonoFile || hasMonoDir );
         }
 	}
 
