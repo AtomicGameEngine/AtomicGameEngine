@@ -77,7 +77,7 @@ Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and schedule
 
 - Fork [AtomicGameEngine/AtomicExamples](https://github.com/AtomicGameEngine/AtomicExamples) and submit a pull request with current example improvements or a new example
 
-- Help with issues marked **```unassigned: help wanted```** in the [current build milestone](https://github.com/AtomicGameEngine/AtomicGameEngine/milestones)
+- Help with issues marked [**```unassigned: help wanted```**](https://github.com/AtomicGameEngine/AtomicGameEngine/labels/unassigned%3A%20help%20wanted) in the [current build milestone](https://github.com/AtomicGameEngine/AtomicGameEngine/milestones)
 
 - Inform us of other ways to help that should be added here :)  
 
