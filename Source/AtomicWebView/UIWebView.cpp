@@ -23,6 +23,8 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Input/Input.h>
+
+#include <Atomic/UI/UIView.h>
 #include <Atomic/UI/UIRenderer.h>
 
 #include "WebClient.h"
@@ -147,7 +149,14 @@ public:
         data[30] = x;
         data[31] = y + h;
 
-        ui->SubmitBatchVertexData(webView_->GetWebTexture2D()->GetTexture2D(), vertexData_);
+        UIView *view = webView_->GetView();
+
+        if (view)
+        {
+            view->SubmitBatchVertexData(webView_->GetWebTexture2D()->GetTexture2D(), vertexData_);
+        }
+
+
 
     }
 

@@ -23,6 +23,7 @@
 
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/UIBatch.h>
+#include <Atomic/UI/UIView.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/Graphics/Graphics.h>
@@ -263,7 +264,12 @@ void SceneViewWidget::OnPaint(const PaintProps &paint_props)
     data[30] = x;
     data[31] = y + h;
 
-    sceneView_->GetSubsystem<UI>()->SubmitBatchVertexData(sceneView_->GetRenderTexture(), vertexData_);
+    UIView *view = sceneView_->GetView();
+
+    if (view)
+    {
+        view->SubmitBatchVertexData(sceneView_->GetRenderTexture(), vertexData_);
+    }
 
 }
 

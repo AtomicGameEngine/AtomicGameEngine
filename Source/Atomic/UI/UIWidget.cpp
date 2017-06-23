@@ -330,12 +330,14 @@ void UIWidget::SetRect(IntRect rect)
 }
 
 
-void UIWidget::SetSize(int width, int height)
+bool UIWidget::SetSize(int width, int height)
 {
     if (!widget_)
-        return;
+        return false;
 
     widget_->SetSize(width, height);
+
+    return true;
 }
 
 void UIWidget::Invalidate()
@@ -833,7 +835,7 @@ void UIWidget::SetFocus()
 
 }
 
-bool UIWidget::GetFocus()
+bool UIWidget::GetFocus() const
 {
     if (!widget_)
         return false;

@@ -24,6 +24,7 @@
 #include <TurboBadger/tb_widgets_common.h>
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/UI/UIView.h>
 #include <Atomic/Graphics/Texture.h>
 
 #include "UIEvents.h"
@@ -151,7 +152,12 @@ void TBTextureWidget::OnPaint(const PaintProps &paint_props)
     data[30] = rect.x;
     data[31] = rect.y + rect.h;
 
-    uiTextureWidget_->GetSubsystem<UI>()->SubmitBatchVertexData(uiTextureWidget_->GetTexture(), vertexData_);
+    UIView *view = uiTextureWidget_->GetView();
+
+    if (view)
+    {
+        view->SubmitBatchVertexData(uiTextureWidget_->GetTexture(), vertexData_);
+    }
 
 }
 

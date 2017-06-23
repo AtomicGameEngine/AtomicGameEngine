@@ -34,11 +34,14 @@ namespace Atomic
 class VertexBuffer;
 class UIRenderer;
 class UIWidget;
+class UIView;
 class UIPopupWindow;
 class MessageBox;
 
 class ATOMIC_API UI : public Object, private tb::TBWidgetListener
 {
+    friend class UIView;
+
     ATOMIC_OBJECT(UI, Object)
 
 public:
@@ -55,8 +58,6 @@ public:
     void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 
     void Render(bool resetRenderTargets = true);
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
-    void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
     void Initialize(const String& languageFile);
 
@@ -130,17 +131,18 @@ public:
     // Debugging
     static void DebugShowSettingsWindow(UIWidget* parent);
 
+    /// Get the currently focused view
+    UIView* GetFocusedView() const { return focusedView_; }
+
 private:
 
     static WeakPtr<Context> uiContext_;
     static void TBFileReader(const char* filename, void** data, unsigned* length);
     static void TBIDRegisterStringCallback(unsigned id, const char* value);
 
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
-
-    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
-    void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
 
     // TBWidgetListener
     void OnWidgetDelete(tb::TBWidget *widget);
@@ -149,15 +151,15 @@ private:
     bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
     void OnWindowClose(tb::TBWindow *window);
 
+    /// Add a UIView to UI subsystem, happens immediately at UIView creation
+    void AddUIView(UIView* uiView);
+    /// Set the currently focused view
+    void SetFocusedView(UIView* uiView);
+    /// Removes a UIView from the UI subsystem, readding a view is not encouraged
+    void RemoveUIView(UIView* uiView);
 
     tb::TBWidget* rootWidget_;
     UIRenderer* renderer_;
-
-    /// UI rendering batches.
-    PODVector<UIBatch> batches_;
-    /// UI rendering vertex data.
-    PODVector<float> vertexData_;
-    SharedPtr<VertexBuffer> vertexBuffer_;
 
     WeakPtr<Graphics> graphics_;
 
@@ -177,22 +179,14 @@ private:
     
     float tooltipHoverTime_;
 
+    Vector<SharedPtr<UIView>> uiViews_;
+
+    WeakPtr<UIView> focusedView_;
+
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
-    void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData);
-    void HandleMouseMove(StringHash eventType, VariantMap& eventData);
-    void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
-    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
-    void HandleKeyUp(StringHash eventType, VariantMap& eventData);
-    void HandleKey(bool keydown, int keycode, int scancode);
-    void HandleTextInput(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
-    //Touch Input
-    void HandleTouchBegin(StringHash eventType, VariantMap& eventData);
-    void HandleTouchMove(StringHash eventType, VariantMap& eventData);
-    void HandleTouchEnd(StringHash eventType, VariantMap& eventData);
 };
 
 }

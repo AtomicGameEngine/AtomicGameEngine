@@ -62,6 +62,7 @@ using namespace tb;
 
 #include "UIRenderer.h"
 #include "UI.h"
+#include "UIView.h"
 #include "UIButton.h"
 #include "UITextField.h"
 #include "UIEditField.h"
@@ -91,6 +92,7 @@ using namespace tb;
 #include "UIPromptWindow.h"
 #include "UIFinderWindow.h"
 #include "UIPulldownMenu.h"
+#include "UIComponent.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -108,12 +110,15 @@ void TBSystem::RescheduleTimer(double fire_time)
 
 }
 
-
 namespace Atomic
 {
 
-WeakPtr<Context> UI::uiContext_;
+void RegisterUILibrary(Context* context)
+{
+    UIComponent::RegisterObject(context);
+}
 
+WeakPtr<Context> UI::uiContext_;
 
 UI::UI(Context* context) :
     Object(context),
@@ -127,6 +132,8 @@ UI::UI(Context* context) :
     changedEventsBlocked_(0),
     tooltipHoverTime_ (0.0f)
 {
+
+    RegisterUILibrary(context);
 
     SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(UI, HandleExitRequested));
 
@@ -201,8 +208,6 @@ void UI::Initialize(const String& languageFile)
     assert(graphics->IsInitialized());
     graphics_ = graphics;
 
-    vertexBuffer_ = new VertexBuffer(context_);
-
     uiContext_ = context_;
 
     TBFile::SetReaderFunction(TBFileReader);
@@ -224,21 +229,10 @@ void UI::Initialize(const String& languageFile)
     rootWidget_->SetSize(width, height);
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, ATOMIC_HANDLER(UI, HandleMouseButtonDown));
-    SubscribeToEvent(E_MOUSEBUTTONUP, ATOMIC_HANDLER(UI, HandleMouseButtonUp));
-    SubscribeToEvent(E_MOUSEMOVE, ATOMIC_HANDLER(UI, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEWHEEL, ATOMIC_HANDLER(UI, HandleMouseWheel));
-    SubscribeToEvent(E_KEYDOWN, ATOMIC_HANDLER(UI, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, ATOMIC_HANDLER(UI, HandleKeyUp));
-    SubscribeToEvent(E_TEXTINPUT, ATOMIC_HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(UI, HandleUpdate));
     SubscribeToEvent(E_SCREENMODE, ATOMIC_HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(E_CONSOLECLOSED, ATOMIC_HANDLER(UI, HandleConsoleClosed));
-
-    SubscribeToEvent(E_TOUCHBEGIN, ATOMIC_HANDLER(UI, HandleTouchBegin));
-    SubscribeToEvent(E_TOUCHEND, ATOMIC_HANDLER(UI, HandleTouchEnd));
-    SubscribeToEvent(E_TOUCHMOVE, ATOMIC_HANDLER(UI, HandleTouchMove));
-
+    SubscribeToEvent(E_POSTUPDATE, ATOMIC_HANDLER(UI, HandlePostUpdate));
     SubscribeToEvent(E_RENDERUPDATE, ATOMIC_HANDLER(UI, HandleRenderUpdate));
 
     // register the UIDragDrop subsystem (after we have subscribed to events, so it is processed after)
@@ -316,158 +310,93 @@ void UI::AddFont(const String& fontFile, const String& name)
     tb::g_font_manager->AddFontInfo(fontFile.CString(), name.CString());
 }
 
-void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UI::AddUIView(UIView* uiView)
 {
+    rootWidget_->AddChild(uiView->GetInternalWidget());
+    uiViews_.Push(SharedPtr<UIView>(uiView));
 
-    if (batches.Empty())
-        return;
-
-    Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
-    Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
-    Vector2 offset(-1.0f, 1.0f);
-
-    Matrix4 projection(Matrix4::IDENTITY);
-    projection.m00_ = scale.x_;
-    projection.m03_ = offset.x_;
-    projection.m11_ = scale.y_;
-    projection.m13_ = offset.y_;
-    projection.m22_ = 1.0f;
-    projection.m23_ = 0.0f;
-    projection.m33_ = 1.0f;
-
-    graphics_->ClearParameterSources();
-    graphics_->SetColorWrite(true);
-    graphics_->SetCullMode(CULL_NONE);
-    graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(false);
-    graphics_->SetFillMode(FILL_SOLID);
-    graphics_->SetStencilTest(false);
-
-    graphics_->ResetRenderTargets();
-
-    graphics_->SetVertexBuffer(buffer);
-
-    ShaderVariation* noTextureVS = graphics_->GetShader(VS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* diffTextureVS = graphics_->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
-    ShaderVariation* noTexturePS = graphics_->GetShader(PS, "Basic", "VERTEXCOLOR");
-    ShaderVariation* diffTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
-    ShaderVariation* diffMaskTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
-    ShaderVariation* alphaTexturePS = graphics_->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
-
-    unsigned alphaFormat = Graphics::GetAlphaFormat();
-
-    for (unsigned i = batchStart; i < batchEnd; ++i)
+    if (!focusedView_ && uiView)
     {
-        const UIBatch& batch = batches[i];
-        if (batch.vertexStart_ == batch.vertexEnd_)
-            continue;
-
-        ShaderVariation* ps;
-        ShaderVariation* vs;
-
-        if (!batch.texture_)
-        {
-            ps = noTexturePS;
-            vs = noTextureVS;
-        }
-        else
-        {
-            // If texture contains only an alpha channel, use alpha shader (for fonts)
-            vs = diffTextureVS;
-
-            if (batch.texture_->GetFormat() == alphaFormat)
-                ps = alphaTexturePS;
-            else if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
-                ps = diffMaskTexturePS;
-            else
-                ps = diffTexturePS;
-        }
-
-        graphics_->SetShaders(vs, ps);
-        if (graphics_->NeedParameterUpdate(SP_OBJECT, this))
-            graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
-        if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
-            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-        if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
-            graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
-
-        graphics_->SetBlendMode(batch.blendMode_);
-        graphics_->SetScissorTest(true, batch.scissor_);
-        graphics_->SetTexture(0, batch.texture_);
-        graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE, (batch.vertexEnd_ - batch.vertexStart_) /
-            UI_VERTEX_SIZE);
+        uiView->SetFocus();
     }
 }
 
-void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+void UI::RemoveUIView(UIView* uiView)
 {
-    if (vertexData.Empty())
-        return;
+    if (focusedView_ == uiView)
+    {
+        SetFocusedView(0);
+    }
 
-    // Update quad geometry into the vertex buffer
-    // Resize the vertex buffer first if too small or much too large
-    unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
-    if (dest->GetVertexCount() < numVertices || dest->GetVertexCount() > numVertices * 2)
-        dest->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
-
-    dest->SetData(&vertexData[0]);
+    rootWidget_->RemoveChild(uiView->GetInternalWidget());
+    uiViews_.Remove(SharedPtr<UIView>(uiView));
 }
 
+void UI::SetFocusedView(UIView* uiView)
+{
+    if (focusedView_ == uiView)
+    {
+        return;
+    }
+
+    focusedView_ = uiView;
+
+    if (focusedView_)
+    {
+        focusedView_->BecomeFocused();
+    }
+    else
+    {
+        focusedView_ = 0;
+
+        // look for first auto activated UIView, and recurse
+        Vector<SharedPtr<UIView>>::Iterator itr = uiViews_.Begin();
+
+        while (itr != uiViews_.End())
+        {
+            if ((*itr)->GetAutoFocus())
+            {                
+                SetFocusedView(*itr);
+                return;
+            }
+
+            itr++;
+        }
+
+    }
+}
 
 void UI::Render(bool resetRenderTargets)
 {
-    SetVertexData(vertexBuffer_, vertexData_);
-    Render(vertexBuffer_, batches_, 0, batches_.Size());
-}
+    Vector<SharedPtr<UIView>>::Iterator itr = uiViews_.Begin();
 
-void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
-{
-    // Get rendering batches from the non-modal UI elements
-    batches_.Clear();
-    vertexData_.Clear();
+    while (itr != uiViews_.End())
+    {
+        (*itr)->Render(resetRenderTargets);
 
-    tb::TBRect rect = rootWidget_->GetRect();
-
-    IntRect currentScissor = IntRect(0, 0, rect.w, rect.h);
-    GetBatches(batches_, vertexData_, currentScissor);
+        itr++;
+    }
 
 }
 
-void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
-{
-    //if (!initialized_)
-    //    return;
 
+void UI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+{
     TBAnimationManager::Update();
 
     rootWidget_->InvokeProcessStates();
     rootWidget_->InvokeProcess();
-
-    tb::g_renderer->BeginPaint(rootWidget_->GetRect().w, rootWidget_->GetRect().h);
-
-    renderer_->currentScissor_ = currentScissor;
-    renderer_->batches_ = &batches;
-    renderer_->vertexData_ = &vertexData;
-    rootWidget_->InvokePaint(tb::TBWidget::PaintProps());
-
-    tb::g_renderer->EndPaint();
 }
 
-void UI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
+void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    UIBatch b(BLEND_ALPHA , renderer_->currentScissor_, texture, &vertexData_);
+    Vector<SharedPtr<UIView>>::Iterator itr = uiViews_.Begin();
 
-    unsigned begin = b.vertexData_->Size();
-    b.vertexData_->Resize(begin + vertexData.Size());
-    float* dest = &(b.vertexData_->At(begin));
-    b.vertexEnd_ = b.vertexData_->Size();
-
-    for (unsigned i = 0; i < vertexData.Size(); i++, dest++)
+    while (itr != uiViews_.End())
     {
-        *dest = vertexData[i];
+        (*itr)->UpdateUIBatches();
+        itr++;
     }
-
-    UIBatch::AddOrMerge(b, batches_);
 
 }
 
@@ -1033,7 +962,5 @@ void UI::DebugShowSettingsWindow(UIWidget* parent)
 #endif
 
 }
-
-
 
 }
