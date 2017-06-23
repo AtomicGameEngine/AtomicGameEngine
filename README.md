@@ -15,7 +15,7 @@ Atomic is lean, full source, technology for mobile and desktop.  It has a powerf
 
 The Atomic Editor is **installed in over 75 countries** and is being used in production environments.  It is also a great resource for learning JavaScript, TypeScript, C#, and the art of native C++ engine design.  
 
-If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="http://atomicgameengine.com/#download-the-atomic-editor">download the Atomic Editor</a> or fork us on GitHub!
+If you need excellent, high performance technology which leverages the full might of GitHub, the Atomic Community invites you to <a href="http://atomicgameengine.com/#download-the-atomic-editor">download the Atomic Editor</a> or <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/fork">fork us</a> on GitHub!
 
 #### Atomic Technology
 
@@ -77,7 +77,7 @@ Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and schedule
 
 - Fork [AtomicGameEngine/AtomicExamples](https://github.com/AtomicGameEngine/AtomicExamples) and submit a pull request with current example improvements or a new example
 
-- Help with issues marked **```unassigned: help wanted```** in the [current build milestone](https://github.com/AtomicGameEngine/AtomicGameEngine/milestones)
+- Help with issues marked [**```unassigned: help wanted```**](https://github.com/AtomicGameEngine/AtomicGameEngine/labels/unassigned%3A%20help%20wanted) in the [current build milestone](https://github.com/AtomicGameEngine/AtomicGameEngine/milestones)
 
 - Inform us of other ways to help that should be added here :)  
 
