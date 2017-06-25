@@ -91,6 +91,8 @@ using namespace tb;
 #include "UIPromptWindow.h"
 #include "UIFinderWindow.h"
 #include "UIPulldownMenu.h"
+#include "UIRadioButton.h"
+#include "UIScrollBar.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -690,6 +692,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return slider;
     }
 
+    if (widget->IsOfType<TBScrollBar>())
+    {
+        UIScrollBar* slider = new UIScrollBar(context_, false);
+        slider->SetWidget(widget);
+        WrapWidget(slider, widget);
+        return slider;
+    }
+
     if (widget->IsOfType<TBColorWidget>())
     {
         UIColorWidget* colorWidget = new UIColorWidget(context_, false);
@@ -800,6 +810,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBCheckBox>())
     {
         UICheckBox* nwidget = new UICheckBox(context_, false);
+        nwidget->SetWidget(widget);
+        WrapWidget(nwidget, widget);
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBRadioButton>())
+    {
+        UIRadioButton* nwidget = new UIRadioButton(context_, false);
         nwidget->SetWidget(widget);
         WrapWidget(nwidget, widget);
         return nwidget;

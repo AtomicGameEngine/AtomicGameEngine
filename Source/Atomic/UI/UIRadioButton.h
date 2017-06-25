@@ -28,22 +28,14 @@ namespace Atomic
 {
 
 
-class ATOMIC_API UIInlineSelect : public UIWidget
+class ATOMIC_API UIRadioButton : public UIWidget
 {
-    ATOMIC_OBJECT(UIInlineSelect, UIWidget)
+    ATOMIC_OBJECT(UIRadioButton, UIWidget)
 
 public:
 
-    UIInlineSelect(Context* context, bool createWidget = true);
-    virtual ~UIInlineSelect();
-
-    void SetLimits(double minimum, double maximum);
-
-	/// set and get the inc, dec step size
-    void SetStepSize(double step);
-    double GetStepSize();
-
-    void SetEditFieldLayoutParams(UILayoutParams* params);
+    UIRadioButton(Context* context, bool createWidget = true);
+    virtual ~UIRadioButton();
 
 protected:
 

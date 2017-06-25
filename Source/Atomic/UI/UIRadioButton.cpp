@@ -20,37 +20,37 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include <TurboBadger/tb_widgets.h>
+#include <TurboBadger/tb_widgets_common.h>
 
-#include "UIWidget.h"
+#include <Atomic/IO/Log.h>
+
+#include "UIEvents.h"
+#include "UI.h"
+#include "UIRadioButton.h"
+
+using namespace tb;
 
 namespace Atomic
 {
 
-
-class ATOMIC_API UIInlineSelect : public UIWidget
+UIRadioButton::UIRadioButton(Context* context, bool createWidget) : UIWidget(context, false)
 {
-    ATOMIC_OBJECT(UIInlineSelect, UIWidget)
+    if (createWidget)
+    {
+        widget_ = new TBRadioButton();
+        widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
+    }
+}
 
-public:
+UIRadioButton::~UIRadioButton()
+{
+}
 
-    UIInlineSelect(Context* context, bool createWidget = true);
-    virtual ~UIInlineSelect();
-
-    void SetLimits(double minimum, double maximum);
-
-	/// set and get the inc, dec step size
-    void SetStepSize(double step);
-    double GetStepSize();
-
-    void SetEditFieldLayoutParams(UILayoutParams* params);
-
-protected:
-
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
-
-private:
-
-};
+bool UIRadioButton::OnEvent(const tb::TBWidgetEvent &ev)
+{
+    return UIWidget::OnEvent(ev);
+}
 
 }

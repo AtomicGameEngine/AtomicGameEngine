@@ -28,22 +28,19 @@ namespace Atomic
 {
 
 
-class ATOMIC_API UIInlineSelect : public UIWidget
+class ATOMIC_API UIScrollBar : public UIWidget
 {
-    ATOMIC_OBJECT(UIInlineSelect, UIWidget)
+    ATOMIC_OBJECT(UIScrollBar, UIWidget)
 
 public:
 
-    UIInlineSelect(Context* context, bool createWidget = true);
-    virtual ~UIInlineSelect();
+    UIScrollBar(Context* context, bool createWidget = true);
+    virtual ~UIScrollBar();
 
-    void SetLimits(double minimum, double maximum);
-
-	/// set and get the inc, dec step size
-    void SetStepSize(double step);
-    double GetStepSize();
-
-    void SetEditFieldLayoutParams(UILayoutParams* params);
+    void SetLimits(double minimum, double maximum, double visible);
+    double GetMinValue() const;
+    double GetMaxValue() const;
+    double GetVisible() const;
 
 protected:
 
