@@ -38,6 +38,8 @@ public:
     virtual ~UISlider();
 
     void SetLimits(double minimum, double maximum);
+    double GetMinValue() const;
+    double GetMaxValue() const;
 
 protected:
 

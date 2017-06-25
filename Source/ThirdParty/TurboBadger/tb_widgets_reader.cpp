@@ -159,6 +159,7 @@ void TBButton::OnInflate(const INFLATE_INFO &info)
     SetToggleMode(info.node->GetValueInt("toggle-mode", GetToggleMode()) ? true : false);
     // ATOMIC BEGIN
     SetURL(info.node->GetValueString("url", ""));
+    SetSqueezable(info.node->GetValueInt("squeezable", GetSqueezable()) ? true : false);
     // ATOMIC END
     TBWidget::OnInflate(info);
 }
@@ -169,6 +170,11 @@ void TBInlineSelect::OnInflate(const INFLATE_INFO &info)
     int min = info.node->GetValueInt("min", GetMinValue());
     int max = info.node->GetValueInt("max", GetMaxValue());
     SetLimits(min, max);
+
+// ATOMIC BEGIN
+    double m_stepsize = (double)info.node->GetValueFloat("stepsize", (float)GetStepSize());
+// ATOMIC END
+
     TBWidget::OnInflate(info);
 }
 
@@ -318,6 +324,12 @@ void TBScrollBar::OnInflate(const INFLATE_INFO &info)
     const char *axis = info.node->GetValueString("axis", "x");
     SetAxis(*axis == 'x' ? AXIS_X : AXIS_Y);
     SetGravity(*axis == 'x' ? WIDGET_GRAVITY_LEFT_RIGHT : WIDGET_GRAVITY_TOP_BOTTOM);
+// ATOMIC BEGIN
+    double min = (double)info.node->GetValueFloat("min", (float)GetMinValue());
+    double max = (double)info.node->GetValueFloat("max", (float)GetMaxValue());
+    double thumb = (double)info.node->GetValueFloat("thumb", (float)GetVisible()); // use thumb, visible is already used.
+    SetLimits(min, max, thumb);
+// ATOMIC END
     TBWidget::OnInflate(info);
 }
 
@@ -387,6 +399,11 @@ void TBTextField::OnInflate(const INFLATE_INFO &info)
         else if (!strcmp(text_align, "center"))	SetTextAlign(TB_TEXT_ALIGN_CENTER);
         else if (!strcmp(text_align, "right"))	SetTextAlign(TB_TEXT_ALIGN_RIGHT);
     }
+
+//ATOMIC BEGIN
+   SetSqueezable(info.node->GetValueInt("squeezable", GetSqueezable()) ? true : false);
+//ATOMIC END
+
     TBWidget::OnInflate(info);
 }
 

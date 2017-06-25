@@ -22,69 +22,70 @@
 
 #include <TurboBadger/tb_widgets.h>
 #include <TurboBadger/tb_widgets_common.h>
-#include <TurboBadger/tb_inline_select.h>
 
 #include <Atomic/IO/Log.h>
 
 #include "UIEvents.h"
 #include "UI.h"
 #include "UILayout.h"
-#include "UIInlineSelect.h"
+#include "UIScrollBar.h"
 
 using namespace tb;
 
 namespace Atomic
 {
 
-UIInlineSelect::UIInlineSelect(Context* context, bool createWidget) : UIWidget(context, false)
+UIScrollBar::UIScrollBar(Context* context, bool createWidget) : UIWidget(context, false)
 {
     if (createWidget)
     {
-        widget_ = new TBInlineSelect();
+        widget_ = new TBScrollBar();
         widget_->SetDelegate(this);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
 
-UIInlineSelect::~UIInlineSelect()
+UIScrollBar::~UIScrollBar()
 {
 
 }
 
-void UIInlineSelect::SetEditFieldLayoutParams(UILayoutParams* params)
-{
-    if (!params || !widget_)
-        return;
-
-    ((TBInlineSelect*) widget_)->SetEditFieldLayoutParams(*(params->GetTBLayoutParams()));
-
-}
-
-void UIInlineSelect::SetLimits(double minimum, double maximum)
+void UIScrollBar::SetLimits(double minimum, double maximum, double visible)
 {
     if (!widget_)
         return;
-    ((TBInlineSelect*) widget_)->SetLimits(minimum, maximum);
+    ((TBScrollBar*) widget_)->SetLimits(minimum, maximum, visible);
 
 }
 
-// set the inc, dec step size
-void UIInlineSelect::SetStepSize(double step)
-{
-    if (!widget_)
-        return;
-    ((TBInlineSelect*) widget_)->SetStepSize(step);
-}
-
-// get the inc, dec step size
-double UIInlineSelect::GetStepSize()
+double UIScrollBar::GetMinValue() const
 {
     if (!widget_)
         return 0.0;
-    return ((TBInlineSelect*) widget_)->GetStepSize();
+
+   return ((TBScrollBar*) widget_)->GetMinValue();
+
 }
 
-bool UIInlineSelect::OnEvent(const tb::TBWidgetEvent &ev)
+double UIScrollBar::GetMaxValue() const
+{
+    if (!widget_)
+        return 0.0;
+
+   return ((TBScrollBar*) widget_)->GetMaxValue();
+
+}
+
+double UIScrollBar::GetVisible() const
+{
+    if (!widget_)
+        return 0.0;
+
+   return ((TBScrollBar*) widget_)->GetVisible();
+
+}
+
+bool UIScrollBar::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
     {

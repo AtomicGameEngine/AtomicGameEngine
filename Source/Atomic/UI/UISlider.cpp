@@ -58,6 +58,24 @@ void UISlider::SetLimits(double minimum, double maximum)
 
 }
 
+double UISlider::GetMinValue() const
+{
+    if (!widget_)
+        return 0.0;
+
+   return ((UISlider*) widget_)->GetMinValue();
+
+}
+
+double UISlider::GetMaxValue() const
+{
+    if (!widget_)
+        return 0.0;
+
+   return ((UISlider*) widget_)->GetMaxValue();
+
+}
+
 bool UISlider::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
