@@ -93,6 +93,8 @@ using namespace tb;
 #include "UIFinderWindow.h"
 #include "UIPulldownMenu.h"
 #include "UIComponent.h"
+#include "UIRadioButton.h"
+#include "UIScrollBar.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -150,12 +152,12 @@ UI::~UI()
 
         TBFile::SetReaderFunction(0);
         TBID::tbidRegisterCallback = 0;
-        
+
         tb::TBWidgetsAnimationManager::Shutdown();
 
         delete rootWidget_;
         widgetWrap_.Clear();
-        
+
         // leak
         //delete TBUIRenderer::renderer_;
 
@@ -355,7 +357,7 @@ void UI::SetFocusedView(UIView* uiView)
         while (itr != uiViews_.End())
         {
             if ((*itr)->GetAutoFocus())
-            {                
+            {
                 SetFocusedView(*itr);
                 return;
             }
@@ -476,7 +478,7 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         exitRequested_ = false;
         return;
     }
-    
+
     tooltipHoverTime_ += eventData[Update::P_TIMESTEP].GetFloat();
 
     if (tooltipHoverTime_ >= 0.5f)
@@ -504,7 +506,7 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
             tooltip_->Show(mousePosition.x_ + 8, mousePosition.y_ + 8);
         }
     }
-    else 
+    else
     {
         if (tooltip_) tooltip_->Close();
     }
@@ -614,6 +616,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBSlider>())
     {
         UISlider* slider = new UISlider(context_, false);
+        slider->SetWidget(widget);
+        WrapWidget(slider, widget);
+        return slider;
+    }
+
+    if (widget->IsOfType<TBScrollBar>())
+    {
+        UIScrollBar* slider = new UIScrollBar(context_, false);
         slider->SetWidget(widget);
         WrapWidget(slider, widget);
         return slider;
@@ -734,6 +744,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return nwidget;
     }
 
+    if (widget->IsOfType<TBRadioButton>())
+    {
+        UIRadioButton* nwidget = new UIRadioButton(context_, false);
+        nwidget->SetWidget(widget);
+        WrapWidget(nwidget, widget);
+        return nwidget;
+    }
+
     if (widget->IsOfType<TBBarGraph>())
     {
         UIBargraph* nwidget = new UIBargraph(context_, false);
@@ -757,7 +775,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         WrapWidget(nwidget, widget);
         return nwidget;
     }
-    
+
     if (widget->IsOfType<TBPromptWindow>())
     {
         UIPromptWindow* nwidget = new UIPromptWindow(context_, NULL, "", false);
