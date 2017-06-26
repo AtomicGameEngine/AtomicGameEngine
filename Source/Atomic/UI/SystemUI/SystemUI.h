@@ -73,8 +73,6 @@ public:
             const Atomic::String& font_path, float size = 0,
             const std::initializer_list<unsigned short>& ranges = {}, bool merge = false);
 
-    void CreateConsoleAndDebugHud();
-
 protected:
     float uiScale_ = 1.f;
     Atomic::Matrix4 projection_;

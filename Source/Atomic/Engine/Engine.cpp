@@ -42,6 +42,7 @@
 
 // ATOMIC BEGIN
 #include "../Resource/XMLFile.h"
+#include "../UI/SystemUI/SystemUI.h"
 // ATOMIC END
 
 #ifdef ATOMIC_NAVIGATION
@@ -344,6 +345,11 @@ bool Engine::Initialize(const VariantMap& parameters)
         EventProfiler::SetActive(true);
     }
 #endif
+
+    // ATOMIC BEGIN
+    context_->RegisterSubsystem(new SystemUI(context_));
+    // ATOMIC END
+
     frameTimer_.Reset();
 
     ATOMIC_LOGINFO("Initialized engine");

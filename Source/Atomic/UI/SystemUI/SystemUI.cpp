@@ -87,6 +87,9 @@ SystemUI::SystemUI(Atomic::Context* context)
     });
     SubscribeToEvent(E_SDLRAWINPUT, std::bind(&SystemUI::OnRawEvent, this, _2));
     SubscribeToEvent(E_SCREENMODE, std::bind(&SystemUI::UpdateProjectionMatrix, this));
+
+    context_->RegisterSubsystem(new Console(context_));
+    context_->RegisterSubsystem(new DebugHud(context_));
 }
 
 SystemUI::~SystemUI()
@@ -366,17 +369,6 @@ void SystemUI::SetScale(float scale)
         return;
     uiScale_ = scale;
     UpdateProjectionMatrix();
-}
-
-void SystemUI::CreateConsoleAndDebugHud()
-{
-    Console* console = new Console(context_);
-    DebugHud* debugHud = new DebugHud(context_);
-
-    // Create console & debug hud
-    context_->RegisterSubsystem(console);
-    context_->RegisterSubsystem(debugHud);
-
 }
 
 }

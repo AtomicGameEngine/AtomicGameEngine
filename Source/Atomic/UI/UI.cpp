@@ -242,10 +242,6 @@ void UI::Initialize(const String& languageFile)
 
     initialized_ = true;
 
-    SystemUI* systemUI = new SystemUI(context_);
-    context_->RegisterSubsystem(systemUI);
-    systemUI->CreateConsoleAndDebugHud();
-
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 }
 
