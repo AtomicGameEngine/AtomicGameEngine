@@ -79,6 +79,16 @@ namespace Atomic
         arguments_.Push(argument);
     }
 
+    unsigned AppBase::GetNumArguments()
+    {
+        return arguments_.Size();
+    }
+
+    String AppBase::GetArgument(unsigned index)
+    {
+        return arguments_[index];
+    }
+
     void AppBase::ProcessArguments()
     {
         for (unsigned i = 0; i < arguments_.Size(); ++i)
