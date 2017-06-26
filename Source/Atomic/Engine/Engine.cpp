@@ -43,6 +43,8 @@
 // ATOMIC BEGIN
 #include "../Resource/XMLFile.h"
 #include "../UI/SystemUI/SystemUI.h"
+#include "../UI/SystemUI/Console.h"
+#include "../UI/SystemUI/DebugHud.h"
 // ATOMIC END
 
 #ifdef ATOMIC_NAVIGATION
@@ -348,6 +350,29 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     // ATOMIC BEGIN
     context_->RegisterSubsystem(new SystemUI(context_));
+
+    context_->engine_ = GetSubsystem<Engine>();
+    context_->time_ = GetSubsystem<Time>();
+    context_->workQueue_ = GetSubsystem<WorkQueue>();
+    context_->profiler_ = GetSubsystem<Profiler>();
+    context_->fileSystem_ = GetSubsystem<FileSystem>();
+    context_->log_ = GetSubsystem<Log>();
+    context_->cache_ = GetSubsystem<ResourceCache>();
+    context_->l18n_ = GetSubsystem<Localization>();
+    context_->network_ = GetSubsystem<Network>();
+    context_->web_ = GetSubsystem<Web>();
+#ifdef ATOMIC_DATABASE
+    context_->db_ = GetSubsystem<Database>();
+#endif
+    context_->input_ = GetSubsystem<Input>();
+    context_->audio_ = GetSubsystem<Audio>();
+    context_->ui_ = GetSubsystem<UI>();
+    context_->systemUi_ = GetSubsystem<SystemUI>();
+    context_->graphics_ = GetSubsystem<Graphics>();
+    context_->renderer_ = GetSubsystem<Renderer>();
+    context_->console_ = GetSubsystem<Console>();
+    context_->debugHud_ = GetSubsystem<DebugHud>();
+    context_->metrics_ = GetSubsystem<Metrics>();
     // ATOMIC END
 
     frameTimer_.Reset();

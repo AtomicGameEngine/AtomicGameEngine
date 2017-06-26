@@ -38,6 +38,27 @@ public:
     virtual void EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
 };
 
+class Metrics;
+class Engine;
+class Time;
+class WorkQueue;
+class Profiler;
+class FileSystem;
+class Log;
+class ResourceCache;
+class Localization;
+class Network;
+class Web;
+class Database;
+class Input;
+class Audio;
+class UI;
+class SystemUI;
+class Graphics;
+class Renderer;
+class Console;
+class DebugHud;
+
 // ATOMIC END
 
 /// Tracking structure for event receivers.
@@ -227,6 +248,27 @@ public:
     // hook for listening into events
     void AddGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Push(listener); }
     void RemoveGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Erase(globalEventListeners_.Find(listener)); }
+
+    WeakPtr<Engine> engine_;
+    WeakPtr<Time> time_;
+    WeakPtr<WorkQueue> workQueue_;
+    WeakPtr<Profiler> profiler_;
+    WeakPtr<FileSystem> fileSystem_;
+    WeakPtr<Log> log_;
+    WeakPtr<ResourceCache> cache_;
+    WeakPtr<Localization> l18n_;
+    WeakPtr<Network> network_;
+    WeakPtr<Web> web_;
+    WeakPtr<Database> db_;
+    WeakPtr<Input> input_;
+    WeakPtr<Audio> audio_;
+    WeakPtr<UI> ui_;
+    WeakPtr<SystemUI> systemUi_;
+    WeakPtr<Graphics> graphics_;
+    WeakPtr<Renderer> renderer_;
+    WeakPtr<Console> console_;
+    WeakPtr<DebugHud> debugHud_;
+    WeakPtr<Metrics> metrics_;
 
     // ATOMIC END
 
