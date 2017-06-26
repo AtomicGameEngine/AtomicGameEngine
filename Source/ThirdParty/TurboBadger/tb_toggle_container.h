@@ -104,6 +104,15 @@ public:
     virtual void SetValue(int value);
     virtual int GetValue() { return m_toggle_container.GetValue(); }
 
+    // ATOMIC BEGIN
+    virtual void AddToggleChild(TBWidget *child, WIDGET_Z z = WIDGET_Z_TOP, WIDGET_INVOKE_INFO info = WIDGET_INVOKE_INFO_NORMAL);
+    virtual void AddToggleChildRelative(TBWidget *child, WIDGET_Z_REL z, TBWidget *reference, WIDGET_INVOKE_INFO info = WIDGET_INVOKE_INFO_NORMAL);
+    virtual void RemoveToggleChild(TBWidget* child);
+    virtual void DeleteAllToggleChildren();
+    virtual TBWidget* GetFirstToggleChild();
+    virtual TBWidget* GetToggleWidgetById(const TBID &id);
+    // ATOMIC END
+
     virtual TBWidget *GetContentRoot() { return m_toggle_container.GetContentRoot(); }
     virtual void OnProcessAfterChildren();
 
@@ -113,6 +122,10 @@ private:
     TBSectionHeader m_header;
     TBToggleContainer m_toggle_container;
     bool m_pending_scroll;
+
+    // ATOMIC BEGIN
+    TBLayout m_toggle_container_layout;
+    // ATOMIC END
 };
 
 }; // namespace tb

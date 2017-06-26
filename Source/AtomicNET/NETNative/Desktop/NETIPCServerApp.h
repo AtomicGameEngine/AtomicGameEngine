@@ -1,4 +1,5 @@
 //
+// Copyright (c) 2008-2014 the Urho3D project.
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,39 +23,29 @@
 
 #pragma once
 
-#include "UIWidget.h"
+#include <AtomicApp/IPCServerApp.h>
 
 namespace Atomic
 {
 
+    class NETIPCServerApp : public IPCServerApp
+    {
+        ATOMIC_OBJECT(NETIPCServerApp,IPCServerApp)
 
-class ATOMIC_API UISection : public UIWidget
-{
-    ATOMIC_OBJECT(UISection, UIWidget)
+    public:
 
-public:
+        static NETIPCServerApp* CreateInternal();
 
-    UISection(Context* context, bool createWidget = true);
-    virtual ~UISection();
+        int Initialize();
 
-    void AddChild(UIWidget* child);
-    void AddChildAfter(UIWidget* child, UIWidget* otherChild);
-    void AddChildBefore(UIWidget* child, UIWidget* otherChild);
-    void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
+    private:
 
-    void RemoveChild(UIWidget* child, bool cleanup = true);
-    void DeleteAllChildren();
+        /// Construct.
+        NETIPCServerApp(Context* context);
 
-    UIWidget* GetFirstChild();
-    UIWidget* GetWidget(const String& id);
+        /// Setup before engine initialization.
+        virtual void Setup();
 
-
-protected:
-
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
-
-private:
-
-};
+    };
 
 }
