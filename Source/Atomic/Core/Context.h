@@ -38,27 +38,6 @@ public:
     virtual void EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
 };
 
-class Metrics;
-class Engine;
-class Time;
-class WorkQueue;
-class Profiler;
-class FileSystem;
-class Log;
-class ResourceCache;
-class Localization;
-class Network;
-class Web;
-class Database;
-class Input;
-class Audio;
-class UI;
-class SystemUI;
-class Graphics;
-class Renderer;
-class Console;
-class DebugHud;
-
 // ATOMIC END
 
 /// Tracking structure for event receivers.

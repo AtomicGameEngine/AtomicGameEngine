@@ -39,6 +39,29 @@ namespace Atomic
 class Context;
 class EventHandler;
 
+// ATOMIC BEGIN
+class Engine;
+class Time;
+class WorkQueue;
+class Profiler;
+class FileSystem;
+class Log;
+class ResourceCache;
+class Localization;
+class Network;
+class Web;
+class Database;
+class Input;
+class Audio;
+class UI;
+class SystemUI;
+class Graphics;
+class Renderer;
+class Console;
+class DebugHud;
+class Metrics;
+// ATOMIC END
+
 /// Type info.
 class ATOMIC_API TypeInfo
 {
@@ -408,5 +431,31 @@ struct ATOMIC_API EventNameRegistrar
 #define ATOMIC_HANDLER(className, function) (new Atomic::EventHandlerImpl<className>(this, &className::function))
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
 #define ATOMIC_HANDLER_USERDATA(className, function, userData) (new Atomic::EventHandlerImpl<className>(this, &className::function, userData))
+
+
+// ATOMIC BEGIN
+// Explicit template specializations for most commonly used engine subsystems. They sidestep HashMap lookup and return
+// subsystem pointer cached in Context object.
+template <> Engine* Object::GetSubsystem<Engine>() const;
+template <> Time* Object::GetSubsystem<Time>() const;
+template <> WorkQueue* Object::GetSubsystem<WorkQueue>() const;
+template <> Profiler* Object::GetSubsystem<Profiler>() const;
+template <> FileSystem* Object::GetSubsystem<FileSystem>() const;
+template <> Log* Object::GetSubsystem<Log>() const;
+template <> ResourceCache* Object::GetSubsystem<ResourceCache>() const;
+template <> Localization* Object::GetSubsystem<Localization>() const;
+template <> Network* Object::GetSubsystem<Network>() const;
+template <> Web* Object::GetSubsystem<Web>() const;
+template <> Database* Object::GetSubsystem<Database>() const;
+template <> Input* Object::GetSubsystem<Input>() const;
+template <> Audio* Object::GetSubsystem<Audio>() const;
+template <> UI* Object::GetSubsystem<UI>() const;
+template <> SystemUI* Object::GetSubsystem<SystemUI>() const;
+template <> Graphics* Object::GetSubsystem<Graphics>() const;
+template <> Renderer* Object::GetSubsystem<Renderer>() const;
+template <> Console* Object::GetSubsystem<Console>() const;
+template <> DebugHud* Object::GetSubsystem<DebugHud>() const;
+template <> Metrics* Object::GetSubsystem<Metrics>() const;
+// ATOMIC END
 
 }
