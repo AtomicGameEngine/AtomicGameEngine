@@ -814,11 +814,19 @@ bool TBWidget::IsEventDestinationFor(TBWidget *other_widget) const
     return false;
 }
 
-TBWidget *TBWidget::GetParentRoot()
+TBWidget *TBWidget::GetParentRoot(bool view_root)
 {
     TBWidget *tmp = this;
+
     while (tmp->m_parent)
+    {
+        if (view_root && !tmp->m_parent->m_parent)
+        {
+            return tmp;
+        }
+
         tmp = tmp->m_parent;
+    }
     return tmp;
 }
 
