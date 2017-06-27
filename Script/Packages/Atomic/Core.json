@@ -1,6 +1,17 @@
 {
 	"name" : "Core",
 	"sources" : ["Source/Atomic/Core", "Source/Atomic/BuildInfo"],
+	"includes": [
+		"<Atomic/Engine/Engine.h>",
+		"<Atomic/Network/Network.h>",
+		"<Atomic/Web/Web.h>",
+		"<Atomic/Input/Input.h>",
+		"<Atomic/Audio/Audio.h>",
+		"<Atomic/UI/UI.h>",
+		"<Atomic/Graphics/Graphics.h>",
+		"<Atomic/Graphics/Renderer.h>",
+		"<Atomic/Metrics/Metrics.h>"
+	],
 	"classes" : ["Context", "Object", "AtomicBuildInfo", "Time"],
 	"classes_rename" : {
 		"Object" : "AObject"
