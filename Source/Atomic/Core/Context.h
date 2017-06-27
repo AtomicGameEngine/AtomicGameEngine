@@ -228,6 +228,27 @@ public:
     void AddGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Push(listener); }
     void RemoveGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Erase(globalEventListeners_.Find(listener)); }
 
+    Engine* GetEngine() const { return engine_; }
+    Time* GetTime() const { return time_; }
+    WorkQueue* GetWorkQueue() const { return workQueue_; }
+    Profiler* GetProfiler() const { return profiler_; }
+    FileSystem* GetFileSystem() const { return fileSystem_; }
+    Log* GetLog() const { return log_; }
+    ResourceCache* GetResourceCache() const { return cache_; }
+    Localization* GetLocalization() const { return l18n_; }
+    Network* GetNetwork() const { return network_; }
+    Web* GetWeb() const { return web_; }
+    Database* GetDatabase() const { return db_; }
+    Input* GetInput() const { return input_; }
+    Audio* GetAudio() const { return audio_; }
+    UI* GetUI() const { return ui_; }
+    SystemUI* GetSystemUI() const { return systemUi_; }
+    Graphics* GetGraphics() const { return graphics_; }
+    Renderer* GetRenderer() const { return renderer_; }
+    Console* GetConsole() const { return console_; }
+    DebugHud* GetDebugHud() const { return debugHud_; }
+    Metrics* GetMetrics() const { return metrics_; }
+
     // ATOMIC END
 
 private:
@@ -290,6 +311,30 @@ private:
 
     PODVector<GlobalEventListener*> globalEventListeners_;
     bool editorContext_;
+
+    WeakPtr<Engine> engine_;
+    WeakPtr<Time> time_;
+    WeakPtr<WorkQueue> workQueue_;
+    WeakPtr<Profiler> profiler_;
+    WeakPtr<FileSystem> fileSystem_;
+    WeakPtr<Log> log_;
+    WeakPtr<ResourceCache> cache_;
+    WeakPtr<Localization> l18n_;
+    WeakPtr<Network> network_;
+    WeakPtr<Web> web_;
+    WeakPtr<Database> db_;
+    WeakPtr<Input> input_;
+    WeakPtr<Audio> audio_;
+    WeakPtr<UI> ui_;
+    WeakPtr<SystemUI> systemUi_;
+    WeakPtr<Graphics> graphics_;
+    WeakPtr<Renderer> renderer_;
+    WeakPtr<Console> console_;
+    WeakPtr<DebugHud> debugHud_;
+    WeakPtr<Metrics> metrics_;
+
+    friend class Engine;
+
     // ATOMIC END
 
 };

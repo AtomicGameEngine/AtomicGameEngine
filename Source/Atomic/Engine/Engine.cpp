@@ -42,6 +42,9 @@
 
 // ATOMIC BEGIN
 #include "../Resource/XMLFile.h"
+#include "../UI/SystemUI/SystemUI.h"
+#include "../UI/SystemUI/Console.h"
+#include "../UI/SystemUI/DebugHud.h"
 // ATOMIC END
 
 #ifdef ATOMIC_NAVIGATION
@@ -181,6 +184,31 @@ Engine::Engine(Context* context) :
     // ATOMIC BEGIN        
     SubscribeToEvent(E_PAUSERESUMEREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseResumeRequested));
     SubscribeToEvent(E_PAUSESTEPREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseStepRequested));
+
+    context_->engine_ = context_->GetSubsystem<Engine>();
+    context_->time_ = context_->GetSubsystem<Time>();
+    context_->workQueue_ = context_->GetSubsystem<WorkQueue>();
+#ifdef ATOMIC_PROFILING
+    context_->profiler_ = context_->GetSubsystem<Profiler>();
+#endif
+    context_->fileSystem_ = context_->GetSubsystem<FileSystem>();
+#ifdef ATOMIC_LOGGING
+    context_->log_ = context_->GetSubsystem<Log>();
+#endif
+    context_->cache_ = context_->GetSubsystem<ResourceCache>();
+    context_->l18n_ = context_->GetSubsystem<Localization>();
+#ifdef ATOMIC_NETWORK
+    context_->network_ = context_->GetSubsystem<Network>();
+#endif
+#ifdef ATOMIC_WEB
+    context_->web_ = context_->GetSubsystem<Web>();
+#endif
+#ifdef ATOMIC_DATABASE
+    context_->db_ = context_->GetSubsystem<Database>();
+#endif
+    context_->input_ = context_->GetSubsystem<Input>();
+    context_->audio_ = context_->GetSubsystem<Audio>();
+    context_->ui_ = context_->GetSubsystem<UI>();
     // ATOMIC END
 }
 
@@ -203,6 +231,10 @@ bool Engine::Initialize(const VariantMap& parameters)
     {
         context_->RegisterSubsystem(new Graphics(context_));
         context_->RegisterSubsystem(new Renderer(context_));
+        // ATOMIC BEGIN
+        context_->graphics_ = context_->GetSubsystem<Graphics>();
+        context_->renderer_ = context_->GetSubsystem<Renderer>();
+        // ATOMIC END
     }
     else
     {
@@ -344,6 +376,18 @@ bool Engine::Initialize(const VariantMap& parameters)
         EventProfiler::SetActive(true);
     }
 #endif
+
+    // ATOMIC BEGIN
+    if (!headless_)
+    {
+        context_->RegisterSubsystem(new SystemUI(context_));
+        context_->systemUi_ = context_->GetSubsystem<SystemUI>();
+        context_->console_ = context_->GetSubsystem<Console>();
+        context_->debugHud_ = context_->GetSubsystem<DebugHud>();
+    }
+    context_->metrics_ = context_->GetSubsystem<Metrics>();
+    // ATOMIC END
+
     frameTimer_.Reset();
 
     ATOMIC_LOGINFO("Initialized engine");
