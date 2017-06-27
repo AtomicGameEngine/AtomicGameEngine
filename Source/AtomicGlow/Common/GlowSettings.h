@@ -174,13 +174,12 @@ namespace AtomicGlow
                 case GLOW_PRESET_FAST_LOW_QUALITY:
                     lexelDensity_ = 0.16f;
                     nsamples_ = 16;
-                    photonPassCount_          = 8;
-                    photonBounceCount_        = 1;
+                    photonPassCount_          = 64;
+                    photonBounceCount_        = 4;
                     photonEnergyThreshold_    = 0.05f;
-                    // fix me should be 10, bigger for massive cornell
                     photonMaxDistance_        = 10;
 
-                    finalGatherSamples_       = 32;
+                    finalGatherSamples_       = 1024;
                     finalGatherDistance_      = 50;
                     finalGatherRadius_        = 7;
                     break;

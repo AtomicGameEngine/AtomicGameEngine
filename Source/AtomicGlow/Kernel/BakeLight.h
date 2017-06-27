@@ -41,6 +41,8 @@ namespace AtomicGlow
 class LightRay;
 class BakeMesh;
 class BakeLight;
+class LightVertexGenerator;
+
 
 /// Light cuttoff is used for configuring the light source influence direction (omni, directional, spotlight).
 /// LightCutoff class is a base for all cutoff models and represents an omni-directional light.
@@ -150,10 +152,10 @@ class LightInfluence : public RefCounted
 
     ATOMIC_REFCOUNTED(LightInfluence)
 
-public:
+    public:
 
-    /// Constructs a LightInfluence instance.
-    LightInfluence( const BakeLight* light );
+        /// Constructs a LightInfluence instance.
+        LightInfluence( const BakeLight* light );
 
     virtual ~LightInfluence( void ) {}
 
@@ -174,10 +176,10 @@ class DirectionalLightInfluence : public LightInfluence
 {
     ATOMIC_REFCOUNTED(DirectionalLightInfluence)
 
-public:
+    public:
 
-    /// Constructs a DirectionalLightInfluence instance.
-    DirectionalLightInfluence( const BakeLight* light, const Vector3& direction );
+        /// Constructs a DirectionalLightInfluence instance.
+        DirectionalLightInfluence( const BakeLight* light, const Vector3& direction );
 
     /// Calculates a directional light influence.
     virtual float Calculate( LightRay* lightRay, const Vector3& light, float& distance ) const;
@@ -193,7 +195,7 @@ class AmbientOcclusionInfluence : public LightInfluence
 {
     ATOMIC_REFCOUNTED(AmbientOcclusionInfluence)
 
-public:
+    public:
 
     /// Constructs a AmbientOcclusionInfluence instance.
     AmbientOcclusionInfluence( const BakeLight* light);
@@ -236,7 +238,7 @@ class DirectionalPhotonEmitter : public PhotonEmitter
 
     ATOMIC_REFCOUNTED(DirectionalPhotonEmitter)
 
-public:
+    public:
 
     // Constructs a new DirectionalPhotonEmitter instance.
     // param light Parent light source.
@@ -283,10 +285,10 @@ class BakeLight : public BakeNode
     void SetAttenuationModel( LightAttenuation* value );
 
     // Returns a light vertex generator.
-    // LightVertexGenerator* vertexGenerator( void ) const;
+    LightVertexGenerator* GetVertexGenerator( void ) const;
 
     // Sets an light vertex generator.
-    // void SetVertexGenerator( LightVertexGenerator* value );
+    void SetVertexGenerator( LightVertexGenerator* value );
 
     // Returns an cutoff model.
     LightCutoff* GetCutoffModel( void ) const;
@@ -343,7 +345,7 @@ class BakeLight : public BakeNode
     static BakeLight* CreateDirectionalLight( SceneBaker* baker, const Vector3& direction, const Color& color = Color::WHITE, float intensity = 1.0f, bool castsShadow = true );
 
     // Creates an area light instance.
-    // static BakeLight* CreateAreaLight( SceneBaker* baker, const Mesh* mesh, const Vector3& position, const Color& color = Color::WHITE, float intensity = 1.0f, bool castsShadow = true );
+    static BakeLight* CreateAreaLight( SceneBaker* baker, BakeMesh* mesh, const Vector3& position, const Color& color = Color::WHITE, float intensity = 1.0f, bool castsShadow = true );
 
 private:
 
@@ -372,80 +374,129 @@ private:
     SharedPtr<PhotonEmitter> photonEmitter_;
 
     // Light vertex sampler.
-    // SharedPtr<LightVertexGenerator> vertexGenerator_;
+    SharedPtr<LightVertexGenerator> vertexGenerator_;
 
 };
 
-/*
-
-// Zone ambient, etc
-class ZoneBakeLight : public BakeLight
+// A light vertex is a single light point used with mesh light sources.
+struct LightVertex
 {
-    ATOMIC_OBJECT(ZoneBakeLight, BakeLight)
+    // Point position.
+    Vector3 position_;
+    // Point normal.
+    Vector3  normal_;
 
-    public:
+    static LightVertex Interpolate( const LightVertex& a, const LightVertex& b, float scalar )
+    {
+        LightVertex result;
 
-    ZoneBakeLight(Context* context, SceneBaker* sceneBaker);
-    virtual ~ZoneBakeLight();
+        result.position_ = a.position_ * scalar + b.position_ * (1.0f - scalar);
 
-    void Light(LightRay* lightRay);
-    void SetLight(Atomic::BakeLight* light) {}
+        result.normal_ = a.normal_ * scalar + b.normal_ * (1.0f - scalar);
+        result.normal_.Normalize();
 
-    void SetZone(Zone* zone);
+        return result;
+    }
+};
 
-protected:
+// A helper class to tesselate faces.
+class LightTriangle
+{
+public:
+
+    /// Constructs a Triangle instance
+    LightTriangle( void ) {}
+
+    /// Constructs a Triangle instance from three vertices.
+    LightTriangle( const LightVertex& a, const LightVertex& b, const LightVertex& c );
+
+    /// Returns a triangle centroid.
+    const LightVertex&   GetCentroid( void ) const;
+
+    /// Tesselates a triangle. Splits this triangle into 4 smaller ones.
+    /// param center Output center triangle.
+    /// param triangles Three triangles on corners.
+    void Tesselate( LightTriangle& center, LightTriangle triangles[3] ) const;
 
 private:
 
-    Zone* zone_;
+    // Triangle vertices
+    LightVertex a_, b_, c_;
 
+    // Triangle centroid.
+    LightVertex centroid_;
 };
 
 
-class DirectionalBakeLight : public BakeLight
+typedef PODVector<LightVertex> LightVertexVector;
+
+/// A LightVertexGenerator used to generate a set of light points for mesh light sources.
+class LightVertexGenerator : public RefCounted
 {
-    ATOMIC_OBJECT(DirectionalBakeLight, BakeLight)
+    ATOMIC_REFCOUNTED(LightVertexGenerator)
 
     public:
 
-        DirectionalBakeLight(Context* context, SceneBaker* sceneBaker);
-    virtual ~DirectionalBakeLight();
+    /// Constructs a LightVertexGenerator instance.
+    LightVertexGenerator( BakeMesh* bakeMesh );
+    virtual ~LightVertexGenerator( void ) {}
 
-    void Set(const Vector3& direction, const Vector3& radiance, float cosAngle);
+    /// Returns vector of light vertices.
+    const LightVertexVector& GetVertices( void ) const;
 
-    void Light(LightRay* lightRay);
+    /// Generates a set of light vertices based on mesh vertices.
+    virtual void Generate( void );
 
-    void SetLight(Atomic::BakeLight* light);
+    /// Clears a previously generated data.
+    void Clear( void );
 
+    /// Returns a total number of light vertices.
+    unsigned GetVertexCount( void ) const;
 
 protected:
 
+    /// Adds a new light vertex.
+    void Push( const LightVertex& vertex );
 
-private:
+protected:
 
+    // Source mesh.
+    WeakPtr<BakeMesh> mesh_;
+
+    // Set of generated light vertices.
+    LightVertexVector vertices_;
 };
 
-class PointBakeLight : public BakeLight
+/// A FaceLightVertexGenerator generates a set of vertices based on mesh vertices & face centroids.
+/// Face based generator can also perform a mesh tesselation.
+class FaceLightVertexGenerator : public LightVertexGenerator
 {
-    ATOMIC_OBJECT(PointBakeLight, BakeLight)
+    ATOMIC_REFCOUNTED(FaceLightVertexGenerator)
 
     public:
 
-        PointBakeLight(Context* context, SceneBaker* sceneBaker);
-    virtual ~PointBakeLight();
+    /// Constructs a FaceLightVertexGenerator instance.
+    /// param mesh Source light mesh.
+    /// param excludeVertices The flag indicating that we should skip mesh vertices.
+    /// param maxSubdivisions Maximum subdivision steps per mesh face (0 means no tesselation).
+    FaceLightVertexGenerator( BakeMesh* bakeMesh, bool excludeVertices = true, int maxSubdivisions = 0 );
 
-    void Light(LightRay* lightRay);
-
-    void SetLight(Atomic::BakeLight* light);
-
-protected:
-
+    /// Generates a set of light vertices.
+    virtual void Generate( void );
 
 private:
 
-};
+    /// Generates a set of light vertices from triangle.
+    virtual void GenerateFromTriangle( const LightTriangle& triangle, int subdivision );
 
-*/
+private:
+
+    /// The flag indicating that we should skip mesh vertices.
+    bool excludeVertices_;
+
+    /// Max subdivision depth.
+    int  maxSubdivisions_;
+};
 
 
 }

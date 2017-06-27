@@ -95,7 +95,7 @@ class BakeMesh : public BakeNode
     /// Get world space bounding box
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }    
     const SharedArrayPtr<MMVertex>& GetVertices(unsigned& numVertices) const { numVertices = numVertices_; return vertices_; }
-    const SharedArrayPtr<MMTriangle>& GetTriangles(unsigned numTriangles) const { numTriangles = numTriangles_; return triangles_; }
+    const SharedArrayPtr<MMTriangle>& GetTriangles(unsigned& numTriangles) const { numTriangles = numTriangles_; return triangles_; }
 
     void Preprocess();
 

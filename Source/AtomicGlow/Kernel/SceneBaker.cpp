@@ -423,7 +423,7 @@ bool SceneBaker::LoadScene(const String& filename)
 
         staticModel->SetZone(newZone, false);
 
-        if (staticModel->GetModel() && (staticModel->GetLightmap() ||staticModel->GetCastShadows()))
+        if (staticModel->GetModel() && (staticModel->GetLightmap() || staticModel->GetCastShadows()))
         {
             Model* model = staticModel->GetModel();
 
@@ -473,6 +473,17 @@ bool SceneBaker::LoadScene(const String& filename)
             SharedPtr<BakeMesh> meshMap (new BakeMesh(context_, this));
             meshMap->SetStaticModel(staticModel);
             bakeMeshes_.Push(meshMap);
+
+            if (staticModel->GetNode()->GetName() == "Plane")
+            {
+                // NOTE: photo emitter should probably be using the vertex generator not staticModel world position
+                BakeLight* bakeLight = BakeLight::CreateAreaLight(this, meshMap, staticModel->GetNode()->GetWorldPosition(), Color::WHITE);
+                if (bakeLight)
+                {
+                    bakeLights_.Push(SharedPtr<BakeLight>(bakeLight));
+                }
+
+            }
         }
 
     }
@@ -490,11 +501,11 @@ void SceneBaker::DirectLight( LightRay* lightRay, const PODVector<BakeLight*>& b
 
         Color influence;
 
-        // if (light->GetVertexGenerator())
-        //{
-        // influence = DirectLightFromPointSet( lightRay, bakeLight );
-        //}
-        //else
+        if (bakeLight->GetVertexGenerator())
+        {
+            influence = DirectLightFromPointSet( lightRay, bakeLight );
+        }
+        else
         {
             influence = DirectLightFromPoint( lightRay, bakeLight );
         }
@@ -521,31 +532,39 @@ Color SceneBaker::DirectLightFromPoint( LightRay* lightRay, const BakeLight* lig
 
 Color SceneBaker::DirectLightFromPointSet( LightRay* lightRay, const BakeLight* light ) const
 {
-    /*
-    LightVertexGenerator* vertexGenerator = light->vertexGenerator();
+    LightVertexGenerator* vertexGenerator = light->GetVertexGenerator();
 
-    // ** No light vertices generated - just exit
-    if( vertexGenerator->vertexCount() == 0 ) {
-        return Rgb( 0, 0, 0 );
+    if (!vertexGenerator)
+    {
+        // this should not happen
+        ATOMIC_LOGERROR("SceneBaker::DirectLightFromPointSet - called without vertex generator");
+        return Color::BLACK;
     }
 
-    const LightVertexBuffer& vertices = vertexGenerator->vertices();
-    Rgb                      color    = Rgb( 0, 0, 0 );
+    // No light vertices generated - just exit
+    if( !vertexGenerator->GetVertexCount())
+    {
+        return Color::BLACK;
+    }
 
-    for( int i = 0, n = vertexGenerator->vertexCount(); i < n; i++ ) {
-        const LightVertex&  vertex    = vertices[i];
-        float               influence = influenceFromPoint( lumel, vertex.m_position + light->position(), light );
+    const LightVertexVector& vertices = vertexGenerator->GetVertices();
+    Color color = Color::BLACK;
+
+    for( unsigned i = 0, n = vertexGenerator->GetVertexCount(); i < n; i++ )
+    {
+        const LightVertex&  vertex = vertices[i];
+        float influence = DirectLightInfluenceFromPoint( lightRay, vertex.position_ /*+ light->GetPosition()*/, light );
 
         // ** We have a non-zero light influence - add a light color to final result
-        if( influence > 0.0f ) {
-            color += light->color() * light->intensity() * influence;
+        if( influence > 0.0f )
+        {
+            color += light->GetColor() * light->GetIntensity() * influence;
         }
     }
 
-    return color / static_cast<float>( vertexGenerator->vertexCount() );
-    */
+    color = color * ( 1.0f / static_cast<float>( vertexGenerator->GetVertexCount()));
 
-    return Color::BLACK;
+    return color;
 }
 
 // ** DirectLight::influenceFromPoint
@@ -608,14 +627,18 @@ void SceneBaker::IndirectLight( LightRay* lightRay)
 
         rtcIntersect(GetEmbreeScene()->GetRTCScene(), ray);
 
+        bool skyEnabled = true;
+
         if (ray.geomID == RTC_INVALID_GEOMETRY_ID)
         {
-            Color skyColor(130.0f/255.0f, 209.0f/255.0f, 207.0f/255.0f);
+            if (skyEnabled)
+            {
+                Color skyColor(130.0f/255.0f, 209.0f/255.0f, 207.0f/255.0f);
+                skyColor = Color::WHITE * 0.15f;
+                gathered += (skyColor * influence).ToVector3();// + ambientColor;
+                hits++;
+            }
 
-            skyColor = skyColor * 0.30f;
-
-            gathered += (skyColor * influence).ToVector3();// + ambientColor;
-            hits++;
             continue;
         }               
 

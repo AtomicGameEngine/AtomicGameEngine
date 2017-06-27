@@ -67,19 +67,15 @@ void BakeLight::SetInfluenceModel( LightInfluence* value )
     influenceModel_ = value;
 }
 
-/*
-LightVertexGenerator* BakeLight::vertexGenerator( void ) const
+LightVertexGenerator* BakeLight::GetVertexGenerator( void ) const
 {
     return vertexGenerator_;
 }
 
-// ** BakeLight::setVertexGenerator
-void BakeLight::setVertexGenerator( LightVertexGenerator* value )
+void BakeLight::SetVertexGenerator( LightVertexGenerator* value )
 {
-    delete m_vertexGenerator;
-    m_vertexGenerator = value;
+    vertexGenerator_ = value;
 }
-*/
 
 LightAttenuation* BakeLight::GetAttenuationModel( void ) const
 {
@@ -203,19 +199,17 @@ BakeLight* BakeLight::CreateDirectionalLight( SceneBaker* baker, const Vector3& 
     return light;
 }
 
-/*
-BakeLight* BakeLight::CreateAreaLight( SceneBaker* baker, const Mesh* mesh, const Vector3& position, const Rgb& color, float intensity, bool castsShadow )
+BakeLight* BakeLight::CreateAreaLight( SceneBaker* baker, BakeMesh* bakeMesh, const Vector3& position, const Color& color, float intensity, bool castsShadow )
 {
-    Light* light = new Light;
+    BakeLight* light = new BakeLight(baker->GetContext(), baker);
 
-    light->SetInfluence( new LightInfluence( light ) );
-    light->SetAttenuation( new LinearLightAttenuation( light, mesh->bounds().volume() ) );
+    light->SetInfluenceModel( new LightInfluence( light ) );
+    const BoundingBox bbox = bakeMesh->GetBoundingBox();
+    float volume = 7.25f; /*(bbox.max_.x_ - bbox.min_.x_) * (bbox.max_.y_ - bbox.min_.y_) * (bbox.max_.z_ - bbox.min_.z_)*/;
+    light->SetAttenuationModel( new LinearLightAttenuation( light, volume ) );
     light->SetPhotonEmitter( new PhotonEmitter( light ) );
-    light->SetCutoff( new LightCutoff( light ) );
-    //light->SetVertexGenerator( new FaceLightVertexGenerator( mesh, true, 3 ) );
-    //light->SetVertexGenerator( new FaceLightVertexGenerator( mesh, false, 0 ) );
-    light->SetVertexGenerator( new FaceLightVertexGenerator( mesh, true, 0 ) );
-    //  light->SetVertexGenerator( new LightVertexGenerator( mesh ) );
+    light->SetCutoffModel( new LightCutoff( light ) );
+    light->SetVertexGenerator( new FaceLightVertexGenerator( bakeMesh, true, 0 ) );
     light->SetCastsShadow( castsShadow );
     light->SetPosition( position );
     light->SetColor( color );
@@ -225,7 +219,6 @@ BakeLight* BakeLight::CreateAreaLight( SceneBaker* baker, const Mesh* mesh, cons
 
     return light;
 }
-*/
 
 // ------------------------------------------------------- LightInfluence --------------------------------------------------------- //
 
@@ -521,6 +514,148 @@ void DirectionalPhotonEmitter::Emit( SceneBaker* sceneBaker, Vector3& position, 
 
     position  = plane_.Project(randomPoint) - direction_ * ( LIGHT_LARGE_DISTANCE * 0.5f);
     direction = direction_;
+}
+
+// ---------------------------------------------------- LightVertexGenerator ------------------------------------------------------ //
+
+
+LightVertexGenerator::LightVertexGenerator( BakeMesh* bakeMesh ) : mesh_( bakeMesh )
+{
+
+}
+
+unsigned LightVertexGenerator::GetVertexCount( void ) const
+{
+    return vertices_.Size();
+}
+
+
+const LightVertexVector& LightVertexGenerator::GetVertices( void ) const
+{
+    return vertices_;
+}
+
+
+void LightVertexGenerator::Clear( void )
+{
+    vertices_.Clear();
+}
+
+
+void LightVertexGenerator::Generate( void )
+{
+    Clear();
+
+    unsigned numVertices;
+    const SharedArrayPtr<BakeMesh::MMVertex>& vertices = mesh_->GetVertices(numVertices);
+
+    LightVertex lightVertex;
+
+    for( unsigned i = 0; i < numVertices; i++ )
+    {
+        lightVertex.position_ = vertices[i].position_;
+        lightVertex.normal_   = vertices[i].normal_;
+
+        Push( lightVertex ) ;
+    }
+}
+
+
+void LightVertexGenerator::Push(const LightVertex &vertex )
+{
+    vertices_.Push( vertex );
+}
+
+// ------------------------------------------------- FaceLightVertexGenerator --------------------------------------------------- //
+
+FaceLightVertexGenerator::FaceLightVertexGenerator( BakeMesh* bakeMesh, bool excludeVertices, int maxSubdivisions )
+    : LightVertexGenerator( bakeMesh ),
+      excludeVertices_( excludeVertices ),
+      maxSubdivisions_( maxSubdivisions )
+{
+
+}
+
+void FaceLightVertexGenerator::Generate( void )
+{
+    Clear();
+
+    if( !excludeVertices_ ) {
+        LightVertexGenerator::Generate();
+    }
+
+    unsigned numVertices;
+    const SharedArrayPtr<BakeMesh::MMVertex>& vertices = mesh_->GetVertices(numVertices);
+
+    unsigned numTriangles;
+    const SharedArrayPtr<BakeMesh::MMTriangle>& triangles = mesh_->GetTriangles(numTriangles);
+
+    for( unsigned i = 0; i < numTriangles; i++ )
+    {
+        const BakeMesh::MMTriangle& mtri = triangles[i];
+
+        LightVertex verts[3];
+
+        for (int j = 0; j < 3; j++)
+        {
+            verts[j].position_ = vertices[mtri.indices_[j]].position_;
+            verts[j].normal_ = vertices[mtri.indices_[j]].normal_;
+        }
+
+        LightTriangle triangle(verts[0], verts[1], verts[2]);
+
+        GenerateFromTriangle( triangle, 0 );
+    }
+}
+
+void FaceLightVertexGenerator::GenerateFromTriangle( const LightTriangle& triangle, int subdivision )
+{
+    // Generate light vertex from triangle centroid
+    Push( triangle.GetCentroid() );
+
+    // The maximum subdivisions exceeded
+    if( subdivision >= maxSubdivisions_ ) {
+        return;
+    }
+
+    //  Tesselate a triangle
+    LightTriangle center, corners[3];
+    triangle.Tesselate( center, corners );
+
+    // Process corner triangles
+    for( int i = 0; i < 3; i++ )
+    {
+        GenerateFromTriangle( corners[i], subdivision + 1 );
+    }
+}
+
+// ---------------------------------------------- Triangle ---------------------------------------------- //
+
+LightTriangle::LightTriangle( const LightVertex& a, const LightVertex& b, const LightVertex& c ) :
+    a_( a ),
+    b_( b ),
+    c_( c )
+{
+    centroid_.position_ = (a_.position_ + b_.position_ + c_.position_)  / 3.0f;
+    centroid_.normal_   = (a_.normal_   + b_.normal_   + c_.normal_)    / 3.0f;
+    centroid_.normal_.Normalize();
+}
+
+const LightVertex& LightTriangle::GetCentroid( void ) const
+{
+    return centroid_;
+}
+
+void LightTriangle::Tesselate( LightTriangle& center, LightTriangle triangles[3] ) const
+{
+    LightVertex xA = LightVertex::Interpolate( a_, b_, 0.5f );
+    LightVertex xB = LightVertex::Interpolate( b_, c_, 0.5f );
+    LightVertex xC = LightVertex::Interpolate( c_, a_, 0.5f );
+
+    triangles[0] = LightTriangle( a_, xA,  xC  );
+    triangles[1] = LightTriangle( xA,  b_, xB  );
+    triangles[2] = LightTriangle( xC,  xB,  c_ );
+    center       = LightTriangle( xA,  xB,  xC  );
 }
 
 

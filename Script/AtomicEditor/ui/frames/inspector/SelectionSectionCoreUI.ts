@@ -152,7 +152,7 @@ class GlowComponentSectionUI extends SelectionSectionUI {
 
             glow.subscribeToEvent(Editor.AtomicGlowBakeResultEvent((evData:Editor.AtomicGlowBakeResultEvent) => {
 
-                if (glowOutput && evData.success) {
+                if (glowOutput) {
                     glowOutput.hide();
                     glowOutput.close();                    
                 }
