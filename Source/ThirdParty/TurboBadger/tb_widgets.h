@@ -752,8 +752,9 @@ public:
         for widgets having multiple children by default, to specify which one that should get the children. */
     virtual TBWidget *GetContentRoot() { return this; }
 
-    /** Get this widget or a parent widget that is the absolute root parent. */
-    TBWidget *GetParentRoot();
+    /** Get this widget or a parent widget that is the absolute root parent
+        if view_root is true, will return the widget for the UIView attached to root widget */
+    TBWidget *GetParentRoot(bool view_root = true);
 
     /** Get the closest parent widget that is a TBWindow or nullptr if there is none.
         If this widget is a window itself, this will be returned. */
