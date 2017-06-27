@@ -191,14 +191,14 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     String GetText();
 
     void SetRect(IntRect r);
-    void SetSize(int width, int height);
+    virtual bool SetSize(int width, int height);
     void SetPosition(int x, int y);
     void SetText(const String& text);
     void SetSkinBg(const String& id);
     void SetLayoutParams(UILayoutParams* params);
     void SetFontDescription(UIFontDescription* fd);
 
-    void Remove();
+    virtual void Remove();
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
     void DeleteAllChildren();
@@ -213,9 +213,8 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     void SetValue(double value);
     virtual double GetValue();
 
-    void SetFocus();
-    bool GetFocus();
-
+    virtual void SetFocus();
+    virtual bool GetFocus() const;
 
     /// Set focus to first widget which accepts it
     void SetFocusRecursive();

@@ -30,6 +30,7 @@ using namespace tb;
 
 #include "UI.h"
 #include "UIEvents.h"
+#include "UIView.h"
 
 namespace Atomic
 {
@@ -53,9 +54,33 @@ static int toupr_ascii(int ascii)
     return ascii;
 }
 
-void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
+bool UIView::FilterDefaultInput(bool keyEvent) const
 {
-    if (inputDisabled_ || consoleVisible_)
+    if (!GetInputEnabled())
+        return true;
+
+    if (ui_.Null() || ui_->GetFocusedView() != this)
+        return true;
+
+    if (ui_->inputDisabled_ || ui_->consoleVisible_)
+        return true;
+
+    if (renderTexture_ && !keyEvent)
+        return true;
+
+    if (!keyEvent && !GetMouseEnabled())
+        return true;
+
+    if (keyEvent && !GetKeyboardEnabled() || ui_->keyboardDisabled_)
+        return true;
+
+    return false;
+
+}
+
+void UIView::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
+{
+    if (FilterDefaultInput())
         return;
 
     using namespace MouseButtonDown;
@@ -89,17 +114,17 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
     last_time = time;
     if (button == MOUSEB_RIGHT)
-        rootWidget_->InvokeRightPointerDown(pos.x_, pos.y_, counter, mod);
+        widget_->InvokeRightPointerDown(pos.x_, pos.y_, counter, mod);
     else
-        rootWidget_->InvokePointerDown(pos.x_, pos.y_, counter, mod, false);
+        widget_->InvokePointerDown(pos.x_, pos.y_, counter, mod, false);
 
 
 }
 
 
-void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
+void UIView::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || consoleVisible_)
+    if (FilterDefaultInput())
         return;
 
     using namespace MouseButtonUp;
@@ -121,31 +146,31 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 
 
     if (button == MOUSEB_RIGHT)
-        rootWidget_->InvokeRightPointerUp(pos.x_, pos.y_, mod);
+        widget_->InvokeRightPointerUp(pos.x_, pos.y_, mod);
     else
-        rootWidget_->InvokePointerUp(pos.x_, pos.y_, mod, false);
+        widget_->InvokePointerUp(pos.x_, pos.y_, mod, false);
 }
 
 
-void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
+void UIView::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
-    if (inputDisabled_ || consoleVisible_)
+    if (FilterDefaultInput())
         return;
 
     int px = eventData[P_X].GetInt();
     int py = eventData[P_Y].GetInt();
 
-    rootWidget_->InvokePointerMove(px, py, tb::TB_MODIFIER_NONE, false);
+    widget_->InvokePointerMove(px, py, tb::TB_MODIFIER_NONE, false);
 
-    tooltipHoverTime_ = 0;
+    ui_->tooltipHoverTime_ = 0;
 }
 
 
-void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
+void UIView::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || consoleVisible_)
+    if (FilterDefaultInput())
         return;
 
     using namespace MouseWheel;
@@ -154,14 +179,14 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
     Input* input = GetSubsystem<Input>();
 
-    rootWidget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, -delta, tb::TB_MODIFIER_NONE);
+    widget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, -delta, tb::TB_MODIFIER_NONE);
 
 }
 
 //Touch Input
-void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+void UIView::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || consoleVisible_)
+    if (FilterDefaultInput())
         return;
 
     using namespace TouchBegin;
@@ -183,12 +208,12 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 
     last_time = time;
     
-    rootWidget_->InvokePointerDown(px, py, counter, TB_MODIFIER_NONE, true, touchId);
+    widget_->InvokePointerDown(px, py, counter, TB_MODIFIER_NONE, true, touchId);
 }
 
-void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
+void UIView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || consoleVisible_)
+    if (FilterDefaultInput())
         return;
     
     using namespace TouchMove;
@@ -197,12 +222,12 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     int px = eventData[P_X].GetInt();
     int py = eventData[P_Y].GetInt();
 
-    rootWidget_->InvokePointerMove(px, py, TB_MODIFIER_NONE, true, touchId);
+    widget_->InvokePointerMove(px, py, TB_MODIFIER_NONE, true, touchId);
 }
 
-void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
+void UIView::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || consoleVisible_)
+    if (FilterDefaultInput())
         return;
 
     using namespace TouchEnd;
@@ -211,7 +236,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     int px = eventData[P_X].GetInt();
     int py = eventData[P_Y].GetInt();
 
-    rootWidget_->InvokePointerUp(px, py, TB_MODIFIER_NONE, true, touchId);
+    widget_->InvokePointerUp(px, py, TB_MODIFIER_NONE, true, touchId);
 }
 
 static bool InvokeShortcut(UI* ui, int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool down)
@@ -307,7 +332,7 @@ static bool InvokeKey(UI* ui, TBWidget* root, unsigned int key, SPECIAL_KEY spec
 }
 
 
-void UI::HandleKey(bool keydown, int keycode, int scancode)
+void UIView::HandleKey(bool keydown, int keycode, int scancode)
 {
     if (keydown && (keycode == KEY_ESCAPE || keycode == KEY_RETURN || keycode == KEY_RETURN2 || keycode == KEY_KP_ENTER)
             && TBWidget::focused_widget)
@@ -423,19 +448,19 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
     {
         if (mod & TB_SUPER)
         {
-            InvokeKey(this, rootWidget_, keycode, TB_KEY_UNDEFINED, mod, keydown);
+            InvokeKey(ui_, widget_, keycode, TB_KEY_UNDEFINED, mod, keydown);
         }
     }
     else
     {
-        InvokeKey(this, rootWidget_, 0, specialKey, mod, keydown);
+        InvokeKey(ui_, widget_, 0, specialKey, mod, keydown);
     }
 
 }
 
-void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void UIView::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
+    if (FilterDefaultInput(true))
         return;
 
     using namespace KeyDown;
@@ -470,9 +495,9 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
 }
 
-void UI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+void UIView::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
+    if (FilterDefaultInput(true))
         return;
 
     using namespace KeyUp;
@@ -484,9 +509,9 @@ void UI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 
 }
 
-void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
+void UIView::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
+    if (FilterDefaultInput(true))
         return;
 
     using namespace TextInput;
@@ -495,8 +520,8 @@ void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 
     for (unsigned i = 0; i < text.Length(); i++)
     {
-        InvokeKey(this, rootWidget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, true);
-        InvokeKey(this, rootWidget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, false);
+        InvokeKey(ui_, widget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, true);
+        InvokeKey(ui_, widget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, false);
     }
 
 }
