@@ -241,10 +241,7 @@ if ($ENV{ATOMIC_BUILD_DIST})
 endif ()
 
 if (MSVC)
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:Debug>:${ATOMIC_MSVC_RUNTIME}d>")
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:Release>:${ATOMIC_MSVC_RUNTIME}>")
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:RelWithDebInfo>:${ATOMIC_MSVC_RUNTIME}>")
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:MinSizeRel>:${ATOMIC_MSVC_RUNTIME}>")
+    target_compile_options(Atomic PUBLIC $<$<CONFIG:Debug>:${ATOMIC_MSVC_RUNTIME}d> $<$<NOT:$<CONFIG:Debug>>:${ATOMIC_MSVC_RUNTIME}>)
 endif ()
 
 if (UNIX OR MINGW)
