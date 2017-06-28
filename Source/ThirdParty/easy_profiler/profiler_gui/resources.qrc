@@ -1,0 +1,29 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file alias="logo">icons/logo.svg</file>
+        <file alias="Exit">icons/off.svg</file>
+        <file alias="Open">icons/open-folder2.svg</file>
+        <file alias="Reopen">icons/reload-folder2.svg</file>
+        <file alias="Reload">icons/reload.svg</file>
+        <file alias="Expand">icons/expand.svg</file>
+        <file alias="Collapse">icons/collapse.svg</file>
+        <file alias="Color">icons/colors.svg</file>
+        <file alias="NoColor">icons/colors-black.svg</file>
+        <file alias="Save">icons/save.svg</file>
+        <file alias="Stats">icons/statistics.svg</file>
+        <file alias="Stats-off">icons/statistics2.svg</file>
+        <file alias="LAN">icons/lan.svg</file>
+        <file alias="LAN-on">icons/lan_on.svg</file>
+        <file alias="WiFi">icons/wifi.svg</file>
+        <file alias="WiFi-on">icons/wifi_on.svg</file>
+        <file alias="Connection">icons/lan.svg</file>
+        <file alias="Connection-on">icons/lan_on.svg</file>
+        <file alias="Start">icons/play.svg</file>
+        <file alias="Stop">icons/stop.svg</file>
+        <file alias="Delete">icons/delete.svg</file>
+        <file alias="List">icons/list.svg</file>
+        <file alias="Search-next">icons/search-next.svg</file>
+        <file alias="Search-prev">icons/search-prev.svg</file>
+        <file alias="Settings">icons/settings.svg</file> 
+    </qresource>
+</RCC>

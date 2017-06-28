@@ -1,0 +1,7 @@
+* text=auto
+
+*.ico binary
+
+*.cpp text
+*.h text
+
