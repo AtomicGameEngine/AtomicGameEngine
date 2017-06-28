@@ -7,6 +7,9 @@ set(EASY_PROGRAM_VERSION_PATCH 0)
 set(EASY_PRODUCT_VERSION_STRING "${EASY_PROGRAM_VERSION_MAJOR}.${EASY_PROGRAM_VERSION_MINOR}.${EASY_PROGRAM_VERSION_PATCH}")
 
 # ATOMIC BEGIN
+
+find_package(Qt5Widgets)
+
 set(EASY_OPTION_LIB_STATIC ON CACHE BOOL "" FORCE)
 set(EASY_OPTION_PREDEFINED_COLORS ON CACHE BOOL "" FORCE)
 set(EASY_PROFILER_NO_SAMPLES ON CACHE BOOL "" FORCE)
@@ -30,7 +33,13 @@ macro(easy_define_target_option TARGET SOURCE_OPTION TARGET_DEFINITION)
 endmacro()
 
 add_subdirectory(easy_profiler_core)
-add_subdirectory(profiler_gui)
+
+# ATOMIC BEGIN
+# Only include the Qt client if on we're building desktop platform and Qt5 was found on system
+if (ATOMIC_DESKTOP AND Qt5Widgets_FOUND)
+    add_subdirectory(profiler_gui)
+endif()
+#ATOMIC END
 
 if (NOT EASY_PROFILER_NO_SAMPLES)
     add_subdirectory(sample)

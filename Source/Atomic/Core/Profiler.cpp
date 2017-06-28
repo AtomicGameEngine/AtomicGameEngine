@@ -130,7 +130,7 @@ bool Profiler::GetEventProfilingEnabled() const
     return enableEventProfiling_;
 }
 
-void Profiler::BeginBlock(const char* name, const char* file, int line, unsigned int color, unsigned char status)
+void Profiler::BeginBlock(const char* name, const char* file, int line, unsigned int argb, unsigned char status)
 {
 #if ATOMIC_PROFILING
     // Line used as starting hash value for efficiency.
@@ -142,7 +142,7 @@ void Profiler::BeginBlock(const char* name, const char* file, int line, unsigned
     {
         String uniqueName = ToString("%s:%d", file, line);
         desc = ::profiler::registerDescription((::profiler::EasyBlockStatus)status, uniqueName.CString(), name, file,
-                                               line, ::profiler::BLOCK_TYPE_BLOCK, color, true);
+                                               line, ::profiler::BLOCK_TYPE_BLOCK, argb, true);
     }
     else
         desc = it->second_;

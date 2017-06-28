@@ -4,9 +4,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt5Widgets)
+# ATOMIC BEGIN
+# moved to easy profiler root CMake, to avoid duplicate checks
+# find_package(Qt5Widgets)
+# ATOMIC END
 
-if (NOT Qt5Widgets_FOUND)
+if (Qt5Widgets_FOUND)
     if (NOT("${CMAKE_BUILD_TYPE}" STREQUAL "Debug") AND WIN32)
         set(APPLICATION_PLATFORM WIN32)
     endif ()

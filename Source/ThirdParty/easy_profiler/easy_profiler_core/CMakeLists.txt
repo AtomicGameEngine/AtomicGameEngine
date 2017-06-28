@@ -217,7 +217,8 @@ install(
 )
 endif ()
 
-if (MSVC)
+# If we're on MSVC, we need a /MD version of the easy profiler library to link with Qt
+if (MSVC AND Qt5Widgets_FOUND)
     add_library(easy_profiler_md ${EASY_OPTION_LIB_TYPE} ${SOURCES} resources.rc)
     foreach(prop COMPILE_DEFINITIONS COMPILE_OPTIONS CXX_STANDARD CXX_STANDARD_REQUIRED INCLUDE_DIRECTORIES INTERFACE_COMPILE_DEFINITIONS INTERFACE_COMPILE_OPTIONS INTERFACE_INCLUDE_DIRECTORIES INTERFACE_LINK_LIBRARIES)
         get_target_property(val easy_profiler ${prop})
