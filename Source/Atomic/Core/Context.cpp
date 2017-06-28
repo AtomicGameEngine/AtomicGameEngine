@@ -23,7 +23,9 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Core/EventProfiler.h"
+// ATOMIC BEGIN
+#include "../Core/Profiler.h"
+// ATOMIC END
 #include "../IO/Log.h"
 
 #ifndef MINI_URHO
@@ -446,30 +448,12 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
 
 void Context::BeginSendEvent(Object* sender, StringHash eventType)
 {
-#ifdef ATOMIC_PROFILING
-    if (EventProfiler::IsActive())
-    {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
-        if (eventProfiler)
-            eventProfiler->BeginBlock(eventType);
-    }
-#endif
-
     eventSenders_.Push(sender);
 }
 
 void Context::EndSendEvent()
 {
     eventSenders_.Pop();
-
-#ifdef ATOMIC_PROFILING
-    if (EventProfiler::IsActive())
-    {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
-        if (eventProfiler)
-            eventProfiler->EndBlock();
-    }
-#endif
 }
 
 }

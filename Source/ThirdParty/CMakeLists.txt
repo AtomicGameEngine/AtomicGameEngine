@@ -96,3 +96,7 @@ if (ATOMIC_IK)
 endif ()
 
 add_subdirectory(imgui)
+
+if (ATOMIC_PROFILING)
+    add_subdirectory(easy_profiler)
+endif ()

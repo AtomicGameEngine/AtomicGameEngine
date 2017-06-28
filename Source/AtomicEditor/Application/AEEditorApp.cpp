@@ -24,6 +24,7 @@
 #include <Atomic/UI/UI.h>
 #include <AtomicJS/Javascript/Javascript.h>
 #include <Atomic/IPC/IPC.h>
+#include <Atomic/Engine/EngineDefs.h>
 
 // This can be removed once bone hack is fixed
 #include <Atomic/Graphics/AnimatedModel.h>
@@ -124,6 +125,7 @@ namespace AtomicEditor
         engineParameters_["ResourcePaths"] = "CoreData;EditorData";
 
 #endif // ATOMIC_DEV_BUILD
+        engineParameters_[EP_PROFILER_LISTEN] = false;
 
         GetSubsystem<AEEditorPrefs>()->ReadPreferences(engineParameters_);
 

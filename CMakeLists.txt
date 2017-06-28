@@ -10,6 +10,14 @@ include(AtomicGit)
 include(AtomicUtils)
 include(AtomicCommon)
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    set (ATOMIC_RELEASE_OFF OFF)
+    set (ATOMIC_RELEASE_ON ON)
+else ()
+    set (ATOMIC_RELEASE_OFF ON)
+    set (ATOMIC_RELEASE_ON OFF)
+endif ()
+
 add_definitions(-DATOMIC_ROOT_SOURCE_DIR="${ATOMIC_SOURCE_DIR}" -DATOMIC_ROOT_BUILD_DIR="${CMAKE_BINARY_DIR}")
 
 if (NOT DEFINED ATOMIC_DEV_BUILD)

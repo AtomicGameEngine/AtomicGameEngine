@@ -12,7 +12,7 @@
 		"<Atomic/Graphics/Renderer.h>",
 		"<Atomic/Metrics/Metrics.h>"
 	],
-	"classes" : ["Context", "Object", "AtomicBuildInfo", "Time"],
+	"classes" : ["Context", "Object", "AtomicBuildInfo", "Time", "Profiler"],
 	"classes_rename" : {
 		"Object" : "AObject"
 	},

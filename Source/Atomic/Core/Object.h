@@ -222,6 +222,9 @@ protected:
     /// Execution context.
     Context* context_;
 
+    void SendEventProfiled(StringHash eventType, VariantMap& eventData);
+    void SendEventNonProfiled(StringHash eventType, VariantMap& eventData);
+
 private:
     /// Find the first event handler with no specific sender.
     EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = 0) const;

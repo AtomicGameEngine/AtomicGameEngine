@@ -185,10 +185,16 @@ endmacro()
 macro(setup_executable)
     cmake_parse_arguments(ARG "PRIVATE;TOOL;NODEPS" "" "" ${ARGN})
     check_source_files()
-
     add_executable(${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
-
     setup_target()
+    if (ARG_TOOL)
+        if (DEFINED ATOMIC_TOOL_DIR)
+            set (TOOL_DIR ${ATOMIC_TOOL_DIR})
+        else ()
+            set (TOOL_DIR ${ATOMIC_SOURCE_DIR}/Artifacts/Build/${TARGET_NAME})
+        endif ()
+        set_property(TARGET ${TARGET_NAME} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${TOOL_DIR})
+    endif ()
 endmacro()
 
 # Macro for replacing substrings in every variable specified in the list.

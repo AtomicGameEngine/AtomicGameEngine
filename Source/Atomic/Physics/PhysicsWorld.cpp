@@ -806,21 +806,17 @@ void PhysicsWorld::PreStep(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
 
+    // ATOMIC BEGIN
     // Start profiling block for the actual simulation step
-#ifdef ATOMIC_PROFILING
-    Profiler* profiler = GetSubsystem<Profiler>();
-    if (profiler)
-        profiler->BeginBlock("StepSimulation");
-#endif
+    ATOMIC_PROFILE_NONSCOPED("PhysicsStepSimulation");
+    // ATOMIC END
 }
 
 void PhysicsWorld::PostStep(float timeStep)
 {
-#ifdef ATOMIC_PROFILING
-    Profiler* profiler = GetSubsystem<Profiler>();
-    if (profiler)
-        profiler->EndBlock();
-#endif
+    // ATOMIC BEGIN
+    ATOMIC_PROFILE_END();
+    // ATOMIC END
 
     SendCollisionEvents();
 

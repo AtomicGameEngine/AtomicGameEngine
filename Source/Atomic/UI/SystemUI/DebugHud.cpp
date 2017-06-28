@@ -297,15 +297,11 @@ void DebugHud::RenderUi(StringHash eventType, VariantMap& eventData)
         {
             if (profilerTimer_.GetMSec(false) >= profilerInterval_)
             {
+                profilerTimer_.Reset();
                 if (profilerMode_ == DEBUG_HUD_PROFILE_PERFORMANCE)
                 {
-                    profilerTimer_.Reset();
-                    Profiler* profiler = GetSubsystem<Profiler>();
-                    if (profiler)
-                    {
-                        profilerOutput_ = profiler->PrintData(false, false, profilerMaxDepth_);
-                        profiler->BeginInterval();
-                    }
+                    // Maybe implement some on-screen performance later.
+                    profilerOutput_ = "Performance metrics may be inspected using Profiler tool.";
                 }
                 else
                 {

@@ -110,36 +110,24 @@ void Time::BeginFrame(float timeStep)
 
     timeStep_ = timeStep;
 
-    Profiler* profiler = GetSubsystem<Profiler>();
-    if (profiler)
-        profiler->BeginFrame();
+// ATOMIC BEGIN
+    ATOMIC_PROFILE(BeginFrame);
+    // Frame begin event
+    using namespace BeginFrame;
 
-    {
-        ATOMIC_PROFILE(BeginFrame);
-
-        // Frame begin event
-        using namespace BeginFrame;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_FRAMENUMBER] = frameNumber_;
-        eventData[P_TIMESTEP] = timeStep_;
-        SendEvent(E_BEGINFRAME, eventData);
-    }
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_FRAMENUMBER] = frameNumber_;
+    eventData[P_TIMESTEP] = timeStep_;
+    SendEvent(E_BEGINFRAME, eventData);
 }
 
 void Time::EndFrame()
 {
-    {
-        ATOMIC_PROFILE(EndFrame);
-
-        // Frame end event
-        SendEvent(E_ENDFRAME);
-    }
-
-    Profiler* profiler = GetSubsystem<Profiler>();
-    if (profiler)
-        profiler->EndFrame();
+    ATOMIC_PROFILE(EndFrame);
+    // Frame end event
+    SendEvent(E_ENDFRAME);
 }
+// ATOMIC END
 
 void Time::SetTimerPeriod(unsigned mSec)
 {
