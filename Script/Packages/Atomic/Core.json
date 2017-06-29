@@ -12,7 +12,7 @@
 		"<Atomic/Graphics/Renderer.h>",
 		"<Atomic/Metrics/Metrics.h>"
 	],
-	"classes" : ["Context", "Object", "AtomicBuildInfo", "Time"],
+	"classes" : ["Context", "Object", "AtomicBuildInfo", "Time", "Profiler"],
 	"classes_rename" : {
 		"Object" : "AObject"
 	},
@@ -28,6 +28,9 @@
 		"CSharp" : {
 			"Object" : {
 				"UnsubscribeFromAllEvents" : []
+			},
+			"Profiler": {
+				"EndBlock" : []
 			}
 		}
 	},
@@ -45,6 +48,9 @@
 			"subscribeToEvent(sender:AObject, eventType:string, callback:(data: any) => void);",
 			"subscribeToEvent(eventMetaData:Atomic.EventMetaData);",
 			"subscribeToEvent(sender:AObject, eventMetaData:Atomic.EventMetaData);"
+		],
+		"Profiler" : [
+			"beginBlock(name:string, filename:string, line:number, argb?:number, status?:Atomic.ProfilerBlockStatus );"
 		]
 	},
 	"haxe_decl" : {

@@ -32,6 +32,8 @@ elseif (ATOMIC_DATABASE_ODBC)
 endif ()
 
 if (WIN32)
+    option (ATOMIC_D3D11 "Use DirectX 11" OFF)
+    option (ATOMIC_OPENGL "Use OpenGL" OFF)
     if (ATOMIC_D3D11) # DirectX 11
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
     elseif (ATOMIC_OPENGL) # OpenGL
@@ -125,8 +127,6 @@ elseif (LINUX)
     target_link_libraries (Atomic pthread GLEW GL dl)
     target_compile_definitions(Atomic PUBLIC -DATOMIC_PLATFORM_LINUX=1)
 elseif (WIN32)
-    option (ATOMIC_D3D11 "Use DirectX 11" ON)
-    option (ATOMIC_OPENGL "Use OpenGL" OFF)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_PLATFORM_WINDOWS=1)
     target_link_libraries (Atomic user32 gdi32 winmm imm32 ole32 oleaut32 version uuid Ws2_32)
     if (ATOMIC_D3D11) # DirectX 11
@@ -177,9 +177,9 @@ if (NOT WEB)
     target_link_libraries (Atomic libcurl Civetweb kNet)
 endif()
 
-option (ATOMIC_PROFILING "Enable profiler" ON)
 if (ATOMIC_PROFILING)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_PROFILING=1)
+    target_link_libraries (Atomic easy_profiler)
 endif ()
 
 option (ATOMIC_LOGGING "Enable logging" ON)
@@ -241,10 +241,7 @@ if ($ENV{ATOMIC_BUILD_DIST})
 endif ()
 
 if (MSVC)
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:Debug>:${ATOMIC_MSVC_RUNTIME}d>")
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:Release>:${ATOMIC_MSVC_RUNTIME}>")
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:RelWithDebInfo>:${ATOMIC_MSVC_RUNTIME}>")
-    target_compile_options(Atomic PUBLIC "$<$<CONFIG:MinSizeRel>:${ATOMIC_MSVC_RUNTIME}>")
+    target_compile_options(Atomic PUBLIC $<$<CONFIG:Debug>:${ATOMIC_MSVC_RUNTIME}d> $<$<NOT:$<CONFIG:Debug>>:${ATOMIC_MSVC_RUNTIME}>)
 endif ()
 
 if (UNIX OR MINGW)

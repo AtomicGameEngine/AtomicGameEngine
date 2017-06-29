@@ -1,0 +1,69 @@
+sudo: required
+dist: trusty
+language: cpp
+cache: ccache
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - cmake
+            - cmake-data
+      env:
+        -CXX_COMPILER=g++-5
+        -C_COMPILER=gcc-5
+    - os: osx
+      osx_image: xcode8
+      #compiler: clang
+      env:
+        #-CXX_COMPILER=clang++
+        #-C_COMPILER=clang
+        -CXX_COMPILER=g++-5
+        -C_COMPILER=gcc-5
+script:
+  - mkdir build
+  - cd build
+  - cmake --version
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        source /opt/qt55/bin/qt55-env.sh;
+        qmake -v;
+    else
+        export PATH=/usr/local/opt/qt/bin:$PATH;
+    fi
+  - cmake -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER  .. && make -j3
+after_success:
+  - cd ../sample && $CXX_COMPILER -std=c++11 -O3 main_clock.cpp -o test_clock && ./test_clock
+  - ./build_express_test.sh
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty;
+        sudo apt-get update -qq;
+    else
+        brew update;
+    fi
+install:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        sudo apt-get -y install qt55tools qt55script qt55base qt55svg;
+    else
+        brew install gcc5;
+        brew install qt5;
+        brew link --force qt5;
+        export HOMEBREW_QT5_VERSION=$(brew list --versions qt5 | rev | cut -d' ' -f1 | rev);
+        ln -s /usr/local/Cellar/qt/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs;
+        ln -s /usr/local/Cellar/qt/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins;
+        echo "ls -l /usr/local/mkspecs";
+        ls -l /usr/local/mkspecs;
+        echo "ls -l /usr/local/plugins";
+        ls -l /usr/local/plugins;
+        echo "/usr/local/Cellar/qt/";
+        ls -l /usr/local/Cellar/qt/;
+    fi
+
+      
+
+

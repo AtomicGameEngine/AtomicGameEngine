@@ -331,6 +331,17 @@ void Color::FromHCM(float h, float c, float m)
     b_ += m;
 }
 
+/// ATOMIC BEGIN
+unsigned Color::ToUIntArgb() const
+{
+    unsigned r = (unsigned)Clamp(((int)(r_ * 255.0f)), 0, 255);
+    unsigned g = (unsigned)Clamp(((int)(g_ * 255.0f)), 0, 255);
+    unsigned b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
+    unsigned a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
+    return (a << 24) | (r << 16) | (g << 8) | b;
+}
+/// ATOMIC END
+
 
 const Color Color::WHITE;
 const Color Color::GRAY(0.5f, 0.5f, 0.5f);
@@ -342,4 +353,5 @@ const Color Color::CYAN(0.0f, 1.0f, 1.0f);
 const Color Color::MAGENTA(1.0f, 0.0f, 1.0f);
 const Color Color::YELLOW(1.0f, 1.0f, 0.0f);
 const Color Color::TRANSPARENT(0.0f, 0.0f, 0.0f, 0.0f);
+
 }

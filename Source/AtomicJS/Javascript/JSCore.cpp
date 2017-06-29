@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Core/Profiler.h>
 
 #include "JSCore.h"
 #include "JSEventHelper.h"
@@ -224,6 +225,51 @@ static int Atomic_GetArguments(duk_context* ctx)
 
 }
 
+static int Profiler_BeginBlock(duk_context* ctx)
+{
+
+#if ATOMIC_PROFILING
+    // Get the Profiler instance
+    duk_push_this(ctx);
+    Profiler* profiler = js_to_class_instance<Profiler>(ctx, -1, 0);
+    duk_pop(ctx);
+
+    // early out, this should never happen
+    if (!profiler)
+    {
+        return 0;
+    }
+
+    // get the number of args
+    duk_idx_t top = duk_get_top(ctx);
+
+    // we need at least 3
+    if ( top < 3)
+    {
+        return 0;
+    }
+
+    // parse args
+    const char* name = duk_require_string(ctx, 0);
+    const char* filename = duk_require_string(ctx, 1);
+    int line = duk_require_number(ctx, 2);
+    unsigned argb = (top > 3) ? (unsigned) duk_require_number(ctx, 3) : PROFILER_COLOR_DEFAULT;
+    unsigned char status = (top > 4) ? (unsigned) duk_require_number(ctx, 4) : ProfilerBlockStatus::ON;
+
+    profiler->BeginBlock(name, filename, line, argb, status);
+
+#else
+    static bool warned = false;
+    if (!warned)
+    {
+        warned = true;
+        ATOMIC_LOGWARNING("Engine is built without profiler support.");
+    }
+#endif
+
+    return 0;
+}
+
 void jsapi_init_core(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -241,6 +287,12 @@ void jsapi_init_core(JSVM* vm)
     duk_push_c_function(ctx, Object_SendEvent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "sendEvent");
     duk_pop(ctx); // pop AObject prototype
+
+    js_class_get_prototype(ctx, "Atomic", "Profiler");
+    duk_push_c_function(ctx, Profiler_BeginBlock, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "beginBlock");
+    duk_pop(ctx); // pop Profiler prototype
+
 }
 
 }

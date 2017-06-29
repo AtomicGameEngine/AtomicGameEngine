@@ -28,6 +28,8 @@
 #include <Atomic/Input/Controls.h>
 
 #include <Atomic/Atomic2D/PhysicsWorld2D.h>
+#include <Atomic/Core/Profiler.h>
+#include <Atomic/IO/Log.h>
 
 #include "NETCore.h"
 
@@ -750,7 +752,32 @@ namespace Atomic
         }
 #endif
 
+        ATOMIC_EXPORT_API void csi_Atomic_Profiler_BeginBlock(Profiler* profiler, const char* name, const char* file, int line, unsigned int argb, unsigned char status)
+        {
+#if ATOMIC_PROFILING
+            if (!profiler)
+                return;
 
+            profiler->BeginBlock(name, file, line, argb, status);
+#else
+            static bool warned = false;
+            if (!warned)
+            {
+                warned = true;
+                ATOMIC_LOGWARNING("Engine is built without profiler support.");
+            }
+#endif
+        }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Profiler_EndBlock(Profiler* profiler)
+        {
+#if ATOMIC_PROFILING
+            if (!profiler)
+                return;
+
+            profiler->EndBlock();
+#endif
+        }
     }
 }
 

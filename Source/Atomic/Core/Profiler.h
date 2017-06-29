@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2017 the Atomic project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,147 +26,31 @@
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
 
+#if ATOMIC_PROFILING
+#   include <easy/profiler.h>
+#else
+namespace profiler { class BaseBlockDescriptor {}; };
+#endif
+
 namespace Atomic
 {
 
-/// Profiling data for one block in the profiling tree.
-class ATOMIC_API ProfilerBlock
+static const int PROFILER_DEFAULT_PORT = 28077;
+static const uint32_t PROFILER_COLOR_DEFAULT = 0xffffecb3;
+static const uint32_t PROFILER_COLOR_EVENTS = 0xffff9800;
+static const uint32_t PROFILER_COLOR_RESOURCES = 0xff00bcd4;
+
+// Copied from easy_profiler
+enum ProfilerBlockStatus
 {
-public:
-    /// Construct with the specified parent block and name.
-    ProfilerBlock(ProfilerBlock* parent, const char* name) :
-        name_(0),
-        time_(0),
-        maxTime_(0),
-        count_(0),
-        parent_(parent),
-        frameTime_(0),
-        frameMaxTime_(0),
-        frameCount_(0),
-        intervalTime_(0),
-        intervalMaxTime_(0),
-        intervalCount_(0),
-        totalTime_(0),
-        totalMaxTime_(0),
-        totalCount_(0)
-    {
-        if (name)
-        {
-            unsigned nameLength = String::CStringLength(name);
-            name_ = new char[nameLength + 1];
-            memcpy(name_, name, nameLength + 1);
-        }
-    }
-
-    /// Destruct. Free the child blocks.
-    virtual ~ProfilerBlock()
-    {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        {
-            delete *i;
-            *i = 0;
-        }
-
-        delete [] name_;
-    }
-
-    /// Begin timing.
-    void Begin()
-    {
-        timer_.Reset();
-        ++count_;
-    }
-
-    /// End timing.
-    void End()
-    {
-        long long time = timer_.GetUSec(false);
-        if (time > maxTime_)
-            maxTime_ = time;
-        time_ += time;
-    }
-
-    /// End profiling frame and update interval and total values.
-    void EndFrame()
-    {
-        frameTime_ = time_;
-        frameMaxTime_ = maxTime_;
-        frameCount_ = count_;
-        intervalTime_ += time_;
-        if (maxTime_ > intervalMaxTime_)
-            intervalMaxTime_ = maxTime_;
-        intervalCount_ += count_;
-        totalTime_ += time_;
-        if (maxTime_ > totalMaxTime_)
-            totalMaxTime_ = maxTime_;
-        totalCount_ += count_;
-        time_ = 0;
-        maxTime_ = 0;
-        count_ = 0;
-
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
-            (*i)->EndFrame();
-    }
-
-    /// Begin new profiling interval.
-    void BeginInterval()
-    {
-        intervalTime_ = 0;
-        intervalMaxTime_ = 0;
-        intervalCount_ = 0;
-
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
-            (*i)->BeginInterval();
-    }
-
-    /// Return child block with the specified name.
-    ProfilerBlock* GetChild(const char* name)
-    {
-        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        {
-            if (!String::Compare((*i)->name_, name, true))
-                return *i;
-        }
-
-        ProfilerBlock* newBlock = new ProfilerBlock(this, name);
-        children_.Push(newBlock);
-
-        return newBlock;
-    }
-
-    /// Block name.
-    char* name_;
-    /// High-resolution timer for measuring the block duration.
-    HiresTimer timer_;
-    /// Time on current frame.
-    long long time_;
-    /// Maximum time on current frame.
-    long long maxTime_;
-    /// Calls on current frame.
-    unsigned count_;
-    /// Parent block.
-    ProfilerBlock* parent_;
-    /// Child blocks.
-    PODVector<ProfilerBlock*> children_;
-    /// Time on the previous frame.
-    long long frameTime_;
-    /// Maximum time on the previous frame.
-    long long frameMaxTime_;
-    /// Calls on the previous frame.
-    unsigned frameCount_;
-    /// Time during current profiler interval.
-    long long intervalTime_;
-    /// Maximum time during current profiler interval.
-    long long intervalMaxTime_;
-    /// Calls during current profiler interval.
-    unsigned intervalCount_;
-    /// Total accumulated time.
-    long long totalTime_;
-    /// All-time maximum time.
-    long long totalMaxTime_;
-    /// Total accumulated calls.
-    unsigned totalCount_;
+    OFF = 0,
+    ON = 1,
+    FORCE_ON = ON | 2,
+    OFF_RECURSIVE = 4,
+    ON_WITHOUT_CHILDREN = ON | OFF_RECURSIVE,
+    FORCE_ON_WITHOUT_CHILDREN = FORCE_ON | OFF_RECURSIVE,
 };
+
 
 /// Hierarchical performance profiler subsystem.
 class ATOMIC_API Profiler : public Object
@@ -179,82 +63,55 @@ public:
     /// Destruct.
     virtual ~Profiler();
 
-    /// Begin timing a profiling block.
-    void BeginBlock(const char* name)
-    {
-        // Profiler supports only the main thread currently
-        if (!Thread::IsMainThread())
-            return;
-
-        current_ = current_->GetChild(name);
-        current_->Begin();
-    }
-
-    /// End timing the current profiling block.
-    void EndBlock()
-    {
-        if (!Thread::IsMainThread())
-            return;
-
-        current_->End();
-        if (current_->parent_)
-            current_ = current_->parent_;
-    }
-
-    /// Begin the profiling frame. Called by HandleBeginFrame().
-    void BeginFrame();
-    /// End the profiling frame. Called by HandleEndFrame().
-    void EndFrame();
-    /// Begin a new interval.
-    void BeginInterval();
-
-    /// Return profiling data as text output. This method is not thread-safe.
-    const String& PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
-    /// Return the current profiling block.
-    const ProfilerBlock* GetCurrentBlock() { return current_; }
-    /// Return the root profiling block.
-    const ProfilerBlock* GetRootBlock() { return root_; }
-
-protected:
-    /// Return profiling data as text output for a specified profiling block.
-    void PrintData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
-
-    /// Current profiling block.
-    ProfilerBlock* current_;
-    /// Root profiling block.
-    ProfilerBlock* root_;
-    /// Frames in the current interval.
-    unsigned intervalFrames_;
-};
-
-/// Helper class for automatically beginning and ending a profiling block
-class ATOMIC_API AutoProfileBlock
-{
-public:
-    /// Construct. Begin a profiling block with the specified name and optional call count.
-    AutoProfileBlock(Profiler* profiler, const char* name) :
-        profiler_(profiler)
-    {
-        if (profiler_)
-            profiler_->BeginBlock(name);
-    }
-
-    /// Destruct. End the profiling block.
-    ~AutoProfileBlock()
-    {
-        if (profiler_)
-            profiler_->EndBlock();
-    }
+    /// Enables or disables profiler.
+    void SetEnabled(bool enabled);
+    /// Returns true if profiler is enabled, false otherwise.
+    bool GetEnabled() const;
+    /// Enables or disables event profiling.
+    void SetEventProfilingEnabled(bool enabled);
+    /// Returns true if event profiling is enabled, false otherwise.
+    bool GetEventProfilingEnabled() const;
+    /// Starts listening for incoming profiler tool connections.
+    void StartListen(unsigned short port=PROFILER_DEFAULT_PORT);
+    /// Stops listening for incoming profiler tool connections.
+    void StopListen();
+    /// Returns true if profiler is currently listening for incoming connections.
+    bool GetListening() const;
+    /// Enables or disables event tracing. This is windows-specific, does nothing on other OS.
+    void SetEventTracingEnabled(bool enable);
+    /// Returns true if event tracing is enabled, false otherwise.
+    bool GetEventTracingEnabled();
+    /// Enables or disables low priority event tracing. This is windows-specific, does nothing on other OS.
+    void SetLowPriorityEventTracing(bool isLowPriority);
+    /// Returns true if low priority event tracing is enabled, false otherwise.
+    bool GetLowPriorityEventTracing();
+    /// Save profiler data to a file.
+    void SaveProfilerData(const String& filePath);
+    /// Begin non-scoped profiled block. Block has to be terminated with call to EndBlock(). This is slow and is for
+    /// integration with scripting lnaguages. Use ATOMIC_PROFILE* macros when writing c++ code instead.
+    void BeginBlock(const char* name, const char* file, int line, unsigned int argb=PROFILER_COLOR_DEFAULT,
+                    unsigned char status=ProfilerBlockStatus::ON);
+    /// End block started with BeginBlock().
+    void EndBlock();
 
 private:
-    /// Profiler.
-    Profiler* profiler_;
+
+    bool enableEventProfiling_ = true;
+    HashMap<unsigned, ::profiler::BaseBlockDescriptor*> blockDescriptorCache_;
 };
 
-#ifdef ATOMIC_PROFILING
-#define ATOMIC_PROFILE(name) Atomic::AutoProfileBlock profile_ ## name (GetSubsystem<Atomic::Profiler>(), #name)
+#if ATOMIC_PROFILING
+#   define ATOMIC_PROFILE(name, ...) EASY_BLOCK(#name, __VA_ARGS__)
+#   define ATOMIC_PROFILE_SCOPED(name, ...) EASY_BLOCK(name, __VA_ARGS__)
+#   define ATOMIC_PROFILE_NONSCOPED(name, ...) EASY_NONSCOPED_BLOCK(name, __VA_ARGS__)
+#   define ATOMIC_PROFILE_END(...) EASY_END_BLOCK
+#   define ATOMIC_PROFILE_THREAD(name) EASY_THREAD(name)
 #else
-#define ATOMIC_PROFILE(name)
+#   define ATOMIC_PROFILE(name, ...)
+#   define ATOMIC_PROFILE_NONSCOPED(name, ...)
+#   define ATOMIC_PROFILE_SCOPED(name, ...)
+#   define ATOMIC_PROFILE_END(...)
+#   define ATOMIC_PROFILE_THREAD(name)
 #endif
 
 }

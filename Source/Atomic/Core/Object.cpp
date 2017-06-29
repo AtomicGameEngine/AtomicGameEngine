@@ -25,6 +25,9 @@
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
+// ATOMIC BEGIN
+#include "../Core/Profiler.h"
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -302,8 +305,34 @@ void Object::SendEvent(StringHash eventType)
 
     SendEvent(eventType, noEventData);
 }
-
+// ATOMIC BEGIN
 void Object::SendEvent(StringHash eventType, VariantMap& eventData)
+{
+#if ATOMIC_PROFILING
+    bool eventProfilingEnabled = false;
+    if (Profiler* profiler = GetSubsystem<Profiler>())
+        eventProfilingEnabled = profiler->GetEventProfilingEnabled();
+
+    if (eventProfilingEnabled)
+        SendEventProfiled(eventType, eventData);
+    else
+#endif
+        SendEventNonProfiled(eventType, eventData);
+}
+
+void Object::SendEventProfiled(StringHash eventType, VariantMap& eventData)
+{
+#if ATOMIC_PROFILING
+    String eventName;
+    if (!StringHash::GetSignificantString(eventType, eventName))
+        eventName = eventType.ToString();
+    ATOMIC_PROFILE_SCOPED(eventName.CString(), PROFILER_COLOR_EVENTS);
+#endif
+    SendEventNonProfiled(eventType, eventData);
+}
+
+void Object::SendEventNonProfiled(StringHash eventType, VariantMap& eventData)
+// ATOMIC END
 {
     if (!Thread::IsMainThread())
     {
@@ -402,7 +431,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->EndSendEvent();
 
 // ATOMIC BEGIN
-    context->GlobalEndSendEvent(this,eventType, eventData);
+    context->GlobalEndSendEvent(this, eventType, eventData);
 // ATOMIC END
 
 }

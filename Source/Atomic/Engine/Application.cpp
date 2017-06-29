@@ -25,6 +25,9 @@
 #include "../Engine/Application.h"
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
+// ATOMIC BEGIN
+#include "../Core/Profiler.h"
+// ATOMIC END
 
 #ifdef IOS
 #include "../Graphics/Graphics.h"
@@ -87,6 +90,10 @@ Application::Application(Context* context) :
 
 int Application::Run()
 {
+    // ATOMIC BEGIN
+    // Profiler requires main thread to be named "Main" as fps calculations depend on it.
+    ATOMIC_PROFILE_THREAD("Main");
+    // ATOMIC END
 #if !defined(__GNUC__) || __EXCEPTIONS
     try
     {

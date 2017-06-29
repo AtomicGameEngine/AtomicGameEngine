@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2017 the Atomic project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,124 +21,140 @@
 //
 
 #include "../Precompiled.h"
-
 #include "../Core/Profiler.h"
-
-#include <cstdio>
-
-#include "../DebugNew.h"
+#include "../Core/StringUtils.h"
 
 namespace Atomic
 {
 
-Profiler::Profiler(Context* context) :
-    Object(context),
-    current_(0),
-    root_(0),
-    intervalFrames_(0)
+Profiler::Profiler(Context* context)
+    : Object(context)
 {
-    current_ = root_ = new ProfilerBlock(0, "RunFrame");
+    SetEnabled(true);
+#if !ATOMIC_PROFILING
+    enableEventProfiling_ = false;
+#endif
 }
 
 Profiler::~Profiler()
 {
-    delete root_;
-    root_ = 0;
 }
 
-void Profiler::BeginFrame()
+void Profiler::SetEnabled(bool enabled)
 {
-    // End the previous frame if any
-    if (root_->count_)
-        EndFrame();
-
-    root_->Begin();
+#if ATOMIC_PROFILING
+    ::profiler::setEnabled(enabled);
+#endif
 }
 
-void Profiler::EndFrame()
+bool Profiler::GetEnabled() const
 {
-    EndBlock();
-    ++intervalFrames_;
-    root_->EndFrame();
-    current_ = root_;
+#if ATOMIC_PROFILING
+    return ::profiler::isEnabled();
+#else
+    return false;
+#endif
 }
 
-void Profiler::BeginInterval()
+void Profiler::StartListen(unsigned short port)
 {
-    root_->BeginInterval();
-    intervalFrames_ = 0;
+#if ATOMIC_PROFILING
+    ::profiler::startListen(port);
+#endif
 }
 
-const String& Profiler::PrintData(bool showUnused, bool showTotal, unsigned maxDepth) const
+void Profiler::StopListen()
 {
-    static String output;
+#if ATOMIC_PROFILING
+    ::profiler::stopListen();
+#endif
+}
 
-    if (!showTotal)
-        output  = "Block                            Cnt     Avg      Max     Frame     Total\n\n";
+bool Profiler::GetListening() const
+{
+#if ATOMIC_PROFILING
+    return ::profiler::isListening();
+#else
+    return false;
+#endif
+}
+
+void Profiler::SetEventTracingEnabled(bool enable)
+{
+#if ATOMIC_PROFILING
+    ::profiler::setEventTracingEnabled(enable);
+#endif
+}
+
+bool Profiler::GetEventTracingEnabled()
+{
+#if ATOMIC_PROFILING
+    return ::profiler::isEventTracingEnabled();
+#else
+    return false;
+#endif
+}
+
+void Profiler::SetLowPriorityEventTracing(bool isLowPriority)
+{
+#if ATOMIC_PROFILING
+    ::profiler::setLowPriorityEventTracing(isLowPriority);
+#endif
+}
+
+bool Profiler::GetLowPriorityEventTracing()
+{
+#if ATOMIC_PROFILING
+    return ::profiler::isLowPriorityEventTracing();
+#else
+    return false;
+#endif
+}
+
+void Profiler::SaveProfilerData(const String& filePath)
+{
+#if ATOMIC_PROFILING
+    ::profiler::dumpBlocksToFile(filePath.CString());
+#endif
+}
+
+void Profiler::SetEventProfilingEnabled(bool enabled)
+{
+#if ATOMIC_PROFILING
+    enableEventProfiling_ = enabled;
+#endif
+}
+
+bool Profiler::GetEventProfilingEnabled() const
+{
+    return enableEventProfiling_;
+}
+
+void Profiler::BeginBlock(const char* name, const char* file, int line, unsigned int argb, unsigned char status)
+{
+#if ATOMIC_PROFILING
+    // Line used as starting hash value for efficiency.
+    // This is likely to not play well with hot code reload.
+    unsigned hash = StringHash::Calculate(file, (unsigned)line);
+    HashMap<unsigned, ::profiler::BaseBlockDescriptor*>::Iterator it = blockDescriptorCache_.Find(hash);
+    const ::profiler::BaseBlockDescriptor* desc = 0;
+    if (it == blockDescriptorCache_.End())
+    {
+        String uniqueName = ToString("%s:%d", file, line);
+        desc = ::profiler::registerDescription((::profiler::EasyBlockStatus)status, uniqueName.CString(), name, file,
+                                               line, ::profiler::BLOCK_TYPE_BLOCK, argb, true);
+    }
     else
-    {
-        output  = "Block                                       Last frame                       Whole execution time\n\n";
-        output += "                                 Cnt     Avg      Max      Total      Cnt      Avg       Max        Total\n\n";
-    }
-
-    if (!maxDepth)
-        maxDepth = 1;
-
-    PrintData(root_, output, 0, maxDepth, showUnused, showTotal);
-
-    return output;
+        desc = it->second_;
+    ::profiler::beginNonScopedBlock(desc, name);
+#endif
 }
 
-void Profiler::PrintData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused,
-    bool showTotal) const
+void Profiler::EndBlock()
 {
-    static const int LINE_MAX_LENGTH = 256;
-    static const int NAME_MAX_LENGTH = 30;
-
-    char line[LINE_MAX_LENGTH];
-    char indentedName[LINE_MAX_LENGTH];
-
-    if (depth >= maxDepth)
-        return;
-
-    // Do not print any block that does not collect critical data
-    if (showUnused || block->intervalCount_ || (showTotal && block->totalCount_))
-    {
-        memset(indentedName, ' ', NAME_MAX_LENGTH);
-        indentedName[depth++] = 0;
-        strncat(indentedName, block->name_, NAME_MAX_LENGTH - depth);
-        indentedName[strlen(indentedName)] = ' ';
-        indentedName[NAME_MAX_LENGTH] = 0;
-
-        if (!showTotal)
-        {
-            float avg = block->intervalTime_ / block->intervalCount_ / 1000.0f;
-            float max = block->intervalMaxTime_ / 1000.0f;
-            float frame = block->intervalTime_ / (intervalFrames_ ? intervalFrames_ : 1) / 1000.0f;
-            float all = block->intervalTime_ / 1000.0f;
-
-            sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, Min(block->intervalCount_, 99999U),
-                avg, max, frame, all);
-        }
-        else
-        {
-            float avg = (block->frameCount_ ? block->frameTime_ / block->frameCount_ : 0.0f) / 1000.0f;
-            float max = block->frameMaxTime_ / 1000.0f;
-            float all = block->frameTime_ / 1000.0f;
-
-            float totalAvg = block->totalTime_ / block->totalCount_ / 1000.0f;
-            float totalMax = block->totalMaxTime_ / 1000.0f;
-            float totalAll = block->totalTime_ / 1000.0f;
-
-            sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, Min(block->frameCount_, 99999U),
-                avg, max, all, Min(block->totalCount_, 99999U), totalAvg, totalMax, totalAll);
-        }
-
-        output += String(line);
-    }
-
-    for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
-        PrintData(*i, output, depth, maxDepth, showUnused, showTotal);
+#if ATOMIC_PROFILING
+    ::profiler::endBlock();
+#endif
 }
 
 }
