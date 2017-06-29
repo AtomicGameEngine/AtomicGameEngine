@@ -768,6 +768,16 @@ namespace Atomic
             }
 #endif
         }
+
+        ATOMIC_EXPORT_API void csi_Atomic_Profiler_EndBlock(Profiler* profiler)
+        {
+#if ATOMIC_PROFILING
+            if (!profiler)
+                return;
+
+            profiler->EndBlock();
+#endif
+        }
     }
 }
 

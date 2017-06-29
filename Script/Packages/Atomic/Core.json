@@ -28,6 +28,9 @@
 		"CSharp" : {
 			"Object" : {
 				"UnsubscribeFromAllEvents" : []
+			},
+			"Profiler": {
+				"EndBlock" : []
 			}
 		}
 	},
