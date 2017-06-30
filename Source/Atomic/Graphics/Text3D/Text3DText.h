@@ -28,7 +28,7 @@
 namespace Atomic
 {
 
-static const int TEXT3D_DEFAULT_FONT_SIZE = 12;
+static const float TEXT3D_DEFAULT_FONT_SIZE = 12;
 
 class Text3DFont;
 class Text3DFontFace;
@@ -46,16 +46,16 @@ enum Text3DTextEffect
 struct Text3DCharLocation
 {
     /// Position.
-    IntVector2 position_;
+    Vector2 position_;
     /// Size.
-    IntVector2 size_;
+    Vector2 size_;
 };
 
 /// Glyph and its location within the text. Used when preparing text rendering.
 struct Text3DGlyphLocation
 {
     /// Construct.
-    Text3DGlyphLocation(int x, int y, const Text3DFontGlyph* glyph) :
+    Text3DGlyphLocation(float x, float y, const Text3DFontGlyph* glyph) :
         x_(x),
         y_(y),
         glyph_(glyph)
@@ -63,9 +63,9 @@ struct Text3DGlyphLocation
     }
 
     /// X coordinate.
-    int x_;
+    float x_;
     /// Y coordinate.
-    int y_;
+    float y_;
     /// Glyph.
     const Text3DFontGlyph* glyph_;
 };
@@ -121,11 +121,11 @@ public:
     virtual void OnIndentSet();
 
     /// Set font by looking from resource cache by name and font size. Return true if successful.
-    bool SetFont(const String& fontName, int size = TEXT3D_DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, float size = TEXT3D_DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.
-    bool SetFont(Text3DFont* font, int size = TEXT3D_DEFAULT_FONT_SIZE);
+    bool SetFont(Text3DFont* font, float size = TEXT3D_DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
-    bool SetFontSize(int size);
+    bool SetFontSize(float size);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set row alignment.
@@ -159,7 +159,7 @@ public:
     Text3DFont* GetFont() const { return font_; }
 
     /// Return font size.
-    int GetFontSize() const { return fontSize_; }
+    float GetFontSize() const { return fontSize_; }
 
     /// Return text.
     const String& GetText() const { return text_; }
@@ -204,7 +204,7 @@ public:
     const Color& GetEffectColor() const { return effectColor_; }
 
     /// Return row height.
-    int GetRowHeight() const { return rowHeight_; }
+    float GetRowHeight() const { return rowHeight_; }
 
     /// Return number of rows.
     unsigned GetNumRows() const { return rowWidths_.Size(); }
@@ -213,11 +213,11 @@ public:
     unsigned GetNumChars() const { return unicodeText_.Size(); }
 
     /// Return width of row by index.
-    int GetRowWidth(unsigned index) const;
+    float GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
-    IntVector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
-    IntVector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(unsigned index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -370,7 +370,7 @@ protected:
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
     void ConstructBatch
-        (Text3DBatch& pageBatch, const PODVector<Text3DGlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0,
+        (Text3DBatch& pageBatch, const PODVector<Text3DGlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = 0,
             float depthBias = 0.0f);
 
     /// Font.
@@ -378,7 +378,7 @@ protected:
     /// Current face.
     WeakPtr<Text3DFontFace> fontFace_;
     /// Font size.
-    int fontSize_;
+    float fontSize_;
     /// UTF-8 encoded text.
     String text_;
     /// Row alignment.
@@ -410,7 +410,7 @@ protected:
     /// Text effect Z bias.
     float effectDepthBias_;
     /// Row height.
-    int rowHeight_;
+    float rowHeight_;
     /// Text as Unicode characters.
     PODVector<unsigned> unicodeText_;
     /// Text modified into printed form.
@@ -418,7 +418,7 @@ protected:
     /// Mapping of printed form back to original char indices.
     PODVector<unsigned> printToText_;
     /// Row widths.
-    PODVector<int> rowWidths_;
+    PODVector<float> rowWidths_;
     /// Glyph locations per each texture in the font.
     Vector<PODVector<Text3DGlyphLocation> > pageGlyphLocations_;
     /// Cached locations of each character in the text.

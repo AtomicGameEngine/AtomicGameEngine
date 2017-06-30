@@ -212,6 +212,8 @@ Graphics::Graphics(Context* context) :
     resizable_(false),
     highDPI_(false),
     vsync_(false),
+    monitor_(0),
+    refreshRate_(0),
     tripleBuffer_(false),
     flushGPU_(false),
     forceGL2_(false),
@@ -382,6 +384,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     AdjustWindow(width, height, fullscreen, borderless, monitor);
     monitor_ = monitor;
+    refreshRate_ = refreshRate;
 
     if (maximize)
     {
@@ -2110,13 +2113,15 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         }
         else 
         {
-            if (newFullscreen || newBorderless) 
+            SDL_Rect display_rect;
+            SDL_GetDisplayBounds(monitor, &display_rect);
+
+            if (newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h))
             {
-                // Reposition the window on the specified monitor
-                SDL_Rect display_rect;
-                SDL_GetDisplayBounds(monitor, &display_rect);
+                // Reposition the window on the specified monitor if it's supposed to cover the entire monitor
                 SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
             }
+
             SDL_SetWindowSize(window_, newWidth, newHeight);
         }
 

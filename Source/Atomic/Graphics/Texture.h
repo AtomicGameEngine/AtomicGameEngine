@@ -36,9 +36,9 @@ class XMLElement;
 class XMLFile;
 
 /// Base class for texture resources.
-class ATOMIC_API Texture : public Resource, public GPUObject
+class ATOMIC_API Texture : public ResourceWithMetadata, public GPUObject
 {
-    ATOMIC_OBJECT(Texture, Resource)
+    ATOMIC_OBJECT(Texture, ResourceWithMetadata)
 
 public:
     /// Construct.
@@ -116,7 +116,7 @@ public:
 
     /// Return whether rendertarget mipmap levels need regenration.
     bool GetLevelsDirty() const { return levelsDirty_; }
-    
+
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
 

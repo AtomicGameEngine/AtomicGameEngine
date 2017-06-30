@@ -42,7 +42,7 @@ public:
     ~Text3DBitmap();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize);
     /// Load from existed font face, pack used glyphs into smallest texture size and smallest number of texture.
     bool Load(Text3DFontFace* fontFace, bool usedGlyphs);
     /// Save as a new bitmap font type in XML format. Return true if successful.

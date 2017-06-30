@@ -128,7 +128,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     buffer[dataSize] = '\0';
 
     rapidjson::Document document;
-    if (document.Parse<0>(buffer).HasParseError())
+    if (document.Parse<kParseCommentsFlag | kParseTrailingCommasFlag>(buffer).HasParseError())
     {
         ATOMIC_LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
@@ -202,7 +202,7 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
                 const char* name = i->first_.CString();
                 rapidjson::Value value;
                 ToRapidjsonValue(value, i->second_, allocator);
-                rapidjsonValue.AddMember(name, value, allocator);
+                rapidjsonValue.AddMember(StringRef(name), value, allocator);
             }
         }
         break;

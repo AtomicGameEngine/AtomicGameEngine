@@ -111,7 +111,7 @@ void Text3DText::RegisterObject(Context* context)
     ATOMIC_COPY_BASE_ATTRIBUTES(Animatable);
     ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Text3DFont::GetTypeStatic()), AM_FILE);
-    ATOMIC_ATTRIBUTE("Font Size", int, fontSize_, TEXT3D_DEFAULT_FONT_SIZE, AM_FILE);
+    ATOMIC_ATTRIBUTE("Font Size", float, fontSize_, TEXT3D_DEFAULT_FONT_SIZE, AM_FILE);
     ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
     ATOMIC_ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     ATOMIC_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
@@ -233,12 +233,12 @@ void Text3DText::GetBatches(PODVector<Text3DBatch>& batches, PODVector<float>& v
         Text3DBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
         batch.SetColor(selectionColor_);
 
-        IntVector2 currentStart = charLocations_[selectionStart_].position_;
-        IntVector2 currentEnd = currentStart;
+        Vector2 currentStart = charLocations_[selectionStart_].position_;
+        Vector2 currentEnd = currentStart;
         for (unsigned i = selectionStart_; i < selectionStart_ + selectionLength_; ++i)
         {
             // Check if row changes, and start a new quad in that case
-            if (charLocations_[i].size_ != IntVector2::ZERO)
+            if (charLocations_[i].size_ != Vector2::ZERO)
             {
                 if (charLocations_[i].position_.y_ != currentStart.y_)
                 {
@@ -297,7 +297,7 @@ void Text3DText::GetBatches(PODVector<Text3DBatch>& batches, PODVector<float>& v
                 {
                     float x = Cos(angle * i) * floatThickness;
                     float y = Sin(angle * i) * floatThickness;
-                    ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
                 }
             }
             else
@@ -341,13 +341,13 @@ void Text3DText::OnIndentSet()
     charLocationsDirty_ = true;
 }
 
-bool Text3DText::SetFont(const String& fontName, int size)
+bool Text3DText::SetFont(const String& fontName, float size)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     return SetFont(cache->GetResource<Text3DFont>(fontName), size);
 }
 
-bool Text3DText::SetFont(Text3DFont* font, int size)
+bool Text3DText::SetFont(Text3DFont* font, float size)
 {
     if (!font)
     {
@@ -365,7 +365,7 @@ bool Text3DText::SetFont(Text3DFont* font, int size)
     return true;
 }
 
-bool Text3DText::SetFontSize(int size)
+bool Text3DText::SetFontSize(float size)
 {
     // Initial font must be set
     if (!font_)
@@ -512,29 +512,29 @@ void Text3DText::SetEffectDepthBias(float bias)
     effectDepthBias_ = bias;
 }
 
-int Text3DText::GetRowWidth(unsigned index) const
+float Text3DText::GetRowWidth(unsigned index) const
 {
     return index < rowWidths_.Size() ? rowWidths_[index] : 0;
 }
 
-IntVector2 Text3DText::GetCharPosition(unsigned index)
+Vector2 Text3DText::GetCharPosition(unsigned index)
 {
     if (charLocationsDirty_)
         UpdateCharLocations();
     if (charLocations_.Empty())
-        return IntVector2::ZERO;
+        return Vector2::ZERO;
     // For convenience, return the position of the text ending if index exceeded
     if (index > charLocations_.Size() - 1)
         index = charLocations_.Size() - 1;
     return charLocations_[index].position_;
 }
 
-IntVector2 Text3DText::GetCharSize(unsigned index)
+Vector2 Text3DText::GetCharSize(unsigned index)
 {
     if (charLocationsDirty_)
         UpdateCharLocations();
     if (charLocations_.Size() < 2)
-        return IntVector2::ZERO;
+        return Vector2::ZERO;
     // For convenience, return the size of the last char if index exceeded (last size entry is zero)
     if (index > charLocations_.Size() - 2)
         index = charLocations_.Size() - 2;
@@ -583,7 +583,7 @@ void Text3DText::UpdateText(bool onResize)
         int width = 0;
         int height = 0;
         int rowWidth = 0;
-        int rowHeight = (int)(rowSpacing_ * rowHeight_);
+        int rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
 
         // First see if the text must be split up
         if (!wordWrap_)
@@ -754,7 +754,7 @@ void Text3DText::UpdateCharLocations()
         return;
     fontFace_ = face;
 
-    int rowHeight = (int)(rowSpacing_ * rowHeight_);
+    int rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
 
     // Store position & size of each character, and locations per texture page
     unsigned numChars = unicodeText_.Size();
@@ -767,19 +767,19 @@ void Text3DText::UpdateCharLocations()
 
     unsigned rowIndex = 0;
     unsigned lastFilled = 0;
-    int x = GetRowStartPosition(rowIndex) + offset.x_;
-    int y = offset.y_;
+    float x = floor(GetRowStartPosition(rowIndex) + offset.x_ + 0.5f);
+    float y = floor(offset.y_ + 0.5f);
 
     for (unsigned i = 0; i < printText_.Size(); ++i)
     {
         Text3DCharLocation loc;
-        loc.position_ = IntVector2(x, y);
+        loc.position_ = Vector2(x, y);
 
         unsigned c = printText_[i];
         if (c != '\n')
         {
             const Text3DFontGlyph* glyph = face->GetGlyph(c);
-            loc.size_ = IntVector2(glyph ? glyph->advanceX_ : 0, rowHeight_);
+            loc.size_ = Vector2(glyph ? glyph->advanceX_ : 0, rowHeight_);
             if (glyph)
             {
                 // Store glyph's location for rendering. Verify that glyph page is valid
@@ -792,7 +792,7 @@ void Text3DText::UpdateCharLocations()
         }
         else
         {
-            loc.size_ = IntVector2::ZERO;
+            loc.size_ = Vector2::ZERO;
             x = GetRowStartPosition(++rowIndex);
             y += rowHeight;
         }
@@ -806,8 +806,8 @@ void Text3DText::UpdateCharLocations()
         lastFilled = printToText_[i] + 1;
     }
     // Store the ending position
-    charLocations_[numChars].position_ = IntVector2(x, y);
-    charLocations_[numChars].size_ = IntVector2::ZERO;
+    charLocations_[numChars].position_ = Vector2(x, y);
+    charLocations_[numChars].size_ = Vector2::ZERO;
 
     charLocationsDirty_ = false;
 }
@@ -832,7 +832,7 @@ void Text3DText::ValidateSelection()
 
 int Text3DText::GetRowStartPosition(unsigned rowIndex) const
 {
-    int rowWidth = 0;
+    float rowWidth = 0;
 
     if (rowIndex < rowWidths_.Size())
         rowWidth = rowWidths_[rowIndex];
@@ -866,7 +866,7 @@ void Text3DText::SetIndentSpacing(int indentSpacing)
     OnIndentSet();
 }
 
-void Text3DText::ConstructBatch(Text3DBatch& pageBatch, const PODVector<Text3DGlyphLocation>& pageGlyphLocation, int dx, int dy, Color* color,
+void Text3DText::ConstructBatch(Text3DBatch& pageBatch, const PODVector<Text3DGlyphLocation>& pageGlyphLocation, float dx, float dy, Color* color,
     float depthBias)
 {
     unsigned startDataSize = pageBatch.vertexData_->Size();

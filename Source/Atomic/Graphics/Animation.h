@@ -107,9 +107,9 @@ static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
 
 /// Skeletal animation resource.
-class ATOMIC_API Animation : public Resource
+class ATOMIC_API Animation : public ResourceWithMetadata
 {
-    ATOMIC_OBJECT(Animation, Resource);
+    ATOMIC_OBJECT(Animation, ResourceWithMetadata);
 
 public:
     /// Construct.
@@ -162,9 +162,9 @@ public:
     const HashMap<StringHash, AnimationTrack>& GetTracks() const { return tracks_; }
 
     /// Return number of animation tracks.
-    unsigned GetNumTracks() const { return tracks_.Size(); } 
+    unsigned GetNumTracks() const { return tracks_.Size(); }
 
-    /// Return animation track by index. 
+    /// Return animation track by index.
     AnimationTrack *GetTrack(unsigned index);
 
     /// Return animation track by name.
