@@ -421,7 +421,7 @@ String GetPlatform()
 #elif defined(__linux__)
     return "Linux";
 #else
-    return String::EMPTY;
+    return "(?)";
 #endif
 }
 
@@ -557,7 +557,7 @@ String GetLoginName()
 {
 #if defined(__linux__) && !defined(__ANDROID__)
     struct passwd *p = getpwuid(getuid());
-    if (p) 
+    if (p != NULL) 
         return p->pw_name;
 #elif defined(_WIN32)
     char name[UNLEN + 1];
@@ -582,7 +582,7 @@ String GetLoginName()
         }
     }
 #endif
-    return "(?)"; 
+    return "(?)";
 }
 
 String GetHostName() 
@@ -597,11 +597,11 @@ String GetHostName()
     if (GetComputerName(buffer, &len))
         return buffer;
 #endif
-    return String::EMPTY; 
+    return "(?)";
 }
 
 // Disable Windows OS version functionality when compiling mini version for Web, see https://github.com/urho3d/Urho3D/issues/1998
-#if defined(_WIN32) && !defined(MINI_URHO)
+#if defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
 typedef NTSTATUS (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
 static void GetOS(RTL_OSVERSIONINFOW *r)
@@ -622,7 +622,7 @@ String GetOSVersion()
     struct utsname u;
     if (uname(&u) == 0)
         return String(u.sysname) + " " + u.release; 
-#elif defined(_WIN32) && !defined(MINI_URHO)
+#elif defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
     RTL_OSVERSIONINFOW r;
     GetOS(&r); 
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
@@ -643,7 +643,7 @@ String GetOSVersion()
     else if (r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
         return "Windows 10/Windows Server 2016"; 
     else 
-        return "Windows Unidentified";
+        return "Windows Unknown";
 #elif defined(__APPLE__)
     char kernel_r[256]; 
     size_t size = sizeof(kernel_r); 
@@ -719,7 +719,7 @@ String GetOSVersion()
         return version + " (Darwin kernel " + kernel_version[0] + "." + kernel_version[1] + "." + kernel_version[2] + ")"; 
     }
 #endif
-    return String::EMPTY; 
+    return "(?)";
 }
 
 }

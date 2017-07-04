@@ -59,7 +59,7 @@ ATOMIC_API const Vector<String>& ParseArguments(int argc, char** argv);
 ATOMIC_API const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 ATOMIC_API String GetConsoleInput();
-/// Return the runtime platform identifier.
+/// Return the runtime platform identifier, or (?) if not identified.
 ATOMIC_API String GetPlatform();
 /// Return the number of physical CPU cores.
 ATOMIC_API unsigned GetNumPhysicalCPUs();
@@ -69,13 +69,13 @@ ATOMIC_API unsigned GetNumLogicalCPUs();
 ATOMIC_API void SetMiniDumpDir(const String& pathName);
 /// Return minidump write location.
 ATOMIC_API String GetMiniDumpDir();
-/// Return the total amount of useable memory. 
+/// Return the total amount of usable memory in bytes.
 ATOMIC_API unsigned long long GetTotalMemory(); 
-/// Return the name of the currently logged in user. 
+/// Return the name of the currently logged in user, or (?) if not identified.
 ATOMIC_API String GetLoginName(); 
 /// Return the name of the running machine. 
 ATOMIC_API String GetHostName();
-/// Return the version of the currently running OS. 
+/// Return the version of the currently running OS, or (?) if not identified.
 ATOMIC_API String GetOSVersion(); 
 
 // ATOMIC BEGIN
