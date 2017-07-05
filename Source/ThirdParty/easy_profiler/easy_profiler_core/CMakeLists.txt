@@ -16,6 +16,13 @@ endif (WIN32)
 set(BUILD_WITH_CHRONO_STEADY_CLOCK     OFF    CACHE BOOL   "Use std::chrono::steady_clock as a timer" )
 set(BUILD_WITH_CHRONO_HIGH_RESOLUTION_CLOCK OFF CACHE BOOL "Use std::chrono::high_resolution_clock as a timer")
 
+# ATOMIC BEGIN
+# force std::chrono::high_resolution_clock usage on iOS
+if (IOS)
+    set(BUILD_WITH_CHRONO_HIGH_RESOLUTION_CLOCK ON)
+endif()
+# ATOMIC END
+
 message(STATUS "-------- EASY_PROFILER OPTIONS: --------")
 if (BUILD_WITH_CHRONO_STEADY_CLOCK)
     message(STATUS "  Use std::chrono::steady_clock as a timer")
