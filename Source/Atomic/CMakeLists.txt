@@ -32,7 +32,7 @@ elseif (ATOMIC_DATABASE_ODBC)
 endif ()
 
 if (WIN32)
-    option (ATOMIC_D3D11 "Use DirectX 11" OFF)
+    option (ATOMIC_D3D11 "Use DirectX 11" ON)
     option (ATOMIC_OPENGL "Use OpenGL" OFF)
     if (ATOMIC_D3D11) # DirectX 11
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
