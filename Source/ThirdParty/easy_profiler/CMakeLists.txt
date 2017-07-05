@@ -13,6 +13,13 @@ find_package(Qt5Widgets)
 set(EASY_OPTION_LIB_STATIC ON CACHE BOOL "" FORCE)
 set(EASY_OPTION_PREDEFINED_COLORS ON CACHE BOOL "" FORCE)
 set(EASY_PROFILER_NO_SAMPLES ON CACHE BOOL "" FORCE)
+set(BUILD_WITH_CHRONO_HIGH_RESOLUTION_CLOCK OFF CACHE BOOL "" FORCE)
+
+# force std::chrono::high_resolution_clock usage on iOS
+if (IOS)
+    set(BUILD_WITH_CHRONO_HIGH_RESOLUTION_CLOCK ON FORCE)
+endif()
+
 if ("${CMAKE_SOURCE_DIR}" STREQUAL "${easy_profiler_SOURCE_DIR}")
     # Do not set these paths if easy_profiler is added as dependency to other projects.
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)

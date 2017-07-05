@@ -45,7 +45,7 @@ function printHelp() {
       console.log("--vs2015        : Build with VS2015");
       console.log("--vs2017        : Build with VS2017");
       console.log("--opengl        : Enable OpenGL renderer");
-      console.log("--d3d11         : Enable DirectX 11 renderer");
+      console.log("--d3d9          : Enable DirectX 9 renderer");
     }
 
     console.log("--------------------------")
@@ -106,22 +106,22 @@ if (cmd == "buildeditor") {
         }
     }
 
-    if (config["d3d11"] && config["opengl"]) {
+    if (config["d3d9"] && config["opengl"]) {
 
         if (os.platform() == "win32") {
-            console.log("\nBoth DirectX 11 and OpenGL flags specified. Please choose only one at a time.\nExiting...\n");
+            console.log("\nBoth DirectX 9 and OpenGL flags specified. Please choose only one at a time.\nExiting...\n");
             process.exit(1);
         }
     }
 
-    if (config["d3d11"]) {
+    if (config["d3d9"]) {
 
         if (os.platform() != "win32") {
-            console.log("\nDirectX 11 build requires Windows, exiting\n");
+            console.log("\nDirectX 9 build requires Windows, exiting\n");
             process.exit(1);
         }
         else {
-            console.log("\nDirectX 11 build selected.\n");
+            console.log("\nDirectX 9 build selected.\n");
         }
     }
 
