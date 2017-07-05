@@ -236,6 +236,8 @@ Graphics::Graphics(Context* context_) :
     resizable_(false),
     highDPI_(false),
     vsync_(false),
+    monitor_(0),
+    refreshRate_(0),
     tripleBuffer_(false),
     sRGB_(false),
     forceGL2_(false),
@@ -429,9 +431,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(monitor, &display_rect);
         SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
+        bool reposition = fullscreen || (borderless && width >= display_rect.w && height >= display_rect.h);
 
-        int x = fullscreen || borderless ? display_rect.x : position_.x_;
-        int y = fullscreen || borderless ? display_rect.y : position_.y_;
+        int x = reposition ? display_rect.x : position_.x_;
+        int y = reposition ? display_rect.y : position_.y_;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
@@ -496,8 +499,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // Set vsync
     SDL_GL_SetSwapInterval(vsync ? 1 : 0);
 
-    // Store the system FBO on IOS now
-#ifdef IOS
+    // Store the system FBO on iOS/tvOS now
+#if defined(IOS) || defined(TVOS)
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
 #endif
 
@@ -508,6 +511,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
+    monitor_ = monitor;
+    refreshRate_ = refreshRate;
 
     SDL_GL_GetDrawableSize(window_, &width_, &height_);
     if (!fullscreen)
@@ -2087,8 +2092,8 @@ bool Graphics::GetDither() const
 
 bool Graphics::IsDeviceLost() const
 {
-    // On iOS treat window minimization as device loss, as it is forbidden to access OpenGL when minimized
-#ifdef IOS
+    // On iOS and tvOS treat window minimization as device loss, as it is forbidden to access OpenGL when minimized
+#if defined(IOS) || defined(TVOS)
     if (window_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED) != 0)
         return true;
 #endif
@@ -2418,7 +2423,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     impl_->depthTextures_.Clear();
 
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
-#if defined(__APPLE__) && !defined(IOS)
+#if defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
         SDL_SetWindowFullscreen(window_, 0);
 #endif
@@ -2511,7 +2516,7 @@ void Graphics::Restore()
         }
 #endif
 
-#ifdef IOS
+#if defined(IOS) || defined(TVOS)
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
 #endif
 
@@ -2830,8 +2835,8 @@ void Graphics::CheckFeatureSupport()
     if (numSupportedRTs >= 4)
         deferredSupport_ = true;
 
-#if defined(__APPLE__) && !defined(IOS)
-    // On OS X check for an Intel driver and use shadow map RGBA dummy color textures, because mixing
+#if defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
+    // On macOS check for an Intel driver and use shadow map RGBA dummy color textures, because mixing
     // depth-only FBO rendering and backbuffer rendering will bug, resulting in a black screen in full
     // screen mode, and incomplete shadow maps in windowed mode
     String renderer((const char*)glGetString(GL_RENDERER));
@@ -2870,9 +2875,8 @@ void Graphics::CheckFeatureSupport()
     }
     else
     {
-        #ifdef IOS
-        // iOS hack: depth renderbuffer seems to fail, so use depth textures for everything
-        // if supported
+#if defined(IOS) || defined(TVOS)
+        // iOS hack: depth renderbuffer seems to fail, so use depth textures for everything if supported
         glesDepthStencilFormat = GL_DEPTH_COMPONENT;
 #endif
         shadowMapFormat_ = GL_DEPTH_COMPONENT;

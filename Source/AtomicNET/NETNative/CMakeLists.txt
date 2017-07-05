@@ -32,7 +32,7 @@ target_include_directories(AtomicNETNative PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (APPLE)
     if (NOT IOS)
-        target_link_libraries( AtomicNETNative "-stdlib=libc++ -framework AudioToolbox -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
+        target_link_libraries( AtomicNETNative "-stdlib=libc++ -framework AudioToolbox -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security -framework SystemConfiguration")
     else()
         set_target_properties(AtomicNETNative PROPERTIES
             FRAMEWORK TRUE

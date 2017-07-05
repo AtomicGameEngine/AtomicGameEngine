@@ -79,32 +79,7 @@ void Text3DBatch::SetDefaultColor()
     }
 }
 
-
-unsigned Text3DBatch::GetInterpolatedColor(int x, int y)
-{
-    const IntVector2& size = element_->GetSize();
-
-    if (size.x_ && size.y_)
-    {
-        float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
-        float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);
-
-        Color topColor = element_->GetColor(C_TOPLEFT).Lerp(element_->GetColor(C_TOPRIGHT), cLerpX);
-        Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
-        Color color = topColor.Lerp(bottomColor, cLerpY);
-        color.a_ *= element_->GetOpacity();
-        return color.ToUInt();
-    }
-    else
-    {
-        Color color = element_->GetColor(C_TOPLEFT);
-        color.a_ *= element_->GetOpacity();
-        return color.ToUInt();
-    }
-}
-
-
-void Text3DBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+void Text3DBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
@@ -129,10 +104,10 @@ void Text3DBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, i
 
     const IntVector2& screenPos = IntVector2::ZERO; //element_->GetScreenPosition();
 
-    float left = (float)(x + screenPos.x_) - posAdjust.x_;
-    float right = left + (float)width;
-    float top = (float)(y + screenPos.y_) - posAdjust.x_;
-    float bottom = top + (float)height;
+    float left = x + screenPos.x_ - posAdjust.x_;
+    float right = left + width;
+    float top = y + screenPos.y_ - posAdjust.x_;
+    float bottom = top + height;
 
     float leftUV = texOffsetX * invTextureSize_.x_;
     float topUV = texOffsetY * invTextureSize_.y_;
@@ -442,6 +417,29 @@ bool Text3DBatch::Merge(const Text3DBatch& batch)
 
     vertexEnd_ = batch.vertexEnd_;
     return true;
+}
+
+unsigned Text3DBatch::GetInterpolatedColor(float x, float y)
+{
+    const IntVector2& size = element_->GetSize();
+
+    if (size.x_ && size.y_)
+    {
+        float cLerpX = Clamp(x / (float)size.x_, 0.0f, 1.0f);
+        float cLerpY = Clamp(y / (float)size.y_, 0.0f, 1.0f);
+
+        Color topColor = element_->GetColor(C_TOPLEFT).Lerp(element_->GetColor(C_TOPRIGHT), cLerpX);
+        Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
+        Color color = topColor.Lerp(bottomColor, cLerpY);
+        color.a_ *= element_->GetOpacity();
+        return color.ToUInt();
+    }
+    else
+    {
+        Color color = element_->GetColor(C_TOPLEFT);
+        color.a_ *= element_->GetOpacity();
+        return color.ToUInt();
+    }
 }
 
 void Text3DBatch::AddOrMerge(const Text3DBatch& batch, PODVector<Text3DBatch>& batches)

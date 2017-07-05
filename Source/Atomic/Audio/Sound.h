@@ -31,9 +31,9 @@ namespace Atomic
 class SoundStream;
 
 /// %Sound resource.
-class ATOMIC_API Sound : public Resource
+class ATOMIC_API Sound : public ResourceWithMetadata
 {
-    ATOMIC_OBJECT(Sound, Resource);
+    ATOMIC_OBJECT(Sound, ResourceWithMetadata);
 
 public:
     /// Construct.

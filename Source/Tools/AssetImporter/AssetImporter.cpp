@@ -947,8 +947,9 @@ void BuildAndSaveModel(OutModel& model)
             
             aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
+            // (in case there are nodes between that are not accounted for otherwise)
             if (boneNode == model.rootBone_)
-                transform = GetDerivedTransform(boneNode, model.rootNode_);
+                transform = GetDerivedTransform(boneNode, model.rootNode_, false);
             
             GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
             
@@ -1050,18 +1051,42 @@ void BuildAndSaveAnimations(OutModel* model)
             aiNodeAnim* channel = anim->mChannels[j];
             String channelName = FromAIString(channel->mNodeName);
             aiNode* boneNode = 0;
-            bool isRootBone = false;
-            
+
             if (model)
             {
-                unsigned boneIndex = GetBoneIndex(*model, channelName);
-                if (boneIndex == M_MAX_UNSIGNED)
+                unsigned boneIndex;
+                unsigned pos = channelName.Find("_$AssimpFbx$");
+
+                if (!suppressFbxPivotNodes_ || pos == String::NPOS)
                 {
-                    PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
-                    continue;
+                    boneIndex = GetBoneIndex(*model, channelName);
+                    if (boneIndex == M_MAX_UNSIGNED)
+                    {
+                        PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                        outAnim->RemoveTrack(channelName);
+                        continue;
+                    }
+                    boneNode = model->bones_[boneIndex];
                 }
-                boneNode = model->bones_[boneIndex];
-                isRootBone = boneIndex == 0;
+                else
+                {
+                    channelName = channelName.Substring(0, pos);
+
+                    // every first $fbx animation channel for a bone will consolidate other $fbx animation to a single channel
+                    // skip subsequent $fbx animation channel for the same bone
+                    if (outAnim->GetTrack(channelName) != NULL)
+                        continue;
+
+                    boneIndex = GetPivotlessBoneIndex(*model, channelName);
+                    if (boneIndex == M_MAX_UNSIGNED)
+                    {
+                        PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                        outAnim->RemoveTrack(channelName);
+                        continue;
+                    }
+
+                    boneNode = model->pivotlessBones_[boneIndex];
+                }
             }
             else
             {
@@ -1164,40 +1189,42 @@ void BuildAndSaveAnimations(OutModel* model)
                 aiQuaternion rot;
                 boneTransform.Decompose(scale, rot, pos);
                 // Then apply the active channels
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     pos = channel->mPositionKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     rot = channel->mRotationKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
-                
-                // If root bone, transform with the model root node transform
-                if (model && isRootBone)
+
+                // If root bone, transform with nodes in between model root node (if any)
+                if (model && boneNode == model->rootBone_)
                 {
                     aiMatrix4x4 transMat, scaleMat, rotMat;
                     aiMatrix4x4::Translation(pos, transMat);
                     aiMatrix4x4::Scaling(scale, scaleMat);
                     rotMat = aiMatrix4x4(rot.GetMatrix());
                     aiMatrix4x4 tform = transMat * rotMat * scaleMat;
-                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_);
-                    tform.Decompose(scale, rot, pos);
+                    aiMatrix4x4 tformOld = tform;
+                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_, false);
+                    // Do not decompose if did not actually change
+                    if (tform != tformOld)
+                        tform.Decompose(scale, rot, pos);
                 }
-                
-                if (track.channelMask_ & CHANNEL_POSITION)
+
+                if (track->channelMask_ & CHANNEL_POSITION)
                     kf.position_ = ToVector3(pos);
-                if (track.channelMask_ & CHANNEL_ROTATION)
+                if (track->channelMask_ & CHANNEL_ROTATION)
                     kf.rotation_ = ToQuaternion(rot);
-                if (track.channelMask_ & CHANNEL_SCALE)
+                if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
-                
-                track.keyFrames_.Push(kf);
+                if (kf.time_ >= thisImportStartTime && kf.time_ <= thisImportEndTime)
+                {
+                    kf.time_ = (kf.time_ - thisImportStartTime) * tickConversion;
+                    track->keyFrames_.Push(kf);
+                }
             }
-            
-            tracks.Push(track);
         }
-        
-        outAnim->SetTracks(tracks);
-        
+
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))
             ErrorExit("Could not open output file " + animOutName);

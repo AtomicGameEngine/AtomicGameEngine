@@ -177,7 +177,7 @@ set (SDL_CFLAGS)
 # in this file need to change that, so remember the original value, and
 # restore back to that afterwards. For check_function_exists() to work in
 # Emscripten, this value must be at its default value.
-# Urho3D - also due to a CMake's try_compile() bug on iOS platform, the CMAKE_REQUIRED_FLAGS contains our SmileyHack-injection on iOS platform
+# Urho3D - also due to a CMake's try_compile() bug on iOS/tvOS platform, the CMAKE_REQUIRED_FLAGS contains our SmileyHack-injection on iOS/tvOS platform
 set (ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
 # Urho3D - save the original CMake global settings, do not leave them to chances
 set (ORIG_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
@@ -276,7 +276,7 @@ dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "NOT MINGW" OFF)
 dep_option(PTHREADS            "Use POSIX threads for multi-threading" ON UNIX OFF)
 dep_option(PTHREADS_SEM        "Use pthread semaphores" ON PTHREADS OFF)
 # Urho3D - SDL_DLOPEN was originally set as option twice (one here and one in the subsystem section above), we keep the one here so that we can make the option dependent on other conditions
-dep_option(SDL_DLOPEN          "Use dlopen for shared object loading" ON "UNIX\;NOT IOS OR NOT IPHONEOS_DEPLOYMENT_TARGET OR NOT IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 8" OFF)
+dep_option(SDL_DLOPEN          "Use dlopen for shared object loading" ON "UNIX\;NOT IOS OR NOT IPHONEOS_DEPLOYMENT_TARGET OR NOT IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 8" OFF)    # No need to check for tvOS as its target version is 9 or above
 # Urho3D - hide Unix-specific audio driver options from Android platform
 dep_option(OSS                 "Support the OSS audio API" ON UNIX_SYS OFF)
 dep_option(ALSA                "Support the ALSA audio API" ON UNIX_SYS OFF)
@@ -292,7 +292,7 @@ dep_option(NAS_SHARED          "Dynamically load NAS audio API" ON NAS OFF)
 dep_option(SNDIO               "Support the Roar audio API" ON UNIX_SYS OFF)
 # Urho3D - commented out RPATH as an option because Urho3D is configured to always use RPATH, so init the variable to always TRUE
 set (RPATH TRUE)
-# Urho3D - prefer clock_gettime() when it is available (hide the option for Windows)
+# Urho3D - prefer clock_gettime() when it is available
 dep_option(CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" ON "NOT WINDOWS" OFF)
 set_option(INPUT_TSLIB         "Use the Touchscreen library for input" ${UNIX_SYS})
 dep_option(VIDEO_WAYLAND       "Use Wayland video driver" ON UNIX_SYS OFF)
@@ -466,7 +466,7 @@ if(ASSEMBLY)
 endif()
 
 # Urho3D - move from Unix platform-specific section below to here
-if(CLOCK_GETTIME)
+if(CLOCK_GETTIME AND (NOT IOS OR IPHONEOS_DEPLOYMENT_TARGET STREQUAL "" OR NOT IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 10.0))   # We cheat a little bit here with a hard-coded check because iOS 10.3 SDK when targeting 9.3 has strong symbol for iPhoneOS archs but weak symbol for iPhoneSimulator archs
   # Urho3D - bug fix - use different variables for different checks because of CMake caches the result variable; this fix the detection on Android platform
   check_library_exists(rt clock_gettime "" FOUND_CLOCK_GETTIME_IN_RT)
   if(FOUND_CLOCK_GETTIME_IN_RT)
@@ -521,7 +521,7 @@ if(LIBC)
     set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SYS_TYPES_SAVED})
     # Urho3D - no fix required - it seems all the compiler toolchains (native and X-compiling) that have been tested are able to find these headers correctly
     #          Android NDK is able to find these headers with the help of "--sysroot" compiler flags, while others like MinGW and Linaro GCC for RPI work out of box
-    #          However, AppleClang when targeting iOS platform can only find these headers correctly AFTER applying a CMake hack from our common module to workaround a CMake bug so that try_compile() command works well on iOS platform
+    #          However, AppleClang when targeting iOS/tvOS platform can only find these headers correctly AFTER applying a CMake hack from our common module to workaround a CMake bug so that try_compile() command works well on iOS/tvOS platform
     foreach(_HEADER
             stdio.h stdlib.h stddef.h stdarg.h malloc.h memory.h string.h
             strings.h inttypes.h stdint.h ctype.h math.h iconv.h signal.h)
@@ -742,8 +742,8 @@ elseif(APPLE)
   endif()
 
   if(SDL_JOYSTICK)
-    # Urho3D - bug fix - make it work for iOS platform
-    if (IOS)
+    # Urho3D - bug fix - make it work for iOS/tvOS platform
+    if (IOS OR TVOS)
       set (SDL_JOYSTICK_MFI 1)
       file (GLOB JOYSTICK_SOURCES ${SDL2_SOURCE_DIR}/src/joystick/iphoneos/*.m)
     else ()
@@ -758,8 +758,8 @@ elseif(APPLE)
   endif()
 
   if(SDL_HAPTIC)
-    # Urho3d - bug fix - make it work for iOS platform
-    if (IOS)
+    # Urho3d - bug fix - make it work for iOS/tvOS platform
+    if (IOS OR TVOS)
       set (SDL_HAPTIC_DUMMY 1)
       file (GLOB HAPTIC_SOURCES ${SDL2_SOURCE_DIR}/src/haptic/dummy/*.c)
     else ()
@@ -776,8 +776,8 @@ elseif(APPLE)
   endif()
 
   if(SDL_POWER)
-    # Urho3d - bug fix - make it work for iOS platform
-    if (IOS)
+    # Urho3d - bug fix - make it work for iOS/tvOS platform
+    if (IOS OR TVOS)
       set (SDL_POWER_UIKIT 1)
       file (GLOB POWER_SOURCES ${SDL2_SOURCE_DIR}/src/power/uikit/*.m)
     else ()
@@ -830,7 +830,7 @@ elseif(APPLE)
     list(APPEND EXTRA_LIBS ${AUDIOTOOLBOX})
   endif()
 
-  # Urho3d - bug fix - make it work for iOS platform
+  # Urho3d - bug fix - make it work for iOS/tvOS platform
   if(SDL_VIDEO)
     if (VIDEO_COCOA)
       # Urho3D - these are moved from commented CheckCOCOA macro
@@ -1118,6 +1118,14 @@ elseif(WINDOWS)
   if(DIRECTX)
     # Urho3D - bug fix - use our own FindDirectX.cmake module which does not rely on DXSDK_DIR environment variable directly when DirectX SDK is being used
     # Urho3D - TODO - move the find_package(DirectX) call from Urho3D common module to here later after we have refactored the library dependency handling
+
+    check_struct_has_member (XINPUT_GAMEPAD_EX wButtons xinput.h HAVE_XINPUT_GAMEPAD_EX)
+    check_struct_has_member (XINPUT_STATE_EX dwPacketNumber xinput.h HAVE_XINPUT_STATE_EX)
+    foreach (VAR HAVE_XINPUT_GAMEPAD_EX HAVE_XINPUT_STATE_EX)
+      if (${VAR})
+        add_definitions (-D${VAR})
+      endif ()
+    endforeach ()
   endif()
 
   if(SDL_AUDIO)
@@ -1425,6 +1433,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
 
 # Define target name
 set (TARGET_NAME SDL)
+
+# Define source files
+file (GLOB H_FILES include/*.h)     # Adding the headers into source files list is just for easier file browsing in the IDE
+list (APPEND SOURCE_FILES ${H_FILES})
 
 # Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
 setup_library ()

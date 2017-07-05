@@ -73,6 +73,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
     ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Sprite ", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
     ATOMIC_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
 }
 
 void ParticleEmitter2D::OnSetEnabled()
@@ -166,6 +167,15 @@ void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
     Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
     if (sprite)
         SetSprite(sprite);
+}
+
+void ParticleEmitter2D::SetEmitting(bool enable)
+{
+    if (enable != emitting_)
+    {
+        emitting_ = enable;
+        emitParticleTime_ = 0.0f;
+    }
 }
 
 ResourceRef ParticleEmitter2D::GetSpriteAttr() const
@@ -328,7 +338,7 @@ void ParticleEmitter2D::Update(float timeStep)
         }
     }
 
-    if (emissionTime_ > 0.0f)
+    if (emitting_ && emissionTime_ > 0.0f)
     {
         float worldAngle = GetNode()->GetWorldRotation().RollAngle();
 
@@ -463,18 +473,5 @@ void ParticleEmitter2D::UpdateParticle(Particle2D& particle, float timeStep, con
     boundingBoxMaxPoint_.y_ = Max(boundingBoxMaxPoint_.y_, particle.position_.y_ + halfSize);
     boundingBoxMaxPoint_.z_ = Max(boundingBoxMaxPoint_.z_, particle.position_.z_);
 }
-
-// ATOMIC BEGIN
-
-void ParticleEmitter2D::SetEmitting(bool enable)
-{
-    emitting_ = enable;
-}
-bool ParticleEmitter2D::IsEmitting() const
-{
-    return emitting_;
-}
-
-// ATOMIC END
 
 }

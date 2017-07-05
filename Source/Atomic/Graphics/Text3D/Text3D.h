@@ -55,11 +55,11 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType();
 
     /// Set font by looking from resource cache by name and font size. Return true if successful.
-    bool SetFont(const String& fontName, int size = TEXT3D_DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, float size = TEXT3D_DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.
-    bool SetFont(Text3DFont* font, int size = TEXT3D_DEFAULT_FONT_SIZE);
+    bool SetFont(Text3DFont* font, float size = TEXT3D_DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
-    bool SetFontSize(int size);
+    bool SetFontSize(float size);
     /// Set material.
     void SetMaterial(Material* material);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
@@ -104,7 +104,7 @@ public:
     /// Return font.
     Text3DFont* GetFont() const;
     /// Return font size.
-    int GetFontSize() const;
+    float GetFontSize() const;
     /// Return material.
     Material* GetMaterial() const;
     /// Return text.
@@ -144,9 +144,9 @@ public:
     /// Return width of row by index.
     int GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
-    IntVector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
-    IntVector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(unsigned index);
     /// Return corner color.
     const Color& GetColor(Text3DCorner corner) const;
     /// Return opacity.
