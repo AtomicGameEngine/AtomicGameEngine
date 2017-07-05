@@ -317,8 +317,8 @@ void Context::ReleaseIK()
     if (ikInitCounter < 0)
         ATOMIC_LOGERROR("Too many calls to Context::ReleaseIK()");
 }
-#endif
-#endif
+#endif // ifdef URHO3D_IK
+#endif // ifndef MINI_URHO
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {

@@ -23,9 +23,9 @@ namespace('build', function() {
     // local cmake builds are always dev builds
     var flags = "-DATOMIC_DEV_BUILD=1";
 
-    // graphics backend (overrides default DX9)
+    // graphics backend overrides, defaults DX11
     flags += " -DATOMIC_OPENGL=" + (config["opengl"] ? "ON" : "OFF");
-    flags += " -DATOMIC_D3D11=" + (config["d3d11"] ? "ON" : "OFF");
+    flags += " -DATOMIC_D3D11=" + (config["d3d9"] ? "OFF" : "ON");
 
     return flags;
 

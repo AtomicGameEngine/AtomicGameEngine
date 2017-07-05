@@ -67,9 +67,9 @@ namespace('build', function() {
       // Redistributable editor build
       flags += "-DATOMIC_DEV_BUILD=0";
 
-      // graphics backend (overrides default DX9)
+      // graphics backend overrides, defaults to D3D11
       flags += " -DATOMIC_OPENGL=" + (config["opengl"] ? "ON" : "OFF");
-      flags += " -DATOMIC_D3D11=" + (config["d3d11"] ? "ON" : "OFF");
+      flags += " -DATOMIC_D3D11=" + (config["d3d9"] ? "OFF" : "ON");
 
       flags += "\"";
 

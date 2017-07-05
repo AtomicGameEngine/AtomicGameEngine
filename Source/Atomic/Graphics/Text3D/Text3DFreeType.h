@@ -30,6 +30,18 @@ namespace Atomic
 class FreeTypeLibrary;
 class Texture2D;
 
+enum FontHintLevel
+{
+    /// Completely disable font hinting. Output will be blurrier but more "correct".
+    FONT_HINT_LEVEL_NONE = 0,
+
+    /// Light hinting. FreeType will pixel-align fonts vertically, but not horizontally.
+    FONT_HINT_LEVEL_LIGHT,
+
+    /// Full hinting, using either the font's own hinting or FreeType's auto-hinter.
+    FONT_HINT_LEVEL_NORMAL
+};
+
 /// Free type font face description.
 class ATOMIC_API Text3DFreeType : public Text3DFontFace
 {
@@ -42,7 +54,7 @@ public:
     ~Text3DFreeType();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize);
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const Text3DFontGlyph* GetGlyph(unsigned c);
 
@@ -51,6 +63,18 @@ public:
 
     /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
     void SetForceAutoHint(bool enable) { forceAutoHint_ = enable; }
+
+    /// Return the current FreeType font hinting level.
+    FontHintLevel GetFontHintLevel() const { return fontHintLevel_; }
+
+    /// Set the hinting level used by FreeType fonts.
+    void SetFontHintLevel(FontHintLevel level) { fontHintLevel_ = level; }
+
+    // Return whether text glyphs can have fractional positions.
+    bool GetSubpixelGlyphPositions() const { return subpixelGlyphPositions_; }
+
+    /// Set whether text glyphs can have fractional positions. Default is false (pixel-aligned).
+    void SetSubpixelGlyphPositions(bool enable) { subpixelGlyphPositions_ = enable; }
 
 private:
     /// Setup next texture.
@@ -65,13 +89,15 @@ private:
     /// Load mode.
     int loadMode_;
     /// Ascender.
-    int ascender_;
+    float ascender_;
     /// Has mutable glyph.
     bool hasMutableGlyph_;
     /// Glyph area allocator.
     AreaAllocator allocator_;
 
     bool forceAutoHint_;
+    bool subpixelGlyphPositions_;
+    FontHintLevel fontHintLevel_;
 };
 
 }

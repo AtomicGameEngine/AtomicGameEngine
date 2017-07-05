@@ -111,9 +111,9 @@ static const unsigned MODEL_VERSION = 1;
 // ATOMIC END
 
 /// 3D model resource.
-class ATOMIC_API Model : public Resource
+class ATOMIC_API Model : public ResourceWithMetadata
 {
-    ATOMIC_OBJECT(Model, Resource);
+    ATOMIC_OBJECT(Model, ResourceWithMetadata);
 
 public:
     /// Construct.

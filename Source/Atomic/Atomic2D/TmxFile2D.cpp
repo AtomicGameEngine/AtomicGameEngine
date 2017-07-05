@@ -666,6 +666,17 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             propertySet->Load(tileElem.GetChild("properties"));
             gidToPropertySetMapping_[firstgid + tileElem.GetInt("id")] = propertySet;
         }
+		else if (tileElem.HasChild("objectgroup"))
+        {
+            XMLElement objectGroup = tileElem.GetChild("objectgroup");
+
+            if (objectGroup.HasChild("properties"))
+            {
+                SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
+                propertySet->Load(objectGroup.GetChild("properties"));
+                gidToPropertySetMapping_[firstgid + tileElem.GetInt("id")] = propertySet;
+            }
+        }
 
         // ATOMIC BEGIN
 
