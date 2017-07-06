@@ -133,6 +133,21 @@ public:
     virtual void GetChildTranslation(int &x, int &y) const;
     virtual void ScrollTo(int x, int y);
     virtual TBWidget::ScrollInfo GetScrollInfo();
+    
+    // ATOMIC BEGIN
+    /// A different way of setting up a layout, using a series of characters to program the main 5 layout fields
+    /// character [0] = 'X' or 'Y'  for UI_AXIS = X(D), Y
+    /// character [1] = 'A'|'G'|'P' for UI_LAYOUT_SIZE = Available, Gravity(D), Perferred
+    /// character [2] = 'C'|'G'|'L'|'R'  for UI_LAYOUT_POSITION = Center(D), Gravity, LeftTop, RightBottom
+    /// character [3] = 'A'|'G'|'P'  for UI_LAYOUT_DISTRIBUTION = Available, Gravity, Perferred(D)
+    /// character [4] = 'C'|'L'|'R'  for UI_LAYOUT_DISTRIBUTION_POSITION, Center(D), LeftTop, RightBottom
+    /// A '-' character in any field will not program that entry.
+    /// Any character used that is not an allowed characters or a '-' will result in the default setting to be used.
+    /// Any text in the string above character 5 is ignored.
+    /// If the input string is less than 5 characters it will not program any of the fields.
+    void SetLayoutConfig ( const char *settings );
+    // ATOMIC END
+    
 protected:
     AXIS m_axis;
     int m_spacing;

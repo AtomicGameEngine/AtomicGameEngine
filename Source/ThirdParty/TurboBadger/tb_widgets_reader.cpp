@@ -263,6 +263,12 @@ void TBLayout::OnInflate(const INFLATE_INFO &info)
             ld = LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM;
         SetLayoutDistributionPosition(ld);
     }
+
+// ATOMIC BEGIN
+    if (const char *layoutConfig = info.node->GetValueString("config", nullptr))
+        SetLayoutConfig(layoutConfig);
+// ATOMIC END
+
     TBWidget::OnInflate(info);
 }
 

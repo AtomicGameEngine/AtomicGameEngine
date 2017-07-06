@@ -44,6 +44,11 @@ public:
     UIWidget* GetCurrentPageWidget();
 
     UILayout* GetTabLayout();
+    
+    int GetCurrentPage(); /// returns the current page number
+    bool DeletePage( int page ); /// deletes a tab + page, returns true if successful
+    void AddTabPageFile ( const String &tabname, const String &layoutFile ); /// adds a tab + page from file
+    void AddTabPageWidget ( const String &tabname, UIWidget *widget ); /// adds a tab + page widget(s)
 
 protected:
 

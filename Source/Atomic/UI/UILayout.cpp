@@ -115,4 +115,13 @@ bool UILayout::OnEvent(const tb::TBWidgetEvent &ev)
     return UIWidget::OnEvent(ev);
 }
 
+/// one step to configure the main 5 fields in a UILayout
+void UILayout::SetLayoutConfig ( const String &settings )
+{
+    if (!widget_)
+        return;
+
+    ((tb::TBLayout*)widget_)->SetLayoutConfig(settings.CString());
+}
+
 }

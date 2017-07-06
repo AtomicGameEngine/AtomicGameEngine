@@ -524,4 +524,77 @@ TBWidget::ScrollInfo TBLayout::GetScrollInfo()
     return info;
 }
 
+// ATOMIC BEGIN
+
+// defines for character positions
+#define LCFG_AXIS 0
+#define LCFG_SZ 1
+#define LCFG_POS 2
+#define LCFG_DST 3
+#define LCFG_DSPOS 4
+
+/// A different way of setting up a layout, using a series of characters to program the main 5 layout fields
+/// character [0] = 'X' or 'Y'  for UI_AXIS = X(D), Y
+/// character [1] = 'A'|'G'|'P' for UI_LAYOUT_SIZE = Available, Gravity(D), Perferred
+/// character [2] = 'C'|'G'|'L'|'R'  for UI_LAYOUT_POSITION = Center(D), Gravity, LeftTop, RightBottom
+/// character [3] = 'A'|'G'|'P'  for UI_LAYOUT_DISTRIBUTION = Available, Gravity, Perferred(D)
+/// character [4] = 'C'|'L'|'R'  for UI_LAYOUT_DISTRIBUTION_POSITION, Center(D), LeftTop, RightBottom
+/// A '-' character in any field will not program that entry.
+/// Any character used that is not an allowed characters or a '-' will result in the default setting to be used.
+/// Any text in the string above character 5 is ignored.
+/// If the input string is less than 5 characters it will not program any of the fields.
+void TBLayout::SetLayoutConfig ( const char *settings )
+{
+    if ( settings && strlen(settings) >= 4 )
+    {
+        switch ( settings[LCFG_AXIS] ) // AXIS
+        {
+            case 'X': SetAxis(AXIS_X); break;
+            case 'Y': SetAxis(AXIS_Y); break;
+            default: if ( settings[LCFG_AXIS] != '-')
+                        SetAxis(AXIS_X);
+                break;
+        }
+        switch ( settings[LCFG_SZ] ) // SIZE
+        {
+            case 'A' : SetLayoutSize(LAYOUT_SIZE_AVAILABLE); break;
+            case 'G' : SetLayoutSize(LAYOUT_SIZE_GRAVITY); break;
+            case 'P' : SetLayoutSize(LAYOUT_SIZE_PREFERRED); break;
+            default: if (settings[LCFG_SZ] != '-')
+                        SetLayoutSize(LAYOUT_SIZE_GRAVITY);
+                break;
+        }
+        switch ( settings[LCFG_POS] ) // POSITION
+        {
+            case 'C' : SetLayoutPosition(LAYOUT_POSITION_CENTER); break;
+            case 'G' : SetLayoutPosition(LAYOUT_POSITION_GRAVITY); break;
+            case 'L' : SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP); break;
+            case 'R' : SetLayoutPosition(LAYOUT_POSITION_RIGHT_BOTTOM); break;
+            default: if (settings[LCFG_POS] != '-' )
+                        SetLayoutPosition(LAYOUT_POSITION_CENTER);
+                 break;
+        }
+        switch ( settings[LCFG_DST] ) // DISTRIBUTION
+        {
+            case 'A' : SetLayoutDistribution(LAYOUT_DISTRIBUTION_AVAILABLE); break;
+            case 'G' : SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY); break;
+            case 'P' : SetLayoutDistribution(LAYOUT_DISTRIBUTION_PREFERRED); break;
+            default: if (settings[LCFG_DST] != '-')
+                        SetLayoutDistribution(LAYOUT_DISTRIBUTION_PREFERRED ); 
+                break;
+        }
+        switch ( settings[LCFG_DSPOS] ) // DISTRIBUTION_POSITION
+        {
+            case 'C' : SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_CENTER); break;
+            case 'L' : SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP); break;
+            case 'R' : SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM); break;
+            default: if (settings[LCFG_DSPOS] != '-' )
+                        SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_CENTER);
+                break;
+        }
+    }
+}
+
+// ATOMIC END
+
 }; // namespace tb
