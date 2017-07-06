@@ -52,6 +52,7 @@ if (Qt5Widgets_FOUND)
     else ()
         target_link_libraries(profiler_gui easy_profiler)
     endif ()
+    deploy_qt_dlls (profiler_gui)
     # ATOMIC END
     if (WIN32)
         target_compile_definitions(profiler_gui PRIVATE -D_WIN32_WINNT=0x0600)
