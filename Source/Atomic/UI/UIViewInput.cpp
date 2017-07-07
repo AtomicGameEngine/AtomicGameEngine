@@ -92,10 +92,10 @@ void UIView::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     Input* input = GetSubsystem<Input>();
     int qualifiers = input->GetQualifiers();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
-#else
+#ifdef ATOMIC_PLATFORM_OSX
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#else
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #endif
 
     MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
@@ -136,10 +136,10 @@ void UIView::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     pos = input->GetMousePosition();
     int qualifiers = input->GetQualifiers();
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
-#else
+#ifdef ATOMIC_PLATFORM_OSX
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#else
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #endif
 
     MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);

@@ -281,10 +281,10 @@ void SceneView3D::MoveCamera(float timeStep)
         CheckCameraSpeedBounds();
     }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
-#else
+#ifdef ATOMIC_PLATFORM_OSX
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#else
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #endif
 
     if (!orbitting && mouseInView && !superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
