@@ -389,7 +389,7 @@ void jsapi_init_atomic(JSVM* vm)
     duk_put_prop_string(ctx, -2, "print");
 
     String platform = GetPlatform();
-    if (platform == "Mac OS X")
+    if (platform == "macOS")
         platform = "MacOSX";
 
     duk_push_string(ctx, platform.CString());

@@ -1,6 +1,6 @@
 {
 	"name" : "UI",
-	"sources" : ["Source/Atomic/UI"],
+	"sources" : ["Source/Atomic/UI", "Source/Atomic/UI/Platform"],
 	"includes" : ["<Atomic/Graphics/Material.h>", "<Atomic/Scene/Node.h>", "<Atomic/Scene/Scene.h>", "<Atomic/Graphics/Texture2D.h>",
 								"<Atomic/UI/UIBatch.h>"],
 	"classes" : ["UI", "UIWidget", "UILayout", "UIView", "UIWindow", "UIButton", "UITextField",
@@ -10,7 +10,8 @@
 								"UISkinImage", "UITabContainer", "UISceneView", "UIPreferredSize", "UIDragObject",
 								"UIContainer", "UISection", "UIInlineSelect", "UITextureWidget", "UIColorWidget", "UIColorWheel",
 								"UIScrollContainer", "UISeparator", "UIDimmer", "UISelectDropdown", "UISlider", "UIBargraph",
-								"UIPromptWindow", "UIFinderWindow", "UIPulldownMenu", "UIRadioButton", "UIScrollBar"],
+								"UIPromptWindow", "UIFinderWindow", "UIPulldownMenu", "UIRadioButton", "UIScrollBar",
+								"UIPlatformWebView"],
 	"overloads" : {
 	},
 	"typescript_decl" : {

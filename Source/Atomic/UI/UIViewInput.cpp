@@ -71,7 +71,7 @@ bool UIView::FilterDefaultInput(bool keyEvent) const
     if (!keyEvent && !GetMouseEnabled())
         return true;
 
-    if (keyEvent && !GetKeyboardEnabled() || ui_->keyboardDisabled_)
+    if (keyEvent && (!GetKeyboardEnabled() || ui_->keyboardDisabled_))
         return true;
 
     return false;

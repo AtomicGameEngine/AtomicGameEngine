@@ -107,9 +107,26 @@ bool AndroidProjectGenerator::GenerateActivitySource()
     String source;
     source.AppendWithFormat("package %s;\n", packageName.CString());
 
+    source += "import android.os.Bundle;\n";
+    source += "import android.view.ViewGroup;\n";
+    source += "import android.widget.FrameLayout;\n";
+    source += "import android.widget.RelativeLayout;\n";
     source += "import org.libsdl.app.SDLActivity;\n";
+    source += "import com.atomicgameengine.player.AtomicWebView;\n";
 
     source += "public class AtomicGameEngine extends SDLActivity {\n";
+
+    source += "    @Override\n";
+    source += "    protected void onCreate(Bundle savedInstanceState) {\n";
+    source += "        super.onCreate(savedInstanceState);\n";
+    source += "        ViewGroup.LayoutParams framelayout_params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);\n";
+    source += "        FrameLayout framelayout = new FrameLayout(this);\n";
+    source += "        framelayout.setLayoutParams(framelayout_params);\n";
+    source += "        ViewGroup webViewGroup = new RelativeLayout(this);\n";
+    source += "        framelayout.addView(webViewGroup);\n";
+    source += "        mLayout.addView(framelayout);\n";
+    source += "        AtomicWebView.setRootLayout(webViewGroup);\n";
+    source += "    }\n";
 
     source += "}\n";
 

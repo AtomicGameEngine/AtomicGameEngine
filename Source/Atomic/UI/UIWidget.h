@@ -218,7 +218,7 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
 
     /// Set focus to first widget which accepts it
     void SetFocusRecursive();
-    void OnFocusChanged(bool focused);
+    virtual void OnFocusChanged(bool focused);
 
     void SetState(UI_WIDGET_STATE state, bool on);
     bool GetState(UI_WIDGET_STATE state);
@@ -319,7 +319,7 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     int GetLayoutMaxHeight();
 
     //  Get x and y (relative to this widget) relative to the upper left corner of the root widget
-    IntVector2 ConvertToRoot(const IntVector2 position ) const;
+    IntVector2 ConvertToRoot(const IntVector2 position = IntVector2::ZERO) const;
 
     // Get x and y (relative to the upper left corner of the root widget) relative to this widget
     IntVector2 ConvertFromRoot(const IntVector2 position) const;

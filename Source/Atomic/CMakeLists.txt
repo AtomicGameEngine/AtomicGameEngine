@@ -16,7 +16,10 @@ endif()
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
+file (GLOB SYSTEM_UI_PLATFORM_SOURCE UI/Platform/*.cpp UI/Platform/*.h)
+file (GLOB SYSTEM_UI_PLATFORM_OBJC_SOURCE UI/Platform/*.mm)
 file (GLOB SYSTEM_UI_SOURCE UI/SystemUI/*.cpp UI/SystemUI/*.h)
+
 file (GLOB PHYSICS_SOURCE Physics/*.cpp Physics/*.h)
 file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
 file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
@@ -45,8 +48,15 @@ else()
     file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
 endif()
 
-if (APPLE AND NOT IOS)
-    set (PLATFORM_SOURCE IO/MacFileWatcher.mm UI/UIDragDropMac.mm)
+if (APPLE)
+    set (SYSTEM_UI_PLATFORM_SOURCE ${SYSTEM_UI_PLATFORM_SOURCE} ${SYSTEM_UI_PLATFORM_OBJC_SOURCE})
+    if (NOT IOS)
+        set (PLATFORM_SOURCE IO/MacFileWatcher.mm UI/UIDragDropMac.mm)
+    endif()
+endif()
+
+if (ANDROID)
+    file (GLOB PLATFORM_SOURCE Platform/Android/*.cpp Platform/Android/*.h)
 endif()
 
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
@@ -55,7 +65,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
-                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
+                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_PLATFORM_SOURCE} ${SYSTEM_UI_SOURCE}
                   ${WEB_SOURCE} ${SCRIPT_SOURCE} ${METRICS_SOURCE}
                   ${PLATFORM_SOURCE} ${DATABASE_SOURCE} ${IK_SOURCE} ${NAVIGATION_SOURCE})
 
