@@ -440,7 +440,7 @@ export default class TypescriptLanguageServiceWebWorker {
                 };
                 return completionItem;
             });
-        };
+        }
 
         port.postMessage(message);
     }

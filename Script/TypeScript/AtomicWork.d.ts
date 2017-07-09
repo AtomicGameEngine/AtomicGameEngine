@@ -33,7 +33,7 @@ declare module Atomic {
     type EventData = Object;
 
     /** Base interface for events, contains eventType string and callback */
-    interface EventMetaData {
+    interface EventMetaData extends EventData {
         /**@internal*/
         _eventType?: string;
         /**@internal*/
