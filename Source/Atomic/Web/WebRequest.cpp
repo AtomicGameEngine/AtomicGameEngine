@@ -79,8 +79,6 @@ struct WebRequestInternalState
     bool isAddedToMulti;
     /// Error string. Empty if no error.
     char error[CURL_ERROR_SIZE];
-    /// String cache of response
-    String response;
 
     WebRequestInternalState(WebRequest &es_) :
         es(es_)
@@ -120,7 +118,7 @@ struct WebRequestInternalState
         WebRequestInternalState *is_(reinterpret_cast<WebRequestInternalState*>(userdata));
         if (is_->isAborted)
         {
-            is_->state = HTTP_CLOSED;
+            is_->state = WR_CLOSED;
             // This should probably be CURL_HEADERFUNC_ABORT, but that doesn't
             // exist. It probably would be the same numeric value, if it did.
             // The docs say that it just has to be a number of bytes that is
@@ -170,10 +168,10 @@ struct WebRequestInternalState
     static size_t onWrite(char *ptr, size_t size, size_t nmemb, void *userdata)
     {
         WebRequestInternalState *is_(reinterpret_cast<WebRequestInternalState*>(userdata));
-        is_->state = HTTP_OPEN;
+        is_->state = WR_OPEN;
         if (is_->isAborted)
         {
-            is_->state = HTTP_CLOSED;
+            is_->state = WR_CLOSED;
             // This should probably be CURL_WRITEFUNC_ABORT, but that doesn't
             // exist. It probably would be the same numeric value, if it did.
             // The docs say that it just has to be a number of bytes that is
@@ -202,10 +200,10 @@ struct WebRequestInternalState
     static size_t onRead(char *buffer, size_t size, size_t nitems, void *instream)
     {
         WebRequestInternalState *is_(reinterpret_cast<WebRequestInternalState*>(instream));
-        is_->state = HTTP_OPEN;
+        is_->state = WR_OPEN;
         if (is_->isAborted)
         {
-            is_->state = HTTP_CLOSED;
+            is_->state = WR_CLOSED;
             return CURL_READFUNC_ABORT;
         }
 
@@ -264,12 +262,12 @@ struct WebRequestInternalState
 
         if (code != CURLE_OK)
         {
-            state = HTTP_ERROR;
+            state = WR_ERROR;
             eventData[P_ERROR] = String(error, (unsigned int)strnlen(error, sizeof(error)));
         }
         else
         {
-            state = HTTP_CLOSED;
+            state = WR_CLOSED;
             eventData[P_DOWNLOAD] = download;
             eventData[P_UPLOAD] = upload;
         }
@@ -286,7 +284,7 @@ WebRequest::WebRequest(Context* context, const String& verb, const String& url, 
     is_->verb = verb;
     is_->upload = new BufferQueue(context);
     is_->download = new BufferQueue(context);
-    is_->state = HTTP_INITIALIZING;
+    is_->state = WR_INITIALIZING;
     is_->curlm = NULL;
     is_->curl = NULL;
     is_->requestContentSize = curl_off_t(std::floor(requestContentSize));
@@ -466,27 +464,9 @@ void WebRequest::SetPostData(const String& postData)
     curl_easy_setopt(is_->curl, CURLOPT_COPYPOSTFIELDS, postData.CString());
 }
 
-const String& WebRequest::GetResponse()
+SharedPtr<BufferQueue> WebRequest::GetDownloadBufferQueue()
 {
-    // use cached response if we have one
-    if (is_->response.Length())
-        return is_->response;
-
-    unsigned size = is_->download->GetSize();
-
-    if (!size)
-        return String::EMPTY;
-
-    SharedArrayPtr<unsigned char> response(new unsigned char[size + 1]);
-
-    // ensure 0 terminated string
-    response[size] = 0;
-
-    is_->download->Read( (void *) &response[0], size);
-    is_->response = (const char*) &response[0];
-
-    return is_->response;
-
+    return is_->download;
 }
 
 }
