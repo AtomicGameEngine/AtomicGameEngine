@@ -107,7 +107,8 @@ export default class TypescriptLanguageExtension extends Atomic.ScriptObject imp
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
             // if the .js file matches up to a .ts file already loaded, then skip it
             let tsfn = filename.replace(/\.js$/, ".ts");
-            if (projectFiles.indexOf(tsfn) == -1) {
+            let tsfnFull = fn.replace(/\.js$/, ".ts");
+            if (projectFiles.indexOf(tsfn) == -1 && projectFiles.indexOf(tsfnFull) == -1) {
                 hasJsFiles = true;
                 projectFiles.push(fn);
             }

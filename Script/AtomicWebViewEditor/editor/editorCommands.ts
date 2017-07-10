@@ -65,12 +65,13 @@ export function updateEditorPrefs() {
 
     let monacoEditor = <monaco.editor.IStandaloneCodeEditor>internalEditor.getInternalEditor();
     monacoEditor.updateOptions({
-        theme: serviceLocator.clientServices.getApplicationPreference("codeEditor", "theme", "vs-dark"),
         renderWhitespace: renderWhitespaceAdapter(serviceLocator.clientServices.getApplicationPreference("codeEditor", "showInvisibles", "none")),
         mouseWheelScrollSensitivity: 2,
         fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12),
         fontFamily: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontFamily", "")
     });
+
+    monaco.editor.setTheme(serviceLocator.clientServices.getApplicationPreference("codeEditor", "theme", "vs-dark"));
 }
 
 /**

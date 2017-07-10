@@ -5,8 +5,9 @@
     "fs-extra": "^0.24.0",
     "glob": "^6.0.3",
     "jake": "^8.0.12",
+    "monaco-editor": "^0.9.0",
     "tslint": "^3.2.0",
-    "typescript": "^2.1.4"
+    "typescript": "^2.4.1"
   },
   "devDependencies": {}
 }

@@ -158,10 +158,19 @@ export class TypescriptLanguageService {
     addProjectFile(filename: string, fileContents?: string): ts.SourceFile {
         if (this.projectFiles.indexOf(filename) == -1) {
             console.log("Added project file: " + filename);
-            this.versionMap[filename] = {
-                version: 0,
-                snapshot: ts.ScriptSnapshot.fromString(fileContents || this.fs.getFile(filename))
-            };
+
+            if (fileContents == null) {
+                this.versionMap[filename] = {
+                    version: 0,
+                    snapshot: ts.ScriptSnapshot.fromString(this.fs.getFile(filename))
+                };
+            } else {
+                this.versionMap[filename] = {
+                    version: 0,
+                    snapshot: ts.ScriptSnapshot.fromString(fileContents)
+                };
+            }
+
             this.projectFiles.push(filename);
             return this.documentRegistry.acquireDocument(
                 filename,
