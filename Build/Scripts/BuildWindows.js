@@ -69,7 +69,7 @@ namespace('build', function() {
 
       // graphics backend overrides, defaults to D3D11
       flags += " -DATOMIC_OPENGL=" + (config["opengl"] ? "ON" : "OFF");
-      flags += " -DATOMIC_D3D11=" + (config["d3d9"] ? "OFF" : "ON");
+      flags += " -DATOMIC_D3D9=" + (config["d3d9"] ? "ON" : "OFF");
 
       flags += "\"";
 
