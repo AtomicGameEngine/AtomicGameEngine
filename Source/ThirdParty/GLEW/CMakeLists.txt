@@ -33,6 +33,7 @@ set (INCLUDE_DIRS .)
 setup_library ()
 
 # ATOMIC BEGIN
+target_compile_definitions(GLEW PUBLIC -DGLEW_STATIC=1)
 if (ANDROID)
     target_compile_definitions(GLEW PUBLIC -DGLEW_NO_GLU)
 endif ()
