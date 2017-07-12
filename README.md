@@ -3,7 +3,7 @@
 
 Website: <a href="https://www.atomicgameengine.com" target="_blank">https://www.AtomicGameEngine.com</a>
 
-Email: info@atomicgameengine.com
+Email: contact@atomicgameengine.com
 
 #### Why Atomic?
 
