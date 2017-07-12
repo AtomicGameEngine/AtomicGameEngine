@@ -7,9 +7,8 @@ Email: contact@atomicgameengine.com
 
 #### Why Atomic?
 
-The Atomic Game Engine is powerful native technology with a consistent API and tooling available in C++, C#, and JavaScript.  The Atomic Editor is **installed in over 75 countries** and has hit “critical mass” with production in multiple industries.
-
 <img align="right" src="https://atomicgameengine.com/images/home/WorldInstallMapHome.png"/>
+The Atomic Game Engine is powerful native technology with a consistent API and tooling available in C++, C#, and JavaScript.  The Atomic Editor is **installed in over 75 countries** and has hit “critical mass” with production in multiple industries.
 
 Atomic can also be used as a library in existing projects with a C++ SDK, C# NuGet, and JavaScript npm package in development.
 
