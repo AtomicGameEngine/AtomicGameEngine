@@ -17,6 +17,8 @@
 #include "tb_editfield.h"
 #endif // TB_ALWAYS_SHOW_EDIT_FOCUS
 
+#include <stdio.h>  // for printfs in PrintPretty
+
 namespace tb {
 
 //static data
@@ -772,6 +774,47 @@ TBWidget *TBWidget::GetWidgetAt(int x, int y, bool include_children) const
     }
     return last_match;
 }
+
+// ATOMIC BEGIN
+
+/** Returns the number of children this widget contains. */
+int TBWidget::numChildren()
+{
+    int nn = 0;
+    TBLinkListOf<TBWidget>::Iterator mx = GetIteratorForward();
+    while (TBWidget *mxw = mx.GetAndStep())
+    {
+        nn++;
+    }
+    return nn;
+}
+
+/** print out the widget tree */
+void TBWidget::PrintPretty( TBStr indent, bool last)
+{
+    printf("%s", indent.CStr());
+    if (last)
+    {
+       printf("\\-");
+       indent.Append("  ");
+    }
+    else
+    {
+       printf("|-");
+       indent.Append("| ");
+    }
+    TBStr shorty(GetText(), 32); 
+    printf("%s:%u `%s`\n", GetClassName(), (uint32)GetID(), shorty.CStr() );
+    int num = numChildren();
+    for (int ii = 0; ii < num; ii++)
+    {
+        TBWidget *child = GetChildFromIndex(ii);
+        child->PrintPretty(indent, ii == num - 1);
+    }
+}
+
+// ATOMIC END
+
 
 TBWidget *TBWidget::GetChildFromIndex(int index) const
 {

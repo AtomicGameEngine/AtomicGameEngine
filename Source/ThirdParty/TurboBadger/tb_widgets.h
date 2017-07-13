@@ -619,6 +619,16 @@ public:
     TBLinkListOf<TBWidget>::Iterator GetIteratorForward() { return m_children.IterateForward(); }
     TBLinkListOf<TBWidget>::Iterator GetIteratorBackward() { return m_children.IterateBackward(); }
 
+// ATOMIC BEGIN
+
+    /** Returns the number of children this widget contains. */
+    int numChildren();
+
+    /** print out the widget tree to stdout */
+    void PrintPretty( TBStr indent, bool last);
+
+// ATOMIC END
+
     /** Return true if this widget is the same or a ancestor of other_widget. */
     bool IsAncestorOf(TBWidget *other_widget) const;
 

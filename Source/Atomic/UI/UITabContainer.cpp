@@ -156,7 +156,7 @@ bool UITabContainer::DeletePage( int page )
 }
 
 /// adds a tab + page from layout file
-void UITabContainer::AddTabPageFile ( const String &tabname, const String &layoutFile )
+void UITabContainer::AddTabPageFile ( const String &tabname, const String &layoutFile, bool selecttab )
 {
     UIButton* button = new UIButton(context_);
     button->SetText(tabname);
@@ -176,10 +176,12 @@ void UITabContainer::AddTabPageFile ( const String &tabname, const String &layou
 
     Invalidate();
 
+    if (selecttab) 
+        SetCurrentPage( GetNumPages() -1 );
 }
 
 /// adds a tab + page widget(s)
-void UITabContainer::AddTabPageWidget ( const String &tabname, UIWidget *widget ) 
+void UITabContainer::AddTabPageWidget ( const String &tabname, UIWidget *widget, bool selecttab ) 
 {
     UIButton* button = new UIButton(context_);
     button->SetText(tabname);
@@ -199,7 +201,35 @@ void UITabContainer::AddTabPageWidget ( const String &tabname, UIWidget *widget 
 
     Invalidate();
 
+    if (selecttab) 
+        SetCurrentPage( GetNumPages() -1 );
 }
 
+/// undocks the page into a window with the tab name, and removes the tab
+void UITabContainer::UndockPage ( int page )
+{
+    if (!widget_)
+        return;
+
+    ((TBTabContainer*)widget_)->UndockPage(page);
+
+    // tab container "feature", can not set it to the page number that was removed.
+    int num = 0;
+    if ( page - 1 > 0 ) num = page - 1;
+    SetCurrentPage(num);
+
+}
+
+/// docks content from a UIDockWindow with specified title
+bool UITabContainer::DockWindow ( String windowTitle )
+{
+    if (!widget_)
+        return false;
+    bool done = ((TBTabContainer*)widget_)->DockFromWindow(windowTitle.CString());
+    if (done) 
+        SetCurrentPage( GetNumPages() -1 );
+
+   return done;
+}
 
 }

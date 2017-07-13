@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2014-2017, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,36 +22,28 @@
 
 #pragma once
 
+#include<TurboBadger/tb_atomic_widgets.h>
+
 #include "UIWidget.h"
+#include "UIWindow.h"
 
 namespace Atomic
 {
 
-class UILayout;
-
-class ATOMIC_API UITabContainer : public UIWidget
+class ATOMIC_API UIDockWindow : public UIWindow
 {
-    ATOMIC_OBJECT(UITabContainer, UIWidget)
+    ATOMIC_OBJECT(UIDockWindow, UIWindow)
 
-public:
+    public:
 
-    UITabContainer(Context* context, bool createWidget = true);
-    virtual ~UITabContainer();
+    UIDockWindow(Context* context, bool createWidget = true, const String& title = String::EMPTY, UIWidget *contentptr = NULL, int minwidth = 800, int minheight=400 );
+    virtual ~UIDockWindow();
 
-    int GetNumPages();
-    void SetCurrentPage(int page);
-
-    UIWidget* GetCurrentPageWidget();
-
-    UILayout* GetTabLayout();
-    
-    int GetCurrentPage(); /// returns the current page number
-    bool DeletePage( int page ); /// deletes a tab + page, returns true if successful
-    void AddTabPageFile ( const String &tabname, const String &layoutFile, bool selecttab = true ); /// adds a tab + page from file
-    void AddTabPageWidget ( const String &tabname, UIWidget *widget, bool selecttab = true ); /// adds a tab + page widget(s)
-
-    void UndockPage ( int page ); /// undocks the page into a window with the tab name, and removes the tab
-    bool DockWindow ( String windowTitle ); /// docks content from a UIDockWindow with specified title
+    void SetDockOrigin( String dockid );  // where using the dock button returns the content to
+    UIWidget *GetDockContent();  // the content that is being swapped around
+    bool HasDockContent();  // is there content in the dockwindow
+    void Dock( UIWidget *target );  // move the dock window content to somewhere else
+    void Show( UIWidget *host, int xpos = 50, int ypos = 50 ); // show the dock window
 
 protected:
 
