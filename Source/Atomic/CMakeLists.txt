@@ -32,15 +32,12 @@ elseif (ATOMIC_DATABASE_ODBC)
 endif ()
 
 if (WIN32)
-    option (ATOMIC_D3D9 "Use DirectX 9" OFF)
-    option (ATOMIC_OPENGL "Use OpenGL" OFF)
     if (ATOMIC_D3D9) # DirectX 9
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
     elseif (ATOMIC_OPENGL) # OpenGL
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
-    else() # DirectX 11
+    elseif(ATOMIC_D3D11) # DirectX 11
         file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
-        set(ATOMIC_D3D11 ON)
     endif()
 else()
     file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
@@ -130,19 +127,18 @@ elseif (LINUX)
 elseif (WIN32)
     target_compile_definitions (Atomic PUBLIC -DATOMIC_PLATFORM_WINDOWS=1)
     target_link_libraries (Atomic user32 gdi32 winmm imm32 ole32 oleaut32 version uuid Ws2_32)
-    if (ATOMIC_D3D11) # DirectX 11
-        target_compile_definitions (Atomic PUBLIC -DATOMIC_D3D11=1)
-        target_link_libraries (Atomic d3d11 d3dcompiler dxguid)
+    if (ATOMIC_D3D9) # DirectX 9
+        target_link_libraries (Atomic d3d9 d3dcompiler)
+        target_compile_definitions (Atomic PUBLIC -DATOMIC_D3D9=1)
     elseif(ATOMIC_OPENGL) # OpenGL
         find_package(OpenGL REQUIRED)
         include_directories (${OpenGL_INCLUDE_DIRS})
         link_directories (${OpenGL_LIBRARY_DIRS})
         target_compile_definitions (Atomic PRIVATE ${OpenGL_DEFINITIONS})
-        target_compile_definitions (Atomic PUBLIC -DGLEW_STATIC=1)
         target_link_libraries (Atomic GLEW opengl32 glu32)
-    elseif(ATOMIC_D3D9) # DirectX 9
-        target_link_libraries (Atomic d3d9 d3dcompiler)
-        target_compile_definitions (Atomic PUBLIC -DATOMIC_D3D9=1)
+    elseif(ATOMIC_D3D11) # DirectX 11
+        target_compile_definitions (Atomic PUBLIC -DATOMIC_D3D11=1)
+        target_link_libraries (Atomic d3d11 d3dcompiler dxguid)
     endif()
     target_link_libraries(Atomic MojoShader user32 gdi32 winmm imm32 ole32 oleaut32 version uuid Ws2_32)
 
