@@ -35,15 +35,21 @@ class ATOMIC_API UIDockWindow : public UIWindow
     ATOMIC_OBJECT(UIDockWindow, UIWindow)
 
     public:
-
+    /// UIDockWindow is the host for UI content which has been transferred from the main window.
+    /// Context is a required argument, this is the application context.
+    /// createWidget is if the UIDockWindow should be created, should be set to true.
+    /// title is the string in the titlebar of the UIDockWindow
+    /// contentptr is the pointer to the widget which the UIDockWindow will display
+    /// minwidth is the minimum width for the UIDockWindow
+    /// minheight is the minimum height for the UIDockWindow
     UIDockWindow(Context* context, bool createWidget = true, const String& title = String::EMPTY, UIWidget *contentptr = NULL, int minwidth = 800, int minheight=400 );
     virtual ~UIDockWindow();
 
-    void SetDockOrigin( String dockid );  // where using the dock button returns the content to
-    UIWidget *GetDockContent();  // the content that is being swapped around
-    bool HasDockContent();  // is there content in the dockwindow
-    void Dock( UIWidget *target );  // move the dock window content to somewhere else
-    void Show( UIWidget *host, int xpos = 50, int ypos = 50 ); // show the dock window
+    void SetDockOrigin( String dockid );  /// ID of the redock widget. If specified, pressing the dock button, will move the content there.
+    UIWidget *GetDockContent();  /// This returns a pointer to the docked content.
+    bool HasDockContent();  /// Returns if the UIDockWindow contains docked content.
+    void Dock( UIWidget *target );  /// Transfers the dock content to the target widget
+    void Show( UIWidget *host, int xpos = 50, int ypos = 50 ); /// Show the UIDockWindow, and optional position
 
 protected:
 

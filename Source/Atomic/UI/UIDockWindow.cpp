@@ -35,6 +35,7 @@ using namespace tb;
 namespace Atomic
 {
 
+/// UIDockWindow is the host for UI content which has been transferred from the main window.
 UIDockWindow::UIDockWindow(Context* context, bool createWidget, const String& title, UIWidget *contentptr, int minwidth, int minheight ) : UIWindow(context, false)
 {
     if (createWidget)
@@ -50,7 +51,8 @@ UIDockWindow::~UIDockWindow()
 {
 }
 
-void UIDockWindow::SetDockOrigin( String dockid ) // where using the dock button returns the content to
+/// ID of the redock widget. If specified, pressing the dock button, will move the content there.
+void UIDockWindow::SetDockOrigin( String dockid )
 {
     if (!widget_)
         return;
@@ -59,7 +61,8 @@ void UIDockWindow::SetDockOrigin( String dockid ) // where using the dock button
 
 }
 
-UIWidget *UIDockWindow::GetDockContent()  // the content that is being swapped around
+/// This returns a pointer to the docked content.
+UIWidget *UIDockWindow::GetDockContent()
 {
     if (!widget_)
         return NULL;
@@ -75,7 +78,8 @@ UIWidget *UIDockWindow::GetDockContent()  // the content that is being swapped a
 
 }
 
-bool UIDockWindow::HasDockContent() // is there content in the dockwindow
+/// Returns if the UIDockWindow contains docked content.
+bool UIDockWindow::HasDockContent()
 {
     if (!widget_)
         return false;
@@ -83,7 +87,8 @@ bool UIDockWindow::HasDockContent() // is there content in the dockwindow
     return ((TBDockWindow*)widget_)->HasDockContent();
 }
 
-void UIDockWindow::Dock( UIWidget *target ) // move the dock window content to somewhere else
+/// Transfers the dock content to the target widget
+void UIDockWindow::Dock( UIWidget *target )
 {
     if (!widget_)
         return;
@@ -94,7 +99,8 @@ void UIDockWindow::Dock( UIWidget *target ) // move the dock window content to s
     ((TBDockWindow*)widget_)->Dock( target->GetInternalWidget() );
 }
 
-void UIDockWindow::Show( UIWidget *host, int xpos, int ypos ) // show the dock window
+/// Show the UIDockWindow, and optional position
+void UIDockWindow::Show( UIWidget *host, int xpos, int ypos )
 {
     if (!widget_)
         return;
