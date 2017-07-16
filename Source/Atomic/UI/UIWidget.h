@@ -166,6 +166,7 @@ enum UI_AXIS {
 class UIView;
 class UILayoutParams;
 class UIFontDescription;
+class UISelectItemSource;
 
 /// Wraps a TurboBadger widget in our Object model
 class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
@@ -202,6 +203,17 @@ class ATOMIC_API UIWidget : public Object, public tb::TBWidgetDelegate
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
     void DeleteAllChildren();
+
+    /// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
+    virtual UIWidget *FindWidget ( const String& searchid );
+    /// return all of the widgets of the specified classname and id that is not 0 from the current widget
+    virtual void SearchWidgetClass ( const String& className, UISelectItemSource *results );  
+    ///  return all of the widgets of the specified id and id that is not 0 from the current widget
+    virtual void SearchWidgetId ( const String& searchid, UISelectItemSource *results );
+    /// return all of the widgets with the specified text and id that is not 0 from the current widget
+    virtual void SearchWidgetText ( const String& searchText, UISelectItemSource *results );
+    /// print out the widget tree to stdout from the current widget
+    virtual void PrintPrettyTree();
 
     // String ID
     virtual void SetId(const String& id);

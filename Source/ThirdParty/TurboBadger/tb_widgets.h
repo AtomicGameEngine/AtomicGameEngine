@@ -22,6 +22,7 @@ class TBFontFace;
 class TBScroller;
 class TBWidgetListener;
 class TBLongClickTimer;
+class TBGenericStringItemSource;
 struct INFLATE_INFO;
 
 // == Generic widget stuff =================================================
@@ -623,9 +624,17 @@ public:
 
     /** Returns the number of children this widget contains. */
     int numChildren();
+    /// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
+    TBWidget *FindWidget ( TBID searchid );
 
-    /** print out the widget tree to stdout */
+    /// print out the widget tree to stdout
     void PrintPretty( TBStr indent, bool last);
+    /// return all of the widgets of the specified classname
+    void SearchWidgetClass ( TBStr className, TBGenericStringItemSource *results );  
+    ///  return all of the widgets of the specified id
+    void SearchWidgetId ( TBID searchid, TBGenericStringItemSource *results );
+    /// return all of the widgets with the specified text
+    void SearchWidgetText ( TBStr searchText, TBGenericStringItemSource *results );
 
 // ATOMIC END
 

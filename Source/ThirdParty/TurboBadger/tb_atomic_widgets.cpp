@@ -764,6 +764,7 @@ void TBPulldownMenu::OnInflate(const INFLATE_INFO &info)
 
 TBDockWindow::TBDockWindow( TBStr title, TBWidget *contentptr, int minwidth, int minheight ) : TBWindow()
 {
+    SetID(TBID(title));
     m_mover.AddChild(&m_redock_button);
     m_redock_button.SetSkinBg(TBIDC("TBWindow.redock"));
     m_redock_button.SetIsFocusable(false);

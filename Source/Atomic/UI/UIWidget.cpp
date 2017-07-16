@@ -29,6 +29,7 @@
 #include "UILayout.h"
 #include "UIFontDescription.h"
 #include "UIView.h"
+#include "UISelectItem.h"
 
 using namespace tb;
 
@@ -346,6 +347,98 @@ void UIWidget::Invalidate()
         return;
 
     widget_->Invalidate();
+}
+
+/// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
+UIWidget *UIWidget::FindWidget ( const String& searchid )
+{
+    if (!widget_)
+        return NULL;
+
+    TBWidget* child = widget_->FindWidget(TBID(searchid.CString()));
+
+    if (!child)
+        return 0;
+
+    UI* ui = GetSubsystem<UI>();
+    return ui->WrapWidget(child);
+}
+
+void UIWidget::PrintPrettyTree()
+{
+    if (!widget_)
+        return;
+
+    widget_->PrintPretty("", true);
+}
+
+/// return all of the widgets of the specified classname
+/// only cpp can get full access to the widget pointers by using the
+/// TBGenericStringItemSource that is inside the UISelectItemSource 
+/// and pulling outthe tag.GetObject().
+void UIWidget::SearchWidgetClass ( const String& className, UISelectItemSource *results ) 
+{
+     if (!widget_)
+        return;
+    // we are going to fill out the TBGenericStringItemSource with all the data
+    tb::TBGenericStringItemSource *myuis = (tb::TBGenericStringItemSource*)results->GetTBItemSource();
+    widget_->SearchWidgetClass(className.CString(), myuis );
+
+    UI* ui = GetSubsystem<UI>(); // but copy the named id'd ones back into the UISelectItemSource
+    int nn=0;
+    for ( nn=0; nn<myuis->GetNumItems(); nn++ )
+    {
+        String idstr;
+        ui->GetTBIDString( myuis->GetItemID(nn), idstr);
+        if ( !idstr.Empty() )
+        {
+            results->AddItem ( new UISelectItem (context_, idstr, idstr) );
+        }
+    } 
+}
+
+///  return all of the widgets of the specified id
+void UIWidget::SearchWidgetId ( const String& searchid, UISelectItemSource *results )
+{
+     if (!widget_)
+        return;
+
+    tb::TBGenericStringItemSource *myuis = (tb::TBGenericStringItemSource*)results->GetTBItemSource();
+    widget_->SearchWidgetId(TBID(searchid.CString()),myuis );
+
+    UI* ui = GetSubsystem<UI>();
+    int nn=0;
+    for ( nn=0; nn<myuis->GetNumItems(); nn++ )
+    {
+        String idstr;
+        ui->GetTBIDString( myuis->GetItemID(nn), idstr);
+        if ( !idstr.Empty() )
+        {
+            results->AddItem ( new UISelectItem (context_, idstr, idstr) );
+        }
+    }
+}
+
+/// return all of the widgets with the specified text
+void UIWidget::SearchWidgetText ( const String& searchText, UISelectItemSource *results )
+{
+     if (!widget_)
+        return;
+
+    tb::TBGenericStringItemSource *myuis = (tb::TBGenericStringItemSource*)results->GetTBItemSource();
+    widget_->SearchWidgetText(searchText.CString(), myuis );
+
+    UI* ui = GetSubsystem<UI>();
+    int nn=0;
+    for ( nn=0; nn<myuis->GetNumItems(); nn++ )
+    {
+        String idstr;
+        ui->GetTBIDString( myuis->GetItemID(nn), idstr);
+        if ( !idstr.Empty() )
+        {
+            results->AddItem ( new UISelectItem (context_, idstr, idstr) );
+        }
+    }
 }
 
 void UIWidget::Center()

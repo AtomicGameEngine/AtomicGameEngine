@@ -18,6 +18,7 @@
 #endif // TB_ALWAYS_SHOW_EDIT_FOCUS
 
 #include <stdio.h>  // for printfs in PrintPretty
+#include "tb_select_item.h"
 
 namespace tb {
 
@@ -812,6 +813,67 @@ void TBWidget::PrintPretty( TBStr indent, bool last)
         child->PrintPretty(indent, ii == num - 1);
     }
 }
+
+/// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
+TBWidget *TBWidget::FindWidget ( TBID searchid )
+{
+    TBWidget *rootwidget = GetParentRoot(true);
+    if(rootwidget)
+        return rootwidget->GetWidgetByID( searchid );
+    return NULL;
+}
+
+/// return all of the widgets of the specified classname
+void TBWidget::SearchWidgetClass ( TBStr className, TBGenericStringItemSource *results )
+{
+    if ( className.Equals(GetClassName()) )
+    {
+        TBGenericStringItem *matched = new TBGenericStringItem( "", GetID()); // capture ID
+        matched->tag.SetObject(this); // add widget ptr to the tag
+        results->AddItem ( matched ); // and add to the list
+    }
+    int num = numChildren();
+    for (int ii = 0; ii < num; ii++)
+    {
+        TBWidget *child = GetChildFromIndex(ii);
+        child->SearchWidgetClass( className, results);
+    }
+}
+
+///  return all of the widgets of the specified id
+void TBWidget::SearchWidgetId ( TBID searchId, TBGenericStringItemSource *results )
+{
+    if ( searchId == GetID() )
+    {
+        TBGenericStringItem *matched = new TBGenericStringItem( "", GetID());
+        matched->tag.SetObject(this);
+        results->AddItem ( matched );
+    }
+    int num = numChildren();
+    for (int ii = 0; ii < num; ii++)
+    {
+        TBWidget *child = GetChildFromIndex(ii);
+        child->SearchWidgetId( searchId, results);
+    }
+}
+
+/// return all of the widgets with the specified text
+void TBWidget::SearchWidgetText ( TBStr searchText, TBGenericStringItemSource *results )
+{
+    if ( searchText.Equals(GetText()) )
+    {
+        TBGenericStringItem *matched = new TBGenericStringItem( "", GetID());
+        matched->tag.SetObject(this);
+        results->AddItem ( matched );
+    }
+    int num = numChildren();
+    for (int ii = 0; ii < num; ii++)
+    {
+        TBWidget *child = GetChildFromIndex(ii);
+        child->SearchWidgetText( searchText, results);
+    }
+}
+
 
 // ATOMIC END
 
