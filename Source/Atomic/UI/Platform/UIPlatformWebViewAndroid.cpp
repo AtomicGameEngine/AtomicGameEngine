@@ -131,7 +131,16 @@ bool UIPlatformWebView::PlatformCreateWebView()
     webViewHandle_ = webViewHandleCounter_++;
 
     android_webViewEnsureInitialized();
-    return (bool) gCreateMethodInfo.GetEnv()->CallStaticBooleanMethod(gCreateMethodInfo.classID, gCreateMethodInfo.methodID, (jint) webViewHandle_, (jlong)0, (jlong)0);
+
+    bool result = (bool) gCreateMethodInfo.GetEnv()->CallStaticBooleanMethod(gCreateMethodInfo.classID, gCreateMethodInfo.methodID, (jint) webViewHandle_, (jlong)0, (jlong)0);
+
+    if (result && queuedRequest_.Length())
+    {
+        LoadURL(queuedRequest_);
+        queuedRequest_.Clear();
+    }
+
+    return result;
 
 }
 
@@ -247,6 +256,7 @@ void UIPlatformWebView::LoadURL(const String& url)
 {
     if (webViewHandle_ == UI_PLATFORM_WEBVIEW_INVALID_HANDLE)
     {
+        queuedRequest_ = url;
         return;
     }
 

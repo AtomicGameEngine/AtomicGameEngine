@@ -92,6 +92,14 @@ public class AtomicWebView {
             @Override
             public void run() {
                 WebView webView = AtomicWebView.webViews.get(handle);
+
+                // Important: this is currently being run per frame
+                // and hide/show should be cached native side
+                if(webView.getParent() == layout)
+                {
+                    return;
+                }
+
                 layout.addView(webView);
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(webView.getLayoutParams());
                 params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
