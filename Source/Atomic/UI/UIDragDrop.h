@@ -53,7 +53,7 @@ public:
 
 private:
 
-    void HandleMouseDown(StringHash eventType, VariantMap& eventData);
+    void HandleUIUpdate(StringHash eventType, VariantMap& eventData);
     void HandleMouseUp(StringHash eventType, VariantMap& eventData);
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 

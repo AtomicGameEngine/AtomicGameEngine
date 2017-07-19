@@ -27,7 +27,7 @@
 namespace Atomic
 {
 
-// UIUpdate event
+// UIUpdate event which is sent post engine update, ensuring all input events have been processed
 ATOMIC_EVENT(E_UIUPDATE, UIUpdate)
 {
 
