@@ -52,9 +52,9 @@ namespace Atomic
 
 UIDragDrop::UIDragDrop(Context* context) : Object(context)
 {
+    SubscribeToEvent(E_UIUPDATE, ATOMIC_HANDLER(UIDragDrop, HandleUIUpdate));
     SubscribeToEvent(E_MOUSEMOVE, ATOMIC_HANDLER(UIDragDrop,HandleMouseMove));
-    SubscribeToEvent(E_MOUSEBUTTONUP, ATOMIC_HANDLER(UIDragDrop,HandleMouseUp));
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, ATOMIC_HANDLER(UIDragDrop,HandleMouseDown));
+    SubscribeToEvent(E_MOUSEBUTTONUP, ATOMIC_HANDLER(UIDragDrop,HandleMouseUp));    
 
     SharedPtr<UIFontDescription> fd(new UIFontDescription(context));
     fd->SetId("Vera");
@@ -107,16 +107,16 @@ void UIDragDrop::DragEnd()
     currentTargetWidget->SendEvent(E_DRAGENDED, dropData);
 }
 
-void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
+void UIDragDrop::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace MouseButtonDown;
-
     Input* input = GetSubsystem<Input>();
 
-    if (!input->IsMouseVisible())
+    if (dragSourceWidget_.NotNull() || !input->IsMouseVisible() || !input->GetMouseButtonDown(MOUSEB_LEFT))
+    {
         return;
+    }
 
-    if ((eventData[P_BUTTONS].GetUInt() & MOUSEB_LEFT) && TBWidget::hovered_widget)
+    if (TBWidget::hovered_widget)
     {
         // see if we have a widget with a drag object
 
@@ -252,7 +252,6 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 void UIDragDrop::FileDragEntered()
 {
     dragObject_ = new UIDragObject(context_);
-    //dragObject_->SetText("Files...");
 }
 
 void UIDragDrop::FileDragAddFile(const String& filename)
