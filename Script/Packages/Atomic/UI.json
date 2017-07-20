@@ -25,7 +25,10 @@
 		    "getWidget<T extends UIWidget>(id: string): T;",
 		    "findWidget<T extends UIWidget>(id: string): T;",
 		    "onEvent: (eventData:UIWidgetEvent) => void;",
-		    "onChanged: () => void;"
+		    "onChanged: () => void;",
+		    "searchWidgetClass(name:string):UIWidget[];",
+		    "searchWidgetId(name:string):UIWidget[];",
+		    "searchWidgetText(name:string):UIWidget[];"
 		]
 	}
 

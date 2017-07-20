@@ -127,6 +127,70 @@ int UI_DebugGetWrappedWidgetCount(duk_context* ctx)
     return 1;
 }
 
+static int UIWidget_SearchWidgetClass(duk_context* ctx)
+{
+    const char* clssName = duk_require_string(ctx, 0);
+    duk_push_this(ctx);
+
+    UIWidget* uiwidget = js_to_class_instance<UIWidget>(ctx, -1, 0);
+
+    PODVector<UIWidget*> dest;
+    uiwidget->SearchWidgetClass( clssName, dest );
+
+    duk_push_array(ctx);
+
+    for (unsigned ii = 0; ii < dest.Size(); ii++)
+    {
+        js_push_class_object_instance(ctx, dest[ii], "UIWidget");
+        duk_put_prop_index(ctx, -2, ii);
+    }
+
+    return 1;
+}
+
+static int UIWidget_SearchWidgetId(duk_context* ctx)
+{
+    const char* idName = duk_require_string(ctx, 0);
+    duk_push_this(ctx);
+ 
+    UIWidget* uiwidget = js_to_class_instance<UIWidget>(ctx, -1, 0);
+
+    PODVector<UIWidget*> dest;
+    uiwidget->SearchWidgetId( idName, dest );
+
+    duk_push_array(ctx);
+
+    for (unsigned i = 0; i < dest.Size(); i++)
+    {
+        js_push_class_object_instance(ctx, dest[i], "UIWidget");
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+}
+
+static int UIWidget_SearchWidgetText(duk_context* ctx)
+{
+    const char* textName = duk_require_string(ctx, 0);
+    duk_push_this(ctx);
+
+    UIWidget* uiwidget = js_to_class_instance<UIWidget>(ctx, -1, 0);
+
+    PODVector<UIWidget*> dest;
+    uiwidget->SearchWidgetText( textName, dest );
+
+    duk_push_array(ctx);
+
+    for (unsigned i = 0; i < dest.Size(); i++)
+    {
+        js_push_class_object_instance(ctx, dest[i], "UIWidget");
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+}
+
+
 void jsapi_init_ui(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -150,6 +214,14 @@ void jsapi_init_ui(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getResizeToFitContentRect");
     duk_pop(ctx);
 
+    js_class_get_prototype(ctx, "Atomic", "UIWidget");
+    duk_push_c_function(ctx, UIWidget_SearchWidgetClass, 1);
+    duk_put_prop_string(ctx, -2, "searchWidgetClass");
+    duk_push_c_function(ctx, UIWidget_SearchWidgetId, 1);
+    duk_put_prop_string(ctx, -2, "searchWidgetId");
+    duk_push_c_function(ctx, UIWidget_SearchWidgetText, 1);
+    duk_put_prop_string(ctx, -2, "searchWidgetText");
+    duk_pop(ctx);
 
 }
 

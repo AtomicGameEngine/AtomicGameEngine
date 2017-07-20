@@ -18,7 +18,6 @@
 #endif // TB_ALWAYS_SHOW_EDIT_FOCUS
 
 #include <stdio.h>  // for printfs in PrintPretty
-#include "tb_select_item.h"
 
 namespace tb {
 
@@ -824,13 +823,12 @@ TBWidget *TBWidget::FindWidget ( TBID searchid )
 }
 
 /// return all of the widgets of the specified classname
-void TBWidget::SearchWidgetClass ( TBStr className, TBGenericStringItemSource *results )
+void TBWidget::SearchWidgetClass ( TBStr className, TBValue &results )
 {
     if ( className.Equals(GetClassName()) )
     {
-        TBGenericStringItem *matched = new TBGenericStringItem( "", GetID()); // capture ID
-        matched->tag.SetObject(this); // add widget ptr to the tag
-        results->AddItem ( matched ); // and add to the list
+        TBValue *new_val = results.GetArray()->AddValue();
+        new_val->SetObject(this); 
     }
     int num = numChildren();
     for (int ii = 0; ii < num; ii++)
@@ -841,13 +839,12 @@ void TBWidget::SearchWidgetClass ( TBStr className, TBGenericStringItemSource *r
 }
 
 ///  return all of the widgets of the specified id
-void TBWidget::SearchWidgetId ( TBID searchId, TBGenericStringItemSource *results )
+void TBWidget::SearchWidgetId ( TBID searchId, TBValue &results )
 {
     if ( searchId == GetID() )
     {
-        TBGenericStringItem *matched = new TBGenericStringItem( "", GetID());
-        matched->tag.SetObject(this);
-        results->AddItem ( matched );
+        TBValue *new_val = results.GetArray()->AddValue();
+        new_val->SetObject(this); 
     }
     int num = numChildren();
     for (int ii = 0; ii < num; ii++)
@@ -858,13 +855,12 @@ void TBWidget::SearchWidgetId ( TBID searchId, TBGenericStringItemSource *result
 }
 
 /// return all of the widgets with the specified text
-void TBWidget::SearchWidgetText ( TBStr searchText, TBGenericStringItemSource *results )
+void TBWidget::SearchWidgetText ( TBStr searchText, TBValue &results )
 {
     if ( searchText.Equals(GetText()) )
     {
-        TBGenericStringItem *matched = new TBGenericStringItem( "", GetID());
-        matched->tag.SetObject(this);
-        results->AddItem ( matched );
+        TBValue *new_val = results.GetArray()->AddValue();
+        new_val->SetObject(this); 
     }
     int num = numChildren();
     for (int ii = 0; ii < num; ii++)

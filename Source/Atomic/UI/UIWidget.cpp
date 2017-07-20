@@ -373,71 +373,62 @@ void UIWidget::PrintPrettyTree()
 }
 
 /// return all of the widgets of the specified classname
-/// only cpp can get full access to the widget pointers by using the
-/// TBGenericStringItemSource that is inside the UISelectItemSource 
-/// and pulling outthe tag.GetObject().
-void UIWidget::SearchWidgetClass ( const String& className, UISelectItemSource *results ) 
-{
-     if (!widget_)
-        return;
-    // we are going to fill out the TBGenericStringItemSource with all the data
-    tb::TBGenericStringItemSource *myuis = (tb::TBGenericStringItemSource*)results->GetTBItemSource();
-    widget_->SearchWidgetClass(className.CString(), myuis );
-
-    UI* ui = GetSubsystem<UI>(); // but copy the named id'd ones back into the UISelectItemSource
-    int nn=0;
-    for ( nn=0; nn<myuis->GetNumItems(); nn++ )
-    {
-        String idstr;
-        ui->GetTBIDString( myuis->GetItemID(nn), idstr);
-        if ( !idstr.Empty() )
-        {
-            results->AddItem ( new UISelectItem (context_, idstr, idstr) );
-        }
-    } 
-}
-
-///  return all of the widgets of the specified id
-void UIWidget::SearchWidgetId ( const String& searchid, UISelectItemSource *results )
+void UIWidget::SearchWidgetClass ( const String& className, PODVector<UIWidget*> &results ) 
 {
      if (!widget_)
         return;
 
-    tb::TBGenericStringItemSource *myuis = (tb::TBGenericStringItemSource*)results->GetTBItemSource();
-    widget_->SearchWidgetId(TBID(searchid.CString()),myuis );
+    tb::TBValue tbval(TBValue::TYPE_ARRAY); // TB array of values
+    tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC); // dont delete pointers on destruction
+    widget_->SearchWidgetClass(className.CString(), tbval ); // visit all children for search 
 
     UI* ui = GetSubsystem<UI>();
     int nn=0;
-    for ( nn=0; nn<myuis->GetNumItems(); nn++ )
+    for ( nn=0; nn<tbval.GetArrayLength(); nn++ ) // copy tbwidget ptr to uiwidget ptr
     {
-        String idstr;
-        ui->GetTBIDString( myuis->GetItemID(nn), idstr);
-        if ( !idstr.Empty() )
-        {
-            results->AddItem ( new UISelectItem (context_, idstr, idstr) );
-        }
+        tb::TBWidget *tbw = (tb::TBWidget *)tbval.GetArray()->GetValue(nn)->GetObject();
+        UIWidget *wrp = ui->WrapWidget(tbw);
+        results.Push( wrp );
+    }
+}
+
+///  return all of the widgets of the specified id
+void UIWidget::SearchWidgetId ( const String& searchid, PODVector<UIWidget*> &results )
+{
+     if (!widget_)
+        return;
+
+    tb::TBValue tbval(TBValue::TYPE_ARRAY);
+    tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+    widget_->SearchWidgetId(TBID(searchid.CString()), tbval );
+
+    UI* ui = GetSubsystem<UI>();
+    int nn=0;
+    for ( nn=0; nn<tbval.GetArrayLength(); nn++ )
+    {
+        tb::TBWidget *tbw = (tb::TBWidget *)tbval.GetArray()->GetValue(nn)->GetObject();
+        UIWidget *wrp = ui->WrapWidget(tbw);
+        results.Push( wrp );
     }
 }
 
 /// return all of the widgets with the specified text
-void UIWidget::SearchWidgetText ( const String& searchText, UISelectItemSource *results )
+void UIWidget::SearchWidgetText ( const String& searchText, PODVector<UIWidget*> &results )
 {
      if (!widget_)
         return;
 
-    tb::TBGenericStringItemSource *myuis = (tb::TBGenericStringItemSource*)results->GetTBItemSource();
-    widget_->SearchWidgetText(searchText.CString(), myuis );
+    tb::TBValue tbval(TBValue::TYPE_ARRAY);
+    tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+    widget_->SearchWidgetText(searchText.CString(), tbval );
 
     UI* ui = GetSubsystem<UI>();
     int nn=0;
-    for ( nn=0; nn<myuis->GetNumItems(); nn++ )
+    for ( nn=0; nn<tbval.GetArrayLength(); nn++ )
     {
-        String idstr;
-        ui->GetTBIDString( myuis->GetItemID(nn), idstr);
-        if ( !idstr.Empty() )
-        {
-            results->AddItem ( new UISelectItem (context_, idstr, idstr) );
-        }
+        tb::TBWidget *tbw = (tb::TBWidget *)tbval.GetArray()->GetValue(nn)->GetObject();
+        UIWidget *wrp = ui->WrapWidget(tbw);
+        results.Push( wrp );
     }
 }
 
