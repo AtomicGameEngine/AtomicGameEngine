@@ -619,6 +619,24 @@ public:
     TBLinkListOf<TBWidget>::Iterator GetIteratorForward() { return m_children.IterateForward(); }
     TBLinkListOf<TBWidget>::Iterator GetIteratorBackward() { return m_children.IterateBackward(); }
 
+// ATOMIC BEGIN
+
+    /** Returns the number of children this widget contains. */
+    int numChildren();
+    /// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
+    TBWidget *FindWidget ( TBID searchid );
+
+    /// print out the widget tree to stdout
+    void PrintPretty( TBStr indent, bool last);
+    /// return all of the widgets of the specified classname
+    void SearchWidgetClass ( TBStr className, TBValue &results );  
+    ///  return all of the widgets of the specified id
+    void SearchWidgetId ( TBID searchid, TBValue &results );
+    /// return all of the widgets with the specified text
+    void SearchWidgetText ( TBStr searchText, TBValue &results );
+
+// ATOMIC END
+
     /** Return true if this widget is the same or a ancestor of other_widget. */
     bool IsAncestorOf(TBWidget *other_widget) const;
 

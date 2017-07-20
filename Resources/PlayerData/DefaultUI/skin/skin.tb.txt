@@ -494,4 +494,14 @@ elements
 		bitmap star.png
 	FolderUp
 		bitmap arrow_up.png
+# dockwindow support
+	TBWindow.redock
+		bitmap window_redock.png
+		type Image
+		children
+			element TBWindow.redock.pressed
+				state pressed
+	TBWindow.redock.pressed
+		bitmap window_redock_pressed.png
+		type Image
 
