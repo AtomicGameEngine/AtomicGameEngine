@@ -375,12 +375,14 @@ void UIWidget::PrintPrettyTree()
 /// return all of the widgets of the specified classname
 void UIWidget::SearchWidgetClass ( const String& className, PODVector<UIWidget*> &results ) 
 {
-     if (!widget_)
+    results.Clear();
+
+    if (!widget_)
         return;
 
     tb::TBValue tbval(TBValue::TYPE_ARRAY); // TB array of values
     tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC); // dont delete pointers on destruction
-    widget_->SearchWidgetClass(className.CString(), tbval ); // visit all children for search 
+    widget_->SearchWidgetClass(className.CString(), tbval ); // visit all children for search
 
     UI* ui = GetSubsystem<UI>();
     int nn=0;
@@ -395,7 +397,10 @@ void UIWidget::SearchWidgetClass ( const String& className, PODVector<UIWidget*>
 ///  return all of the widgets of the specified id
 void UIWidget::SearchWidgetId ( const String& searchid, PODVector<UIWidget*> &results )
 {
-     if (!widget_)
+
+    results.Clear();
+
+    if (!widget_)
         return;
 
     tb::TBValue tbval(TBValue::TYPE_ARRAY);
@@ -415,7 +420,9 @@ void UIWidget::SearchWidgetId ( const String& searchid, PODVector<UIWidget*> &re
 /// return all of the widgets with the specified text
 void UIWidget::SearchWidgetText ( const String& searchText, PODVector<UIWidget*> &results )
 {
-     if (!widget_)
+    results.Clear();
+
+    if (!widget_)
         return;
 
     tb::TBValue tbval(TBValue::TYPE_ARRAY);
