@@ -71,6 +71,12 @@ public:
 
     virtual TBWidget *GetContentRoot() { return &m_content_root; }
     TBLayout *GetTabLayout() { return &m_tab_layout; }
+    
+// ATOMIC BEGIN
+    virtual void UndockPage ( int page ); /// undocks the page into a window with the tab name, and removes the tab
+    virtual bool DockFromWindow ( TBStr windowTitle ); /// takes the contents of a DockWindow into a tab in a tabcontainer 
+// ATOMIC END
+
 protected:
     TBLayout m_root_layout;
     TBTabLayout m_tab_layout;

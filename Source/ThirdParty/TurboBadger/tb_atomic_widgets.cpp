@@ -32,6 +32,7 @@
 #include "tb_editfield.h"
 #include "tb_menu_window.h"
 #include "tb_select.h"
+#include "tb_tab_container.h"
 
 #include <math.h>
 
@@ -757,6 +758,146 @@ void TBPulldownMenu::OnInflate(const INFLATE_INFO &info)
     // Read items (if there is any) into the default source
     ReadItems(info.node, GetDefaultSource());
     TBWidget::OnInflate(info);
+}
+
+// == TBDockWindow ==========================================
+
+TBDockWindow::TBDockWindow( TBStr title, TBWidget *contentptr, int minwidth, int minheight ) : TBWindow()
+{
+    SetID(TBID(title));
+    m_mover.AddChild(&m_redock_button);
+    m_redock_button.SetSkinBg(TBIDC("TBWindow.redock"));
+    m_redock_button.SetIsFocusable(false);
+    m_redock_button.SetID(TBIDC("TBWindow.redock"));
+    m_redock_button.SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
+
+    SetText(title);
+
+    TBStr uilayout; // undock host ui layout
+    uilayout.SetFormatted ( "TBLayout: axis: y, distribution: gravity\n\tlp: min-width: %ddp, min-height: %ddp\n\tTBLayout: id: \"undocklayout\", distribution: gravity\n", minwidth, minheight );
+    g_widgets_reader->LoadData(this, uilayout );
+    TBLayout *lo1 = GetWidgetByIDAndType<TBLayout>(TBID("undocklayout"));
+    lo1->AddChild(contentptr); // jam it into the window before the pointer gets stale
+    ResizeToFitContent();
+} 
+
+TBDockWindow::~TBDockWindow()
+{
+    if (m_resizer.GetParent()) RemoveChild(&m_resizer);
+    if (m_mover.GetParent()) RemoveChild(&m_mover);
+    if (m_close_button.GetParent()) m_mover.RemoveChild(&m_close_button);
+    if (m_redock_button.GetParent()) m_mover.RemoveChild(&m_redock_button);
+    m_mover.RemoveChild(&m_textfield);
+}
+
+void TBDockWindow::SetDockOrigin( TBID dockid )
+{
+     m_dockid = dockid;
+    if ( m_dockid > 0 ) //enable/show the (re)dock button is a return id is specified
+    {
+        m_redock_button.SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
+    }
+}
+
+
+void TBDockWindow::Show( TBWidget *host, int xpos, int ypos )
+{
+    if ( host )
+    {
+        host->AddChild(this);
+        SetPosition( TBPoint( xpos, ypos) );
+    }
+}
+
+TBWidget *TBDockWindow::GetDockContent()
+{
+    TBLayout *lo1 = GetWidgetByIDAndType<TBLayout>(TBID("undocklayout"));
+    if ( lo1 )
+        return lo1->GetChildFromIndex(0);
+}
+
+bool TBDockWindow::HasDockContent()
+{
+    return ( GetDockContent() != NULL );
+}
+
+void TBDockWindow::Redock ()
+{
+    if ( m_dockid > 0 ) // see if there is a dock point id specified  
+    {
+        TBWidget *mytarget = GetParentRoot(true)->GetWidgetByID(m_dockid);
+        if (mytarget)
+            Dock (mytarget);
+    }
+}
+
+void TBDockWindow::Dock ( TBWidget *target )
+{
+    if ( !HasDockContent() ) return; 
+
+    if ( target ) // what kind of widget is it?
+    {
+        TBStr mystr;
+        TBWidget *mypage = NULL;
+        TBLayout *lo1 = NULL;
+        TBTabContainer *tc1 = NULL;
+        if ( tc1 = TBSafeCast<TBTabContainer>( target ) ) // handle TBTabContainer
+        {
+            mystr = GetText();
+            mypage = GetDockContent();
+            if (mypage)
+            {
+                TBButton *tbb = new TBButton();
+                tbb->SetID (TBID(mystr));
+                tbb->SetText(mystr);
+                mypage->GetParent()->RemoveChild(mypage);
+                tc1->GetContentRoot()->AddChild(mypage);
+                tc1->GetTabLayout()->AddChild(tbb);
+                tc1->Invalidate();
+                tc1->SetCurrentPage(tc1->GetNumPages()-1);
+                Close();
+            }
+        }
+    }   
+}
+
+bool TBDockWindow::OnEvent(const TBWidgetEvent &ev)
+{
+   if (ev.target == &m_close_button)
+    {
+        if (ev.type == EVENT_TYPE_CLICK)
+            Close();
+        return true;
+    }
+   if (ev.target == &m_redock_button)
+    {
+        if (ev.type == EVENT_TYPE_CLICK)
+            Redock();
+        return true;
+    }
+    return TBWidget::OnEvent(ev);
+}
+
+void TBDockWindow::OnResized(int old_w, int old_h)
+{
+    // Apply gravity on children
+    TBWidget::OnResized(old_w, old_h);
+    // Manually move our own decoration children
+    // FIX: Put a layout in the TBMover so we can add things there nicely.
+    int title_height = GetTitleHeight();
+    m_mover.SetRect(TBRect(0, 0, GetRect().w, title_height));
+    PreferredSize ps = m_resizer.GetPreferredSize();
+    m_resizer.SetRect(TBRect(GetRect().w - ps.pref_w, GetRect().h - ps.pref_h, ps.pref_w, ps.pref_h));
+    TBRect mover_rect = m_mover.GetPaddingRect();
+    int button_size = mover_rect.h;
+    m_close_button.SetRect(TBRect(mover_rect.x + mover_rect.w - button_size, mover_rect.y, button_size, button_size));
+    if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
+        mover_rect.w -= button_size;
+    // add redock button to header
+    m_redock_button.SetRect(TBRect(mover_rect.x + mover_rect.w - button_size, mover_rect.y, button_size, button_size));
+    if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
+        mover_rect.w -= button_size;
+    m_textfield.SetRect(mover_rect);
 }
 
 

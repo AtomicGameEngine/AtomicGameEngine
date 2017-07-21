@@ -264,6 +264,34 @@ protected:
 };
 
 
+/** TBDockWindow is a window for undocking (and redocking) content */
+
+class TBDockWindow : public TBWindow
+{
+public:
+    // For safe typecasting
+    TBOBJECT_SUBCLASS(TBDockWindow, TBWindow);
+
+    TBDockWindow( TBStr title, TBWidget *contentptr, int minwidth = 800, int minheight = 400 );
+    virtual ~TBDockWindow();
+
+    void SetDockOrigin( TBID dockid );
+    TBWidget *GetDockContent();
+    bool HasDockContent();
+    void Dock( TBWidget *target );
+    void Show(TBWidget *host, int xpos = 50, int ypos = 50 );
+
+    virtual bool OnEvent(const TBWidgetEvent &ev);
+    virtual void OnResized(int old_w, int old_h);
+
+protected:
+
+    void Redock();
+
+    TBWidget m_redock_button;  // return content to origin
+    TBID m_dockid; /// the TBID of the origin container
+
+};
 
 
 }; // namespace tb

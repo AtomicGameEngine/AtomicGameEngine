@@ -29,6 +29,7 @@
 #include "UILayout.h"
 #include "UIFontDescription.h"
 #include "UIView.h"
+#include "UISelectItem.h"
 
 using namespace tb;
 
@@ -346,6 +347,96 @@ void UIWidget::Invalidate()
         return;
 
     widget_->Invalidate();
+}
+
+/// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
+UIWidget *UIWidget::FindWidget ( const String& searchid )
+{
+    if (!widget_)
+        return NULL;
+
+    TBWidget* child = widget_->FindWidget(TBID(searchid.CString()));
+
+    if (!child)
+        return 0;
+
+    UI* ui = GetSubsystem<UI>();
+    return ui->WrapWidget(child);
+}
+
+void UIWidget::PrintPrettyTree()
+{
+    if (!widget_)
+        return;
+
+    widget_->PrintPretty("", true);
+}
+
+/// return all of the widgets of the specified classname
+void UIWidget::SearchWidgetClass ( const String& className, PODVector<UIWidget*> &results ) 
+{
+    results.Clear();
+
+    if (!widget_)
+        return;
+
+    tb::TBValue tbval(TBValue::TYPE_ARRAY); // TB array of values
+    tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC); // dont delete pointers on destruction
+    widget_->SearchWidgetClass(className.CString(), tbval ); // visit all children for search
+
+    UI* ui = GetSubsystem<UI>();
+    int nn=0;
+    for ( nn=0; nn<tbval.GetArrayLength(); nn++ ) // copy tbwidget ptr to uiwidget ptr
+    {
+        tb::TBWidget *tbw = (tb::TBWidget *)tbval.GetArray()->GetValue(nn)->GetObject();
+        UIWidget *wrp = ui->WrapWidget(tbw);
+        results.Push( wrp );
+    }
+}
+
+///  return all of the widgets of the specified id
+void UIWidget::SearchWidgetId ( const String& searchid, PODVector<UIWidget*> &results )
+{
+
+    results.Clear();
+
+    if (!widget_)
+        return;
+
+    tb::TBValue tbval(TBValue::TYPE_ARRAY);
+    tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+    widget_->SearchWidgetId(TBID(searchid.CString()), tbval );
+
+    UI* ui = GetSubsystem<UI>();
+    int nn=0;
+    for ( nn=0; nn<tbval.GetArrayLength(); nn++ )
+    {
+        tb::TBWidget *tbw = (tb::TBWidget *)tbval.GetArray()->GetValue(nn)->GetObject();
+        UIWidget *wrp = ui->WrapWidget(tbw);
+        results.Push( wrp );
+    }
+}
+
+/// return all of the widgets with the specified text
+void UIWidget::SearchWidgetText ( const String& searchText, PODVector<UIWidget*> &results )
+{
+    results.Clear();
+
+    if (!widget_)
+        return;
+
+    tb::TBValue tbval(TBValue::TYPE_ARRAY);
+    tbval.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+    widget_->SearchWidgetText(searchText.CString(), tbval );
+
+    UI* ui = GetSubsystem<UI>();
+    int nn=0;
+    for ( nn=0; nn<tbval.GetArrayLength(); nn++ )
+    {
+        tb::TBWidget *tbw = (tb::TBWidget *)tbval.GetArray()->GetValue(nn)->GetObject();
+        UIWidget *wrp = ui->WrapWidget(tbw);
+        results.Push( wrp );
+    }
 }
 
 void UIWidget::Center()

@@ -6,6 +6,12 @@
 #include "tb_tab_container.h"
 #include <assert.h>
 
+// ATOMIC BEGIN
+#include "tb_node_tree.h"
+#include "tb_widgets_reader.h"
+#include "tb_atomic_widgets.h"
+// ATOMIC END
+
 namespace tb {
 
 // == TBTabLayout =======================================================================
@@ -181,5 +187,48 @@ void TBTabContainer::OnProcess()
         SetValue(current_page);
     }
 }
+
+// ATOMIC BEGIN
+
+/// takes the contents of a DockWindow into a tab in a tabcontainer 
+bool TBTabContainer::DockFromWindow ( TBStr windowTitle )
+{
+    int nn = 0;
+    TBLinkListOf<TBWidget>::Iterator mx = GetParentRoot(true)->GetIteratorForward();
+    while (TBWidget *mxw = mx.GetAndStep())
+    {
+        if ( mxw->GetText().Equals(windowTitle) )
+        {
+            TBDockWindow *dw1 = TBSafeCast<TBDockWindow>( mxw );
+            if (dw1) 
+                dw1->Dock ( this );
+            return true;
+        }
+        nn++;
+    }
+    return false;
+}
+
+/// undocks the page into a window with the tab name, and removes the tab
+void TBTabContainer::UndockPage ( int page )
+{
+    TBWidget *mytab = GetTabLayout()->GetChildFromIndex(page);  // find the offending tab 
+    TBWidget *mypage = GetContentRoot()->GetChildFromIndex(page);   // find the offending page (layout)
+
+    if (mytab == NULL || mypage == NULL ) return; // nobody home
+
+    TBStr tabstr = mytab->GetText(); //get the name/text of the tab
+    GetTabLayout()->RemoveChild(mytab); // remove, delete the tab[page] button
+    mytab->Die();  // and get rid of it
+    GetContentRoot()->RemoveChild(mypage);  // remove the pagewidget[page] from the content root (without deleting it, hopefully)
+    TBDockWindow *mywindow = new TBDockWindow(tabstr, mypage); // create an undock window.
+    mywindow->SetDockOrigin( GetID() );  //tell it to redock here
+    mywindow->Show(GetParentRoot(true)); 
+
+    Invalidate(); // and tell everyone the party is over.
+
+}
+
+// ATOMIC END
 
 }; // namespace tb
