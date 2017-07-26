@@ -168,8 +168,10 @@ namespace('build', function() {
             var lintTask = jake.Task['build:lint_typescript'];
 
             lintTask.addListener('complete', function () {
+
                 console.log("\n\nLint: Typescript linting complete.\n\n");
-                jake.exec(cmds, function() {
+
+                jake.exec(cmds, { printStdout : true, printStderr: true }, function() {
 
                     // copy some external dependencies into the editor modules directory
                     var editorModulesDir = "./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules";

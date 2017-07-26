@@ -821,8 +821,11 @@ ImGuiIO::ImGuiIO()
     DisplaySize = ImVec2(-1.0f, -1.0f);
     DeltaTime = 1.0f/60.0f;
     IniSavingRate = 5.0f;
-    IniFilename = "imgui.ini";
-    LogFilename = "imgui_log.txt";
+    // ATOMIC BEGIN
+    // Don't use imgui ini or log by default
+    IniFilename = 0; // "imgui.ini";
+    LogFilename = 0; // "imgui_log.txt";
+    // ATOMIC END
     Fonts = &GImDefaultFontAtlas;
     FontGlobalScale = 1.0f;
     FontDefault = NULL;
