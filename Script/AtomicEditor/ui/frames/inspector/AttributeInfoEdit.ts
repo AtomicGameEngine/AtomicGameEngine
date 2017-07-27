@@ -351,7 +351,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
                     } else {
                         widget.text = attrInfo.enumNames[value];
                     }
-                
+
                 }
                 else {
                     widget.text = value.toString();

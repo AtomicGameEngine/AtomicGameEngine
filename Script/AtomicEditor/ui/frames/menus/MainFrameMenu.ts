@@ -452,11 +452,11 @@ var developerItems = {
             "3x": ["developer ui width project 3x"],
             "4x": ["developer ui width project 4x"]
         }
-    },     
+    },
     "Theme": {
         "Toggle Theme": ["toggle theme"],
         "Toggle Code Editor Theme": ["toggle codeeditor"]
-    }, 
+    },
     "ScreenShot": ["screenshot", StringID.ShortcutScreenshot],
     "Show Console": ["developer show console"],
     "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list

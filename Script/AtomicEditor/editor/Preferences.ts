@@ -491,7 +491,7 @@ class PreferencesFormat {
 
         this.developmentUI = {
             projectFrameWidthScalar: 1
-        }
+        };
 
     }
 
@@ -562,7 +562,7 @@ class PreferencesFormat {
             prefs.developmentUI = this.developmentUI;
             updatedMissingDefaults = true;
         }
-        
+
         return updatedMissingDefaults;
     }
 

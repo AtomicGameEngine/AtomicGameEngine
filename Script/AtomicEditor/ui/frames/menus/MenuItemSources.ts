@@ -58,14 +58,20 @@ function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
 
                 if (value.length == 1)
                     src.addItem(new UIMenuItem(key, value[0]));
-                else if (value.length == 2)
-                    src.addItem(new UIMenuItem(key, value[0], strings.EditorString.GetString(value[1])));
+                else if (value.length == 2) {
+                    var prospectShortcut = value[1]; // raw shortcut or editor shortcut 
+                    if ( strings.EditorString.GetString(value[1]) != undefined )  // editor defined shortcut
+                        prospectShortcut = strings.EditorString.GetString(value[1]);
+                    src.addItem(new UIMenuItem(key, value[0], prospectShortcut));
+                }
                 else if (value.length == 3) {
 
                     var str = "";
-                    if (value[1])
-                        str = strings.EditorString.GetString(value[1]);
-
+                    if (value[1]) {
+                        str = value[1];
+                        if ( strings.EditorString.GetString(value[1]) != undefined )
+                            str = strings.EditorString.GetString(value[1]);
+                    }
                     var skinBg = "";
                     if (value[2])
                         skinBg = value[2];

@@ -95,7 +95,7 @@ class ProjectFrame extends ScriptWidget {
                 this.handleScaleWidth(data.arg1);
             }
         });
-                
+
     }
 
     handleAssetRenamed(ev: ToolCore.AssetRenamedEvent) {
