@@ -96,11 +96,11 @@ class AnimationToolbar extends Atomic.UIWidget {
     }
 
     handleUpdate(ev) {
-    
+
         var rotspeed = this.rotateModel.value;
         if (rotspeed > 0) {                  // only do work if the spinning is turned on
             this.updateDelta += ev.timeStep; // add some time to the clock
-            if (this.updateDelta > (0.134 * (10-rotspeed))) {  //see if we have reached our limit
+            if (this.updateDelta > (0.134 * (10 - rotspeed))) {  //see if we have reached our limit
                 this.updateDelta = 0.0;      // reset the limit
                 this.updateYaw += 2.1;       // increase the yaw
                 if (this.updateYaw > 26.3)   // clamp the yaw
@@ -110,7 +110,7 @@ class AnimationToolbar extends Atomic.UIWidget {
 
         }
     }
-    
+
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
         if (ev.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
