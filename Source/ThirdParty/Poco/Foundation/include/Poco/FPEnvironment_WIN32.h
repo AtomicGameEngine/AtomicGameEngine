@@ -27,6 +27,26 @@
 
 namespace Poco {
 
+// ATOMIC BEGIN
+#if __MINGW32__ || __MINW64__
+#	define RC_DOWN _RC_DOWN
+#	define RC_UP _RC_UP
+#	define RC_NEAR _RC_NEAR
+#	define RC_CHOP _RC_CHOP
+
+#	define SW_ZERODIVIDE _EM_ZERODIVIDE
+#	define SW_INEXACT _EM_INEXACT
+#	define SW_OVERFLOW _EM_OVERFLOW
+#	define SW_UNDERFLOW _EM_UNDERFLOW
+#	define SW_INVALID _EM_INVALID
+
+#	define MCW_DN _MCW_DN
+#	define MCW_EM _MCW_EM
+#	define MCW_IC _MCW_IC
+#	define MCW_RC _MCW_RC
+#	define MCW_PC _MCW_PC
+#endif
+// ATOMIC END
 
 class Foundation_API FPEnvironmentImpl
 {

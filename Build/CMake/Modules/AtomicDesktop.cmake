@@ -1,7 +1,7 @@
 set(ATOMIC_DESKTOP TRUE)
 
 # Check whether the CEF submodule is available
-if (NOT DEFINED ATOMIC_WEBVIEW AND EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF)
+if (NOT MINGW AND NOT DEFINED ATOMIC_WEBVIEW AND EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF)
     #Check if CEF got pulled by looking if the foldes is empty
     file(GLOB CEF_FILES ${ATOMIC_SOURCE_DIR}/Submodules/CEF/*)
 
