@@ -9,15 +9,17 @@
 #define UNICODE
 #endif
 
+#ifdef __MINGW32__
+// Explicitly setting NTDDI version, this is necessary for the MinGW compiler
+#define NTDDI_VERSION NTDDI_VISTA
+#define _WIN32_WINNT _WIN32_WINNT_VISTA
+#endif
 
 #include <wchar.h>
 #include <stdio.h>
 #include <assert.h>
-//ATOMIC: Removed reference to ATL
-//#include <atlbase.h>
 #include <windows.h>
 #include <ShObjIdl.h>
-
 #include "nfd_common.h"
 
 
@@ -130,7 +132,7 @@ static nfdresult_t AddFiltersToDialog( ::IFileDialog *fileOpenDialog, const char
         return NFD_OKAY;
 
     // Count rows to alloc
-    size_t filterCount = 1; /* guaranteed to have one filter on a correct, non-empty parse */
+    UINT filterCount = 1; /* guaranteed to have one filter on a correct, non-empty parse */
     const char *p_filterList;
     for ( p_filterList = filterList; *p_filterList; ++p_filterList )
     {
@@ -203,7 +205,7 @@ static nfdresult_t AddFiltersToDialog( ::IFileDialog *fileOpenDialog, const char
     specList[specIdx].pszSpec = WILDCARD;
     specList[specIdx].pszName = EMPTY_WSTR;
     
-    fileOpenDialog->SetFileTypes( static_cast<UINT>(filterCount+1), specList );
+    fileOpenDialog->SetFileTypes( filterCount+1, specList );
 
     /* free speclist */
     for ( size_t i = 0; i < filterCount; ++i )
@@ -361,13 +363,14 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
     HRESULT result = ::CoInitializeEx(NULL,
                                       ::COINIT_APARTMENTTHREADED |
                                       ::COINIT_DISABLE_OLE1DDE );
+
+    ::IFileOpenDialog *fileOpenDialog(NULL);
+
     if ( !SUCCEEDED(result))
     {
         NFDi_SetError("Could not initialize COM.");
         goto end;
     }
-
-    ::IFileOpenDialog *fileOpenDialog(NULL);
 
     // Create dialog
     result = ::CoCreateInstance(::CLSID_FileOpenDialog, NULL,
@@ -619,102 +622,132 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
     return nfdResult;
 }
 
-nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaultPath,
-                                nfdchar_t **outPath )
+class AutoCoInit
 {
-    nfdresult_t nfdResult = NFD_ERROR;
-
-    // Init COM library.
-    HRESULT result = ::CoInitializeEx(NULL,
-                                      ::COINIT_APARTMENTTHREADED |
-                                      ::COINIT_DISABLE_OLE1DDE );
-
-    wchar_t *promptW = {0};
-    if (prompt && strlen(prompt))
-        CopyNFDCharToWChar( prompt, &promptW );
-
-
-    if ( !SUCCEEDED(result))
+public:
+    AutoCoInit()
     {
-        NFDi_SetError("Could not initialize COM.");
-        goto end;
+        mResult = ::CoInitializeEx(NULL,
+            ::COINIT_APARTMENTTHREADED |
+            ::COINIT_DISABLE_OLE1DDE);
     }
 
-    ::IFileOpenDialog *fileOpenDialog(NULL);
-
-    // Create dialog
-    result = ::CoCreateInstance(::CLSID_FileOpenDialog, NULL,
-                                CLSCTX_ALL, ::IID_IFileOpenDialog,
-                                reinterpret_cast<void**>(&fileOpenDialog) );
-
-    if ( !SUCCEEDED(result) )
+    ~AutoCoInit()
     {
-        NFDi_SetError("Could not create dialog.");
-        goto end;
+        if (SUCCEEDED(mResult))
+        {
+            ::CoUninitialize();
+        }
     }
 
-    DWORD dwOptions;
-    if (SUCCEEDED(fileOpenDialog->GetOptions(&dwOptions)))
+    HRESULT Result() const { return mResult; }
+private:
+    HRESULT mResult;
+};
+
+// VS2010 hasn't got a copy of CComPtr - this was first added in the 2003 SDK, so we make our own small CComPtr instead
+template<class T>
+class ComPtr
+{
+public:
+    ComPtr() : mPtr(NULL) { }
+    ~ComPtr()
     {
-        fileOpenDialog->SetOptions(dwOptions | FOS_PICKFOLDERS);
+        if (mPtr)
+        {
+            mPtr->Release();
+        }
+    }
+
+    T* Ptr() const { return mPtr; }
+    T** operator&() { return &mPtr; }
+    T* operator->() const { return mPtr; }
+private:
+    // Don't allow copy or assignment
+    ComPtr(const ComPtr&);
+    ComPtr& operator = (const ComPtr&) const;
+    T* mPtr;
+};
+
+nfdresult_t NFD_PickFolder(const nfdchar_t *defaultPath,
+    nfdchar_t **outPath)
+{
+    // Init COM
+    AutoCoInit autoCoInit;
+    if (!SUCCEEDED(autoCoInit.Result()))
+    {
+        NFDi_SetError("CoInitializeEx failed.");
+        return NFD_ERROR;
+    }
+
+    // Create the file dialog COM object
+    ComPtr<IFileDialog> pFileDialog;
+    if (!SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog,
+                                    NULL,
+                                    CLSCTX_ALL,
+                                    IID_PPV_ARGS(&pFileDialog))))
+    {
+        NFDi_SetError("CoCreateInstance for CLSID_FileOpenDialog failed.");
+        return NFD_ERROR;
     }
 
     // Set the default path
-    if ( !SetDefaultPath( fileOpenDialog, defaultPath ) )
+    if (SetDefaultPath(pFileDialog.Ptr(), defaultPath) != NFD_OKAY)
     {
-        goto end;
+        NFDi_SetError("SetDefaultPath failed.");
+        return NFD_ERROR;
     }
 
-    fileOpenDialog->SetTitle(promptW);
-
-
-    // Show the dialog.
-    result = fileOpenDialog->Show(NULL);
-    if ( SUCCEEDED(result) )
+    // Get the dialogs options
+    DWORD dwOptions = 0;
+    if (!SUCCEEDED(pFileDialog->GetOptions(&dwOptions)))
     {
-        // Get the file name
-        ::IShellItem *shellItem(NULL);
-        result = fileOpenDialog->GetResult(&shellItem);
-        if ( !SUCCEEDED(result) )
-        {
-            NFDi_SetError("Could not get shell item from dialog.");
-            goto end;
-        }
-        wchar_t *filePath(NULL);
-        result = shellItem->GetDisplayName(::SIGDN_FILESYSPATH, &filePath);
-        if ( !SUCCEEDED(result) )
-        {
-            NFDi_SetError("Could not get file path for selected.");
-            goto end;
-        }
-
-        CopyWCharToNFDChar( filePath, outPath );
-        CoTaskMemFree(filePath);
-        if ( !*outPath )
-        {
-            /* error is malloc-based, error message would be redundant */
-            goto end;
-        }
-
-        nfdResult = NFD_OKAY;
-        shellItem->Release();
-    }
-    else if (result == HRESULT_FROM_WIN32(ERROR_CANCELLED) )
-    {
-        nfdResult = NFD_CANCEL;
-    }
-    else
-    {
-        NFDi_SetError("File dialog box show failed.");
-        nfdResult = NFD_ERROR;
+        NFDi_SetError("GetOptions for IFileDialog failed.");
+        return NFD_ERROR;
     }
 
- end:
+    // Add in FOS_PICKFOLDERS which hides files and only allows selection of folders
+    if (!SUCCEEDED(pFileDialog->SetOptions(dwOptions | FOS_PICKFOLDERS)))
+    {
+        NFDi_SetError("SetOptions for IFileDialog failed.");
+        return NFD_ERROR;
+    }
 
-    if (prompt && strlen(prompt));
-        NFDi_Free( promptW );
+    // Show the dialog to the user
+    const HRESULT result = pFileDialog->Show(NULL);
+    if (result == HRESULT_FROM_WIN32(ERROR_CANCELLED))
+    {
+        return NFD_CANCEL;
+    }
+    else if (!SUCCEEDED(result))
+    {
+        NFDi_SetError("Show for IFileDialog failed.");
+        return NFD_ERROR;
+    }
 
-    ::CoUninitialize();
+    // Get the shell item result
+    ComPtr<IShellItem> pShellItem;
+    if (!SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
+    {
+        return NFD_OKAY;
+    }
 
-    return nfdResult;
+    // Finally get the path
+    wchar_t *path = NULL;
+    if (!SUCCEEDED(pShellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
+    {
+        NFDi_SetError("GetDisplayName for IShellItem failed.");
+        return NFD_ERROR;
+    }
+
+    // Convert string
+    CopyWCharToNFDChar(path, outPath);
+    CoTaskMemFree(path);
+    if (!*outPath)
+    {
+        // error is malloc-based, error message would be redundant
+        return NFD_ERROR;
+    }
+
+    return NFD_OKAY;
 }
