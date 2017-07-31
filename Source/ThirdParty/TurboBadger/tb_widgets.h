@@ -354,14 +354,16 @@ enum WIDGET_HIT_STATUS {
     WIDGET_HIT_STATUS_HIT_NO_CHILDREN		///< The widget was hit, no children should be hit.
 };
 
-// ATOMIC: this must only be used by UIWidget, as we are casting to it
+// ATOMIC BEGIN: this must only be used by UIWidget, as we are casting to it
 class TBWidgetDelegate
 {
 public:
     virtual bool OnEvent(const TBWidgetEvent &ev) = 0;
     virtual void OnFocusChanged(bool focused) = 0;
     virtual void OnDelete() = 0;
+    virtual void OnResized(int old_w, int old_h) = 0;
 };
+// ATOMIC END
 
 /** The base TBWidget class.
     Make a subclass to implement UI controls.

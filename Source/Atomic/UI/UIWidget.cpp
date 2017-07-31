@@ -1066,6 +1066,12 @@ UIView* UIWidget::GetView()
     return 0;
 }
 
+
+void UIWidget::OnResized(int old_w, int old_h)
+{
+    // default implementation does nothing
+}
+
 void UIWidget::OnFocusChanged(bool focused)
 {
     using namespace WidgetFocusChanged;

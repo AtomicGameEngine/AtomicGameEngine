@@ -96,6 +96,7 @@ using namespace tb;
 #include "UIRadioButton.h"
 #include "UIScrollBar.h"
 #include "UIDockWindow.h"
+#include "UIButtonGrid.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"

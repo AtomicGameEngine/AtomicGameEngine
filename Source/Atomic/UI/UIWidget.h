@@ -351,6 +351,7 @@ protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
     virtual void OnDelete();
+    virtual void OnResized(int old_w, int old_h);
 
     String id_;
     tb::TBWidget* widget_;

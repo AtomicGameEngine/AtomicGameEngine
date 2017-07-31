@@ -312,6 +312,11 @@ void TBScrollContainer::OnResized(int old_w, int old_h)
     InvalidateLayout(INVALIDATE_LAYOUT_TARGET_ONLY);
     SizeConstraints sc(GetRect().w, GetRect().h);
     ValidateLayout(sc);
+
+    // ATOMIC BEGIN  So pure UIWidgets can handle resize
+    if (GetDelegate()) { GetDelegate()->OnResized(old_w, old_h); }
+    // ATOMIC END
+
 }
 
 }; // namespace tb
