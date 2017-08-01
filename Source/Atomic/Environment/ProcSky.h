@@ -22,7 +22,7 @@
 
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
+#if _MSC_VER
 #define fmax max
 #define fmin min
 #endif

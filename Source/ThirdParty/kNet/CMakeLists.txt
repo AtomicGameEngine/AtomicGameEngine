@@ -53,6 +53,9 @@ if (WIN32)
         get_filename_component (baseName ${srcFile} NAME)
         set_source_files_properties (${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
     endforeach ()
+   # ATOMIC BEGIN
+   set(LIBS ws2_32.lib)
+   # ATOMIC END
 endif ()
 
 # Define source files

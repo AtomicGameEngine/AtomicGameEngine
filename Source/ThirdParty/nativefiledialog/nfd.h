@@ -48,12 +48,12 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
 /* save dialog */
 nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
                             const nfdchar_t *defaultPath,
-                            const nfdchar_t *defaultFilename,
                             nfdchar_t **outPath );
 
-nfdresult_t NFD_ChooseDirectory( const nfdchar_t *prompt,
-                                 const nfdchar_t *defaultPath,
-                                 nfdchar_t **outPath );
+
+/* select folder dialog */
+nfdresult_t NFD_PickFolder( const nfdchar_t *defaultPath,
+                            nfdchar_t **outPath);
 
 /* nfd_common.c */
 

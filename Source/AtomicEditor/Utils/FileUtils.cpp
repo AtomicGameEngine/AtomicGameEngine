@@ -96,10 +96,7 @@ String FileUtils::NewProjectFileDialog()
     upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
 #endif
 
-    nfdresult_t result = NFD_ChooseDirectory( "Please choose the root folder for your project",
-                                upath.Length() ? GetNativePath(upath).CString() : "",
-                                &outPath);
-
+    nfdresult_t result = NFD_PickFolder(upath.Length() ? GetNativePath(upath).CString() : "", &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
@@ -121,9 +118,7 @@ String FileUtils::GetBuildPath(const String& defaultPath)
 
     nfdchar_t *outPath = NULL;
     
-    nfdresult_t result = NFD_ChooseDirectory( "Please choose the build folder",
-                                defaultPath.Length() ? GetNativePath(defaultPath).CString() : "",
-                                &outPath);
+    nfdresult_t result = NFD_PickFolder(defaultPath.Length() ? GetNativePath(defaultPath).CString() : "", &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
@@ -145,15 +140,7 @@ String FileUtils::GetAntPath(const String& defaultPath)
 
     nfdchar_t *outPath = NULL;
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    String msg = "Please select the folder which contains ant.bat";
-#else
-    String msg = "Please select the folder which contains the ant executable";
-#endif
-
-    nfdresult_t result = NFD_ChooseDirectory(msg.CString(),
-                        defaultPath.Length() ? GetNativePath(defaultPath).CString() : "",
-                        &outPath);
+    nfdresult_t result = NFD_PickFolder(defaultPath.Length() ? GetNativePath(defaultPath).CString() : "", &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
@@ -208,9 +195,7 @@ String FileUtils::FindPath(const String& title, const String& defaultPath)
     String resultPath;
     nfdchar_t *outPath = NULL;
 
-    nfdresult_t result = NFD_ChooseDirectory(title.CString(),
-                       defaultPath.Length() ? GetNativePath(defaultPath).CString() : "",
-                       &outPath);
+    nfdresult_t result = NFD_PickFolder(defaultPath.Length() ? GetNativePath(defaultPath).CString() : "", &outPath);
 
     if (outPath && result == NFD_OKAY)
     {

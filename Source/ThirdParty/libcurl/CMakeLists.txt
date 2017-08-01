@@ -1,5 +1,5 @@
 
-if (WIN32)
+if (MSVC)
     include(LibCurlWindows.cmake)
 else()
     include(LibCurl.cmake)
