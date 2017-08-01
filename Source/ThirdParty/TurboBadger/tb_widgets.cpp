@@ -1017,6 +1017,10 @@ void TBWidget::OnPaintChildren(const PaintProps &paint_props)
 
 void TBWidget::OnResized(int old_w, int old_h)
 {
+    // ATOMIC BEGIN  So pure UIWidgets can handle resize
+    if (GetDelegate()) { GetDelegate()->OnResized(old_w, old_h); }
+    // ATOMIC END
+
     int dw = m_rect.w - old_w;
     int dh = m_rect.h - old_h;
     for (TBWidget *child = GetFirstChild(); child; child = child->GetNext())
@@ -1038,6 +1042,7 @@ void TBWidget::OnResized(int old_w, int old_h)
 
         child->SetRect(rect);
     }
+
 }
 
 void TBWidget::OnInflateChild(TBWidget *child)
