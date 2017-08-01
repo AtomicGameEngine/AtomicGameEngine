@@ -37,12 +37,12 @@ namespace Atomic
 
 UIButtonGrid::UIButtonGrid(Context* context, int numRows, int numCols, int margin, bool createWidget ) 
     : UIWidget(context, false),
-    m_rows(numRows),
-    m_cols(numCols),
-    m_margin(margin),
-    m_rowHeight(0),
-    m_colWidth(0),
-    m_count(0)
+    rows_(numRows),
+    columns_(numCols),
+    margin_(margin),
+    rowHeight_(0),
+    columnWidth_(0),
+    addCount_(0)
 {
     if (createWidget)
     {
@@ -58,7 +58,7 @@ UIButtonGrid::~UIButtonGrid()
 {
 }
 
-void UIButtonGrid::SetGridText (int row, int col, String str)
+void UIButtonGrid::SetGridText (int row, int column, String str)
 {
     if (!widget_)
         return;
@@ -66,7 +66,7 @@ void UIButtonGrid::SetGridText (int row, int col, String str)
     TBLayout *lo0 = (TBLayout *)widget_->GetChildFromIndex(row);  // find row
     if (lo0) 
     {
-        TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(col);  // find col
+        TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(column);  // find column
         if (b0)
         {
            b0->SetText( str.CString() );
@@ -74,49 +74,55 @@ void UIButtonGrid::SetGridText (int row, int col, String str)
     }
 }
 
-int UIButtonGrid::AddGridText ( String str ) /// add strings starting at 0,0 and filling out cols, then next row, returns count
+/// add strings starting at 0,0 and filling out columns, then next row, returns count
+int UIButtonGrid::AddGridText ( String str )
 {
     int row = 0;
-    int col = 0;
-    if ( m_count > ( m_rows * m_cols) ) return m_count; // dont write past the end of the grid
-    row = m_count / m_cols;
-    col = m_count % m_cols;
-    SetGridText ( row, col, str );
-    m_count++;
-    return m_count-1;
+    int column = 0;
+    if ( addCount_ > ( rows_ * columns_) ) return addCount_; // dont write past the end of the grid
+    row = addCount_ / columns_;
+    column = addCount_ % columns_;
+    SetGridText ( row, column, str );
+    addCount_++;
+    return addCount_-1;
 }
 
-int UIButtonGrid::GetNumRows() const /// returns number of rows that were programmed
+/// returns number of rows that were programmed
+int UIButtonGrid::GetNumRows() const
 {
-    return m_rows;
+    return rows_;
 }
 
-int UIButtonGrid::GetNumCols() const  /// returns number of cols that were programmed
+/// returns number of columns that were programmed
+int UIButtonGrid::GetNumColumns() const
 {
-    return m_cols;
+    return columns_;
 }
 
-int UIButtonGrid::GetRowHeight() const /// returns current row height
+/// returns current row height
+int UIButtonGrid::GetRowHeight() const
 {
-    return m_rowHeight;
+    return rowHeight_;
 }
 
-int UIButtonGrid::GetColWidth() const /// returns current col width
+/// returns current column width
+int UIButtonGrid::GetColumnWidth() const
 {
-    return m_colWidth;
+    return columnWidth_;
 }
 
-int UIButtonGrid::GetMargin() const  /// returns current margin value
+/// returns current margin value
+int UIButtonGrid::GetMargin() const
 {
-    return m_margin;
+    return margin_;
 }
 
-String UIButtonGrid::GetGridId( int row, int col ) 
+String UIButtonGrid::GetGridId( int row, int column ) 
 {
-    return String( 'A' + row ) + String(col); // generate spreadsheet style id
+    return String( 'A' + row ) + String(column); // generate spreadsheet style id
 }
 
-String UIButtonGrid::GetGridText(int row, int col)
+String UIButtonGrid::GetGridText(int row, int column)
 {
     if (!widget_)
         return "";
@@ -124,7 +130,7 @@ String UIButtonGrid::GetGridText(int row, int col)
     TBLayout *lo0 = (TBLayout *)widget_->GetChildFromIndex(row);  // find row
     if (lo0) 
     {
-        TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(col);  // find col
+        TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(column);  // find column
         if (b0)
         {
             TBStr foo;
@@ -135,16 +141,17 @@ String UIButtonGrid::GetGridText(int row, int col)
     return "";
 }
 
-String UIButtonGrid::AtGridText( int count ) /// returns text at count
+/// returns text at count
+String UIButtonGrid::AtGridText( int count )
 {
     int row = 0;
-    int col = 0;
-    row = count / m_cols;
-    col = count % m_cols;
-    return GetGridText( row, col );
+    int column = 0;
+    row = count / columns_;
+    column = count % columns_;
+    return GetGridText( row, column );
 }
 
-UIWidget* UIButtonGrid::GetGridWidget(int row, int col)
+UIWidget* UIButtonGrid::GetGridWidget(int row, int column)
 {
     if (!widget_)
         return NULL;
@@ -153,7 +160,7 @@ UIWidget* UIButtonGrid::GetGridWidget(int row, int col)
     TBLayout *lo0 = (TBLayout *)widget_->GetChildFromIndex(row); // find row
     if (lo0) 
     {
-        mywidget = lo0->GetChildFromIndex(col);  // find col
+        mywidget = lo0->GetChildFromIndex(column);  // find column
     }
     if ( mywidget )
     {
@@ -163,21 +170,22 @@ UIWidget* UIButtonGrid::GetGridWidget(int row, int col)
    return NULL; 
 }
 
-UIWidget* UIButtonGrid::AtGridWidget( int count ) /// returns widget at count
+/// returns widget at count
+UIWidget* UIButtonGrid::AtGridWidget( int count )
 {
     int row = 0;
-    int col = 0;
-    row = count / m_cols;
-    col = count % m_cols;
-    return GetGridWidget ( row, col );
+    int column = 0;
+    row = count / columns_;
+    column = count % columns_;
+    return GetGridWidget ( row, column );
 }
 
 void UIButtonGrid::GenerateGrid()
 {
     if ( widget_ && widget_->numChildren() == 0 )  // build once.
     {
-        ((TBLayout *)widget_)->SetSpacing(m_margin);
-        for (int nn=0; nn<m_rows; nn++ )
+        ((TBLayout *)widget_)->SetSpacing(margin_);
+        for (int nn=0; nn<rows_; nn++ )
             AddGridRow( nn );
     }
 }
@@ -187,13 +195,13 @@ void UIButtonGrid::AddGridRow( int rownum )
     TBLayout *lo0 = new TBLayout(); // make a new layout
     lo0->SetID( TBID (rownum) );
     lo0->SetLayoutConfig ( "XACAC" ); // do config + (spacing) margin
-    lo0->SetSpacing(m_margin);
+    lo0->SetSpacing(margin_);
     int cc = 0;
-    for ( cc=0; cc<m_cols; cc++) // stuff new button ( with preferred size, new id ) in.
+    for ( cc=0; cc<columns_; cc++) // stuff new button ( with preferred size, new id ) in.
     {
         LayoutParams *lp0 = new LayoutParams();
-        lp0->SetWidth( m_colWidth <= 0 ? 1 : m_colWidth);
-        lp0->SetHeight( m_rowHeight <= 0 ? 1 : m_rowHeight);
+        lp0->SetWidth( columnWidth_ <= 0 ? 1 : columnWidth_);
+        lp0->SetHeight( rowHeight_ <= 0 ? 1 : rowHeight_);
         TBButton *b0 = new TBButton();
         b0->SetLayoutParams(*lp0);
         b0->SetSqueezable(true);
@@ -205,18 +213,19 @@ void UIButtonGrid::AddGridRow( int rownum )
     widget_->AddChild ( lo0 );
 }
 
-void UIButtonGrid::DisableEmptyButtons() /// will disable buttons that havent set any text, and enable those with text.
+/// will disable buttons that havent set any text, and enable those with text.
+void UIButtonGrid::DisableEmptyButtons()
 {
     int row = 0;
-    int col = 0;
-    for ( row=0; row<m_rows; row++ )
+    int column = 0;
+    for ( row=0; row<rows_; row++ )
     {
         TBLayout *lo0 = (TBLayout *)widget_->GetChildFromIndex(row);  // find row layout
         if (lo0) 
         {
-            for ( col=0; col<m_cols; col++ )
+            for ( column=0; column<columns_; column++ )
             {
-                TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(col);  // find col button
+                TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(column);  // find column button
                 if (b0)
                 {
                     TBStr foo;
@@ -233,30 +242,30 @@ void UIButtonGrid::DisableEmptyButtons() /// will disable buttons that havent se
 
 void UIButtonGrid::ResizeGrid()
 {
-    if ( m_rows == 0 || m_cols == 0 ) return; // dont do bad maths.
+    if ( rows_ == 0 || columns_ == 0 ) return; // dont do bad maths.
 
     TBRect myrect = widget_->GetRect();
-    m_rowHeight = (int)(  (myrect.h - (m_margin * m_rows )) / m_rows );
-    m_colWidth = (int)( (myrect.w -( m_margin * m_cols )) / m_cols );
+    rowHeight_ = (int)(  (myrect.h - (margin_ * rows_ )) / rows_ );
+    columnWidth_ = (int)( (myrect.w -( margin_ * columns_ )) / columns_ );
 
-    if ( m_rowHeight <= 1) m_rowHeight = 1;
-    if ( m_colWidth <= 1)  m_colWidth = 1;
+    if ( rowHeight_ <= 1) rowHeight_ = 1;
+    if ( columnWidth_ <= 1)  columnWidth_ = 1;
 
     int row = 0;
-    int col = 0;
-    for ( row=0; row<m_rows; row++ )
+    int column = 0;
+    for ( row=0; row<rows_; row++ )
     {
         TBLayout *lo0 = (TBLayout *)widget_->GetChildFromIndex(row);  // find row layout
         if (lo0) 
         {
-            for ( col=0; col<m_cols; col++ )
+            for ( column=0; column<columns_; column++ )
             {
-                TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(col);  // find col button
+                TBButton *b0 = (TBButton *)lo0->GetChildFromIndex(column);  // find column button
                 if (b0)
                 {
                     LayoutParams *lp1 = new LayoutParams(); // replace with new calced values
-                    lp1->SetWidth(m_colWidth);
-                    lp1->SetHeight(m_rowHeight);
+                    lp1->SetWidth(columnWidth_);
+                    lp1->SetHeight(rowHeight_);
                     b0->SetLayoutParams(*lp1);
                 }
             }
