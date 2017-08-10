@@ -8,7 +8,9 @@ set(EASY_PRODUCT_VERSION_STRING "${EASY_PROGRAM_VERSION_MAJOR}.${EASY_PROGRAM_VE
 
 # ATOMIC BEGIN
 
-find_package(Qt5Widgets)
+if (ATOMIC_DESKTOP)
+    find_package(Qt5Widgets)
+endif ()
 
 set(EASY_OPTION_LIB_STATIC ON CACHE BOOL "" FORCE)
 set(EASY_OPTION_PREDEFINED_COLORS ON CACHE BOOL "" FORCE)
@@ -43,7 +45,7 @@ add_subdirectory(easy_profiler_core)
 
 # ATOMIC BEGIN
 # Only include the Qt client if on we're building desktop platform and Qt5 was found on system
-if (ATOMIC_DESKTOP AND Qt5Widgets_FOUND)
+if (Qt5Widgets_FOUND)
     add_subdirectory(profiler_gui)
 endif()
 #ATOMIC END

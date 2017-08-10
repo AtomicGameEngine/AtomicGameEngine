@@ -241,5 +241,5 @@ if (MSVC)
 endif ()
 
 if (UNIX OR MINGW)
-    target_compile_options(Atomic PUBLIC -std=gnu++11)
+    target_compile_options(Atomic PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11>)
 endif ()
