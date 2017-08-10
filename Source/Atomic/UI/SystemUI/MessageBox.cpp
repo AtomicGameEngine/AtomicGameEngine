@@ -81,7 +81,7 @@ void MessageBox::RenderFrame(StringHash eventType, VariantMap& eventData)
     if (ImGui::Begin(titleText_.CString(), &isOpen_, windowSize_, -1, ImGuiWindowFlags_NoCollapse|
                      ImGuiWindowFlags_NoSavedSettings))
     {
-        ImGui::Text(messageText_.CString());
+        ImGui::TextUnformatted(messageText_.CString());
         auto region = ImGui::GetContentRegionAvail();
         ImGui::SetCursorPos(ImVec2(region.x - 100 + 20, region.y + 20));
 
