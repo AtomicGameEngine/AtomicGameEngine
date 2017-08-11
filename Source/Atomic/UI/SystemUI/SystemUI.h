@@ -82,7 +82,7 @@ protected:
 
     void ReallocateFontTexture();
     void UpdateProjectionMatrix();
-    void OnPostUpdate(Atomic::VariantMap& args);
+    void OnEndRendering(Atomic::VariantMap& args);
     void OnRenderDrawLists(ImDrawData* data);
     void OnRawEvent(VariantMap& args);
 };
