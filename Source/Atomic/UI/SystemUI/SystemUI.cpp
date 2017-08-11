@@ -79,12 +79,7 @@ SystemUI::SystemUI(Atomic::Context* context)
     UpdateProjectionMatrix();
 
     // Subscribe to events
-    SubscribeToEvent(E_POSTUPDATE, std::bind(&SystemUI::OnPostUpdate, this, _2));
-    SubscribeToEvent(E_ENDRENDERING, [&](StringHash, VariantMap&)
-    {
-        ATOMIC_PROFILE(SystemUiRender);
-        ImGui::Render();
-    });
+    SubscribeToEvent(E_ENDRENDERING, std::bind(&SystemUI::OnEndRendering, this, _2));
     SubscribeToEvent(E_SDLRAWINPUT, std::bind(&SystemUI::OnRawEvent, this, _2));
     SubscribeToEvent(E_SCREENMODE, std::bind(&SystemUI::UpdateProjectionMatrix, this));
 
@@ -190,14 +185,18 @@ void SystemUI::OnRawEvent(VariantMap& args)
     }
 }
 
-void SystemUI::OnPostUpdate(VariantMap& args)
+void SystemUI::OnEndRendering(VariantMap& args)
 {
     auto& io = ImGui::GetIO();
     float timeStep = args[PostUpdate::P_TIMESTEP].GetFloat();
     io.DeltaTime = timeStep > 0.0f ? timeStep : 1.0f / 60.0f;
     ImGui::NewFrame();
+
     ATOMIC_PROFILE(SystemUiFrame);
     SendEvent(E_SYSTEMUIFRAME);
+
+    ATOMIC_PROFILE(SystemUiRender);
+    ImGui::Render();
 }
 
 void SystemUI::OnRenderDrawLists(ImDrawData* data)
