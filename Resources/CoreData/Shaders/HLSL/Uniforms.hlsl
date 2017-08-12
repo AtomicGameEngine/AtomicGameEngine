@@ -143,6 +143,10 @@ cbuffer ObjectVS : register(b5)
 #endif
 #ifdef SKINNED
     uniform float4x3 cSkinMatrices[MAXBONES];
+#else    
+// ATOMIC BEGIN
+    uniform float4 cLMOffset;
+// ATOMIC END
 #endif
 }
 #endif

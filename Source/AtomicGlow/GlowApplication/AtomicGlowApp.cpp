@@ -327,7 +327,7 @@ namespace AtomicGlow
         // TODO: change to using new workerthreadcount command line arg
         // which exposed in editor GlowComponent UI
         // also, check how the number of threads affects light times
-        // engineParameters_[EP_WORKER_THREADS_COUNT] = 8;
+        engineParameters_[EP_WORKER_THREADS_COUNT] = 4;
 
         IPCClientApp::Setup();
 
