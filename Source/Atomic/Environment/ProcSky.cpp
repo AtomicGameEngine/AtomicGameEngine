@@ -182,10 +182,17 @@ float ProcSky::SetDayTime(float time)
         // fade out
         if (shadowFade_ < 0.0f || shadowFade_ != 1.0f)
         {
-            shadowFade_ += .05f;
+            if (autoUpdate_)
+            {
+                shadowFade_ += .05f;
 
-            if (shadowFade_ > 1.0f)
+                if (shadowFade_ > 1.0f)
+                    shadowFade_ = 1.0f;
+            }
+            else
+            {
                 shadowFade_ = 1.0f;
+            }
 
             sunlight_->SetShadowIntensity(shadowFade_);
 
@@ -205,10 +212,18 @@ float ProcSky::SetDayTime(float time)
         // fade in
         if (shadowFade_ < 0.0f || shadowFade_ != 0.0f)
         {
-            shadowFade_ -= .05f;
 
-            if (shadowFade_ < 0.0f)
+            if (autoUpdate_)
+            {
+                shadowFade_ -= .05f;
+
+                if (shadowFade_ < 0.0f)
+                    shadowFade_ = 0.0f;
+            }
+            else
+            {
                 shadowFade_ = 0.0f;
+            }
 
             sunlight_->SetShadowIntensity(shadowFade_);
 
