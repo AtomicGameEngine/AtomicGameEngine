@@ -1,9 +1,10 @@
 
 // This script is the main entry point of the game
 
-// called per frame, optional
-function update(timeStep) {
+exports.update = function() {
+
+    if (Atomic.input.getKeyDown(Atomic.KEY_ESCAPE)) {
+        Atomic.engine.exit();
+    }
 
 }
-
-exports.update = update;

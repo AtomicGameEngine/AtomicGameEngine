@@ -1220,13 +1220,9 @@ namespace ToolCore
 
                     propertyGroup.CreateChild("StartArguments").SetValue(startArguments);
 
-#ifdef ATOMIC_DEBUG
-                    // When building a debug build, default native code debugging to true
-                    if (cfg == "Debug")
-                    {
-                        propertyGroup.CreateChild("EnableUnmanagedDebugging").SetValue("true");
-                    }
-#endif                    
+                    // Always enabled unmanaged debugging, solve issues with release building hanging when run from IDE
+                    propertyGroup.CreateChild("EnableUnmanagedDebugging").SetValue("true");
+
                 }
 
 

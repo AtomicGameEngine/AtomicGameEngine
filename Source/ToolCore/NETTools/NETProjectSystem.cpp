@@ -523,6 +523,12 @@ namespace ToolCore
 
         if (idePath_.Length())
         {
+            // Ensure the path ends with a slash
+            if (!idePath_.EndsWith("\\"))
+            {
+                idePath_ += "\\";
+            }
+
             idePath_.Replace("Tools\\", "IDE\\devenv.exe");
 
             if (!fileSystem->FileExists(idePath_))
