@@ -567,10 +567,13 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
 
-    if (!GenerateLightmapUV(outModel))
+    if (genLightmapUV_)
     {
-        errorMessage_ = "Failed to generate lightmap UV " + model.outName_;
-        return false;
+        if (!GenerateLightmapUV(outModel))
+        {
+            errorMessage_ = "Failed to generate lightmap UV " + model.outName_;
+            return false;
+        }
     }
 
     File outFile(context_);

@@ -22,10 +22,12 @@ float2 GetTexCoord(float2 iTexCoord)
 };
 
 // ATOMIC BEGIN
+#ifndef SKINNED
 float2 GetLightMapTexCoord(float2 texCoord)
 {
     return float2(texCoord.x * cLMOffset.x + cLMOffset.z, texCoord.y * cLMOffset.y + cLMOffset.w);
 }
+#endif
 // ATOMIC END
 
 float4 GetClipPos(float3 worldPos)
@@ -169,4 +171,3 @@ float3 GetTrailNormal(float4 iPos, float3 iParentPos, float3 iForward)
 #endif
 
 #endif
-
