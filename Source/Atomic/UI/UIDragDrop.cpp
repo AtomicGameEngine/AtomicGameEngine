@@ -101,6 +101,12 @@ void UIDragDrop::DragEnd()
         return;
     }
 
+    // Filter dragging buttons on top of themselves
+    if ((dragSourceWidget == currentTargetWidget) && dragSourceWidget->IsInstanceOf<UIButton>())
+    {
+        return;
+    }
+
     VariantMap dropData;
     dropData[DragEnded::P_TARGET] = currentTargetWidget;
     dropData[DragEnded::P_DRAGOBJECT] = dragObject;
