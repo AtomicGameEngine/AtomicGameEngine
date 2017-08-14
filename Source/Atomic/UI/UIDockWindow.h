@@ -50,6 +50,7 @@ class ATOMIC_API UIDockWindow : public UIWindow
     bool HasDockContent();  /// Returns if the UIDockWindow contains docked content.
     void Dock( UIWidget *target );  /// Transfers the dock content to the target widget
     void Show( UIWidget *host, int xpos = 50, int ypos = 50 ); /// Show the UIDockWindow, and optional position
+    void SetAxis(UI_AXIS axis);   /// Axis orientation of titlebar, UI_AXIS_Y = top(default), UI_AXIS_X = left side
 
 protected:
 

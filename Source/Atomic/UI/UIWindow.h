@@ -64,6 +64,8 @@ class ATOMIC_API UIWindow : public UIWidget
     void AddChild(UIWidget *child);
 
     void Close();
+    
+    void SetAxis(UI_AXIS axis);  /// Axis orientation of titlebar, UI_AXIS_Y = top(default), UI_AXIS_X = left side
 
 protected:
 
