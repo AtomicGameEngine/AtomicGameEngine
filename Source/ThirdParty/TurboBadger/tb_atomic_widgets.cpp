@@ -767,6 +767,8 @@ TBDockWindow::TBDockWindow( TBStr title, TBWidget *contentptr, int minwidth, int
     SetID(TBID(title));
     m_mover.AddChild(&m_redock_button);
     m_redock_button.SetSkinBg(TBIDC("TBWindow.redock"));
+    if ( m_redock_button.GetSkinBgElement() == NULL )
+        m_redock_button.SetSkinBg(TBIDC("arrow.down"));  // fallback skin for editor
     m_redock_button.SetIsFocusable(false);
     m_redock_button.SetID(TBIDC("TBWindow.redock"));
     m_redock_button.SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
@@ -799,6 +801,14 @@ void TBDockWindow::SetDockOrigin( TBID dockid )
     }
 }
 
+TBWidget *TBDockWindow::GetEventDestination() 
+{ 
+    if ( m_dockid > 0 ) // if the origin is specified, send events back to there while the content is undocked
+    {                   // so the original event handlers will still function.
+        return GetParentRoot(true)->GetWidgetByID(m_dockid);
+    }
+    return GetParent();
+}
 
 void TBDockWindow::Show( TBWidget *host, int xpos, int ypos )
 {
