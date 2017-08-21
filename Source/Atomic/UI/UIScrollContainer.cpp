@@ -117,4 +117,15 @@ bool UIScrollContainer::OnEvent(const tb::TBWidgetEvent &ev)
     return UIWidget::OnEvent(ev);
 }
 
+
+void UIScrollContainer::AddChild(UIWidget* child)
+{
+    if (!widget_ || !child || !child->GetInternalWidget() )
+        return;
+
+   ((TBScrollContainer*) widget_)->GetContentRoot()->AddChild(child->GetInternalWidget());
+}
+
+
+
 }

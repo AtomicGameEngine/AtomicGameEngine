@@ -117,6 +117,13 @@ bool UIDockWindow::OnEvent(const tb::TBWidgetEvent &ev)
     return UIWidget::OnEvent(ev);
 }
 
+void UIDockWindow::SetAxis(UI_AXIS axis)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetAxis((AXIS) axis);
+}
 
 
 

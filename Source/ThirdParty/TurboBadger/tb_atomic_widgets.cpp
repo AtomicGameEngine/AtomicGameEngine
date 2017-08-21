@@ -767,6 +767,8 @@ TBDockWindow::TBDockWindow( TBStr title, TBWidget *contentptr, int minwidth, int
     SetID(TBID(title));
     m_mover.AddChild(&m_redock_button);
     m_redock_button.SetSkinBg(TBIDC("TBWindow.redock"));
+    if ( m_redock_button.GetSkinBgElement() == NULL )
+        m_redock_button.SetSkinBg(TBIDC("arrow.down"));  // fallback skin for editor
     m_redock_button.SetIsFocusable(false);
     m_redock_button.SetID(TBIDC("TBWindow.redock"));
     m_redock_button.SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
@@ -792,13 +794,21 @@ TBDockWindow::~TBDockWindow()
 
 void TBDockWindow::SetDockOrigin( TBID dockid )
 {
-     m_dockid = dockid;
+    m_dockid = dockid;
     if ( m_dockid > 0 ) //enable/show the (re)dock button is a return id is specified
     {
         m_redock_button.SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
     }
 }
 
+TBWidget *TBDockWindow::GetEventDestination() 
+{ 
+    if ( m_dockid > 0 ) // if the origin is specified, send events back to there while the content is undocked
+    {                   // so the original event handlers will still function.
+        return GetParentRoot(true)->GetWidgetByID(m_dockid);
+    }
+    return GetParent();
+}
 
 void TBDockWindow::Show( TBWidget *host, int xpos, int ypos )
 {
@@ -885,19 +895,37 @@ void TBDockWindow::OnResized(int old_w, int old_h)
     // Manually move our own decoration children
     // FIX: Put a layout in the TBMover so we can add things there nicely.
     int title_height = GetTitleHeight();
-    m_mover.SetRect(TBRect(0, 0, GetRect().w, title_height));
-    PreferredSize ps = m_resizer.GetPreferredSize();
-    m_resizer.SetRect(TBRect(GetRect().w - ps.pref_w, GetRect().h - ps.pref_h, ps.pref_w, ps.pref_h));
-    TBRect mover_rect = m_mover.GetPaddingRect();
-    int button_size = mover_rect.h;
-    m_close_button.SetRect(TBRect(mover_rect.x + mover_rect.w - button_size, mover_rect.y, button_size, button_size));
-    if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
-        mover_rect.w -= button_size;
-    // add redock button to header
-    m_redock_button.SetRect(TBRect(mover_rect.x + mover_rect.w - button_size, mover_rect.y, button_size, button_size));
-    if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
-        mover_rect.w -= button_size;
-    m_textfield.SetRect(mover_rect);
+    if ( m_axis == AXIS_Y )  // default 
+    {
+        m_mover.SetRect(TBRect(0, 0, GetRect().w, title_height));
+        PreferredSize ps = m_resizer.GetPreferredSize();
+        m_resizer.SetRect(TBRect(GetRect().w - ps.pref_w, GetRect().h - ps.pref_h, ps.pref_w, ps.pref_h));
+        TBRect mover_rect = m_mover.GetPaddingRect();
+        int button_size = mover_rect.h;
+        m_close_button.SetRect(TBRect(mover_rect.x + mover_rect.w - button_size, mover_rect.y, button_size, button_size));
+        if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
+            mover_rect.w -= button_size;
+        // add redock button to header
+        m_redock_button.SetRect(TBRect(mover_rect.x + mover_rect.w - button_size, mover_rect.y, button_size, button_size));
+        if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
+            mover_rect.w -= button_size;
+        m_textfield.SetRect(mover_rect);
+    }
+    else if ( m_axis == AXIS_X )  // rotated sideways
+    {
+        m_mover.SetRect(TBRect(0, 0, title_height, GetRect().h ));
+        PreferredSize ps = m_resizer.GetPreferredSize();
+        m_resizer.SetRect(TBRect(GetRect().w - ps.pref_w, GetRect().h - ps.pref_h, ps.pref_w, ps.pref_h));
+        TBRect mover_rect = m_mover.GetPaddingRect();
+        int button_size = mover_rect.w;
+        m_close_button.SetRect(TBRect(mover_rect.x + 1, mover_rect.y + 1, button_size, button_size));
+        if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
+            mover_rect.y += button_size;
+        m_redock_button.SetRect(TBRect(mover_rect.x + 1, mover_rect.y + 1, button_size, button_size));
+        if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
+            mover_rect.y -= button_size;
+        m_textfield.SetRect(TBRect(mover_rect.x + 5, mover_rect.y + mover_rect.h - button_size, button_size - 1, button_size));
+    }
 }
 
 

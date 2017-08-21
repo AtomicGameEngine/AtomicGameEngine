@@ -65,6 +65,8 @@ public:
 
     void ScrollTo(int x, int y);
 
+    /// This is overriden to add children to the widget that is being scrolled rather than the container
+    virtual void AddChild(UIWidget* child);
 
 protected:
 

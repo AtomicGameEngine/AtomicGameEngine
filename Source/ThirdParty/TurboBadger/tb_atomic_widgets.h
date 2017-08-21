@@ -284,6 +284,10 @@ public:
     virtual bool OnEvent(const TBWidgetEvent &ev);
     virtual void OnResized(int old_w, int old_h);
 
+    /// Get the widget that should receive the events this widget invoke.
+    /// By default the parent, when undocked, the origin widget if specified.
+    virtual TBWidget *GetEventDestination();
+
 protected:
 
     void Redock();

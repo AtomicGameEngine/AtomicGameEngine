@@ -99,6 +99,13 @@ public:
     virtual void OnRemove();
     virtual void OnChildAdded(TBWidget *child);
     virtual void OnResized(int old_w, int old_h);
+
+// ATOMIC BEGIN
+    /** Set along which axis the content should be layouted. */
+    virtual AXIS GetAxis() const { return m_axis; }
+    virtual void SetAxis(AXIS axis);
+// ATOMIC END
+
 protected:
     TBMover m_mover;
     TBResizer m_resizer;
@@ -106,6 +113,9 @@ protected:
     TBWidget m_close_button;
     WINDOW_SETTINGS m_settings;
     TBWidgetSafePointer m_last_focus;
+// ATOMIC BEGIN
+    AXIS m_axis;
+// ATOMIC END
     TBWindow *GetTopMostOtherWindow(bool only_activable_windows);
     void SetWindowActiveState(bool active);
     void DeActivate();

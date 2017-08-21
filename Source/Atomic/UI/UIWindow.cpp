@@ -104,4 +104,12 @@ bool UIWindow::OnEvent(const tb::TBWidgetEvent &ev)
     return UIWidget::OnEvent(ev);
 }
 
+void UIWindow::SetAxis(UI_AXIS axis)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetAxis((AXIS) axis);
+}
+
 }
