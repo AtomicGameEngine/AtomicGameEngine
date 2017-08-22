@@ -297,6 +297,63 @@ protected:
 
 };
 
+/// == MultiList Support  ==========================================
+
+/** MultiItem adds extra info to a string item. */
+class MultiItem : public TBGenericStringItem
+{
+public:
+    MultiItem(const TBID &colid, TBStr widgettype0, TBStr str0, int width0, int colheight=0 )
+        : TBGenericStringItem(str0, colid),
+        colStr_(TBValue::TYPE_ARRAY),
+        colWidget_(TBValue::TYPE_ARRAY),
+        colWidth_(TBValue::TYPE_ARRAY),
+        colHeight_(colheight)
+        {
+            colStr_.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+            colWidget_.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+            colWidth_.SetArray(new tb::TBValueArray(), TBValue::SET_AS_STATIC);
+            
+            AddColumn ( widgettype0, str0, width0);
+        }
+
+    void AddColumn ( TBStr string, TBStr widgettype, int width );
+    const char* GetColumnStr( int col );
+    const char* GetColumnWidget( int col );
+    int GetColumnWidth( int col );
+    int GetColumnHeight();
+    int GetNumColumns();
+
+private:
+    TBValue colStr_;
+    TBValue colWidget_; 
+    TBValue colWidth_;
+    int colHeight_; 
+};
+
+
+/** MultiItemSource provides items of type MultiItem and makes sure
+    the viewer is populated with the customized widget for each item. */
+class MultiItemSource : public TBSelectItemSourceList<MultiItem>
+{
+public:
+    virtual bool Filter(int index, const char *filter);
+    virtual TBWidget *CreateItemWidget(int index, TBSelectItemViewer *viewer);
+};
+
+/** MultiItemWidget is the widget representing a MultiItem.
+    On changes to the item, it calls InvokeItemChanged on the source, so that all
+    viewers of the source are updated to reflect the change. */
+class MultiItemWidget : public TBLayout
+{
+public:
+    MultiItemWidget(MultiItem *item, MultiItemSource *source, TBSelectItemViewer *source_viewer, int index);
+    virtual bool OnEvent(const TBWidgetEvent &ev);
+private:
+    MultiItemSource *m_source;
+    TBSelectItemViewer *m_source_viewer;
+    int m_index;
+};
 
 }; // namespace tb
 

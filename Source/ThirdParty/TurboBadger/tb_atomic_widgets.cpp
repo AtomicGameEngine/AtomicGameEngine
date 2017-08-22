@@ -33,6 +33,7 @@
 #include "tb_menu_window.h"
 #include "tb_select.h"
 #include "tb_tab_container.h"
+#include "image/tb_image_widget.h"
 
 #include <math.h>
 
@@ -926,6 +927,170 @@ void TBDockWindow::OnResized(int old_w, int old_h)
             mover_rect.y -= button_size;
         m_textfield.SetRect(TBRect(mover_rect.x + 5, mover_rect.y + mover_rect.h - button_size, button_size - 1, button_size));
     }
+}
+
+
+// == MultiList Support  ==========================================
+
+
+void MultiItem::AddColumn (TBStr widgettype, TBStr string, int width )
+{
+    TBValue *new_str = colStr_.GetArray()->AddValue();
+    new_str->SetString(string.CStr(), TBValue::SET_NEW_COPY );
+    TBValue *new_widget = colWidget_.GetArray()->AddValue();
+    new_widget->SetString( widgettype.CStr(), TBValue::SET_NEW_COPY );
+    TBValue *new_width = colWidth_.GetArray()->AddValue();
+    new_width->SetInt(width); 
+}
+
+const char* MultiItem::GetColumnStr( int col ) 
+{
+    const char* strx = colStr_.GetArray()->GetValue(col)->GetString();
+    return strx;
+}
+
+const char* MultiItem::GetColumnWidget( int col )
+{
+    const char* strx = colWidget_.GetArray()->GetValue(col)->GetString();
+    return strx;
+}
+
+int MultiItem::GetColumnWidth( int col )
+{
+   return colWidth_.GetArray()->GetValue(col)->GetInt();
+}
+
+int MultiItem::GetColumnHeight()
+{
+   return colHeight_;
+}
+
+int MultiItem::GetNumColumns()
+{
+    return colStr_.GetArrayLength();
+}
+
+
+bool MultiItemSource::Filter(int index, const char *filter)
+{
+    // Override this method so we can return hits for our extra data too.
+
+    if (TBSelectItemSource::Filter(index, filter))
+        return true;
+
+    // do this on ALL of the columns?
+    return false;
+}
+
+TBWidget *MultiItemSource::CreateItemWidget(int index, TBSelectItemViewer *viewer)
+{
+    if (TBLayout *layout = new MultiItemWidget( GetItem(index), this, viewer, index))
+        return layout;
+    return NULL;
+}
+
+MultiItemWidget::MultiItemWidget(MultiItem *item, MultiItemSource *source, TBSelectItemViewer *source_viewer, int index)
+{
+    SetSkinBg(TBIDC("TBSelectItem"));
+    SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
+    SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP);
+    SetPaintOverflowFadeout(false);
+
+    if (item) // unpack the MultiItem recipe.
+    {
+        int col = 0;
+        int numcols = item->GetNumColumns();
+        int prefheight = item->GetColumnHeight();
+        for ( col = 0; col < numcols; col++ )
+        {
+            TBStr widget;
+            const char *widgetx = item->GetColumnWidget(col); // what are we making?
+            if (widgetx) widget = TBStr(widgetx); // lets not deal with char *s
+            if ( widget.Equals("TEXTC") )  // TextField center justified text
+            {
+                TBTextField *tfc = new TBTextField();
+                tfc->SetTextAlign(TB_TEXT_ALIGN::TB_TEXT_ALIGN_CENTER);
+                tfc->SetSqueezable(true);
+                tfc->SetIgnoreInput(true);
+                tfc->SetText( item->GetColumnStr(col));
+                LayoutParams *lpx = new LayoutParams();
+                lpx->SetWidth(item->GetColumnWidth(col));
+                if ( prefheight > 0) lpx->SetHeight( prefheight);
+                tfc->SetLayoutParams(*lpx);
+                AddChild (tfc);
+            }
+            else if ( widget.Equals("TEXTR") )  // TextField right justified text
+            {
+                TBTextField *tfr = new TBTextField();
+                tfr->SetTextAlign(TB_TEXT_ALIGN::TB_TEXT_ALIGN_RIGHT);
+                tfr->SetSqueezable(true);
+                tfr->SetIgnoreInput(true);
+                tfr->SetText( item->GetColumnStr(col));
+                LayoutParams *lpx = new LayoutParams();
+                lpx->SetWidth(item->GetColumnWidth(col));
+                if ( prefheight > 0) lpx->SetHeight( prefheight);
+                tfr->SetLayoutParams(*lpx);
+                AddChild (tfr);
+            }
+            else if ( widget.Equals("IMAGE") )  // ImageWidget + filename
+            {
+                TBImageWidget *ti = new TBImageWidget();
+                ti->SetImage(item->GetColumnStr(col));
+                ti->SetIgnoreInput(true);
+                LayoutParams *lpx = new LayoutParams();
+                lpx->SetWidth(item->GetColumnWidth(col));
+                if ( prefheight > 0) lpx->SetHeight( prefheight);
+                ti->SetLayoutParams(*lpx);
+                AddChild (ti);
+            }
+            else if ( widget.Equals("COLOR") )  // ColorWidget
+            {
+                TBColorWidget *cw = new TBColorWidget();
+                cw->SetColor(item->GetColumnStr(col));
+                cw->SetIgnoreInput(true);
+                cw->SetGravity(WIDGET_GRAVITY_ALL);
+                LayoutParams *lpx = new LayoutParams();
+                lpx->SetWidth(item->GetColumnWidth(col));
+                if ( prefheight > 0) lpx->SetHeight( prefheight);
+                cw->SetLayoutParams(*lpx);
+                AddChild(cw);
+            }
+            else if ( widget.Equals("ICON") )   // SkinImage + skinname
+            {
+                const char *skin = item->GetColumnStr(col);
+                if (skin)
+                {
+                    TBID skinn = TBID(skin);
+                    TBSkinImage *si = new TBSkinImage(skinn);
+                    si->SetIgnoreInput(true);
+                    LayoutParams *lpx = new LayoutParams();
+                    lpx->SetWidth(item->GetColumnWidth(col));
+                    if (prefheight > 0) lpx->SetHeight(prefheight);
+                    si->SetLayoutParams(*lpx);
+                    AddChild (si);
+                }
+            }
+            else // the default is TextField, left justified text
+            {
+                TBTextField *tfl = new TBTextField();
+                tfl->SetTextAlign(TB_TEXT_ALIGN::TB_TEXT_ALIGN_LEFT);
+                tfl->SetSqueezable(true);
+                tfl->SetIgnoreInput(true);
+                tfl->SetText( item->GetColumnStr(col));
+                LayoutParams *lpx = new LayoutParams();
+                lpx->SetWidth(item->GetColumnWidth(col));
+                if ( prefheight > 0) lpx->SetHeight(prefheight);
+                tfl->SetLayoutParams(*lpx);
+                AddChild (tfl);
+            }
+        }
+    }
+}
+
+bool MultiItemWidget::OnEvent(const TBWidgetEvent &ev)
+{
+    // if there are active widgets (buttons, checkbox) handle the events here
+    return TBLayout::OnEvent(ev);
 }
 
 
