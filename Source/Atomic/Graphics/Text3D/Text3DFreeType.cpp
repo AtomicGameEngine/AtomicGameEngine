@@ -28,8 +28,11 @@
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../IO/MemoryBuffer.h"
+#include "../../Resource/ResourceCache.h"
 #include "Text3DFont.h"
 #include "Text3DFreeType.h"
+
+#include <assert.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -106,6 +109,11 @@ bool Text3DFreeType::Load(const unsigned char* fontData, unsigned fontDataSize, 
     freeType_ = freeType;
 
     int maxTextureSize = TEXT3D_DEFAULT_FONT_TEXTURE_MAX_SIZE;
+    const FontHintLevel hintLevel = GetFontHintLevel();
+    const float subpixelThreshold = GetFontSubpixelThreshold();
+
+    subpixel_ = (hintLevel <= FONT_HINT_LEVEL_LIGHT) && (pointSize <= subpixelThreshold);
+    oversampling_ = subpixel_ ? GetFontOversampling() : 1;
 
     FT_Face face;
     FT_Error error;
@@ -129,7 +137,7 @@ bool Text3DFreeType::Load(const unsigned char* fontData, unsigned fontDataSize, 
         ATOMIC_LOGERROR("Could not create font face");
         return false;
     }
-    error = FT_Set_Char_Size(face, 0, pointSize * 64, TEXT3D_FONT_DPI, TEXT3D_FONT_DPI);
+    error = FT_Set_Char_Size(face, 0, pointSize * 64, oversampling_ * TEXT3D_FONT_DPI, TEXT3D_FONT_DPI);
     if (error)
     {
         FT_Done_Face(face);
@@ -263,11 +271,14 @@ bool Text3DFreeType::Load(const unsigned char* fontData, unsigned fontDataSize, 
                     // Skip searchRange, entrySelector and rangeShift
                     deserializer.Seek((unsigned)(deserializer.GetPosition() + 3 * sizeof(unsigned short)));
 
+                    // x_scale is a 16.16 fixed-point value that converts font units -> 26.6 pixels (oversampled!)
+                    float xScale = face->size->metrics.x_scale / float(1 << 22) / oversampling_;
+
                     for (unsigned j = 0; j < numKerningPairs; ++j)
                     {
                         unsigned leftIndex = deserializer.ReadUShort();
                         unsigned rightIndex = deserializer.ReadUShort();
-                        short amount = FixedToFloat(deserializer.ReadShort());
+                        float amount = deserializer.ReadShort() * xScale;
 
                         unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex + 1] : 0;
                         unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex + 1] : 0;
@@ -341,6 +352,65 @@ bool Text3DFreeType::SetupNextTexture(int textureWidth, int textureHeight)
     return true;
 }
 
+void Text3DFreeType::BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize)
+{
+    const int filterSize = oversampling_;
+
+    assert(filterSize > 0);
+    assert(destSize == srcSize + filterSize - 1);
+
+    if (filterSize == 1)
+    {
+        memcpy(dest, src, srcSize);
+        return;
+    }
+
+    // "accumulator" holds the total value of filterSize samples. We add one sample
+    // and remove one sample per step (with special cases for left and right edges).
+    int accumulator = 0;
+
+    // The divide might make these inner loops slow. If so, some possible optimizations:
+    // a) Turn it into a fixed-point multiply-and-shift rather than an integer divide;
+    // b) Make this function a template, with the filter size a compile-time constant.
+
+    int i = 0;
+
+    if (srcSize < filterSize)
+    {
+        for (; i < srcSize; ++i)
+        {
+            accumulator += src[i];
+            dest[i] = accumulator / filterSize;
+        }
+
+        for (; i < filterSize; ++i)
+        {
+            dest[i] = accumulator / filterSize;
+        }
+    }
+    else
+    {
+        for ( ; i < filterSize; ++i)
+        {
+            accumulator += src[i];
+            dest[i] = accumulator / filterSize;
+        }
+
+        for (; i < srcSize; ++i)
+        {
+            accumulator += src[i];
+            accumulator -= src[i - filterSize];
+            dest[i] = accumulator / filterSize;
+        }
+    }
+
+    for (; i < srcSize + filterSize - 1; ++i)
+    {
+        accumulator -= src[i - filterSize];
+        dest[i] = accumulator / filterSize;
+    }
+}
+
 bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
 {
     if (!face_)
@@ -355,6 +425,8 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     {
         const char* family = face->family_name ? face->family_name : "NULL";
         ATOMIC_LOGERRORF("FT_Load_Char failed (family: %s, char code: %u)", family, charCode);
+        fontGlyph.texWidth_ = 0;
+        fontGlyph.texHeight_ = 0;
         fontGlyph.width_ = 0;
         fontGlyph.height_ = 0;
         fontGlyph.offsetX_ = 0;
@@ -365,14 +437,16 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     else
     {
         // Note: position within texture will be filled later
-        fontGlyph.width_ = slot->bitmap.width;
+        fontGlyph.texWidth_ = slot->bitmap.width + oversampling_ - 1;
+        fontGlyph.texHeight_ = slot->bitmap.rows;
+        fontGlyph.width_ = slot->bitmap.width + oversampling_ - 1;
         fontGlyph.height_ = slot->bitmap.rows;
-        fontGlyph.offsetX_ = slot->bitmap_left;
-        fontGlyph.offsetY_ = ascender_ - slot->bitmap_top;
+        fontGlyph.offsetX_ = slot->bitmap_left - (oversampling_ - 1) / 2.0f;
+        fontGlyph.offsetY_ = floorf(ascender_ + 0.5f) - slot->bitmap_top;
 
         FontHintLevel level = GetFontHintLevel();
         bool subpixel = GetSubpixelGlyphPositions();
-        if (level <= FONT_HINT_LEVEL_LIGHT && subpixel && slot->linearHoriAdvance)
+        if (subpixel_ && slot->linearHoriAdvance)
         {
             // linearHoriAdvance is stored in 16.16 fixed point, not the usual 26.6
             fontGlyph.advanceX_ = slot->linearHoriAdvance / 65536.0;
@@ -380,14 +454,18 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         else
         {
             // Round to nearest pixel (only necessary when hinting is disabled)
-            fontGlyph.advanceX_ = floor(FixedToFloat(slot->metrics.horiAdvance) + 0.5f);
+            fontGlyph.advanceX_ = floorf(FixedToFloat(slot->metrics.horiAdvance) + 0.5f);
         }
+
+        fontGlyph.width_ /= oversampling_;
+        fontGlyph.offsetX_ /= oversampling_;
+        fontGlyph.advanceX_ /= oversampling_;
     }
 
     int x = 0, y = 0;
-    if (fontGlyph.width_ > 0 && fontGlyph.height_ > 0)
+    if (fontGlyph.texWidth_ > 0 && fontGlyph.texHeight_ > 0)
     {
-        if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
+        if (!allocator_.Allocate(fontGlyph.texWidth_ + 1, fontGlyph.texHeight_ + 1, x, y))
         {
             if (image)
             {
@@ -402,7 +480,7 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
                 return false;
             }
 
-            if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
+            if (!allocator_.Allocate(fontGlyph.texWidth_ + 1, fontGlyph.texHeight_ + 1, x, y))
             {
                 return false;
             }
@@ -422,8 +500,8 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         else
         {
             fontGlyph.page_ = textures_.Size() - 1;
-            dest = new unsigned char[fontGlyph.width_ * fontGlyph.height_];
-            pitch = (unsigned)fontGlyph.width_;
+            dest = new unsigned char[fontGlyph.texWidth_ * fontGlyph.texHeight_];
+            pitch = (unsigned)fontGlyph.texWidth_;
         }
 
         if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
@@ -431,8 +509,9 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             for (unsigned y = 0; y < (unsigned)slot->bitmap.rows; ++y)
             {
                 unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-                unsigned char* rowDest = dest + y * pitch;
+                unsigned char* rowDest = dest + (oversampling_ - 1)/2 + y * pitch;
 
+                // Don't do any oversampling, just unpack the bits directly.
                 for (unsigned x = 0; x < (unsigned)slot->bitmap.width; ++x)
                     rowDest[x] = (unsigned char)((src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0);
             }
@@ -443,15 +522,13 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             {
                 unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                 unsigned char* rowDest = dest + y * pitch;
-
-                for (unsigned x = 0; x < (unsigned)slot->bitmap.width; ++x)
-                    rowDest[x] = src[x];
+                BoxFilter(rowDest, fontGlyph.texWidth_, src, slot->bitmap.width);
             }
         }
 
         if (!image)
         {
-            textures_.Back()->SetData(0, fontGlyph.x_, fontGlyph.y_, fontGlyph.width_, fontGlyph.height_, dest);
+            textures_.Back()->SetData(0, fontGlyph.x_, fontGlyph.y_, fontGlyph.texWidth_, fontGlyph.texHeight_, dest);
             delete[] dest;
         }
     }
@@ -465,6 +542,38 @@ bool Text3DFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     glyphMapping_[charCode] = fontGlyph;
 
     return true;
+}
+
+void Text3DFreeType::ReleaseFontFaces()
+{
+    ATOMIC_LOGDEBUG("Reloading font faces");
+
+    PODVector<Text3DFont*> fonts;
+    font_->GetSubsystem<ResourceCache>()->GetResources<Text3DFont>(fonts);
+
+    for (unsigned i = 0; i < fonts.Size(); ++i)
+        fonts[i]->ReleaseFaces();
+}
+
+void Text3DFreeType::SetFontSubpixelThreshold(float threshold)
+{
+    assert(threshold >= 0);
+    if (threshold != fontSubpixelThreshold_)
+    {
+        fontSubpixelThreshold_ = threshold;
+        ReleaseFontFaces();
+    }
+}
+
+void Text3DFreeType::SetFontOversampling(int oversampling)
+{
+    assert(oversampling >= 1);
+    oversampling = Clamp(oversampling, 1, 8);
+    if (oversampling != fontOversampling_)
+    {
+        fontOversampling_ = oversampling;
+        ReleaseFontFaces();
+    }
 }
 
 }

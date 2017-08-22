@@ -731,8 +731,13 @@ void Text3DText::UpdateText(bool onResize)
         // Set minimum and current size according to the text size, but respect fixed width if set
         if (!IsFixedWidth())
         {
-            SetMinWidth(wordWrap_ ? 0 : width);
-            SetWidth(width);
+            if (wordWrap_)
+                SetMinWidth(0);
+            else
+            {
+                SetMinWidth(width);
+                SetWidth(width);
+            }
         }
 
         SetFixedHeight(height);
@@ -881,7 +886,7 @@ void Text3DText::ConstructBatch(Text3DBatch& pageBatch, const PODVector<Text3DGl
         const Text3DGlyphLocation& glyphLocation = pageGlyphLocation[i];
         const Text3DFontGlyph& glyph = *glyphLocation.glyph_;
         pageBatch.AddQuad(dx + glyphLocation.x_ + glyph.offsetX_, dy + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
-            glyph.height_, glyph.x_, glyph.y_);
+            glyph.height_, glyph.x_, glyph.y_, glyph.texWidth_, glyph.texHeight_);
     }
 
     if (depthBias != 0.0f)
