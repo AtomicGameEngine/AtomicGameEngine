@@ -53,13 +53,13 @@ public:
     float GetHeight() const { return height_; }
 
     /// Set the height of this obstacle.
-    void SetHeight(float height);
+    void SetHeight(float newHeight);
 
     /// Get the blocking radius of this obstacle.
     float GetRadius() const { return radius_; }
 
     /// Set the blocking radius of this obstacle.
-    void SetRadius(float radius);
+    void SetRadius(float newRadius);
 
     /// Get the internal obstacle ID.
     unsigned GetObstacleID() const { return obstacleId_; }
@@ -76,6 +76,8 @@ protected:
     virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Handle navigation mesh tile added.
+    void HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData);
 
 private:
     /// Radius of this obstacle.
