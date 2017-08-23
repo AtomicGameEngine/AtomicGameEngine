@@ -76,11 +76,27 @@ public:
     /// Set whether text glyphs can have fractional positions. Default is false (pixel-aligned).
     void SetSubpixelGlyphPositions(bool enable) { subpixelGlyphPositions_ = enable; }
 
+    /// Set the font subpixel threshold. Below this size, if the hint level is LIGHT or NONE, fonts will use subpixel positioning plus oversampling for higher-quality rendering. Has no effect at hint level NORMAL.
+    void SetFontSubpixelThreshold(float threshold);
+
+    /// Set the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
+    void SetFontOversampling(int oversampling);
+
+    /// Get the font subpixel threshold. Below this size, if the hint level is LIGHT or NONE, fonts will use subpixel positioning plus oversampling for higher-quality rendering. Has no effect at hint level NORMAL.
+    float GetFontSubpixelThreshold() const { return fontSubpixelThreshold_; }
+
+    /// Get the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
+    int GetFontOversampling() const { return fontOversampling_; }
+
 private:
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
     bool LoadCharGlyph(unsigned charCode, Image* image = 0);
+    /// Smooth one row of a horizontally oversampled glyph image.
+    void BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize);
+    /// Force release of font faces when global font properties change.
+    void ReleaseFontFaces();
 
     /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
@@ -88,6 +104,10 @@ private:
     void* face_;
     /// Load mode.
     int loadMode_;
+    /// Use subpixel glyph positioning?
+    bool subpixel_;
+    /// Oversampling level.
+    int oversampling_;
     /// Ascender.
     float ascender_;
     /// Has mutable glyph.
@@ -95,9 +115,15 @@ private:
     /// Glyph area allocator.
     AreaAllocator allocator_;
 
-    bool forceAutoHint_;
     bool subpixelGlyphPositions_;
+    /// Flag for forcing FreeType auto hinting.
+    bool forceAutoHint_;
+    /// FreeType hinting level (default is FONT_HINT_LEVEL_NORMAL).
     FontHintLevel fontHintLevel_;
+    /// Maxmimum font size for subpixel glyph positioning and oversampling (default is 12).
+    float fontSubpixelThreshold_;
+    /// Horizontal oversampling for subpixel fonts (default is 2).
+    int fontOversampling_;
 };
 
 }
