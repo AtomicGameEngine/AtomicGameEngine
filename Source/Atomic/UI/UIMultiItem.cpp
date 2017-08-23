@@ -27,7 +27,8 @@ using namespace tb;
 namespace Atomic
 {
 
-UIMultiItem::UIMultiItem(Context* context, const String &colid, const String &widgettype, const String &str, int colwidth, int colheight ) : Object(context)
+UIMultiItem::UIMultiItem(Context* context, const String &colid, const String &widgettype, const String &str, int colwidth, int colheight )
+ : UISelectItem(context, str, colid)
 {
     SetID(colid);
     AddColumn ( widgettype, str, colwidth );
@@ -98,7 +99,7 @@ tb::MultiItem* UIMultiItem::GetTBItem()
 
 // UIMultiItemSource 
 
-UIMultiItemSource::UIMultiItemSource(Context* context) : Object(context)
+UIMultiItemSource::UIMultiItemSource(Context* context) :  UISelectItemSource(context)
 {
 
 }

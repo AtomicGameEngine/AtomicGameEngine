@@ -30,14 +30,16 @@
 #include "../Container/List.h"
 #include "../IO/Log.h"
 
+#include "UISelectItem.h"
+
 namespace Atomic
 {
 
 class UIMultiItemSource;
 
-class ATOMIC_API UIMultiItem : public Object
+class ATOMIC_API UIMultiItem : public  UISelectItem
 {
-    ATOMIC_OBJECT(UIMultiItem, Object)
+    ATOMIC_OBJECT(UIMultiItem, UISelectItem )
 
 public:
 
@@ -64,9 +66,9 @@ protected:
     int colHeight_; 
 };
 
-class ATOMIC_API UIMultiItemSource : public Object
+class ATOMIC_API UIMultiItemSource : public UISelectItemSource
 {
-    ATOMIC_OBJECT(UIMultiItemSource, Object)
+    ATOMIC_OBJECT(UIMultiItemSource, UISelectItemSource )
 
 public:
 
