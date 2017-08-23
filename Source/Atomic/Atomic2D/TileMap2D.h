@@ -72,7 +72,8 @@ public:
     void SetTmxFileAttr(const ResourceRef& value);
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
-
+    ///
+    Vector<SharedPtr<TileMapObject2D> > GetTileCollisionShapes(int gid) const;
     // ATOMIC BEGIN
 
     TileMapLayer2D* GetLayerByName(const String& name) const;

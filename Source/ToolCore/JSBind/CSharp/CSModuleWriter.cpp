@@ -478,7 +478,7 @@ void CSModuleWriter::GenerateManagedNativeEvents(String& sourceOut)
                     line += "scriptMap.GetString";
                 else if (cls)
                 {
-                    if (typeName == "Vector3")
+                    if (typeName == "Vector3" || typeName == "IntVector2")
                     {
                         line += "scriptMap.Get" + typeName;
                     }

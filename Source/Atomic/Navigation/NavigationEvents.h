@@ -43,6 +43,28 @@ ATOMIC_EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
     ATOMIC_PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
 }
 
+/// Mesh tile is added to navigation mesh.
+ATOMIC_EVENT(E_NAVIGATION_TILE_ADDED, NavigationTileAdded)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_MESH, Mesh); // NavigationMesh pointer
+    ATOMIC_PARAM(P_TILE, Tile); // IntVector2
+}
+
+/// Mesh tile is removed from navigation mesh.
+ATOMIC_EVENT(E_NAVIGATION_TILE_REMOVED, NavigationTileRemoved)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_MESH, Mesh); // NavigationMesh pointer
+    ATOMIC_PARAM(P_TILE, Tile); // IntVector2
+}
+
+/// All mesh tiles are removed from navigation mesh.
+ATOMIC_EVENT(E_NAVIGATION_ALL_TILES_REMOVED, NavigationAllTilesRemoved)
+{
+    ATOMIC_PARAM(P_NODE, Node); // Node pointer
+    ATOMIC_PARAM(P_MESH, Mesh); // NavigationMesh pointer
+}
 /// Crowd agent formation.
 ATOMIC_EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
 {
