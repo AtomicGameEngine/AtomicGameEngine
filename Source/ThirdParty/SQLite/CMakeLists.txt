@@ -60,7 +60,12 @@ if (NOT IOS AND NOT TVOS AND NOT WEB)
 
     # Define dependency libs
     if (NOT WIN32)
-        set (LIBS dl pthread)    # ATOMIC FIX
+        # ATOMIC BEGIN
+        set (LIBS dl)
+        if (NOT ANDROID)
+            list (APPEND LIBS pthread)
+        endif ()
+        # ATOMIC END
         if (READLINE_FOUND)
             add_definitions (-DHAVE_READLINE)
             list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})

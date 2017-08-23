@@ -52,7 +52,14 @@ public:
         y_(data[1])
     {
     }
-
+    // ATOMIC BEGIN
+    /// Construct from an int array.
+    IntVector2(const float* data) :
+        x_((int)data[0]),
+        y_((int)data[1])
+    {
+    }
+    // ATOMIC END
     /// Copy-construct from another vector.
     IntVector2(const IntVector2& rhs) :
         x_(rhs.x_),

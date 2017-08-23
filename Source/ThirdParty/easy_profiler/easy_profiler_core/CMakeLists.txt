@@ -121,7 +121,11 @@ easy_define_target_option(easy_profiler EASY_OPTION_PREDEFINED_COLORS EASY_OPTIO
 
 if (UNIX)
     target_compile_options(easy_profiler PRIVATE -Wall -Wno-long-long -Wno-reorder -Wno-braced-scalar-init -pedantic -O3)
-    target_link_libraries(easy_profiler pthread)
+    # ATOMIC BEGIN
+    if (NOT ANDROID)
+        target_link_libraries(easy_profiler pthread)
+    endif ()
+    # ATOMIC END
 elseif (WIN32)
     target_compile_definitions(easy_profiler PRIVATE -D_WIN32_WINNT=0x0600 -D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
     target_link_libraries(easy_profiler ws2_32 psapi)
@@ -132,7 +136,7 @@ if (MINGW)
 endif ()
 
 if (APPLE)
-    target_compile_options(easy_profiler PUBLIC -std=gnu++11)
+    target_compile_options(easy_profiler PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11>)
 else ()
     
 
@@ -141,11 +145,9 @@ else ()
             target_compile_options(easy_profiler PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11>)
         endif ()
     else()
-    
         if (NOT MSVC)
-            target_compile_options(easy_profiler PUBLIC -std=gnu++11)
+            target_compile_options(easy_profiler PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11>)
         endif ()
-        
         set_target_properties(easy_profiler PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON)
     endif ()
 endif ()
