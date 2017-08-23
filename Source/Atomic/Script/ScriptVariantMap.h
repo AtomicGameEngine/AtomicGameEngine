@@ -92,6 +92,18 @@ public:
 
     }
 
+    const IntVector2& GetIntVector2(StringHash key) const
+    {
+        Variant* variant = vmap_[key];
+
+        if (!variant)
+            return IntVector2::ZERO;
+
+        return variant->GetIntVector2();
+
+    }
+
+
     const Vector3& GetVector3(StringHash key) const
     {
         Variant* variant = vmap_[key];
