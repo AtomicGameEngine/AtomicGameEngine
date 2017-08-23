@@ -11,7 +11,7 @@
 								"UIContainer", "UISection", "UIInlineSelect", "UITextureWidget", "UIColorWidget", "UIColorWheel",
 								"UIScrollContainer", "UISeparator", "UIDimmer", "UISelectDropdown", "UISlider", "UIBargraph",
 								"UIPromptWindow", "UIFinderWindow", "UIPulldownMenu", "UIRadioButton", "UIScrollBar", "UIDockWindow",
-								"UIButtonGrid"],
+								"UIButtonGrid", "UIMultiItem", "UIMultiItemSource" ],
 	"overloads" : {
 	},
 	"typescript_decl" : {
