@@ -83,7 +83,9 @@ Text3DFreeType::Text3DFreeType(Text3DFont* font) :
     hasMutableGlyph_(false),
     forceAutoHint_(false),
     subpixelGlyphPositions_(false),
-    fontHintLevel_(FONT_HINT_LEVEL_NORMAL)
+    fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
+    fontSubpixelThreshold_(12),
+    fontOversampling_(2)
 {
 }
 
