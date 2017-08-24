@@ -1,7 +1,7 @@
 
 project(Atomic)
 
-cmake_minimum_required(VERSION 2.8.12.1)
+cmake_minimum_required(VERSION 3.3)
 
 set(ATOMIC_SOURCE_DIR ${Atomic_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${ATOMIC_SOURCE_DIR}/Build/CMake/Modules)
