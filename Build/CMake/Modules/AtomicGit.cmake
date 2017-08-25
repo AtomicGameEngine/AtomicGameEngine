@@ -1,18 +1,26 @@
 
-# If submodules aren't initialized, look for git and initialize
-if (NOT EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/CEF/.git OR NOT EXISTS ${ATOMIC_SOURCE_DIR}/Submodules/AtomicExamples/.git)
-    find_package(Git)
-    if (GIT_FOUND)
-        message("\n\nUpdating submodules, please wait...\n\n")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init
-            WORKING_DIRECTORY ${ATOMIC_SOURCE_DIR}
-            RESULT_VARIABLE ATOMIC_GIT_STATUS)
-        # check return status
-        if (NOT ATOMIC_GIT_STATUS EQUAL 0)
-            message(FATAL_ERROR "BUILD ERROR:\n\nError initializing submodules: git submodule update --init returned ${ATOMIC_GIT_STATUS}\n")
-        endif ()
-    else ()
-        # Git not found
-        message(FATAL_ERROR "BUILD ERROR:\n\Submodules not initialized, please run: git submodule update --init\n")
+macro (initialize_submodule target_dir result_variable)
+    file(GLOB SUBMODULE_FILES ${target_dir}/*)
+    list(LENGTH SUBMODULE_FILES SUBMODULE_FILES_LEN)
+
+    if (SUBMODULE_FILES_LEN LESS 2)
+        message(STATUS "Initialising ${target_dir}")
+        find_package(Git REQUIRED)
+        if (GIT_FOUND)
+            execute_process(
+                COMMAND git submodule update --init --remote "${target_dir}"
+                WORKING_DIRECTORY ${ATOMIC_SOURCE_DIR}
+                RESULT_VARIABLE SUBMODULE_RESULT
+            )
+            if (SUBMODULE_RESULT EQUAL 0)
+                set (${result_variable} ON)
+                message(INFO "Initialized ${target_dir}")
+            else ()
+                set (${result_variable} OFF)
+                message(WARNING "Running git returned an error.")
+            endif ()
+        else ()
+            message(STATUS "Could not find git in your Path. Please install git.")
+        endif (GIT_FOUND)
     endif ()
-endif ()
+endmacro ()
