@@ -38,7 +38,7 @@ public:
     UIBargraph(Context* context, bool createWidget = true);
     virtual ~UIBargraph();
 
-	void SetColor(Color col);
+    void SetColor(Color col);
 
 protected:
 
