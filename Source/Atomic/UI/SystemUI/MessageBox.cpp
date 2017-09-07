@@ -77,7 +77,7 @@ const String& MessageBox::GetMessage() const
 void MessageBox::RenderFrame(StringHash eventType, VariantMap& eventData)
 {
     using namespace MessageACK;
-    ImGui::SetNextWindowPos(windowPosition_, ImGuiSetCond_FirstUseEver);
+    ImGui::SetNextWindowPos(windowPosition_, ImGuiCond_FirstUseEver);
     if (ImGui::Begin(titleText_.CString(), &isOpen_, windowSize_, -1, ImGuiWindowFlags_NoCollapse|
                      ImGuiWindowFlags_NoSavedSettings))
     {
