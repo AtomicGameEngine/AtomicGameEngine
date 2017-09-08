@@ -50,6 +50,15 @@ UIBargraph::~UIBargraph()
 {
 }
 
+void UIBargraph::SetColor(Color color) 
+{
+
+        if (!widget_)
+              return;
+
+        ((TBBarGraph*)widget_)->SetColor(color.r_ * 255, color.g_ * 255, color.b_ * 255, color.a_ * 255);
+}
+
 bool UIBargraph::OnEvent(const tb::TBWidgetEvent &ev)
 {
     return UIWidget::OnEvent(ev);

@@ -38,6 +38,8 @@ public:
     UIBargraph(Context* context, bool createWidget = true);
     virtual ~UIBargraph();
 
+    void SetColor(Color col);
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
