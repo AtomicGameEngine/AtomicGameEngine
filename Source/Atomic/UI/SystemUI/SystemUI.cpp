@@ -178,7 +178,7 @@ void SystemUI::OnRawEvent(VariantMap& args)
     case SDL_FINGERUP:
     case SDL_FINGERDOWN:
     case SDL_FINGERMOTION:
-        args[SDLRawInput::P_CONSUMED] = ImGui::IsMouseHoveringAnyWindow();
+        args[SDLRawInput::P_CONSUMED] = ImGui::IsAnyWindowHovered();
         break;
     default:
         break;
