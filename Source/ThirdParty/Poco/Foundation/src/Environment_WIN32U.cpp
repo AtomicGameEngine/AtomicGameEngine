@@ -21,6 +21,13 @@
 #include <sstream>
 #include <cstring>
 #include "Poco/UnWindows.h"
+// ATOMIC BEGIN
+// For MingW
+#include <wincrypt.h>
+#include <winsock2.h>
+#include <ws2ipdef.h>
+#include <windows.h>
+// ATOMIC END
 #include <iphlpapi.h>
 
 

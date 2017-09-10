@@ -18,6 +18,14 @@ if (WIN32)
     endif ()
 endif ()
 
+if (ATOMIC_OPENGL)
+    message(STATUS "Renderer: OpenGL")
+elseif (ATOMIC_D3D11)
+    message(STATUS "Renderer: D3D11")
+elseif (ATOMIC_D3D9)
+    message(STATUS "Renderer: D3D9")
+endif ()
+
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
 
