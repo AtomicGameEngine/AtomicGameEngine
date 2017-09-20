@@ -3,8 +3,6 @@
 
 Website: <a href="https://www.atomicgameengine.com" target="_blank">https://www.AtomicGameEngine.com</a>
 
-Email: contact@atomicgameengine.com
-
 #### Why Atomic?
 
 <img align="right" src="https://atomicgameengine.com/images/home/WorldInstallMapHome.png"/>
@@ -12,8 +10,6 @@ Email: contact@atomicgameengine.com
 The Atomic Game Engine is powerful native technology with a consistent API and tooling available in C++, C#, Typescript and JavaScript. The Atomic Editor is **installed in over 75 countries** and has hit “critical mass” with production in multiple industries.
 
 Atomic can also be used as a library in existing projects with a C++ SDK, C# NuGet, and JavaScript npm package in development.
-
-Atomic is lead and evangelized by <a href="http://joshengebretson.com/" target="_blank">Josh Engebretson</a> with the help of contributors from around the world.
 
 #### Atomic Technology
 
@@ -38,11 +34,9 @@ Atomic is lead and evangelized by <a href="http://joshengebretson.com/" target="
 
 ---
 
-### Downloads
+### Build Instructions
 
-Atomic Editor binary releases are managed by THUNDERBEAST GAMES LLC and scheduled as rolling build <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/milestones" target="_blank">milestones.</a>
-
-**[Download the Atomic Editor](https://atomicgameengine.com/#download-the-atomic-editor)**
+The Atomic Editor can be built for your platform using these <a href="https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-Atomic-from-Source" target="_blank">build instructions.</a>
 
 #### Atomic Resources
 
