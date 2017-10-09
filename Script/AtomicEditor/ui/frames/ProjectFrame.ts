@@ -104,8 +104,11 @@ class ProjectFrame extends ScriptWidget {
                 var pathInfo = Atomic.splitPath(srcFilename);
                 var destFilename = Atomic.addTrailingSlash(data.destination);
                 destFilename += pathInfo.fileName + pathInfo.ext;
-                if ( fileSystem.copy(srcFilename, destFilename) )
+                if ( fileSystem.copy(srcFilename, destFilename) ) {
                     EditorUI.showEditorStatus ( "Copied Asset " + pathInfo.fileName + " into project as " + destFilename);
+                    var db = ToolCore.getAssetDatabase();
+                    db.scan(); // fix up the asset database on success
+                }
                 else {
                     EditorUI.showEditorStatus ( "Warning, could not copy Asset " + pathInfo.fileName + " from " + srcFilename);
                 }
