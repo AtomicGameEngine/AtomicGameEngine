@@ -101,4 +101,4 @@ THUNDERBEAST GAMES began developing the Atomic Game Engine on November 12th, 201
 
 ### License
 
-AtomicGameEngine is released under the [MIT license](https://opensource.org/licenses/mit-license.php)
+Atomic Game Engine is released under the [MIT license](https://opensource.org/licenses/mit-license.php)
