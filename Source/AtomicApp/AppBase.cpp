@@ -44,7 +44,7 @@ namespace Atomic
         Application(context)
     {
         // Copy arguments
-        if (!arguments_.Size())
+        if (arguments_.empty())
         {
             arguments_ = GetArguments();
         }
@@ -132,13 +132,8 @@ namespace Atomic
     bool AppBase::RunFrame()
     {
         engine_->RunFrame();
-
-        if (engine_->IsExiting())
-        {
-            return false;
-        }
-
-        return true;
+        
+        return !engine_->IsExiting();
 
     }
 
@@ -236,7 +231,7 @@ namespace Atomic
     {
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-        return IsDebuggerPresent() ? true : false;
+        return IsDebuggerPresent();
 #else
         return false;
 #endif
