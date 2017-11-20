@@ -1,0 +1,110 @@
+os: linux
+dist: trusty
+compiler: gcc
+language: cpp
+sudo: false
+cache:
+  apt: true
+  directories:
+    - $HOME/cmake-3.3.2-Linux-x86_64/bin
+    - $HOME/cmake-3.3.2-Linux-x86_64/share
+    - $TRAVIS_BUILD_DIR/Submodules/CEF
+    - $TRAVIS_BUILD_DIR/.git/modules/Submodules/CEF
+git:
+  submodules: false
+addons:
+  apt:
+    packages: &linux_packages
+      - nodejs
+env:
+  global:
+    - MAKEFLAGS=-j4
+    - CXXFLAGS=-Wno-invalid-offsetof
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/c123a34751c16d5a7b40
+    on_success: always  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: always    # options: [always|never|change] default: always
+matrix:
+  fast_finish: true
+  include:
+    - &Linux-64bit
+      env: LINUX=1
+      addons:
+        apt:
+          packages: &linux_packages_64bit
+            - *linux_packages
+            - libgtk-3-dev
+            - libasound2-dev
+            - libxrandr-dev
+            - libgl1-mesa-dev
+            - libglu1-mesa-dev
+    - <<: *Linux-64bit
+      compiler: clang
+  exclude:
+    # Broken due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71444
+    - &MingW-64bit
+      env: CMAKE_TOOLCHAIN_FILE=Build/CMake/Toolchains/MinGW.cmake CMAKE_SYSTEM_PROCESSOR=x86_64 ATOMIC_D3D9=1
+      addons:
+        apt:
+          packages:
+            - *linux_packages
+            - gcc-mingw-w64-x86-64
+            - g++-mingw-w64-x86-64
+            - binutils-mingw-w64-x86-64
+      before_script: &mingw_workaround |
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/windows.h Windows.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/shobjidl.h ShObjIdl.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/strsafe.h Strsafe.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/psapi.h Psapi.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/sddl.h Sddl.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/accctrl.h AccCtrl.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/aclapi.h Aclapi.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/include/oleidl.h OleIdl.h
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/lib/libws2_32.a libWs2_32.a
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/lib/libiphlpapi.a libIphlpapi.a
+        ln -s /usr/$CMAKE_SYSTEM_PROCESSOR-w64-mingw32/lib/libwldap32.a libWldap32.a
+        export CFLAGS="-I`pwd` -L`pwd` $CFLAGS"
+        export CXXFLAGS="-I`pwd` -L`pwd` $CXXFLAGS"
+    - &MingW-32bit
+      env: CMAKE_TOOLCHAIN_FILE=Build/CMake/Toolchains/MinGW.cmake CMAKE_SYSTEM_PROCESSOR=i686 ATOMIC_D3D9=1
+      addons:
+        apt:
+          packages:
+            - *linux_packages
+            - gcc-mingw-w64-i686
+            - g++-mingw-w64-i686
+            - binutils-mingw-w64-i686
+      before_script: *mingw_workaround
+    # 32-bit builds break due to libgtk-3-dev:i386 failing to install.
+    - &Linux-32bit
+      addons:
+        apt:
+          packages:
+            - *linux_packages
+            - g++-multilib
+            - libasound2-dev:i386
+            - libxrandr-dev:i386
+            - libgl1-mesa-dev:i386
+            - libglu1-mesa-dev:i386
+      env: LINUX=1 ATOMIC_64BIT=0 CFLAGS=-m32 CXXFLAGS=-m32
+    - <<: *Linux-32bit
+      compiler: clang
+script: |
+  # Update CMake to 3.3 (minimum required version)
+  if [[ ! -f $HOME/cmake-3.3.2-Linux-x86_64/bin/cmake ]];
+  then
+      wget --no-check-certificate https://cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && \
+      tar xf $HOME/cmake.tar.gz -C $HOME && \
+      rm $HOME/cmake.tar.gz
+  fi
+  export PATH=$HOME/cmake-3.3.2-Linux-x86_64/bin:$PATH
+  mkdir build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} ..
+  cmake --build .

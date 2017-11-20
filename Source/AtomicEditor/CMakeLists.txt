@@ -28,7 +28,7 @@ if (ATOMIC_WEBVIEW)
     # Target executable names.
     set(CEF_TARGET "AtomicEditor")
     if (OS_MACOSX)
-        set(CEF_HELPER_TARGET "AtomicEditor Helper")
+        set(CEF_HELPER_TARGET "AtomicEditor-Helper")
     endif ()
 
     # Logical target used to link the libcef library.
@@ -106,8 +106,8 @@ if (ATOMIC_WEBVIEW)
             "${CEF_APP}/Contents/Frameworks/${CEF_HELPER_TARGET}.app"
             # Copy the CEF framework into the Frameworks directory.
             COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CEF_BINARY_DIR}/Chromium Embedded Framework.framework"
-            "${CEF_APP}/Contents/Frameworks/Chromium Embedded Framework.framework"
+            "${CEF_BINARY_DIR}/CEF.framework"
+            "${CEF_APP}/Contents/Frameworks/CEF.framework"
             VERBATIM
         )
 
