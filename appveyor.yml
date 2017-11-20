@@ -1,0 +1,33 @@
+version: 1.0.{build}
+branches:
+  only:
+  - master
+image: Visual Studio 2015
+configuration: Debug
+platform: x64
+# uncomment to anable RDP access
+#environment:
+#  appveyor_rdp_password: P@ssw0rd1
+#init:
+#  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+build_script:
+- cmd: >-
+    cd C:\projects\atomicgameengine\
+
+    echo ******* Generate distribution build *******
+    Build\Windows\node\node.exe ./Build/Scripts/Bootstrap.js buildeditor
+
+    REM echo ******* Generate VS2015 solution for development build *******
+    REM C:\projects\atomicgameengine\Build\Windows\node\node.exe C:\projects\atomicgameengine\Build\Scripts\Bootstrap.js --task=build:genvs2015
+
+    REM echo ******* Build development solution *******
+    REM msbuild C:\projects\atomicgameengine-VS2015\Atomic.sln /m /p:Configuration=Debug /p:Platform=x64 /t:ALL_BUILD /t:GenerateScriptBindings
+notifications:
+- provider: Webhook
+  url: https://webhooks.gitter.im/e/df204f07203694e4fdeb
+  method: POST
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
