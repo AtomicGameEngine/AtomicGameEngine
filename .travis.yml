@@ -22,8 +22,14 @@ env:
     - CXXFLAGS=-Wno-invalid-offsetof
 notifications:
   email:
-    on_success: never
-    on_failure: never
+    on_success: change
+    on_failure: always
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/c123a34751c16d5a7b40
+    on_success: always  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: always    # options: [always|never|change] default: always
 matrix:
   fast_finish: true
   include:
