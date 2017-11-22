@@ -25,6 +25,7 @@ import {default as AtomicEditor} from "editor/Editor";
 import ProjectFrameMenu = require("./menus/ProjectFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import SearchBarFiltering = require("resources/SearchBarFiltering");
+import EditorUI = require("ui/EditorUI");
 
 class ProjectFrame extends ScriptWidget {
 
@@ -93,6 +94,24 @@ class ProjectFrame extends ScriptWidget {
         this.subscribeToEvent("DevelopmentUIEvent", (data) => {
             if (data.subEvent == "ScaleFrameWidth" && data.arg0 == "projectframe") {
                 this.handleScaleWidth(data.arg1);
+            }
+        });
+
+        this.subscribeToEvent("ImportAssetEvent", (data) => {
+            if (data.file.length > 0) {  // imported an asset file 
+                var fileSystem = Atomic.getFileSystem();
+                var srcFilename = data.file;
+                var pathInfo = Atomic.splitPath(srcFilename);
+                var destFilename = Atomic.addTrailingSlash(data.destination);
+                destFilename += pathInfo.fileName + pathInfo.ext;
+                if ( fileSystem.copy(srcFilename, destFilename) ) {
+                    EditorUI.showEditorStatus ( "Copied Asset " + pathInfo.fileName + " into project as " + destFilename);
+                    var db = ToolCore.getAssetDatabase();
+                    db.scan(); // fix up the asset database on success
+                }
+                else {
+                    EditorUI.showEditorStatus ( "Warning, could not copy Asset " + pathInfo.fileName + " from " + srcFilename);
+                }
             }
         });
 

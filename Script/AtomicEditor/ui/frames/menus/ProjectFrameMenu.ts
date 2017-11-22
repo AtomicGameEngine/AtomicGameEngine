@@ -105,6 +105,15 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "import_asset") {
+                var fileUtils = new Editor.FileUtils();
+                var myassets = fileUtils.findFile("" , "");
+                if (  myassets.length > 0 ) {
+                    this.sendEvent("ImportAssetEvent", { "file" : myassets, "destination" : path });
+                }
+                return true;
+            }
+
             if (refid == "force_reimport_folder") {
                 ToolCore.assetDatabase.reimportAllAssetsInDirectory(path);
                 return true;
@@ -196,6 +205,7 @@ var assetFolderContextItems = {
     "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "Force Reimport": ["force_reimport_folder", undefined, ""],
+    "Import Asset...": ["import_asset", undefined, ""],
     "-1": null,
     [showInFs]: ["reveal_folder", undefined, ""],
     "-2": null,
