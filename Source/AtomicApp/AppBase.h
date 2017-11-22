@@ -53,6 +53,12 @@ namespace Atomic
         /// Called before initializing application for inserting arguments
         static void AddArgument(const String& argument);
 
+        /// Returns the number of arguments specified on the commandline and added with AddArgument
+        static unsigned GetNumArguments();
+
+        /// Returns an argument from the list of arguments specified on the commandline or added with AddArgument
+        static String GetArgument(unsigned index);
+
         virtual void ProcessArguments();
 
         static void AddEngineConfigSearchPath(const String& path) { engineConfigSearchPaths_.Push(path); }
