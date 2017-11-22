@@ -81,6 +81,11 @@ void AtomicTool::Setup()
                 engineParameters_["LogLevel"] = Variant(VariantType::VAR_INT, value);
                 i++;
             }
+            else if (argument == "logname")
+            {
+                engineParameters_["LogName"] = Variant(VariantType::VAR_STRING, value);
+                i++;
+            }
         }
     }
 
