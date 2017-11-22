@@ -81,11 +81,6 @@ bool BuildCmd::ParseInternal(const Vector<String>& arguments, unsigned startInde
         {
             autoLog_ = true;
         }
-        else
-        {
-            errorMsg = "Invalid option: " + option;
-            return false;
-        }
     }
 
     String tag = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
