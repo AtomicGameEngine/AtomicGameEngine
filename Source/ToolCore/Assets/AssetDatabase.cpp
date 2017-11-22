@@ -754,6 +754,15 @@ bool AssetDatabase::GenerateCache(bool clean)
         if (!CleanCache())
             return false;
     }
+    else
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        String cachePath = GetCachePath();
+        if (!fileSystem->DirExists(cachePath))
+        {
+            fileSystem->CreateDir(cachePath);
+        }
+    }
 
     ReimportAllAssets();
 

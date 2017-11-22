@@ -48,6 +48,8 @@ public:
 
     void Run();
 
+    bool RequiresNETService() { return true; }
+
 protected:
 
     bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);

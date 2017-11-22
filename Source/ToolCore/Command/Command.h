@@ -62,6 +62,8 @@ public:
 
     virtual bool RequiresProjectLoad() { return true; }
 
+    virtual bool RequiresNETService() { return false; }
+
     /// Loads project into ToolSystem returning true on success
     bool LoadProject();
 

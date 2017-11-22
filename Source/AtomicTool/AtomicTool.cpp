@@ -34,6 +34,10 @@
 #include <ToolCore/Command/Command.h>
 #include <ToolCore/Command/CommandParser.h>
 
+#include <Atomic/IPC/IPC.h>
+#include <AtomicNET/NETScript/NETScript.h>
+#include <ToolCore/NETTools/AtomicNETService.h>
+
 #include "AtomicTool.h"
 
 ATOMIC_DEFINE_APPLICATION_MAIN(AtomicTool::AtomicTool);
@@ -254,6 +258,22 @@ void AtomicTool::Start()
 
     }
 
+    if (cmd->RequiresNETService())
+    {
+        context_->RegisterSubsystem(new IPC(context_));
+        RegisterNETScriptLibrary(context_);
+        SharedPtr<AtomicNETService> netService(new AtomicNETService(context_));
+
+        if (!netService->Start())
+        {
+            netService = nullptr;
+            ErrorExit(ToString("Unable to start AtomicNETService"));
+            return;
+        }
+
+        context_->RegisterSubsystem(netService);
+    }
+
     command_ = cmd;
 
     // BEGIN LICENSE MANAGEMENT
@@ -277,7 +297,11 @@ void AtomicTool::Start()
 
 void AtomicTool::Stop()
 {
-
+    IPC* ipc = GetSubsystem<IPC>();
+    if (ipc)
+    {
+        ipc->Shutdown();
+    }
 }
 
 void AtomicTool::ErrorExit(const String& message)
