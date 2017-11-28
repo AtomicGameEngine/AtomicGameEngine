@@ -29,6 +29,11 @@
 
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
+#include <kNet/Socket.h>
+
+#ifdef SendMessage
+#undef SendMessage
+#endif
 
 namespace Atomic
 {
@@ -64,12 +69,12 @@ public:
     /// Handle a client disconnection.
     virtual void ClientDisconnected(kNet::MessageConnection* connection);
 
-    /// Connect to a server using UDP protocol. Return true if connection process successfully started.
-    bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Connect to a server using specified protocol. Return true if connection process successfully started.
+    bool Connect(const String& address, unsigned short port, kNet::SocketTransportLayer transport, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
-    /// Start a server on a port using UDP protocol. Return true if successful.
-    bool StartServer(unsigned short port);
+    /// Start a server on a port using specified protocol. Return true if successful.
+    bool StartServer(unsigned short port, kNet::SocketTransportLayer transport);
     /// Stop the server.
     void StopServer();
     /// Broadcast a message with content ID to all client connections.

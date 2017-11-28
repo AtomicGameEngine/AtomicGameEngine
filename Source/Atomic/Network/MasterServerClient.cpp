@@ -576,7 +576,7 @@ bool MasterServerClient::StartServerAndRegisterWithMaster(unsigned short serverP
     }
 
     // First start the server
-    bool rc = network->StartServer(serverPort);
+    bool rc = network->StartServer(serverPort, kNet::SocketOverUDP);
 
     if (!rc)
     {

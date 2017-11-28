@@ -206,7 +206,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     }
 }
 
-bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
+bool Network::Connect(const String& address, unsigned short port, kNet::SocketTransportLayer transport, Scene* scene, const VariantMap& identity)
 {
     ATOMIC_PROFILE(Connect);
 
@@ -217,7 +217,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         OnServerDisconnected();
     }
 
-    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, kNet::SocketOverUDP, this);
+    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, transport, this);
     if (connection)
     {
         serverConnection_ = new Connection(context_, false, connection);
@@ -246,7 +246,7 @@ void Network::Disconnect(int waitMSec)
     serverConnection_->Disconnect(waitMSec);
 }
 
-bool Network::StartServer(unsigned short port)
+bool Network::StartServer(unsigned short port, kNet::SocketTransportLayer transport)
 {
     if (IsServerRunning())
         return true;
@@ -257,14 +257,14 @@ bool Network::StartServer(unsigned short port)
     serverPort_ = port;
 // ATOMIC END
 
-    if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
+    if (network_->StartServer(port, transport, this, true) != 0)
     {
-        ATOMIC_LOGINFO("Started server on port " + String(port));
+        ATOMIC_LOGINFOF("Started %s server on port %i", (transport == kNet::SocketOverTCP ? "TCP" : "UDP"), port);
         return true;
     }
     else
     {
-        ATOMIC_LOGERROR("Failed to start server on port " + String(port));
+        ATOMIC_LOGERRORF("Failed to start %s server on port %i", (transport == kNet::SocketOverTCP ? "TCP" : "UDP"), port);
         return false;
     }
 }
