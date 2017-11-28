@@ -76,7 +76,7 @@ namespace AtomicEngine
                 {
                     Log.Error(e.StackTrace);
                     // rethrow
-                    throw e;
+                    throw;
                 }
             }
             finally
