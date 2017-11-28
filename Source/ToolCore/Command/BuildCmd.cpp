@@ -36,7 +36,10 @@
 namespace ToolCore
 {
 
-BuildCmd::BuildCmd(Context* context) : Command(context)
+BuildCmd::BuildCmd(Context* context) :
+    Command(context),
+    autoLog_(false),
+    verbose_(false)
 {
 
 }
@@ -68,7 +71,7 @@ bool BuildCmd::ParseInternal(const Vector<String>& arguments, unsigned startInde
     for (int i = startIndex + 2; i < arguments.Size(); ++i)
     {
         String option = arguments[i].ToLower();
-        
+
         if (option == "-tag")
         {
             if (arguments.Size() == i + 1)
@@ -80,6 +83,10 @@ bool BuildCmd::ParseInternal(const Vector<String>& arguments, unsigned startInde
         else if (option == "-autolog")
         {
             autoLog_ = true;
+        }
+        else if (option == "-verbose")
+        {
+            verbose_ = true;
         }
     }
 
@@ -127,6 +134,7 @@ void BuildCmd::Run()
         buildBase->SetAssetBuildTag(assetsBuildTag_);
     }
     buildBase->SetAutoLog(autoLog_);
+    buildBase->SetVerbose(verbose_);
 
     // add it to the build system
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();

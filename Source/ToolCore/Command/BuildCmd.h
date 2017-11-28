@@ -47,11 +47,12 @@ protected:
 private:
 
     void HandleBuildComplete(StringHash eventType, VariantMap& eventData);
-    
+
 
     String buildPlatform_;
     String assetsBuildTag_;
     bool autoLog_;
+    bool verbose_;
 
 };
 
