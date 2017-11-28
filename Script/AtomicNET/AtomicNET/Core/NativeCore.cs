@@ -45,10 +45,11 @@ namespace AtomicEngine
     }
 
     /// <summary>
-    ///  Internal class for native interop 
+    ///  Internal class for native interop
     /// </summary>
     internal static class NativeCore
     {
+        public static string GetCacheStatus() => refCountedCache.GetCacheStatus();
 
         static internal void SubscribeToEvent(AObject receiver, uint eventType)
         {
@@ -215,16 +216,16 @@ namespace AtomicEngine
         }
 
         /// <summary>
-        ///  Runs a GC collection, waits for any finalizers, and then expires any natives collected 
+        ///  Runs a GC collection, waits for any finalizers, and then expires any natives collected
         /// </summary>
         public static void RunGC()
         {
             // run a GC collection
             GC.Collect();
             // finalizers can run on any thread, we're explicitly running a GC here
-            // so wait for all the finalizers to finish            
+            // so wait for all the finalizers to finish
             GC.WaitForPendingFinalizers();
-            // Anything finalized on another thread will now be available to release 
+            // Anything finalized on another thread will now be available to release
             // in main thread
             RefCounted.ReleaseFinalized();
 
@@ -270,7 +271,7 @@ namespace AtomicEngine
         #endif
         public static void RefCountedDeleted(IntPtr refCounted)
         {
-            
+
         }
 
         // Called to throw a managed exception from native code
@@ -286,7 +287,7 @@ namespace AtomicEngine
         {
             if (refCounted == IntPtr.Zero)
                 return;
-           
+
             RemoveEventSender(refCounted);
 
             refCountedCache.Remove(refCounted);
