@@ -30,6 +30,7 @@
 #include "../ToolEnvironment.h"
 #include "../Assets/Asset.h"
 #include "../Assets/AssetDatabase.h"
+#include "../Import/ImportConfig.h"
 
 #include "BuildSystem.h"
 #include "BuildEvents.h"
@@ -384,19 +385,101 @@ void BuildBase::BuildAllProjectResourceEntries()
         String projectResourceDir = projectResourceDir_[i];
         fileIncludedResourcesLog_->WriteLine("\nBuildBase::BuildAllProjectResourceEntries - Project resources being included from: " + projectResourceDir);
 
-        Vector<String> fileNamesInProject;
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        bool compressTextures = false;
+
+        if (ImportConfig::IsLoaded())
+        {
+            VariantMap tiParameters;
+            ImportConfig::ApplyConfig(tiParameters);
+            VariantMap::ConstIterator itr = tiParameters.Begin();
+
+            for (; itr != tiParameters.End(); itr++)
+            {
+                if (itr->first_ == "tiProcess_CompressTextures")
+                    compressTextures = itr->second_.GetBool();
+            }
+        }
+
+        Vector<String> assetFileNamesInProject;
+        fileSystem->ScanDir(assetFileNamesInProject, projectResourceDir, "*.asset", SCAN_FILES, true);
+
+        Vector<String> cachedFileNames;
+
+        AssetDatabase* db = GetSubsystem<AssetDatabase>();
+        String cachePath = db->GetCachePath();
+        Vector<String> filesInCacheFolder;
+        Vector<String> fileNamesInCacheFolder;
+
+        Vector<String> compressedResources;
+
+        if (assetFileNamesInProject.Size() > 0)
+        {
+            fileSystem->ScanDir(filesInCacheFolder, cachePath, "*.*", SCAN_FILES, false);
+
+            for (unsigned j = 0; j < filesInCacheFolder.Size(); ++j)
+            {
+
+                const String &fileName = GetFileNameAndExtension(filesInCacheFolder[j]);
+                fileNamesInCacheFolder.Push(fileName);
+            }
+        }
+
+
+        for (unsigned i = 0; i < assetFileNamesInProject.Size(); i++)
+        {
+            unsigned assetSubStrPos = assetFileNamesInProject[i].Find(".asset");
+
+            String baseFileName = assetFileNamesInProject[i].Substring(0, assetSubStrPos);
+
+            String extension = GetExtension(baseFileName);
+
+            if (compressTextures && (extension == ".jpg" || extension == ".png" || extension == ".tga"))
+            {
+                SharedPtr<File> file(new File(context_, project_->GetResourcePath() + assetFileNamesInProject[i]));
+                SharedPtr<JSONFile> json(new JSONFile(context_));
+                json->Load(*file);
+                file->Close();
+
+                JSONValue& root = json->GetRoot();
+                int test = root.Get("version").GetInt();
+                assert(root.Get("version").GetInt() == ASSET_VERSION);
+
+                String guid = root.Get("guid").GetString();
+
+                String dds = guid + ".dds";
+
+                if (fileNamesInCacheFolder.Contains(dds))
+                {
+                    compressedResources.Push(baseFileName);
+                }
+            }
+        }
+
+        Vector<String> fileNamesInProject;        
         fileSystem->ScanDir(fileNamesInProject, projectResourceDir, "*.*", SCAN_FILES, true);
 
         for (unsigned i = 0; i < fileNamesInProject.Size(); i++)
         {
-            AddToResourcePackager(fileNamesInProject[i], projectResourceDir);
+            String fName = fileNamesInProject[i];
 
-            if (verbose_)
+            if (compressedResources.Contains(fName))
             {
-                ATOMIC_LOGINFO(ToString("Project Resource Added: %s%s", projectResourceDir.CString(), fileNamesInProject[i].CString()));
+                if (autoLog_)
+                {
+                    ATOMIC_LOGINFO(ToString("Project Resource not included because compressed version exists: %s%s", projectResourceDir.CString(), fileNamesInProject[i].CString()));
+                }
             }
-
+            else
+            {
+                AddToResourcePackager(fileNamesInProject[i], projectResourceDir);
+                
+                if (verbose_)
+                {
+                    ATOMIC_LOGINFO(ToString("Project Resource Added: %s%s", projectResourceDir.CString(), fileNamesInProject[i].CString()));
+                }
+            }
         }
     }
 }

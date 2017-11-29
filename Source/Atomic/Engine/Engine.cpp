@@ -131,7 +131,7 @@ Engine::Engine(Context* context) :
     exiting_(false),
     headless_(false),
     audioPaused_(false),
-    // ATOMIC BEGIN    
+    // ATOMIC BEGIN
     paused_(false),
     runNextPausedFrame_(false),
     fpsTimeSinceUpdate_(ENGINE_FPS_UPDATE_INTERVAL),
@@ -185,7 +185,7 @@ Engine::Engine(Context* context) :
 #endif
 
     SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(Engine, HandleExitRequested));
-    // ATOMIC BEGIN        
+    // ATOMIC BEGIN
     SubscribeToEvent(E_PAUSERESUMEREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseResumeRequested));
     SubscribeToEvent(E_PAUSESTEPREQUESTED, ATOMIC_HANDLER(Engine, HandlePauseStepRequested));
 
@@ -264,9 +264,18 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Set maximally accurate low res timer
     GetSubsystem<Time>()->SetTimerPeriod(1);
 
-    // Configure max FPS
+    // Configure FPS limits
     if (GetParameter(parameters, EP_FRAME_LIMITER, true) == false)
+    {
         SetMaxFps(0);
+    }
+    else
+    {
+        if (HasParameter(parameters, "MaxFps"))
+            SetMaxFps(GetParameter(parameters, "MaxFps").GetInt());
+        if (HasParameter(parameters, "MinFps"))
+            SetMinFps(GetParameter(parameters, "MinFps").GetInt());
+    }
 
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
@@ -582,7 +591,7 @@ void Engine::RunFrame()
     ATOMIC_PROFILE(DoFrame);
     time->BeginFrame(timeStep_);
     // check for exit again that comes in thru an event handler
-    if ( exiting_ ) // needed to prevent scripts running the 
+    if ( exiting_ ) // needed to prevent scripts running the
         return;     // current frame update with null objects
 
     // If paused, or pause when minimized -mode is in use, stop updates and audio as necessary
@@ -603,7 +612,7 @@ void Engine::RunFrame()
             audio->Play();
             audioPaused_ = false;
         }
-        
+
         // Only run one frame when stepping
         runNextPausedFrame_ = false;
 
@@ -887,6 +896,16 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_HEADLESS] = true;
             else if (argument == "nolimit")
                 ret[EP_FRAME_LIMITER] = false;
+            else if (argument == "maxfps" && !value.Empty())
+            {
+                ret["MaxFps"] = ToInt(value);
+                i++;
+            }
+            else if (argument == "minfps" && !value.Empty())
+            {
+                ret["MinFps"] = ToInt(value);
+                i++;
+            }
             else if (argument == "flushgpu")
                 ret[EP_FLUSH_GPU] = true;
             else if (argument == "gl2")

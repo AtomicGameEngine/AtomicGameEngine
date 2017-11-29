@@ -97,9 +97,10 @@ bool TextureImporter::Import()
         }
 
         if (image->SaveDDS(compressedPath))
-        {            
-            Renderer * renderer = GetSubsystem<Renderer>();
-            renderer->ReloadTextures();
+        {
+            Renderer* renderer = GetSubsystem<Renderer>();
+            if (renderer != NULL) // May be importing through headless process
+                renderer->ReloadTextures();
         }
     }
 

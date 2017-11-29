@@ -38,6 +38,26 @@ static const unsigned SCAN_DIRS = 0x2;
 /// Return also hidden files.
 static const unsigned SCAN_HIDDEN = 0x4;
 
+// ATOMIC BEGIN
+
+/// Helper class to expose resource iteration to script
+class FileNameIterator : public RefCounted
+{
+    ATOMIC_REFCOUNTED(FileNameIterator);
+public:
+    FileNameIterator();
+
+    const String& GetCurrent();
+    bool MoveNext();
+    void Reset();
+
+    Vector<String> filenames_;
+private:
+    unsigned index_;
+};
+
+// ATOMIC END
+
 /// Subsystem for file and directory operations and access control.
 class ATOMIC_API FileSystem : public Object
 {
@@ -103,6 +123,8 @@ public:
     String GetAppPreferencesDir(const String& org, const String& app) const;
 
 // ATOMIC BEGIN
+    /// Scan specified files, returning them as an iterator
+    SharedPtr<FileNameIterator> ScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive) const;
 
     /// Check if a file or directory exists at the specified path
     bool Exists(const String& pathName) const { return FileExists(pathName) || DirExists(pathName); }

@@ -186,7 +186,11 @@ public:
     /// Set all animation tracks.
     void SetTracks(const Vector<AnimationTrack>& tracks);
 
+    /// Return position of an animation track's keyframe at index.
+    Vector3 GetKeyFramePositionAtIndex(const String& name, unsigned keyIndex);
+
     // ATOMIC END
+
 
 private:
     /// Animation name.

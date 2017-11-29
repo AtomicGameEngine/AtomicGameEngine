@@ -1,5 +1,6 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +23,29 @@
 
 #pragma once
 
-#include "Command.h"
+#include <AtomicApp/IPCServerApp.h>
 
-using namespace Atomic;
-
-namespace ToolCore
+namespace Atomic
 {
 
-class BuildCmd: public Command
-{
-    ATOMIC_OBJECT(BuildCmd, Command);
+    class NETIPCServerApp : public IPCServerApp
+    {
+        ATOMIC_OBJECT(NETIPCServerApp,IPCServerApp)
 
-public:
+    public:
 
-    BuildCmd(Context* context);
-    virtual ~BuildCmd();
+        static NETIPCServerApp* CreateInternal();
 
-    void Run();
+        int Initialize();
 
-protected:
+    private:
 
-    bool ParseInternal(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
+        /// Construct.
+        NETIPCServerApp(Context* context);
 
-private:
+        /// Setup before engine initialization.
+        virtual void Setup();
 
-    void HandleBuildComplete(StringHash eventType, VariantMap& eventData);
-
-
-    String buildPlatform_;
-    String assetsBuildTag_;
-    bool autoLog_;
-    bool verbose_;
-
-};
+    };
 
 }

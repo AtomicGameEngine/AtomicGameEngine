@@ -12,6 +12,8 @@ namespace AtomicEngine
 
     public partial class Application : AObject
     {
+        public static AppBase AppBase { get; private set; }
+
 
         public static int Run<T>(string[] args) where T : AppDelegate, new()
         {
@@ -22,10 +24,8 @@ namespace AtomicEngine
         {
             // Create the Application
 
-            AppBase app = null;
-
 #if ATOMIC_DESKTOP
-            app = NETIPCPlayerApp.Create(args);
+            AppBase = NETIPCPlayerApp.Create(args);
 #endif
 
 #if ATOMIC_IOS
@@ -36,7 +36,7 @@ namespace AtomicEngine
 
 #if ATOMIC_MOBILE
 
-            app = NETAtomicPlayer.Create(args);
+            AppBase = NETAtomicPlayer.Create(args);
             
             var renderer = AtomicNET.GetSubsystem<Renderer>();
             renderer.ReuseShadowMaps = false;
@@ -54,7 +54,7 @@ namespace AtomicEngine
                 appDelegate.Start();
 
                 // Managed code in charge of main loop
-                while (app.RunFrame())
+                while (AppBase.RunFrame())
                 {
                     appDelegate.PostFrame();
                 }
@@ -62,7 +62,59 @@ namespace AtomicEngine
                 appDelegate.Shutdown();
 
                 // Shut 'er down
-                app.Shutdown();
+                AppBase.Shutdown();
+            }
+            catch (Exception e)
+            {
+                if (e.InnerException != null)
+                {
+                    Log.Error(e.InnerException.StackTrace);
+                    // rethrow inner exception
+                    throw e.InnerException;
+                }
+                else
+                {
+                    Log.Error(e.StackTrace);
+                    // rethrow
+                    throw;
+                }
+            }
+            finally
+            {
+                AppBase = null;
+            }
+
+            return 0;
+        }
+
+
+#if ATOMIC_DESKTOP
+        public static int RunServer<T>(string[] args) where T : AppDelegate, new()
+        {
+            return RunServer(typeof(T), args);
+        }
+
+        public static int RunServer(Type appDelegateType, string[] args)
+        {
+            // Create the Application
+            AppBase = NETIPCServerApp.Create(args);
+
+            appDelegate = (AppDelegate)Activator.CreateInstance(appDelegateType);
+
+            try
+            {
+                appDelegate.Start();
+
+                // Managed code in charge of main loop
+                while (AppBase.RunFrame())
+                {
+                    appDelegate.PostFrame();
+                }
+
+                appDelegate.Shutdown();
+
+                // Shut 'er down
+                AppBase.Shutdown();
             }
             catch (Exception e)
             {
@@ -79,13 +131,16 @@ namespace AtomicEngine
                     throw e;
                 }
             }
+            finally
+            {
+                AppBase = null;
+            }
+
 
             return 0;
         }
-
-
+#endif
         internal static AppDelegate appDelegate;
 
     }
-
 }

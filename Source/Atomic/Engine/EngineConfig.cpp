@@ -68,6 +68,10 @@ bool EngineConfig::LoadGraphicsConfig(const JSONValue& jgraphics)
             valueMap_["Headless"] = GetBoolValue(jvalue, false);
         else if (key == "framelimiter")
             valueMap_["FrameLimiter"] = GetBoolValue(jvalue, true);
+        else if (key == "maxfps")
+            valueMap_["MaxFps"] = GetIntValue(jvalue, 0);
+        else if (key == "minfps")
+            valueMap_["MinFps"] = GetIntValue(jvalue, 0);
         else if (key == "flushgpu")
             valueMap_["FlushGPU"] = GetBoolValue(jvalue, false);
         else if (key == "forcegl2")
