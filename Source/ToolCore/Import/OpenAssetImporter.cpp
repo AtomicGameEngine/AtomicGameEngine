@@ -308,7 +308,7 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
     }
 
     String rootNodeName = FromAIString(model.rootNode_->mName);
-    if (!model.meshes_.Size())
+    if (!model.meshes_.Size() && !includeNonSkinningBones_)
     {
         errorMessage_ = "No geometries found starting from node " + rootNodeName;
         return false;
@@ -324,7 +324,7 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
 
     bool combineBuffers = true;
     // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
-    unsigned elementMask = GetElementMask(model.meshes_[0]);
+    unsigned elementMask = (model.meshes_.Size() > 0) ? GetElementMask(model.meshes_[0]) : 0;
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         if (GetNumValidFaces(model.meshes_[i]))

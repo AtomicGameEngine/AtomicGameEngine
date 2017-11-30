@@ -75,14 +75,6 @@ namespace Atomic
             return exitCode_;
         }
 
-        // TODO: Proper CSComponent assembly preload
-        // For now, user must ensure that assemblies are loaded via
-        // referencing their types or load assembly before initializing
-        // AtomicNET in application.  This is commented out as it
-        // causes an issue with double loading referenced assemblies
-        // and the ones in the project file
-        // CSComponentAssembly::PreloadClassAssemblies();
-
         Start();
 
         if (exitCode_)
