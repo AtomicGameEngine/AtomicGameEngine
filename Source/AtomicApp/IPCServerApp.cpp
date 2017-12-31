@@ -1,25 +1,40 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include <Atomic/IO/IOEvents.h>
+#include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Core/CoreEvents.h>
+
+#include <Atomic/IPC/IPC.h>
 #include <Atomic/IPC/IPCEvents.h>
+#include <Atomic/IPC/IPCWorker.h>
 #include <Atomic/IPC/IPCBroker.h>
 
+#include <ToolCore/ToolSystem.h>
+#include <ToolCore/ToolEnvironment.h>
+#include <ToolCore/Project/Project.h>
+#include <ToolCore/Project/ProjectSettings.h>
+
+#include <Atomic/UI/SystemUI/DebugHud.h>
 #include <AtomicApp/Player/IPCPlayerAppEvents.h>
+
+#include <AtomicJS/Javascript/JSIPCEvents.h>
+
 #include <Atomic/Input/InputEvents.h>
 
 #include "IPCServerApp.h"
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-// PostMessage/PostMessageA windows macro introduced through AppBase.h
-#pragma push_macro("UndefPostMessage")
+#pragma push_macro("PostMessage")
 #undef PostMessage
-#endif
+
+using namespace ToolCore;
 
 namespace Atomic
 {
 
     IPCServerApp::IPCServerApp(Context* context) :
-        AppBase(context)
+        AppBase(context),
+        playerEnabled_(false)
     {
     }
 
@@ -33,6 +48,14 @@ namespace Atomic
 
         // Register IPC system
         context_->RegisterSubsystem(new IPC(context_));
+
+        ToolEnvironment* env = new ToolEnvironment(context_);
+        context_->RegisterSubsystem(env);
+
+        env->Initialize();
+
+        ToolSystem* system = new ToolSystem(context_);
+        context_->RegisterSubsystem(system);
 
         engineParameters_["Headless"] = true;
         engineParameters_["LogLevel"] = LOG_INFO;
@@ -50,17 +73,30 @@ namespace Atomic
         AppBase::Stop();
     }
 
-    bool IPCServerApp::RunIPCClient(const String& projectName, const String& projectPath, const String &addArgs)
+    bool IPCServerApp::RunIPCPlayer(const String& projectName, const String& projectPath, const String &addArgs)
     {
-        if (clientBroker_.NotNull())
+        /* Params to pass in (possibly) from PE
+        --windowposx 244
+        --windowposy 157
+        --windowwidth 1440
+        --windowheight 806
+        --resizable
+
+        ALSO STUFF TO TELL VSEATOMIC WHICH CUTSCENE TO LAUNCH..app delegate will need to parse run params I think
+
+        */
+
+        if (playerBroker_.NotNull())
             return false;
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
         String projectAssembly = projectName + ".dll";
         String projectExe = projectName + ".exe";
 
-        String clientBinary = "";
+        String playerBinary = "";
 
         String resourcePath = projectPath + "Resources/" + projectAssembly;
 
@@ -70,20 +106,20 @@ namespace Atomic
 #ifdef ATOMIC_DEV_BUILD
 
 #ifdef ATOMIC_DEBUG        
-            clientBinary = projectPath + "AtomicNET/Debug/Bin/Desktop/" + projectExe;
+            playerBinary = projectPath + "AtomicNET/Debug/Bin/Desktop/" + projectExe;
 #else
-            clientBinary = projectPath + "AtomicNET/Release/Bin/Desktop/" + projectExe;
+            playerBinary = projectPath + "AtomicNET/Release/Bin/Desktop/" + projectExe;
 #endif
 
 #else
             // TODO: We are using the release build of the managed project here, how and when to use debug?
-            clientBinary = projectPath + "AtomicNET/Release/Bin/Desktop/" + projectExe;
+            playerBinary = projectPath + "AtomicNET/Release/Bin/Desktop/" + projectExe;
 #endif
 
 
-            if (!fileSystem->FileExists(clientBinary))
+            if (!fileSystem->FileExists(playerBinary))
             {
-                ATOMIC_LOGERRORF("Managed client: %s does not exist", clientBinary.CString());
+                ATOMIC_LOGERRORF("Managed player: %s does not exist", playerBinary.CString());
                 return false;
             }
 
@@ -95,13 +131,12 @@ namespace Atomic
 
         Vector<String> vargs;
 
-        
-        String args = ToString("--project \"%s\"", projectPath.CString());
+        String args = ToString("--player --project \"%s\"", projectPath.CString());
 
         vargs = args.Split(' ');
 
 #ifdef ATOMIC_DEV_BUILD
-        vargs.Insert(0, ToString("\"%s/Resources/\"", ATOMIC_ROOT_SOURCE_DIR));
+        vargs.Insert(0, ToString("\"%s/Resources/\"", tenv->GetRootSourceDir().CString()));
 #else
 
 #ifdef ATOMIC_PLATFORM_OSX
@@ -119,33 +154,42 @@ namespace Atomic
 
         String dump;
         dump.Join(vargs, " ");
-        ATOMIC_LOGINFOF("Launching Broker %s %s", clientBinary.CString(), dump.CString());
+        ATOMIC_LOGINFOF("Launching Broker %s %s", playerBinary.CString(), dump.CString());
 
         IPC* ipc = GetSubsystem<IPC>();
-        clientBroker_ = ipc->SpawnWorker(clientBinary, vargs);
+        playerBroker_ = ipc->SpawnWorker(playerBinary, vargs);
 
-        if (clientBroker_)
+        if (playerBroker_)
         {
-            SubscribeToEvent(clientBroker_, E_IPCWORKERSTART, ATOMIC_HANDLER(IPCServerApp, HandleIPCWorkerStarted));
-            SubscribeToEvent(clientBroker_, E_IPCWORKEREXIT, ATOMIC_HANDLER(IPCServerApp, HandleIPCWorkerExit));
-            SubscribeToEvent(clientBroker_, E_IPCWORKERLOG, ATOMIC_HANDLER(IPCServerApp, HandleIPCWorkerLog));
+            SubscribeToEvent(playerBroker_, E_IPCWORKERSTART, ATOMIC_HANDLER(IPCServerApp, HandleIPCWorkerStarted));
+            SubscribeToEvent(playerBroker_, E_IPCJSERROR, ATOMIC_HANDLER(IPCServerApp, HandleIPCJSError));
+            SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, ATOMIC_HANDLER(IPCServerApp, HandleIPCWorkerExit));
+            SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, ATOMIC_HANDLER(IPCServerApp, HandleIPCWorkerLog));
         }
 
-        return clientBroker_.NotNull();
+        return playerBroker_.NotNull();
     }
 
     void IPCServerApp::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
     {
         VariantMap startupData;
-        clientBroker_->PostMessage(E_IPCINITIALIZE, startupData);
+        DebugHud* debugHud = GetSubsystem<DebugHud>();
+
+        startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned)0;
+        startupData["debugHudProfilerMode"] = (unsigned)(debugHud ? debugHud->GetProfilerMode() : DEBUG_HUD_PROFILE_PERFORMANCE);
+
+        playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
+
+        playerEnabled_ = true;
     }
 
 
     void IPCServerApp::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
     {
-        if (eventData[IPCWorkerExit::P_BROKER] == clientBroker_)
+        if (eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
         {
-            clientBroker_ = 0;
+            playerBroker_ = 0;
+            playerEnabled_ = false;
 
             UnsubscribeFromEvent(E_IPCWORKERSTART);
             UnsubscribeFromEvent(E_IPCPLAYERPAUSERESUMEREQUEST);
@@ -163,47 +207,55 @@ namespace Atomic
     {
         using namespace IPCWorkerLog;
 
+        // convert to a player log
+
         VariantMap playerLogData;
 
         playerLogData["message"] = eventData[P_MESSAGE].GetString();
         playerLogData["level"] = eventData[P_LEVEL].GetInt();
 
+        //SendEvent("EditorPlayerLog", playerLogData);
+
+    }
+
+    void IPCServerApp::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
+    {
+
     }
     
     void IPCServerApp::RequestTogglePlayerUpdatesPaused()
     {
-        if (!clientBroker_)
+        if (!playerBroker_)
         {
             return;
         }
 
         VariantMap noEventData;
-        clientBroker_->PostMessage(E_PAUSERESUMEREQUESTED, noEventData);
+        playerBroker_->PostMessage(E_PAUSERESUMEREQUESTED, noEventData);
     }
 
     void IPCServerApp::RequestPlayerPauseStep()
     {
-        if (!clientBroker_)
+        if (!playerBroker_)
         {
             return;
         }
 
         VariantMap noEventData;
-        clientBroker_->PostMessage(E_PAUSESTEPREQUESTED, noEventData);
+        playerBroker_->PostMessage(E_PAUSESTEPREQUESTED, noEventData);
     }
 
     void IPCServerApp::RequestPlayerExit()
     {
-        if (!clientBroker_)
+        if (!playerBroker_)
         {
             return;
         }
 
         VariantMap noEventData;
-        clientBroker_->PostMessage(E_EXITREQUESTED, noEventData);
+        playerBroker_->PostMessage(E_EXITREQUESTED, noEventData);
     }
+
 }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-#pragma pop_macro("UndefPostMessage")
-#endif
+#pragma pop_macro("PostMessage")
