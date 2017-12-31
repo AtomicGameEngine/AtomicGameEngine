@@ -20,7 +20,7 @@ namespace Atomic
         virtual void Setup();
         virtual void Stop();
 
-        bool RunIPCClient(const String& projectName, const String& projectPath, const String &addArgs);
+        bool RunIPCPlayer(const String& projectName, const String& projectPath, const String &addArgs);
 
         void RequestTogglePlayerUpdatesPaused();
         void RequestPlayerPauseStep();
@@ -34,7 +34,9 @@ namespace Atomic
         void HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData);
         void HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData);        
         
-        SharedPtr<IPCBroker> clientBroker_;
+        SharedPtr<IPCBroker> playerBroker_;
+
+        bool playerEnabled_;
 
     };
 
