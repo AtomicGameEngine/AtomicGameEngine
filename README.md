@@ -43,7 +43,7 @@ The Atomic Editor can be built for your platform using these <a href="https://gi
 ##### Community
 
 <a href="https://discourse.atomicgameengine.com/">![](https://atomicgameengine.com/images/community/CommunitySupportPortal.png)</a>
-<a href="https://gitter.im/AtomicGameEngine/AtomicGameEngine/">![](https://atomicgameengine.com/images/community/Community_Chat.png)</a>
+<a href="https://gitter.im/AtomicGameEngine/AtomicGameEngine/">![](https://github.com/SamyBencherif/AtomicGameEngine/blob/master/chat.png)</a>
 <a href="https://atomicgameengine.com/blog/">![](https://atomicgameengine.com/images/community/Community_Blog.png)</a>
 
 ##### Documentation
