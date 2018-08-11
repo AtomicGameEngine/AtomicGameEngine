@@ -36,7 +36,7 @@ The Atomic Editor can be built for your platform using these <a href="https://gi
 
 ##### Community
 
-<a href="https://discourse.atomicgameengine.com/">Discourse</a>
+<a href="https://discourse.atomicgameengine.com/">Discourse</a>  
 <a href="https://gitter.im/AtomicGameEngine/AtomicGameEngine/">Gitter Chat</a>
 
 ##### Documentation
