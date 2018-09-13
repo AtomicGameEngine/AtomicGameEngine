@@ -1,6 +1,8 @@
 [AtomicLogo]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/Atomic-Game-Engine-512.png
 ![alt text][AtomicLogo]
 
+#### Please note that Atomic is no longer actively being developed or maintained. Issues will not be attended to, though PRs that fix build issues may be considered. The remainder of this README has been kept in place for future reference.
+
 Website: <a href="https://github.com/AtomicGameEngine/AtomicGameEngine" target="_blank">https://github.com/AtomicGameEngine/AtomicGameEngine</a>
 
 #### Why Atomic?
