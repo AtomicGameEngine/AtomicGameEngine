@@ -1007,7 +1007,7 @@ bool OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &an
                     startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
                 if (channel->mNumRotationKeys > 0)
                     startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
-                if (channel->mScalingKeys > 0)
+                if (channel->mScalingKeys != nullptr)
                     startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
             }
 
