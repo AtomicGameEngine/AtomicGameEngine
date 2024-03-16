@@ -101,4 +101,9 @@ namespace('build', function() {
 
   });
 
+  task('genvs2022', {
+    async: true
+  }, function() {
+    spawnCMake("VS2022");
+  });
 });// end of build namespace

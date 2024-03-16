@@ -1,30 +1,45 @@
 @echo OFF
 
-:: locate VS2017, this is done first as inside the conditional was having problems
-FOR /F "usebackq tokens=2,* skip=2" %%L IN (
-    `reg query ""HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7"" /v 15.0 2^> nul`
-) DO (SET ATOMIC_VS2017PATH=%%M)
+echo Setup VS Environment
+set RENGINE_VSWHERE=%~dp0..\..\Windows\vswhere.exe
+
+
+if "%1"=="VS2022" (
+  goto setup_vs_2022
+)
+
+if "%1"=="VS2019" (
+  goto setup_vs_2019
+)
 
 if "%1"=="VS2017" (
+  goto setup_vs_2017
+) 
 
-  if defined ATOMIC_VS2017PATH (
+goto setup_unsupported
 
-    set ATOMIC_CMAKE="%ATOMIC_VS2017PATH%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
-    set ATOMIC_CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+:setup_vs_2022
+  for /f "tokens=*" %%i in ('%RENGINE_VSWHERE% -version 17.0 -property installationPath') do set "RENGINE_VS_PATH=%%i"
+  set RENGINE_CMAKE_GENERATOR="Visual Studio 17 2022"
+  goto setup_vs
 
-    call "%ATOMIC_VS2017PATH%\Common7\Tools\VsDevCmd.bat"
+:setup_vs_2019
+  for /f "tokens=*" %%i in ('%RENGINE_VSWHERE% -version 16.0 -property installationPath') do set "RENGINE_VS_PATH=%%i"
+  set RENGINE_CMAKE_GENERATOR="Visual Studio 16 2019"
+  goto setup_vs
 
-  )
+:setup_vs_2017
+  for /f "tokens=*" %%i in ('%RENGINE_VSWHERE% -version 15.0 -property installationPath') do set "RENGINE_VS_PATH=%%i"
+  set RENGINE_CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+  goto setup_vs
 
-) else (
+:setup_vs
+  call "%RENGINE_VS_PATH%\Common7\Tools\VsDevCmd.bat"
+  goto end
 
-  if defined VS140COMNTOOLS (
+:setup_unsupported
+  echo Unsupported Visual Studio Version. Please Install the Latest Version of Visual Studio!
+  goto end
 
-    set ATOMIC_CMAKE=cmake
-    set ATOMIC_CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
-
-    call "%VS140COMNTOOLS%..\..\VC\bin\amd64\vcvars64.bat"
-
-  )
-
-)
+:end
+  echo Finish VS Setup Environment

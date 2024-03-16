@@ -77,13 +77,26 @@ namespace('build', function() {
 
     }
 
+    function getVisualStudioVersion() {
+        const expectedVersions = ['vs2015', 'vs2017', 'vs2022'];
+        const cfgKeys = Object.keys(config);
+        const vsver = cfgKeys.find(x => expectedVersions.indexOf(x) != -1);
+
+        if(!vsver) {
+            fail(`Invalid visual studio version. Use one of this [${expectedVersions.join(', ')}]`);
+            return;
+        }
+
+        return vsver.toUpperCase();
+    }
+
     task('atomiceditor_phase2', {
         async: true
     }, function() {
 
         process.chdir(buildDir);
 
-        var vsver = (config["vs2017"] ? "VS2017" : "VS2015");
+        const vsver = getVisualStudioVersion();
 
         var cmds = [];
         cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditorPhase2.bat " + config["config"] + " " + vsver);
@@ -122,7 +135,7 @@ namespace('build', function() {
 
         process.chdir(buildDir);
 
-        var vsver = (config["vs2017"] ? "VS2017" : "VS2015");
+        const vsver = getVisualStudioVersion();
 
         var cmds = [];
 

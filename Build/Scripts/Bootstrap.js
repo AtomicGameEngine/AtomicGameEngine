@@ -44,6 +44,7 @@ function printHelp() {
     if (os.platform() == "win32") {
       console.log("--vs2015        : Build with VS2015");
       console.log("--vs2017        : Build with VS2017");
+      console.log("--vs2022        : Build with VS2022");
       console.log("--opengl        : Enable OpenGL renderer");
       console.log("--d3d9          : Enable DirectX 9 renderer");
     }
