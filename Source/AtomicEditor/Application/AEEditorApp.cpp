@@ -165,7 +165,8 @@ namespace AtomicEditor
             ErrorExit("Error executing main.js");
         }
 
-        GetSubsystem<LicenseSystem>()->Initialize();
+        // uncomment this to enable license modal
+        //GetSubsystem<LicenseSystem>()->Initialize();
 
         Input* input = GetSubsystem<Input>();
         // Ensure exclusive fullscreen is disabled in Editor application
