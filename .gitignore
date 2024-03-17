@@ -23,4 +23,4 @@ Script/TypeScript/**/*.d.ts
 Script/Haxe/*
 **/.vscode
 .idea
-/node_modules/
+node_modules/
