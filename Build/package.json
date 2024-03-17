@@ -1,5 +1,17 @@
 {
   "name": "atomic-editor",
+  "license" : "MIT",
+  "author": {
+    "name": "Ruben Gomes",
+    "email": "rbnpontes@gmail.com"
+  },
+  "engines": {
+    "node" : ">=18.0.0"
+  },
+  "engineStrict": true,
+  "scripts": {
+    "build:vs2022" : "node ./Scripts/Bootstrap.js --task=build:genvs2022"
+  },
   "dependencies": {
     "dts-generator": "^2.0.0",
     "fs-extra": "^0.24.0",
